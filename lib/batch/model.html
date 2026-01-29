@@ -1,0 +1,2360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.model documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.model</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L1-L391" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import io
+
+from dataclasses import dataclass, field
+from typing import Generic, Iterable, TypeVar, Union
+
+from refinery.lib.batch.const import TILDE
+from refinery.lib.structures import FlagAccessMixin
+
+IntOrStr = TypeVar(&#39;IntOrStr&#39;, int, str)
+
+
+class Ctrl(str, enum.Enum):
+    Label               = &#39;:&#39;   # noqa;
+    Equals              = &#39;=&#39;   # noqa;
+    IsEqualTo           = &#39;==&#39;  # noqa;
+    NewGroup            = &#39;(&#39;   # noqa;
+#   The following can terminate a command:
+    EndGroup            = &#39;)&#39;   # noqa;
+    NewLine             = &#39;\n&#39;  # noqa;
+    RunOnSuccess        = &#39;&amp;&amp;&#39;  # noqa;
+    RunOnFailure        = &#39;||&#39;  # noqa;
+    CommandSeparator    = &#39;&amp;&#39;   # noqa;
+    Pipe                = &#39;|&#39;   # noqa;
+    EndOfFile           = &#39;&#39;    # noqa;
+
+    def __str__(self):
+        return self.value
+
+
+class Word(str):
+    pass
+
+
+class Expected(str):
+    pass
+
+
+class Redirect(str, enum.Enum):
+    Out = &#39;&gt;&#39;
+    OutAppend = &#39;&gt;&gt;&#39;
+    In = &#39;&lt;&#39;
+
+    def __str__(self):
+        return self.value
+
+
+@dataclass
+class RedirectIO:
+    type: Redirect
+    source: int
+    target: int | str = -1
+
+    @property
+    def target_is_file(self) -&gt; bool:
+        return isinstance(self.target, str)
+
+    @property
+    def outbound(self):
+        return self.type in (Redirect.Out, Redirect.OutAppend)
+
+    def __str__(self):
+        target = self.target
+        string = F&#39;{self.source}{self.type!s}&#39;
+        if target is None:
+            return string
+        return F&#39;{string}{target}&#39;
+
+    def isspace(self):
+        return False
+
+    def upper(self):
+        return None
+
+
+Token = Union[str, Ctrl, RedirectIO]
+
+
+class ArgVarFlags(FlagAccessMixin, enum.IntFlag):
+    Empty = 0
+
+    q = 0b0000_00001
+    d = 0b0000_00010
+    p = 0b0000_00100
+    n = 0b0000_01000
+    x = 0b0000_10000
+    s = 0b0001_00000
+    a = 0b0010_00000
+    t = 0b0100_00000
+    z = 0b1000_00000
+    f = d | p | n | x
+
+    StripQuotes = q # noqa
+    FullPath    = f # noqa
+    DriveLetter = d # noqa
+    PathOnly    = p # noqa
+    NameOnly    = n # noqa
+    Extension   = x # noqa
+    ShortName   = s # noqa
+    Attributes  = a # noqa
+    DateTime    = t # noqa
+    FileSize    = z # noqa
+
+    def __str__(self):
+        options = self.__class__
+        value = self.value
+        string = &#39;&#39;
+        for flag, char in (
+            (options.q, &#39;~&#39;),
+            (options.f, &#39;f&#39;),
+        ):
+            if value &amp; flag == flag:
+                string += char
+                value ^= flag
+        for flag in options:
+            if value &amp; flag == flag:
+                assert flag.name
+                string += flag.name
+        return string
+
+    @classmethod
+    def FromToken(cls, t: int):
+        if t == TILDE:
+            return cls(1)
+        return cls[chr(t)]
+
+
+@dataclass
+class ArgVar:
+    offset: int | ellipsis = 0
+    path: str | None = None
+    flags: ArgVarFlags = ArgVarFlags.Empty
+
+    def __str__(self):
+        k = self.offset
+        if k is (...):
+            assert self.path is None
+            assert self.flags is ArgVarFlags.Empty
+            return &#39;%*&#39;
+        p = F&#39;${p}&#39; if (p := self.path) is not None else &#39;&#39;
+        return F&#39;%{self.flags!s}{p}{k}&#39;
+
+
+class AstCondition(str, enum.Enum):
+    NoCheck = &#39;&amp;&#39;
+    Success = &#39;&amp;&amp;&#39;
+    Failure = &#39;||&#39;
+
+    @classmethod
+    def Try(cls, value):
+        try:
+            return cls(value)
+        except ValueError:
+            return None
+
+    def __str__(self):
+        return self.value
+
+
+@dataclass
+class AstNode:
+    offset: int
+
+
+@dataclass
+class AstStatement(AstNode):
+    ...
+
+
+@dataclass
+class AstLabel(AstStatement):
+    line: str = &#39;&#39;
+    label: str = &#39;&#39;
+
+
+@dataclass
+class AstCommand(AstNode):
+    tokens: list[str] = field(default_factory=list)
+    redirects: list[RedirectIO] = field(default_factory=list)
+
+
+@dataclass
+class AstSet(AstCommand):
+    name: str = &#34;&#34;
+    value: str = &#34;&#34;
+
+
+@dataclass
+class AstPipeline(AstStatement):
+    parts: list[AstCommand] = field(default_factory=list)
+
+
+@dataclass
+class AstConditionalStatement(AstNode):
+    condition: AstCondition
+    statement: AstStatement
+
+
+@dataclass
+class AstSequence(AstStatement):
+    head: AstStatement
+    tail: list[AstConditionalStatement] = field(default_factory=list)
+
+
+@dataclass
+class AstGroup(AstStatement):
+    sequences: list[AstSequence] = field(default_factory=list)
+
+
+class AstForVariant(str, enum.Enum):
+    D = &#39;D&#39;
+    R = &#39;R&#39;
+    L = &#39;L&#39;
+    F = &#39;F&#39;
+    Default = &#39;&#39;
+    MatchFolders = D
+    DescendRecursively = R
+    NumericLoop = L
+    FileParsing = F
+
+
+class AstForParserMode(enum.IntEnum):
+    FileSet = 0
+    Literal = 1
+    Command = 2
+
+
+@dataclass
+class AstForOptions:
+    comment: str | None = None
+    skip: int = 0
+    tokens: tuple[int, ...] = (0,)
+    asterisk: bool = False
+    delims: str = &#39;\x20\t&#39;
+    usebackq: bool = False
+
+
+@dataclass
+class AstFor(AstStatement):
+    variant: AstForVariant
+    variable: str
+    options: AstForOptions
+    body: AstStatement
+    spec: list[str] | range
+    path: str | None
+    mode: AstForParserMode
+
+    def strings(self):
+        spec = self.spec
+        if isinstance(spec, range):
+            spec = (str(k) for k in spec)
+        yield from spec
+
+
+class AstIfVariant(str, enum.Enum):
+    Defined = &#39;DEFINED&#39;             # IF DEFINED VARIABLE
+    CmdExtVersion = &#39;CMDEXTVERSION&#39; # IF CMDEXTVERSION NUMBER
+    Exist = &#39;EXIST&#39;                 # IF EXIST PATH
+    ErrorLevel = &#39;ERRORLEVEL&#39;       # IF ERRORLEVEL NUMBER
+
+
+class AstIfCmp(str, enum.Enum):
+    STR = &#39;==&#39;
+    EQU = &#39;EQU&#39;
+    NEQ = &#39;NEQ&#39;
+    LSS = &#39;LSS&#39;
+    LEQ = &#39;LEQ&#39;
+    GTR = &#39;GTR&#39;
+    GEQ = &#39;GEQ&#39;
+
+
+@dataclass
+class AstIf(AstStatement, Generic[IntOrStr]):
+    then_do: AstStatement
+    else_do: AstStatement | None = None
+    variant: AstIfVariant | None = None
+    casefold: bool = True
+    negated: bool = False
+    cmp: AstIfCmp | None = None
+    lhs: IntOrStr | None = None
+    rhs: IntOrStr | None = None
+
+    @property
+    def var_int(self):
+        var = self.lhs
+        if not isinstance(var, int):
+            raise RuntimeError
+        return var
+
+    @property
+    def var_str(self):
+        var = self.lhs
+        if not isinstance(var, str):
+            raise RuntimeError
+        return var
+
+
+class If(enum.IntFlag):
+    Inactive = 0b0000
+    Active = 0b0001
+    Block = 0b0010
+    Then = 0b0100
+    Else = 0b1000
+
+    def skip_block(self):
+        skip = If.Then not in self
+        if If.Else in self:
+            skip = not skip
+        return skip
+
+
+class EmulatorException(Exception):
+    pass
+
+
+class EmulatorLongJump(EmulatorException):
+    pass
+
+
+class Goto(EmulatorLongJump):
+    def __init__(self, label: str):
+        self.label = label
+
+
+class Call(EmulatorLongJump):
+    def __init__(self, label: str, offset: int):
+        self.label = label
+        self.offset = offset
+
+
+class Exit(EmulatorLongJump):
+    def __init__(self, code: int, exit: bool):
+        self.code = code
+        self.exit = exit
+
+
+class UnexpectedEOF(EmulatorException, EOFError):
+    pass
+
+
+class UnexpectedToken(EmulatorException):
+    def __init__(self, token, msg: str | None = None) -&gt; None:
+        if isinstance(token, int):
+            token = chr(token)
+        else:
+            token = str(token)
+        end = msg and F&#39;: {msg}&#39; or &#39;.&#39;
+        super().__init__(F&#39;The token &#34;{token}&#34; was unexpected{end}&#39;)
+
+
+class UnexpectedFirstToken(UnexpectedToken):
+    def __init__(self, token: str | int) -&gt; None:
+        super().__init__(token, &#39;This token may not occur as the first token in a line.&#39;)
+
+
+class InvalidLabel(EmulatorException):
+    def __init__(self, label: str):
+        self.label = label
+
+    def __str__(self):
+        return F&#39;The following label was not found: {self.label}&#39;
+
+
+class EmulatorCommand:
+    argv: list[str]
+    args: list[str]
+    verb: str
+
+    def __init__(self, tokens: Iterable[str]):
+        self.argv = list(tokens)
+        self.args = []
+        self.verb = &#39;&#39;
+        argstr = io.StringIO()
+        for token in self.argv:
+            if token.isspace():
+                if self.verb:
+                    argstr.write(token)
+                continue
+            if not self.verb:
+                self.verb = token.strip()
+                continue
+            self.args.append(token)
+            argstr.write(token)
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = argstr.getvalue().lstrip()
+
+    def __str__(self):
+        return &#39;&#39;.join(self.argv).lstrip()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.model.Ctrl"><code class="flex name class">
+<span>class <span class="ident">Ctrl</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L15-L30" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ctrl(str, enum.Enum):
+    Label               = &#39;:&#39;   # noqa;
+    Equals              = &#39;=&#39;   # noqa;
+    IsEqualTo           = &#39;==&#39;  # noqa;
+    NewGroup            = &#39;(&#39;   # noqa;
+#   The following can terminate a command:
+    EndGroup            = &#39;)&#39;   # noqa;
+    NewLine             = &#39;\n&#39;  # noqa;
+    RunOnSuccess        = &#39;&amp;&amp;&#39;  # noqa;
+    RunOnFailure        = &#39;||&#39;  # noqa;
+    CommandSeparator    = &#39;&amp;&#39;   # noqa;
+    Pipe                = &#39;|&#39;   # noqa;
+    EndOfFile           = &#39;&#39;    # noqa;
+
+    def __str__(self):
+        return self.value</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.Ctrl.Label"><code class="name">var <span class="ident">Label</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.Equals"><code class="name">var <span class="ident">Equals</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.IsEqualTo"><code class="name">var <span class="ident">IsEqualTo</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.NewGroup"><code class="name">var <span class="ident">NewGroup</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.EndGroup"><code class="name">var <span class="ident">EndGroup</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.NewLine"><code class="name">var <span class="ident">NewLine</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.RunOnSuccess"><code class="name">var <span class="ident">RunOnSuccess</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.RunOnFailure"><code class="name">var <span class="ident">RunOnFailure</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.CommandSeparator"><code class="name">var <span class="ident">CommandSeparator</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.Pipe"><code class="name">var <span class="ident">Pipe</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Ctrl.EndOfFile"><code class="name">var <span class="ident">EndOfFile</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.Word"><code class="flex name class">
+<span>class <span class="ident">Word</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L33-L34" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Word(str):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.Expected"><code class="flex name class">
+<span>class <span class="ident">Expected</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L37-L38" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Expected(str):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.Redirect"><code class="flex name class">
+<span>class <span class="ident">Redirect</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L41-L47" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Redirect(str, enum.Enum):
+    Out = &#39;&gt;&#39;
+    OutAppend = &#39;&gt;&gt;&#39;
+    In = &#39;&lt;&#39;
+
+    def __str__(self):
+        return self.value</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.Redirect.Out"><code class="name">var <span class="ident">Out</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Redirect.OutAppend"><code class="name">var <span class="ident">OutAppend</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.Redirect.In"><code class="name">var <span class="ident">In</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.RedirectIO"><code class="flex name class">
+<span>class <span class="ident">RedirectIO</span></span>
+<span>(</span><span>type, source, target=-1)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>RedirectIO(type: 'Redirect', source: 'int', target: 'int | str' = -1)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L50-L75" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class RedirectIO:
+    type: Redirect
+    source: int
+    target: int | str = -1
+
+    @property
+    def target_is_file(self) -&gt; bool:
+        return isinstance(self.target, str)
+
+    @property
+    def outbound(self):
+        return self.type in (Redirect.Out, Redirect.OutAppend)
+
+    def __str__(self):
+        target = self.target
+        string = F&#39;{self.source}{self.type!s}&#39;
+        if target is None:
+            return string
+        return F&#39;{string}{target}&#39;
+
+    def isspace(self):
+        return False
+
+    def upper(self):
+        return None</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.RedirectIO.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.RedirectIO.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.RedirectIO.target"><code class="name">var <span class="ident">target</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.RedirectIO.target_is_file"><code class="name">var <span class="ident">target_is_file</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L56-L58" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def target_is_file(self) -&gt; bool:
+    return isinstance(self.target, str)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.model.RedirectIO.outbound"><code class="name">var <span class="ident">outbound</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L60-L62" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def outbound(self):
+    return self.type in (Redirect.Out, Redirect.OutAppend)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.model.RedirectIO.isspace"><code class="name flex">
+<span>def <span class="ident">isspace</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L71-L72" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def isspace(self):
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.model.RedirectIO.upper"><code class="name flex">
+<span>def <span class="ident">upper</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L74-L75" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def upper(self):
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags"><code class="flex name class">
+<span>class <span class="ident">ArgVarFlags</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>This class can be mixed into an <code>enum.IntFlag</code> for some quality of life improvements. Firstly,
+you can now access flags as follows:</p>
+<pre><code>class Flags(FlagAccessMixin, enum.IntFlag):
+    IsBinary = 1
+    IsCompressed = 2
+
+flag = Flags(3)
+
+if flag.IsCompressed:
+    decompress()
+</code></pre>
+<p>Furthermore, flag values can be enumerated:</p>
+<pre><code>&gt;&gt;&gt; list(flag)
+[IsBinary, IsCompressed]
+&gt;&gt;&gt; flag
+IsBinary|IsCompressed
+</code></pre>
+<p>And finally, as visible from the above output, flag values are represented by their name by
+default.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L81-L127" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ArgVarFlags(FlagAccessMixin, enum.IntFlag):
+    Empty = 0
+
+    q = 0b0000_00001
+    d = 0b0000_00010
+    p = 0b0000_00100
+    n = 0b0000_01000
+    x = 0b0000_10000
+    s = 0b0001_00000
+    a = 0b0010_00000
+    t = 0b0100_00000
+    z = 0b1000_00000
+    f = d | p | n | x
+
+    StripQuotes = q # noqa
+    FullPath    = f # noqa
+    DriveLetter = d # noqa
+    PathOnly    = p # noqa
+    NameOnly    = n # noqa
+    Extension   = x # noqa
+    ShortName   = s # noqa
+    Attributes  = a # noqa
+    DateTime    = t # noqa
+    FileSize    = z # noqa
+
+    def __str__(self):
+        options = self.__class__
+        value = self.value
+        string = &#39;&#39;
+        for flag, char in (
+            (options.q, &#39;~&#39;),
+            (options.f, &#39;f&#39;),
+        ):
+            if value &amp; flag == flag:
+                string += char
+                value ^= flag
+        for flag in options:
+            if value &amp; flag == flag:
+                assert flag.name
+                string += flag.name
+        return string
+
+    @classmethod
+    def FromToken(cls, t: int):
+        if t == TILDE:
+            return cls(1)
+        return cls[chr(t)]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.FlagAccessMixin" href="../structures.html#refinery.lib.structures.FlagAccessMixin">FlagAccessMixin</a></li>
+<li>enum.IntFlag</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Flag</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.ArgVarFlags.Empty"><code class="name">var <span class="ident">Empty</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.q"><code class="name">var <span class="ident">q</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.d"><code class="name">var <span class="ident">d</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.p"><code class="name">var <span class="ident">p</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.n"><code class="name">var <span class="ident">n</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.x"><code class="name">var <span class="ident">x</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.s"><code class="name">var <span class="ident">s</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.a"><code class="name">var <span class="ident">a</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.t"><code class="name">var <span class="ident">t</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.z"><code class="name">var <span class="ident">z</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.f"><code class="name">var <span class="ident">f</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.StripQuotes"><code class="name">var <span class="ident">StripQuotes</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.FullPath"><code class="name">var <span class="ident">FullPath</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.DriveLetter"><code class="name">var <span class="ident">DriveLetter</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.PathOnly"><code class="name">var <span class="ident">PathOnly</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.NameOnly"><code class="name">var <span class="ident">NameOnly</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.Extension"><code class="name">var <span class="ident">Extension</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.ShortName"><code class="name">var <span class="ident">ShortName</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.Attributes"><code class="name">var <span class="ident">Attributes</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.DateTime"><code class="name">var <span class="ident">DateTime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVarFlags.FileSize"><code class="name">var <span class="ident">FileSize</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.batch.model.ArgVarFlags.FromToken"><code class="name flex">
+<span>def <span class="ident">FromToken</span></span>(<span>t)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVar"><code class="flex name class">
+<span>class <span class="ident">ArgVar</span></span>
+<span>(</span><span>offset=0, path=None, flags=Empty)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>ArgVar(offset: 'int | ellipsis' = 0, path: 'str | None' = None, flags: 'ArgVarFlags' = Empty)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L130-L143" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class ArgVar:
+    offset: int | ellipsis = 0
+    path: str | None = None
+    flags: ArgVarFlags = ArgVarFlags.Empty
+
+    def __str__(self):
+        k = self.offset
+        if k is (...):
+            assert self.path is None
+            assert self.flags is ArgVarFlags.Empty
+            return &#39;%*&#39;
+        p = F&#39;${p}&#39; if (p := self.path) is not None else &#39;&#39;
+        return F&#39;%{self.flags!s}{p}{k}&#39;</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.ArgVar.offset"><code class="name">var <span class="ident">offset</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVar.path"><code class="name">var <span class="ident">path</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.ArgVar.flags"><code class="name">var <span class="ident">flags</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstCondition"><code class="flex name class">
+<span>class <span class="ident">AstCondition</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L146-L159" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AstCondition(str, enum.Enum):
+    NoCheck = &#39;&amp;&#39;
+    Success = &#39;&amp;&amp;&#39;
+    Failure = &#39;||&#39;
+
+    @classmethod
+    def Try(cls, value):
+        try:
+            return cls(value)
+        except ValueError:
+            return None
+
+    def __str__(self):
+        return self.value</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstCondition.NoCheck"><code class="name">var <span class="ident">NoCheck</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstCondition.Success"><code class="name">var <span class="ident">Success</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstCondition.Failure"><code class="name">var <span class="ident">Failure</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstCondition.Try"><code class="name flex">
+<span>def <span class="ident">Try</span></span>(<span>value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstNode"><code class="flex name class">
+<span>class <span class="ident">AstNode</span></span>
+<span>(</span><span>offset)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstNode(offset: 'int')</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L162-L164" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstNode:
+    offset: int</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstCommand" href="#refinery.lib.batch.model.AstCommand">AstCommand</a></li>
+<li><a title="refinery.lib.batch.model.AstConditionalStatement" href="#refinery.lib.batch.model.AstConditionalStatement">AstConditionalStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstNode.offset"><code class="name">var <span class="ident">offset</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstStatement"><code class="flex name class">
+<span>class <span class="ident">AstStatement</span></span>
+<span>(</span><span>offset)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstStatement(offset: 'int')</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L167-L169" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstStatement(AstNode):
+    ...</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstFor" href="#refinery.lib.batch.model.AstFor">AstFor</a></li>
+<li><a title="refinery.lib.batch.model.AstGroup" href="#refinery.lib.batch.model.AstGroup">AstGroup</a></li>
+<li><a title="refinery.lib.batch.model.AstIf" href="#refinery.lib.batch.model.AstIf">AstIf</a></li>
+<li><a title="refinery.lib.batch.model.AstLabel" href="#refinery.lib.batch.model.AstLabel">AstLabel</a></li>
+<li><a title="refinery.lib.batch.model.AstPipeline" href="#refinery.lib.batch.model.AstPipeline">AstPipeline</a></li>
+<li><a title="refinery.lib.batch.model.AstSequence" href="#refinery.lib.batch.model.AstSequence">AstSequence</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstNode.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstLabel"><code class="flex name class">
+<span>class <span class="ident">AstLabel</span></span>
+<span>(</span><span>offset, line='', label='')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstLabel(offset: 'int', line: 'str' = '', label: 'str' = '')</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L172-L175" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstLabel(AstStatement):
+    line: str = &#39;&#39;
+    label: str = &#39;&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstLabel.line"><code class="name">var <span class="ident">line</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstLabel.label"><code class="name">var <span class="ident">label</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstStatement.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstCommand"><code class="flex name class">
+<span>class <span class="ident">AstCommand</span></span>
+<span>(</span><span>offset, tokens=&lt;factory&gt;, redirects=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstCommand(offset: 'int', tokens: 'list[str]' = <factory>, redirects: 'list[RedirectIO]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L178-L181" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstCommand(AstNode):
+    tokens: list[str] = field(default_factory=list)
+    redirects: list[RedirectIO] = field(default_factory=list)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstSet" href="#refinery.lib.batch.model.AstSet">AstSet</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstCommand.tokens"><code class="name">var <span class="ident">tokens</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstCommand.redirects"><code class="name">var <span class="ident">redirects</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstNode.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstSet"><code class="flex name class">
+<span>class <span class="ident">AstSet</span></span>
+<span>(</span><span>offset, tokens=&lt;factory&gt;, redirects=&lt;factory&gt;, name='', value='')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstSet(offset: 'int', tokens: 'list[str]' = <factory>, redirects: 'list[RedirectIO]' = <factory>, name: 'str' = '', value: 'str' = '')</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L184-L187" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstSet(AstCommand):
+    name: str = &#34;&#34;
+    value: str = &#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstCommand" href="#refinery.lib.batch.model.AstCommand">AstCommand</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstSet.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstSet.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstCommand" href="#refinery.lib.batch.model.AstCommand">AstCommand</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstCommand.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+<li><code><a title="refinery.lib.batch.model.AstCommand.redirects" href="#refinery.lib.batch.model.AstCommand.redirects">redirects</a></code></li>
+<li><code><a title="refinery.lib.batch.model.AstCommand.tokens" href="#refinery.lib.batch.model.AstCommand.tokens">tokens</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstPipeline"><code class="flex name class">
+<span>class <span class="ident">AstPipeline</span></span>
+<span>(</span><span>offset, parts=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstPipeline(offset: 'int', parts: 'list[AstCommand]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L190-L192" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstPipeline(AstStatement):
+    parts: list[AstCommand] = field(default_factory=list)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstPipeline.parts"><code class="name">var <span class="ident">parts</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstStatement.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstConditionalStatement"><code class="flex name class">
+<span>class <span class="ident">AstConditionalStatement</span></span>
+<span>(</span><span>offset, condition, statement)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstConditionalStatement(offset: 'int', condition: 'AstCondition', statement: 'AstStatement')</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L195-L198" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstConditionalStatement(AstNode):
+    condition: AstCondition
+    statement: AstStatement</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstConditionalStatement.condition"><code class="name">var <span class="ident">condition</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstConditionalStatement.statement"><code class="name">var <span class="ident">statement</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstNode.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstSequence"><code class="flex name class">
+<span>class <span class="ident">AstSequence</span></span>
+<span>(</span><span>offset, head, tail=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstSequence(offset: 'int', head: 'AstStatement', tail: 'list[AstConditionalStatement]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L201-L204" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstSequence(AstStatement):
+    head: AstStatement
+    tail: list[AstConditionalStatement] = field(default_factory=list)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstSequence.head"><code class="name">var <span class="ident">head</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstSequence.tail"><code class="name">var <span class="ident">tail</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstStatement.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstGroup"><code class="flex name class">
+<span>class <span class="ident">AstGroup</span></span>
+<span>(</span><span>offset, sequences=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstGroup(offset: 'int', sequences: 'list[AstSequence]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L207-L209" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstGroup(AstStatement):
+    sequences: list[AstSequence] = field(default_factory=list)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstGroup.sequences"><code class="name">var <span class="ident">sequences</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstStatement.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant"><code class="flex name class">
+<span>class <span class="ident">AstForVariant</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L212-L221" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AstForVariant(str, enum.Enum):
+    D = &#39;D&#39;
+    R = &#39;R&#39;
+    L = &#39;L&#39;
+    F = &#39;F&#39;
+    Default = &#39;&#39;
+    MatchFolders = D
+    DescendRecursively = R
+    NumericLoop = L
+    FileParsing = F</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstForVariant.D"><code class="name">var <span class="ident">D</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.R"><code class="name">var <span class="ident">R</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.L"><code class="name">var <span class="ident">L</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.F"><code class="name">var <span class="ident">F</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.Default"><code class="name">var <span class="ident">Default</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.MatchFolders"><code class="name">var <span class="ident">MatchFolders</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.DescendRecursively"><code class="name">var <span class="ident">DescendRecursively</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.NumericLoop"><code class="name">var <span class="ident">NumericLoop</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForVariant.FileParsing"><code class="name">var <span class="ident">FileParsing</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstForParserMode"><code class="flex name class">
+<span>class <span class="ident">AstForParserMode</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L224-L227" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AstForParserMode(enum.IntEnum):
+    FileSet = 0
+    Literal = 1
+    Command = 2</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstForParserMode.FileSet"><code class="name">var <span class="ident">FileSet</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForParserMode.Literal"><code class="name">var <span class="ident">Literal</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForParserMode.Command"><code class="name">var <span class="ident">Command</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstForOptions"><code class="flex name class">
+<span>class <span class="ident">AstForOptions</span></span>
+<span>(</span><span>comment=None, skip=0, tokens=(0,), asterisk=False, delims=' \t', usebackq=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstForOptions(comment: 'str | None' = None, skip: 'int' = 0, tokens: 'tuple[int, &hellip;]' = (0,), asterisk: 'bool' = False, delims: 'str' = ' \t', usebackq: 'bool' = False)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L230-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstForOptions:
+    comment: str | None = None
+    skip: int = 0
+    tokens: tuple[int, ...] = (0,)
+    asterisk: bool = False
+    delims: str = &#39;\x20\t&#39;
+    usebackq: bool = False</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstForOptions.comment"><code class="name">var <span class="ident">comment</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForOptions.skip"><code class="name">var <span class="ident">skip</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForOptions.tokens"><code class="name">var <span class="ident">tokens</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForOptions.asterisk"><code class="name">var <span class="ident">asterisk</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForOptions.delims"><code class="name">var <span class="ident">delims</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstForOptions.usebackq"><code class="name">var <span class="ident">usebackq</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor"><code class="flex name class">
+<span>class <span class="ident">AstFor</span></span>
+<span>(</span><span>offset, variant, variable, options, body, spec, path, mode)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstFor(offset: 'int', variant: 'AstForVariant', variable: 'str', options: 'AstForOptions', body: 'AstStatement', spec: 'list[str] | range', path: 'str | None', mode: 'AstForParserMode')</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L240-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstFor(AstStatement):
+    variant: AstForVariant
+    variable: str
+    options: AstForOptions
+    body: AstStatement
+    spec: list[str] | range
+    path: str | None
+    mode: AstForParserMode
+
+    def strings(self):
+        spec = self.spec
+        if isinstance(spec, range):
+            spec = (str(k) for k in spec)
+        yield from spec</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstFor.variant"><code class="name">var <span class="ident">variant</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor.variable"><code class="name">var <span class="ident">variable</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor.options"><code class="name">var <span class="ident">options</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor.body"><code class="name">var <span class="ident">body</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor.spec"><code class="name">var <span class="ident">spec</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor.path"><code class="name">var <span class="ident">path</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstFor.mode"><code class="name">var <span class="ident">mode</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstFor.strings"><code class="name flex">
+<span>def <span class="ident">strings</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L250-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def strings(self):
+    spec = self.spec
+    if isinstance(spec, range):
+        spec = (str(k) for k in spec)
+    yield from spec</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstStatement.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfVariant"><code class="flex name class">
+<span>class <span class="ident">AstIfVariant</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L257-L261" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AstIfVariant(str, enum.Enum):
+    Defined = &#39;DEFINED&#39;             # IF DEFINED VARIABLE
+    CmdExtVersion = &#39;CMDEXTVERSION&#39; # IF CMDEXTVERSION NUMBER
+    Exist = &#39;EXIST&#39;                 # IF EXIST PATH
+    ErrorLevel = &#39;ERRORLEVEL&#39;       # IF ERRORLEVEL NUMBER</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstIfVariant.Defined"><code class="name">var <span class="ident">Defined</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfVariant.CmdExtVersion"><code class="name">var <span class="ident">CmdExtVersion</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfVariant.Exist"><code class="name">var <span class="ident">Exist</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfVariant.ErrorLevel"><code class="name">var <span class="ident">ErrorLevel</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp"><code class="flex name class">
+<span>class <span class="ident">AstIfCmp</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L264-L271" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AstIfCmp(str, enum.Enum):
+    STR = &#39;==&#39;
+    EQU = &#39;EQU&#39;
+    NEQ = &#39;NEQ&#39;
+    LSS = &#39;LSS&#39;
+    LEQ = &#39;LEQ&#39;
+    GTR = &#39;GTR&#39;
+    GEQ = &#39;GEQ&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstIfCmp.STR"><code class="name">var <span class="ident">STR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp.EQU"><code class="name">var <span class="ident">EQU</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp.NEQ"><code class="name">var <span class="ident">NEQ</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp.LSS"><code class="name">var <span class="ident">LSS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp.LEQ"><code class="name">var <span class="ident">LEQ</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp.GTR"><code class="name">var <span class="ident">GTR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIfCmp.GEQ"><code class="name">var <span class="ident">GEQ</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf"><code class="flex name class">
+<span>class <span class="ident">AstIf</span></span>
+<span>(</span><span>offset, then_do, else_do=None, variant=None, casefold=True, negated=False, cmp=None, lhs=None, rhs=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>AstIf(offset: 'int', then_do: 'AstStatement', else_do: 'AstStatement | None' = None, variant: 'AstIfVariant | None' = None, casefold: 'bool' = True, negated: 'bool' = False, cmp: 'AstIfCmp | None' = None, lhs: 'IntOrStr | None' = None, rhs: 'IntOrStr | None' = None)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L274-L297" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class AstIf(AstStatement, Generic[IntOrStr]):
+    then_do: AstStatement
+    else_do: AstStatement | None = None
+    variant: AstIfVariant | None = None
+    casefold: bool = True
+    negated: bool = False
+    cmp: AstIfCmp | None = None
+    lhs: IntOrStr | None = None
+    rhs: IntOrStr | None = None
+
+    @property
+    def var_int(self):
+        var = self.lhs
+        if not isinstance(var, int):
+            raise RuntimeError
+        return var
+
+    @property
+    def var_str(self):
+        var = self.lhs
+        if not isinstance(var, str):
+            raise RuntimeError
+        return var</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></li>
+<li><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></li>
+<li>typing.Generic</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.AstIf.then_do"><code class="name">var <span class="ident">then_do</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.else_do"><code class="name">var <span class="ident">else_do</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.variant"><code class="name">var <span class="ident">variant</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.casefold"><code class="name">var <span class="ident">casefold</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.negated"><code class="name">var <span class="ident">negated</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.cmp"><code class="name">var <span class="ident">cmp</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.lhs"><code class="name">var <span class="ident">lhs</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.rhs"><code class="name">var <span class="ident">rhs</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.var_int"><code class="name">var <span class="ident">var_int</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L285-L290" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def var_int(self):
+    var = self.lhs
+    if not isinstance(var, int):
+        raise RuntimeError
+    return var</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.model.AstIf.var_str"><code class="name">var <span class="ident">var_str</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L292-L297" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def var_str(self):
+    var = self.lhs
+    if not isinstance(var, str):
+        raise RuntimeError
+    return var</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.batch.model.AstStatement.offset" href="#refinery.lib.batch.model.AstNode.offset">offset</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.If"><code class="flex name class">
+<span>class <span class="ident">If</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Support for integer-based Flags</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L300-L311" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class If(enum.IntFlag):
+    Inactive = 0b0000
+    Active = 0b0001
+    Block = 0b0010
+    Then = 0b0100
+    Else = 0b1000
+
+    def skip_block(self):
+        skip = If.Then not in self
+        if If.Else in self:
+            skip = not skip
+        return skip</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntFlag</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Flag</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.If.Inactive"><code class="name">var <span class="ident">Inactive</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.If.Active"><code class="name">var <span class="ident">Active</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.If.Block"><code class="name">var <span class="ident">Block</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.If.Then"><code class="name">var <span class="ident">Then</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.If.Else"><code class="name">var <span class="ident">Else</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.model.If.skip_block"><code class="name flex">
+<span>def <span class="ident">skip_block</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L307-L311" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def skip_block(self):
+    skip = If.Then not in self
+    if If.Else in self:
+        skip = not skip
+    return skip</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.model.EmulatorException"><code class="flex name class">
+<span>class <span class="ident">EmulatorException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L314-L315" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class EmulatorException(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorLongJump" href="#refinery.lib.batch.model.EmulatorLongJump">EmulatorLongJump</a></li>
+<li><a title="refinery.lib.batch.model.InvalidLabel" href="#refinery.lib.batch.model.InvalidLabel">InvalidLabel</a></li>
+<li><a title="refinery.lib.batch.model.UnexpectedEOF" href="#refinery.lib.batch.model.UnexpectedEOF">UnexpectedEOF</a></li>
+<li><a title="refinery.lib.batch.model.UnexpectedToken" href="#refinery.lib.batch.model.UnexpectedToken">UnexpectedToken</a></li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.EmulatorLongJump"><code class="flex name class">
+<span>class <span class="ident">EmulatorLongJump</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L318-L319" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class EmulatorLongJump(EmulatorException):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.Call" href="#refinery.lib.batch.model.Call">Call</a></li>
+<li><a title="refinery.lib.batch.model.Exit" href="#refinery.lib.batch.model.Exit">Exit</a></li>
+<li><a title="refinery.lib.batch.model.Goto" href="#refinery.lib.batch.model.Goto">Goto</a></li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.Goto"><code class="flex name class">
+<span>class <span class="ident">Goto</span></span>
+<span>(</span><span>label)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L322-L324" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Goto(EmulatorLongJump):
+    def __init__(self, label: str):
+        self.label = label</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorLongJump" href="#refinery.lib.batch.model.EmulatorLongJump">EmulatorLongJump</a></li>
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.Call"><code class="flex name class">
+<span>class <span class="ident">Call</span></span>
+<span>(</span><span>label, offset)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L327-L330" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Call(EmulatorLongJump):
+    def __init__(self, label: str, offset: int):
+        self.label = label
+        self.offset = offset</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorLongJump" href="#refinery.lib.batch.model.EmulatorLongJump">EmulatorLongJump</a></li>
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.Exit"><code class="flex name class">
+<span>class <span class="ident">Exit</span></span>
+<span>(</span><span>code, exit)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L333-L336" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Exit(EmulatorLongJump):
+    def __init__(self, code: int, exit: bool):
+        self.code = code
+        self.exit = exit</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorLongJump" href="#refinery.lib.batch.model.EmulatorLongJump">EmulatorLongJump</a></li>
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.UnexpectedEOF"><code class="flex name class">
+<span>class <span class="ident">UnexpectedEOF</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read beyond end of file.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L339-L340" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UnexpectedEOF(EmulatorException, EOFError):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.EOFError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.UnexpectedToken"><code class="flex name class">
+<span>class <span class="ident">UnexpectedToken</span></span>
+<span>(</span><span>token, msg=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L343-L350" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UnexpectedToken(EmulatorException):
+    def __init__(self, token, msg: str | None = None) -&gt; None:
+        if isinstance(token, int):
+            token = chr(token)
+        else:
+            token = str(token)
+        end = msg and F&#39;: {msg}&#39; or &#39;.&#39;
+        super().__init__(F&#39;The token &#34;{token}&#34; was unexpected{end}&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.UnexpectedFirstToken" href="#refinery.lib.batch.model.UnexpectedFirstToken">UnexpectedFirstToken</a></li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.UnexpectedFirstToken"><code class="flex name class">
+<span>class <span class="ident">UnexpectedFirstToken</span></span>
+<span>(</span><span>token)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L353-L355" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UnexpectedFirstToken(UnexpectedToken):
+    def __init__(self, token: str | int) -&gt; None:
+        super().__init__(token, &#39;This token may not occur as the first token in a line.&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.UnexpectedToken" href="#refinery.lib.batch.model.UnexpectedToken">UnexpectedToken</a></li>
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.InvalidLabel"><code class="flex name class">
+<span>class <span class="ident">InvalidLabel</span></span>
+<span>(</span><span>label)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L358-L363" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class InvalidLabel(EmulatorException):
+    def __init__(self, label: str):
+        self.label = label
+
+    def __str__(self):
+        return F&#39;The following label was not found: {self.label}&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.model.EmulatorCommand"><code class="flex name class">
+<span>class <span class="ident">EmulatorCommand</span></span>
+<span>(</span><span>tokens)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/831eea3615c91ffc226c68f2c853427e471cf066/refinery/lib/batch/model.py#L366-L391" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class EmulatorCommand:
+    argv: list[str]
+    args: list[str]
+    verb: str
+
+    def __init__(self, tokens: Iterable[str]):
+        self.argv = list(tokens)
+        self.args = []
+        self.verb = &#39;&#39;
+        argstr = io.StringIO()
+        for token in self.argv:
+            if token.isspace():
+                if self.verb:
+                    argstr.write(token)
+                continue
+            if not self.verb:
+                self.verb = token.strip()
+                continue
+            self.args.append(token)
+            argstr.write(token)
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = argstr.getvalue().lstrip()
+
+    def __str__(self):
+        return &#39;&#39;.join(self.argv).lstrip()</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.model.EmulatorCommand.argv"><code class="name">var <span class="ident">argv</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.EmulatorCommand.args"><code class="name">var <span class="ident">args</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.model.EmulatorCommand.verb"><code class="name">var <span class="ident">verb</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Ctrl" href="#refinery.lib.batch.model.Ctrl">Ctrl</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Word" href="#refinery.lib.batch.model.Word">Word</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Expected" href="#refinery.lib.batch.model.Expected">Expected</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Redirect" href="#refinery.lib.batch.model.Redirect">Redirect</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.RedirectIO" href="#refinery.lib.batch.model.RedirectIO">RedirectIO</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.model.RedirectIO.isspace" href="#refinery.lib.batch.model.RedirectIO.isspace">isspace</a></code></li>
+<li><code><a title="refinery.lib.batch.model.RedirectIO.upper" href="#refinery.lib.batch.model.RedirectIO.upper">upper</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.ArgVarFlags" href="#refinery.lib.batch.model.ArgVarFlags">ArgVarFlags</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.model.ArgVarFlags.FromToken" href="#refinery.lib.batch.model.ArgVarFlags.FromToken">FromToken</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.ArgVar" href="#refinery.lib.batch.model.ArgVar">ArgVar</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstCondition" href="#refinery.lib.batch.model.AstCondition">AstCondition</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.model.AstCondition.Try" href="#refinery.lib.batch.model.AstCondition.Try">Try</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstNode" href="#refinery.lib.batch.model.AstNode">AstNode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstStatement" href="#refinery.lib.batch.model.AstStatement">AstStatement</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstLabel" href="#refinery.lib.batch.model.AstLabel">AstLabel</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstCommand" href="#refinery.lib.batch.model.AstCommand">AstCommand</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstSet" href="#refinery.lib.batch.model.AstSet">AstSet</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstPipeline" href="#refinery.lib.batch.model.AstPipeline">AstPipeline</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstConditionalStatement" href="#refinery.lib.batch.model.AstConditionalStatement">AstConditionalStatement</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstSequence" href="#refinery.lib.batch.model.AstSequence">AstSequence</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstGroup" href="#refinery.lib.batch.model.AstGroup">AstGroup</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstForVariant" href="#refinery.lib.batch.model.AstForVariant">AstForVariant</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstForParserMode" href="#refinery.lib.batch.model.AstForParserMode">AstForParserMode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstForOptions" href="#refinery.lib.batch.model.AstForOptions">AstForOptions</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstFor" href="#refinery.lib.batch.model.AstFor">AstFor</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.model.AstFor.strings" href="#refinery.lib.batch.model.AstFor.strings">strings</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstIfVariant" href="#refinery.lib.batch.model.AstIfVariant">AstIfVariant</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstIfCmp" href="#refinery.lib.batch.model.AstIfCmp">AstIfCmp</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.AstIf" href="#refinery.lib.batch.model.AstIf">AstIf</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.If" href="#refinery.lib.batch.model.If">If</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.model.If.skip_block" href="#refinery.lib.batch.model.If.skip_block">skip_block</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.EmulatorException" href="#refinery.lib.batch.model.EmulatorException">EmulatorException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.EmulatorLongJump" href="#refinery.lib.batch.model.EmulatorLongJump">EmulatorLongJump</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Goto" href="#refinery.lib.batch.model.Goto">Goto</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Call" href="#refinery.lib.batch.model.Call">Call</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.Exit" href="#refinery.lib.batch.model.Exit">Exit</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.UnexpectedEOF" href="#refinery.lib.batch.model.UnexpectedEOF">UnexpectedEOF</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.UnexpectedToken" href="#refinery.lib.batch.model.UnexpectedToken">UnexpectedToken</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.UnexpectedFirstToken" href="#refinery.lib.batch.model.UnexpectedFirstToken">UnexpectedFirstToken</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.InvalidLabel" href="#refinery.lib.batch.model.InvalidLabel">InvalidLabel</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.model.EmulatorCommand" href="#refinery.lib.batch.model.EmulatorCommand">EmulatorCommand</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
