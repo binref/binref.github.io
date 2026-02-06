@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.emulator documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.emulator</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L1-L373" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import fnmatch
+import re
+
+from typing import Callable, ClassVar, Generator
+
+from refinery.lib.batch.model import (
+    ArgVarFlags,
+    AstCommand,
+    AstCondition,
+    AstFor,
+    AstForParserMode,
+    AstForVariant,
+    AstGroup,
+    AstIf,
+    AstIfCmp,
+    AstIfVariant,
+    AstLabel,
+    AstNode,
+    AstPipeline,
+    AstSequence,
+    AstStatement,
+    EmulatorCommand,
+    EmulatorException,
+    Exit,
+    Goto,
+    InvalidLabel,
+    Redirect,
+)
+from refinery.lib.batch.parser import BatchParser
+from refinery.lib.batch.state import BatchState
+from refinery.lib.batch.util import batchint, uncaret, unquote
+from refinery.lib.deobfuscation import cautious_eval_or_default
+from refinery.lib.types import buf
+
+
+class BatchEmulator:
+
+    class _register:
+        handlers: ClassVar[dict[type[AstNode], Callable[[BatchEmulator, AstNode], Generator[str]]]] = {}
+
+        def __init__(self, node_type: type[AstNode]):
+            self.node_type = node_type
+
+        def __call__(self, handler):
+            self.handlers[self.node_type] = handler
+            return handler
+
+    def __init__(self, data: str | buf | BatchParser, state: BatchState | None = None):
+        self.stack = []
+        self.parser = BatchParser(data, state)
+
+    @property
+    def state(self):
+        return self.parser.state
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    @property
+    def delayexpand(self):
+        return self.state.delayexpand
+
+    def delay_expand(self, block: str):
+        def expansion(match: re.Match[str]):
+            name = match.group(1)
+            return parse(name)
+        parse = self.parser.lexer.parse_env_variable
+        return re.sub(r&#39;!([^!\n]*)!&#39;, expansion, block)
+
+    def for_expand(self, block: str, vars: dict[str, str]):
+        def expansion(match: re.Match[str]):
+            flags = ArgVarFlags.Empty
+            for flag in match[1]:
+                flags |= ArgVarFlags.FromToken(ord(flag))
+            return vars[match[3]]
+        return re.sub(
+            RF&#39;%((?:~[fdpnxsatz]*)?)((?:\\$\\w+)?)([{&#34;&#34;.join(vars)}])&#39;, expansion, block)
+
+    def execute_set(self, cmd: EmulatorCommand):
+        if not (args := cmd.argv):
+            raise EmulatorException(&#39;Empty SET instruction&#39;)
+
+        arithmetic = False
+        quote_mode = False
+
+        it = iter(args)
+
+        if next(it).upper() != &#39;SET&#39;:
+            raise RuntimeError
+        while (tok := next(it)).isspace():
+            continue
+        if tok.upper() == &#39;/P&#39;:
+            raise NotImplementedError(&#39;Prompt SET not implemented.&#39;)
+        if tok.upper() == &#39;/A&#39;:
+            arithmetic = True
+            tok = next(it)
+
+        args = [tok, *it]
+
+        if arithmetic:
+            integers = {}
+            updated = {}
+            assignment = &#39;&#39;.join(args[1:])
+            for name, value in self.environment.items():
+                try:
+                    integers[name] = batchint(value)
+                except ValueError:
+                    pass
+            for assignment in assignment.split(&#39;,&#39;):
+                assignment = assignment.strip()
+                name, _, expression = assignment.partition(&#39;=&#39;)
+                expression = cautious_eval_or_default(expression, environment=integers)
+                if expression is not None:
+                    integers[name] = expression
+                    updated[name] = str(expression)
+                self.environment.update(updated)
+        else:
+            if len(args) &gt;= 2 and args[1] == &#39;=&#39;:
+                name, _, content = args
+            elif (assignment := cmd.argument_string).startswith(&#39;&#34;&#39;):
+                quote_mode = True
+                assignment, _, unquoted = assignment[1:].rpartition(&#39;&#34;&#39;)
+                assignment = assignment or unquoted
+                name, _, content = assignment.partition(&#39;=&#39;)
+            else:
+                name, _, content = &#39;&#39;.join(args).partition(&#39;=&#39;)
+            name = name.upper()
+            _, content = uncaret(content, quote_mode)
+            if not content:
+                self.environment.pop(name, None)
+            else:
+                self.environment[name] = content
+
+    def execute_command(self, ast_command: AstCommand):
+        tokens = iter(ast_command.tokens)
+        if self.delayexpand:
+            tokens = (self.delay_expand(token) for token in tokens)
+        if v := self.state.for_loop_variables:
+            tokens = (self.for_expand(token, v) for token in tokens)
+        command = EmulatorCommand(tokens)
+        verb = command.verb.upper().strip()
+        if verb == &#39;SET&#39;:
+            self.execute_set(command)
+        elif verb == &#39;GOTO&#39;:
+            label, *_ = command.argument_string.split(maxsplit=1)
+            if label.startswith(&#39;:&#39;):
+                if label.upper() == &#39;:EOF&#39;:
+                    raise Exit(self.state.ec, False)
+                label = label[1:]
+            raise Goto(label)
+        elif verb == &#39;CALL&#39;:
+            empty, colon, label = command.argument_string.partition(&#39;:&#39;)
+            if empty or not colon:
+                raise EmulatorException(F&#39;Invalid CALL label: {label}&#39;)
+            try:
+                offset = self.parser.lexer.labels[label.upper()]
+            except KeyError as KE:
+                raise InvalidLabel(label) from KE
+            emu = BatchEmulator(self.parser)
+            yield from emu.emulate(offset, called=True)
+        elif verb == &#39;SETLOCAL&#39;:
+            setting = command.argument_string.strip().upper()
+            delay = {
+                &#39;DISABLEDELAYEDEXPANSION&#39;: False,
+                &#39;ENABLEDELAYEDEXPANSION&#39; : True,
+            }.get(setting, self.state.delayexpand)
+            cmdxt = {
+                &#39;DISABLEEXTENSIONS&#39;: False,
+                &#39;ENABLEEXTENSIONS&#39; : True,
+            }.get(setting, self.state.ext_setting)
+            self.state.delayexpands.append(delay)
+            self.state.ext_settings.append(cmdxt)
+            self.state.environments.append(dict(self.environment))
+        elif verb == &#39;ENDLOCAL&#39; and len(self.state.environments) &gt; 1:
+            self.state.environments.pop()
+            self.state.delayexpands.pop()
+        elif verb == &#39;EXIT&#39;:
+            it = iter(command.args)
+            exit = True
+            token = 0
+            for arg in it:
+                if arg.upper() == &#39;/B&#39;:
+                    exit = False
+                    continue
+                token = arg
+                break
+            try:
+                code = int(token)
+            except ValueError:
+                code = 0
+            raise Exit(code, exit)
+        elif verb == &#39;CD&#39; or verb == &#39;CHDIR&#39;:
+            self.state.cwd = command.argument_string
+        elif verb == &#39;PUSHD&#39;:
+            directory = command.argument_string
+            self.state.dirstack.append(self.cwd)
+            self.cwd = directory.rstrip()
+        elif verb == &#39;POPD&#39;:
+            try:
+                self.state.cwd = self.state.dirstack.pop()
+            except IndexError:
+                pass
+        elif verb == &#39;ECHO&#39;:
+            for io in ast_command.redirects:
+                if io.type == Redirect.In:
+                    continue
+                if isinstance(path := io.target, str):
+                    path = unquote(path.lstrip())
+                    method = (
+                        self.state.append_file
+                    ) if io.type == Redirect.OutAppend else (
+                        self.state.create_file
+                    )
+                    method(path, command.argument_string)
+                break
+            else:
+                yield str(command)
+        else:
+            yield str(command)
+
+    @_register(AstPipeline)
+    def emulate_pipeline(self, pipeline: AstPipeline):
+        for part in pipeline.parts:
+            yield from self.execute_command(part)
+
+    @_register(AstSequence)
+    def emulate_sequence(self, sequence: AstSequence):
+        yield from self.emulate_statement(sequence.head)
+        for cs in sequence.tail:
+            if cs.condition == AstCondition.Failure:
+                if self.state.ec == 0:
+                    continue
+            if cs.condition == AstCondition.Success:
+                if self.state.ec != 0:
+                    continue
+            yield from self.emulate_statement(cs.statement)
+
+    @_register(AstIf)
+    def emulate_if(self, _if: AstIf):
+        if _if.variant == AstIfVariant.ErrorLevel:
+            condition = _if.var_int &lt;= self.state.ec
+        elif _if.variant == AstIfVariant.CmdExtVersion:
+            condition = _if.var_int &lt;= self.state.extensions_version
+        elif _if.variant == AstIfVariant.Exist:
+            condition = self.state.exists_file(_if.var_str)
+        elif _if.variant == AstIfVariant.Defined:
+            condition = _if.var_str.upper() in self.state.environment
+        else:
+            lhs = _if.lhs
+            rhs = _if.rhs
+            cmp = _if.cmp
+            assert lhs is not None
+            assert rhs is not None
+            if cmp == AstIfCmp.STR:
+                if _if.casefold:
+                    if isinstance(lhs, str):
+                        lhs = lhs.casefold()
+                    if isinstance(rhs, str):
+                        rhs = rhs.casefold()
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.GTR:
+                condition = lhs &gt; rhs
+            elif cmp == AstIfCmp.GEQ:
+                condition = lhs &gt;= rhs
+            elif cmp == AstIfCmp.NEQ:
+                condition = lhs != rhs
+            elif cmp == AstIfCmp.EQU:
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.LSS:
+                condition = lhs &lt; rhs
+            elif cmp == AstIfCmp.LEQ:
+                condition = lhs &lt;= rhs
+            else:
+                raise RuntimeError(cmp)
+        if _if.negated:
+            condition = not condition
+
+        if condition:
+            yield from self.emulate_statement(_if.then_do)
+        elif (_else := _if.else_do):
+            yield from self.emulate_statement(_else)
+
+    @_register(AstFor)
+    def emulate_for(self, _for: AstFor):
+        vars = self.state.new_forloop()
+        body = _for.body
+        name = _for.variable
+
+        if _for.variant == AstForVariant.FileParsing:
+            if _for.mode == AstForParserMode.Command:
+                return NotImplemented
+            if _for.mode == AstForParserMode.Literal:
+                lines = _for.strings()
+            else:
+                def lines_from_files():
+                    fs = self.state.file_system
+                    for name in _for.strings():
+                        for path, content in fs.items():
+                            if not fnmatch.fnmatch(path, name):
+                                continue
+                            yield from content.splitlines(False)
+                lines = lines_from_files()
+            opt = _for.options
+            tokens = sorted(opt.tokens)
+            split = re.compile(&#39;[{}]+&#39;.format(re.escape(opt.delims)))
+            count = tokens[-1] + 1
+            first_variable = ord(name)
+            if opt.asterisk:
+                tokens.append(count)
+            for n, line in enumerate(lines):
+                if n &lt; opt.skip:
+                    continue
+                if opt.comment and line.startswith(opt.comment):
+                    continue
+                tokenized = split.split(line, maxsplit=count)
+                for k, tok in enumerate(tokens):
+                    name = chr(first_variable + k)
+                    if not name.isalpha():
+                        raise EmulatorException(&#39;Ran out of variables in FOR-Loop.&#39;)
+                    try:
+                        vars[name] = tokenized[tok]
+                    except IndexError:
+                        vars[name] = &#39;&#39;
+                yield from self.emulate_statement(body)
+        else:
+            for entry in _for.strings():
+                vars[name] = entry
+                yield from self.emulate_statement(_for.body)
+
+    @_register(AstGroup)
+    def emulate_group(self, group: AstGroup):
+        for sequence in group.sequences:
+            yield from self.emulate_sequence(sequence)
+
+    @_register(AstLabel)
+    def emulate_label(self, label: AstLabel):
+        yield from ()
+
+    def emulate_statement(self, statement: AstStatement):
+        try:
+            handler = self._register.handlers[statement.__class__]
+        except KeyError:
+            raise RuntimeError(statement)
+        yield from handler(self, statement)
+
+    def emulate(self, offset: int = 0, name: str | None = None, command_line: str = &#39;&#39;, called: bool = False):
+        if name:
+            self.state.name = name
+        self.state.command_line = command_line
+        length = len(self.parser.lexer.code)
+        labels = self.parser.lexer.labels
+
+        while offset &lt; length:
+            try:
+                for sequence in self.parser.parse(offset):
+                    yield from self.emulate_sequence(sequence)
+            except Goto as goto:
+                try:
+                    offset = labels[goto.label.upper()]
+                except KeyError:
+                    raise InvalidLabel(goto.label) from goto
+                continue
+            except Exit as exit:
+                self.state.ec = exit.code
+                if exit.exit and called:
+                    raise
+                else:
+                    break
+            else:
+                break</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.emulator.BatchEmulator"><code class="flex name class">
+<span>class <span class="ident">BatchEmulator</span></span>
+<span>(</span><span>data, state=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L38-L373" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BatchEmulator:
+
+    class _register:
+        handlers: ClassVar[dict[type[AstNode], Callable[[BatchEmulator, AstNode], Generator[str]]]] = {}
+
+        def __init__(self, node_type: type[AstNode]):
+            self.node_type = node_type
+
+        def __call__(self, handler):
+            self.handlers[self.node_type] = handler
+            return handler
+
+    def __init__(self, data: str | buf | BatchParser, state: BatchState | None = None):
+        self.stack = []
+        self.parser = BatchParser(data, state)
+
+    @property
+    def state(self):
+        return self.parser.state
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    @property
+    def delayexpand(self):
+        return self.state.delayexpand
+
+    def delay_expand(self, block: str):
+        def expansion(match: re.Match[str]):
+            name = match.group(1)
+            return parse(name)
+        parse = self.parser.lexer.parse_env_variable
+        return re.sub(r&#39;!([^!\n]*)!&#39;, expansion, block)
+
+    def for_expand(self, block: str, vars: dict[str, str]):
+        def expansion(match: re.Match[str]):
+            flags = ArgVarFlags.Empty
+            for flag in match[1]:
+                flags |= ArgVarFlags.FromToken(ord(flag))
+            return vars[match[3]]
+        return re.sub(
+            RF&#39;%((?:~[fdpnxsatz]*)?)((?:\\$\\w+)?)([{&#34;&#34;.join(vars)}])&#39;, expansion, block)
+
+    def execute_set(self, cmd: EmulatorCommand):
+        if not (args := cmd.argv):
+            raise EmulatorException(&#39;Empty SET instruction&#39;)
+
+        arithmetic = False
+        quote_mode = False
+
+        it = iter(args)
+
+        if next(it).upper() != &#39;SET&#39;:
+            raise RuntimeError
+        while (tok := next(it)).isspace():
+            continue
+        if tok.upper() == &#39;/P&#39;:
+            raise NotImplementedError(&#39;Prompt SET not implemented.&#39;)
+        if tok.upper() == &#39;/A&#39;:
+            arithmetic = True
+            tok = next(it)
+
+        args = [tok, *it]
+
+        if arithmetic:
+            integers = {}
+            updated = {}
+            assignment = &#39;&#39;.join(args[1:])
+            for name, value in self.environment.items():
+                try:
+                    integers[name] = batchint(value)
+                except ValueError:
+                    pass
+            for assignment in assignment.split(&#39;,&#39;):
+                assignment = assignment.strip()
+                name, _, expression = assignment.partition(&#39;=&#39;)
+                expression = cautious_eval_or_default(expression, environment=integers)
+                if expression is not None:
+                    integers[name] = expression
+                    updated[name] = str(expression)
+                self.environment.update(updated)
+        else:
+            if len(args) &gt;= 2 and args[1] == &#39;=&#39;:
+                name, _, content = args
+            elif (assignment := cmd.argument_string).startswith(&#39;&#34;&#39;):
+                quote_mode = True
+                assignment, _, unquoted = assignment[1:].rpartition(&#39;&#34;&#39;)
+                assignment = assignment or unquoted
+                name, _, content = assignment.partition(&#39;=&#39;)
+            else:
+                name, _, content = &#39;&#39;.join(args).partition(&#39;=&#39;)
+            name = name.upper()
+            _, content = uncaret(content, quote_mode)
+            if not content:
+                self.environment.pop(name, None)
+            else:
+                self.environment[name] = content
+
+    def execute_command(self, ast_command: AstCommand):
+        tokens = iter(ast_command.tokens)
+        if self.delayexpand:
+            tokens = (self.delay_expand(token) for token in tokens)
+        if v := self.state.for_loop_variables:
+            tokens = (self.for_expand(token, v) for token in tokens)
+        command = EmulatorCommand(tokens)
+        verb = command.verb.upper().strip()
+        if verb == &#39;SET&#39;:
+            self.execute_set(command)
+        elif verb == &#39;GOTO&#39;:
+            label, *_ = command.argument_string.split(maxsplit=1)
+            if label.startswith(&#39;:&#39;):
+                if label.upper() == &#39;:EOF&#39;:
+                    raise Exit(self.state.ec, False)
+                label = label[1:]
+            raise Goto(label)
+        elif verb == &#39;CALL&#39;:
+            empty, colon, label = command.argument_string.partition(&#39;:&#39;)
+            if empty or not colon:
+                raise EmulatorException(F&#39;Invalid CALL label: {label}&#39;)
+            try:
+                offset = self.parser.lexer.labels[label.upper()]
+            except KeyError as KE:
+                raise InvalidLabel(label) from KE
+            emu = BatchEmulator(self.parser)
+            yield from emu.emulate(offset, called=True)
+        elif verb == &#39;SETLOCAL&#39;:
+            setting = command.argument_string.strip().upper()
+            delay = {
+                &#39;DISABLEDELAYEDEXPANSION&#39;: False,
+                &#39;ENABLEDELAYEDEXPANSION&#39; : True,
+            }.get(setting, self.state.delayexpand)
+            cmdxt = {
+                &#39;DISABLEEXTENSIONS&#39;: False,
+                &#39;ENABLEEXTENSIONS&#39; : True,
+            }.get(setting, self.state.ext_setting)
+            self.state.delayexpands.append(delay)
+            self.state.ext_settings.append(cmdxt)
+            self.state.environments.append(dict(self.environment))
+        elif verb == &#39;ENDLOCAL&#39; and len(self.state.environments) &gt; 1:
+            self.state.environments.pop()
+            self.state.delayexpands.pop()
+        elif verb == &#39;EXIT&#39;:
+            it = iter(command.args)
+            exit = True
+            token = 0
+            for arg in it:
+                if arg.upper() == &#39;/B&#39;:
+                    exit = False
+                    continue
+                token = arg
+                break
+            try:
+                code = int(token)
+            except ValueError:
+                code = 0
+            raise Exit(code, exit)
+        elif verb == &#39;CD&#39; or verb == &#39;CHDIR&#39;:
+            self.state.cwd = command.argument_string
+        elif verb == &#39;PUSHD&#39;:
+            directory = command.argument_string
+            self.state.dirstack.append(self.cwd)
+            self.cwd = directory.rstrip()
+        elif verb == &#39;POPD&#39;:
+            try:
+                self.state.cwd = self.state.dirstack.pop()
+            except IndexError:
+                pass
+        elif verb == &#39;ECHO&#39;:
+            for io in ast_command.redirects:
+                if io.type == Redirect.In:
+                    continue
+                if isinstance(path := io.target, str):
+                    path = unquote(path.lstrip())
+                    method = (
+                        self.state.append_file
+                    ) if io.type == Redirect.OutAppend else (
+                        self.state.create_file
+                    )
+                    method(path, command.argument_string)
+                break
+            else:
+                yield str(command)
+        else:
+            yield str(command)
+
+    @_register(AstPipeline)
+    def emulate_pipeline(self, pipeline: AstPipeline):
+        for part in pipeline.parts:
+            yield from self.execute_command(part)
+
+    @_register(AstSequence)
+    def emulate_sequence(self, sequence: AstSequence):
+        yield from self.emulate_statement(sequence.head)
+        for cs in sequence.tail:
+            if cs.condition == AstCondition.Failure:
+                if self.state.ec == 0:
+                    continue
+            if cs.condition == AstCondition.Success:
+                if self.state.ec != 0:
+                    continue
+            yield from self.emulate_statement(cs.statement)
+
+    @_register(AstIf)
+    def emulate_if(self, _if: AstIf):
+        if _if.variant == AstIfVariant.ErrorLevel:
+            condition = _if.var_int &lt;= self.state.ec
+        elif _if.variant == AstIfVariant.CmdExtVersion:
+            condition = _if.var_int &lt;= self.state.extensions_version
+        elif _if.variant == AstIfVariant.Exist:
+            condition = self.state.exists_file(_if.var_str)
+        elif _if.variant == AstIfVariant.Defined:
+            condition = _if.var_str.upper() in self.state.environment
+        else:
+            lhs = _if.lhs
+            rhs = _if.rhs
+            cmp = _if.cmp
+            assert lhs is not None
+            assert rhs is not None
+            if cmp == AstIfCmp.STR:
+                if _if.casefold:
+                    if isinstance(lhs, str):
+                        lhs = lhs.casefold()
+                    if isinstance(rhs, str):
+                        rhs = rhs.casefold()
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.GTR:
+                condition = lhs &gt; rhs
+            elif cmp == AstIfCmp.GEQ:
+                condition = lhs &gt;= rhs
+            elif cmp == AstIfCmp.NEQ:
+                condition = lhs != rhs
+            elif cmp == AstIfCmp.EQU:
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.LSS:
+                condition = lhs &lt; rhs
+            elif cmp == AstIfCmp.LEQ:
+                condition = lhs &lt;= rhs
+            else:
+                raise RuntimeError(cmp)
+        if _if.negated:
+            condition = not condition
+
+        if condition:
+            yield from self.emulate_statement(_if.then_do)
+        elif (_else := _if.else_do):
+            yield from self.emulate_statement(_else)
+
+    @_register(AstFor)
+    def emulate_for(self, _for: AstFor):
+        vars = self.state.new_forloop()
+        body = _for.body
+        name = _for.variable
+
+        if _for.variant == AstForVariant.FileParsing:
+            if _for.mode == AstForParserMode.Command:
+                return NotImplemented
+            if _for.mode == AstForParserMode.Literal:
+                lines = _for.strings()
+            else:
+                def lines_from_files():
+                    fs = self.state.file_system
+                    for name in _for.strings():
+                        for path, content in fs.items():
+                            if not fnmatch.fnmatch(path, name):
+                                continue
+                            yield from content.splitlines(False)
+                lines = lines_from_files()
+            opt = _for.options
+            tokens = sorted(opt.tokens)
+            split = re.compile(&#39;[{}]+&#39;.format(re.escape(opt.delims)))
+            count = tokens[-1] + 1
+            first_variable = ord(name)
+            if opt.asterisk:
+                tokens.append(count)
+            for n, line in enumerate(lines):
+                if n &lt; opt.skip:
+                    continue
+                if opt.comment and line.startswith(opt.comment):
+                    continue
+                tokenized = split.split(line, maxsplit=count)
+                for k, tok in enumerate(tokens):
+                    name = chr(first_variable + k)
+                    if not name.isalpha():
+                        raise EmulatorException(&#39;Ran out of variables in FOR-Loop.&#39;)
+                    try:
+                        vars[name] = tokenized[tok]
+                    except IndexError:
+                        vars[name] = &#39;&#39;
+                yield from self.emulate_statement(body)
+        else:
+            for entry in _for.strings():
+                vars[name] = entry
+                yield from self.emulate_statement(_for.body)
+
+    @_register(AstGroup)
+    def emulate_group(self, group: AstGroup):
+        for sequence in group.sequences:
+            yield from self.emulate_sequence(sequence)
+
+    @_register(AstLabel)
+    def emulate_label(self, label: AstLabel):
+        yield from ()
+
+    def emulate_statement(self, statement: AstStatement):
+        try:
+            handler = self._register.handlers[statement.__class__]
+        except KeyError:
+            raise RuntimeError(statement)
+        yield from handler(self, statement)
+
+    def emulate(self, offset: int = 0, name: str | None = None, command_line: str = &#39;&#39;, called: bool = False):
+        if name:
+            self.state.name = name
+        self.state.command_line = command_line
+        length = len(self.parser.lexer.code)
+        labels = self.parser.lexer.labels
+
+        while offset &lt; length:
+            try:
+                for sequence in self.parser.parse(offset):
+                    yield from self.emulate_sequence(sequence)
+            except Goto as goto:
+                try:
+                    offset = labels[goto.label.upper()]
+                except KeyError:
+                    raise InvalidLabel(goto.label) from goto
+                continue
+            except Exit as exit:
+                self.state.ec = exit.code
+                if exit.exit and called:
+                    raise
+                else:
+                    break
+            else:
+                break</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.state"><code class="name">var <span class="ident">state</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L54-L56" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def state(self):
+    return self.parser.state</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.environment"><code class="name">var <span class="ident">environment</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L58-L60" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def environment(self):
+    return self.state.environment</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.delayexpand"><code class="name">var <span class="ident">delayexpand</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L62-L64" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def delayexpand(self):
+    return self.state.delayexpand</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.delay_expand"><code class="name flex">
+<span>def <span class="ident">delay_expand</span></span>(<span>self, block)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L66-L71" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def delay_expand(self, block: str):
+    def expansion(match: re.Match[str]):
+        name = match.group(1)
+        return parse(name)
+    parse = self.parser.lexer.parse_env_variable
+    return re.sub(r&#39;!([^!\n]*)!&#39;, expansion, block)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.for_expand"><code class="name flex">
+<span>def <span class="ident">for_expand</span></span>(<span>self, block, vars)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L73-L80" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def for_expand(self, block: str, vars: dict[str, str]):
+    def expansion(match: re.Match[str]):
+        flags = ArgVarFlags.Empty
+        for flag in match[1]:
+            flags |= ArgVarFlags.FromToken(ord(flag))
+        return vars[match[3]]
+    return re.sub(
+        RF&#39;%((?:~[fdpnxsatz]*)?)((?:\\$\\w+)?)([{&#34;&#34;.join(vars)}])&#39;, expansion, block)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_set"><code class="name flex">
+<span>def <span class="ident">execute_set</span></span>(<span>self, cmd)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L82-L135" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def execute_set(self, cmd: EmulatorCommand):
+    if not (args := cmd.argv):
+        raise EmulatorException(&#39;Empty SET instruction&#39;)
+
+    arithmetic = False
+    quote_mode = False
+
+    it = iter(args)
+
+    if next(it).upper() != &#39;SET&#39;:
+        raise RuntimeError
+    while (tok := next(it)).isspace():
+        continue
+    if tok.upper() == &#39;/P&#39;:
+        raise NotImplementedError(&#39;Prompt SET not implemented.&#39;)
+    if tok.upper() == &#39;/A&#39;:
+        arithmetic = True
+        tok = next(it)
+
+    args = [tok, *it]
+
+    if arithmetic:
+        integers = {}
+        updated = {}
+        assignment = &#39;&#39;.join(args[1:])
+        for name, value in self.environment.items():
+            try:
+                integers[name] = batchint(value)
+            except ValueError:
+                pass
+        for assignment in assignment.split(&#39;,&#39;):
+            assignment = assignment.strip()
+            name, _, expression = assignment.partition(&#39;=&#39;)
+            expression = cautious_eval_or_default(expression, environment=integers)
+            if expression is not None:
+                integers[name] = expression
+                updated[name] = str(expression)
+            self.environment.update(updated)
+    else:
+        if len(args) &gt;= 2 and args[1] == &#39;=&#39;:
+            name, _, content = args
+        elif (assignment := cmd.argument_string).startswith(&#39;&#34;&#39;):
+            quote_mode = True
+            assignment, _, unquoted = assignment[1:].rpartition(&#39;&#34;&#39;)
+            assignment = assignment or unquoted
+            name, _, content = assignment.partition(&#39;=&#39;)
+        else:
+            name, _, content = &#39;&#39;.join(args).partition(&#39;=&#39;)
+        name = name.upper()
+        _, content = uncaret(content, quote_mode)
+        if not content:
+            self.environment.pop(name, None)
+        else:
+            self.environment[name] = content</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_command"><code class="name flex">
+<span>def <span class="ident">execute_command</span></span>(<span>self, ast_command)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L137-L222" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def execute_command(self, ast_command: AstCommand):
+    tokens = iter(ast_command.tokens)
+    if self.delayexpand:
+        tokens = (self.delay_expand(token) for token in tokens)
+    if v := self.state.for_loop_variables:
+        tokens = (self.for_expand(token, v) for token in tokens)
+    command = EmulatorCommand(tokens)
+    verb = command.verb.upper().strip()
+    if verb == &#39;SET&#39;:
+        self.execute_set(command)
+    elif verb == &#39;GOTO&#39;:
+        label, *_ = command.argument_string.split(maxsplit=1)
+        if label.startswith(&#39;:&#39;):
+            if label.upper() == &#39;:EOF&#39;:
+                raise Exit(self.state.ec, False)
+            label = label[1:]
+        raise Goto(label)
+    elif verb == &#39;CALL&#39;:
+        empty, colon, label = command.argument_string.partition(&#39;:&#39;)
+        if empty or not colon:
+            raise EmulatorException(F&#39;Invalid CALL label: {label}&#39;)
+        try:
+            offset = self.parser.lexer.labels[label.upper()]
+        except KeyError as KE:
+            raise InvalidLabel(label) from KE
+        emu = BatchEmulator(self.parser)
+        yield from emu.emulate(offset, called=True)
+    elif verb == &#39;SETLOCAL&#39;:
+        setting = command.argument_string.strip().upper()
+        delay = {
+            &#39;DISABLEDELAYEDEXPANSION&#39;: False,
+            &#39;ENABLEDELAYEDEXPANSION&#39; : True,
+        }.get(setting, self.state.delayexpand)
+        cmdxt = {
+            &#39;DISABLEEXTENSIONS&#39;: False,
+            &#39;ENABLEEXTENSIONS&#39; : True,
+        }.get(setting, self.state.ext_setting)
+        self.state.delayexpands.append(delay)
+        self.state.ext_settings.append(cmdxt)
+        self.state.environments.append(dict(self.environment))
+    elif verb == &#39;ENDLOCAL&#39; and len(self.state.environments) &gt; 1:
+        self.state.environments.pop()
+        self.state.delayexpands.pop()
+    elif verb == &#39;EXIT&#39;:
+        it = iter(command.args)
+        exit = True
+        token = 0
+        for arg in it:
+            if arg.upper() == &#39;/B&#39;:
+                exit = False
+                continue
+            token = arg
+            break
+        try:
+            code = int(token)
+        except ValueError:
+            code = 0
+        raise Exit(code, exit)
+    elif verb == &#39;CD&#39; or verb == &#39;CHDIR&#39;:
+        self.state.cwd = command.argument_string
+    elif verb == &#39;PUSHD&#39;:
+        directory = command.argument_string
+        self.state.dirstack.append(self.cwd)
+        self.cwd = directory.rstrip()
+    elif verb == &#39;POPD&#39;:
+        try:
+            self.state.cwd = self.state.dirstack.pop()
+        except IndexError:
+            pass
+    elif verb == &#39;ECHO&#39;:
+        for io in ast_command.redirects:
+            if io.type == Redirect.In:
+                continue
+            if isinstance(path := io.target, str):
+                path = unquote(path.lstrip())
+                method = (
+                    self.state.append_file
+                ) if io.type == Redirect.OutAppend else (
+                    self.state.create_file
+                )
+                method(path, command.argument_string)
+            break
+        else:
+            yield str(command)
+    else:
+        yield str(command)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_pipeline"><code class="name flex">
+<span>def <span class="ident">emulate_pipeline</span></span>(<span>self, pipeline)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L224-L227" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(AstPipeline)
+def emulate_pipeline(self, pipeline: AstPipeline):
+    for part in pipeline.parts:
+        yield from self.execute_command(part)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_sequence"><code class="name flex">
+<span>def <span class="ident">emulate_sequence</span></span>(<span>self, sequence)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L229-L239" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(AstSequence)
+def emulate_sequence(self, sequence: AstSequence):
+    yield from self.emulate_statement(sequence.head)
+    for cs in sequence.tail:
+        if cs.condition == AstCondition.Failure:
+            if self.state.ec == 0:
+                continue
+        if cs.condition == AstCondition.Success:
+            if self.state.ec != 0:
+                continue
+        yield from self.emulate_statement(cs.statement)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_if"><code class="name flex">
+<span>def <span class="ident">emulate_if</span></span>(<span>self, _if)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L241-L284" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(AstIf)
+def emulate_if(self, _if: AstIf):
+    if _if.variant == AstIfVariant.ErrorLevel:
+        condition = _if.var_int &lt;= self.state.ec
+    elif _if.variant == AstIfVariant.CmdExtVersion:
+        condition = _if.var_int &lt;= self.state.extensions_version
+    elif _if.variant == AstIfVariant.Exist:
+        condition = self.state.exists_file(_if.var_str)
+    elif _if.variant == AstIfVariant.Defined:
+        condition = _if.var_str.upper() in self.state.environment
+    else:
+        lhs = _if.lhs
+        rhs = _if.rhs
+        cmp = _if.cmp
+        assert lhs is not None
+        assert rhs is not None
+        if cmp == AstIfCmp.STR:
+            if _if.casefold:
+                if isinstance(lhs, str):
+                    lhs = lhs.casefold()
+                if isinstance(rhs, str):
+                    rhs = rhs.casefold()
+            condition = lhs == rhs
+        elif cmp == AstIfCmp.GTR:
+            condition = lhs &gt; rhs
+        elif cmp == AstIfCmp.GEQ:
+            condition = lhs &gt;= rhs
+        elif cmp == AstIfCmp.NEQ:
+            condition = lhs != rhs
+        elif cmp == AstIfCmp.EQU:
+            condition = lhs == rhs
+        elif cmp == AstIfCmp.LSS:
+            condition = lhs &lt; rhs
+        elif cmp == AstIfCmp.LEQ:
+            condition = lhs &lt;= rhs
+        else:
+            raise RuntimeError(cmp)
+    if _if.negated:
+        condition = not condition
+
+    if condition:
+        yield from self.emulate_statement(_if.then_do)
+    elif (_else := _if.else_do):
+        yield from self.emulate_statement(_else)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_for"><code class="name flex">
+<span>def <span class="ident">emulate_for</span></span>(<span>self, _for)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L286-L331" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(AstFor)
+def emulate_for(self, _for: AstFor):
+    vars = self.state.new_forloop()
+    body = _for.body
+    name = _for.variable
+
+    if _for.variant == AstForVariant.FileParsing:
+        if _for.mode == AstForParserMode.Command:
+            return NotImplemented
+        if _for.mode == AstForParserMode.Literal:
+            lines = _for.strings()
+        else:
+            def lines_from_files():
+                fs = self.state.file_system
+                for name in _for.strings():
+                    for path, content in fs.items():
+                        if not fnmatch.fnmatch(path, name):
+                            continue
+                        yield from content.splitlines(False)
+            lines = lines_from_files()
+        opt = _for.options
+        tokens = sorted(opt.tokens)
+        split = re.compile(&#39;[{}]+&#39;.format(re.escape(opt.delims)))
+        count = tokens[-1] + 1
+        first_variable = ord(name)
+        if opt.asterisk:
+            tokens.append(count)
+        for n, line in enumerate(lines):
+            if n &lt; opt.skip:
+                continue
+            if opt.comment and line.startswith(opt.comment):
+                continue
+            tokenized = split.split(line, maxsplit=count)
+            for k, tok in enumerate(tokens):
+                name = chr(first_variable + k)
+                if not name.isalpha():
+                    raise EmulatorException(&#39;Ran out of variables in FOR-Loop.&#39;)
+                try:
+                    vars[name] = tokenized[tok]
+                except IndexError:
+                    vars[name] = &#39;&#39;
+            yield from self.emulate_statement(body)
+    else:
+        for entry in _for.strings():
+            vars[name] = entry
+            yield from self.emulate_statement(_for.body)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_group"><code class="name flex">
+<span>def <span class="ident">emulate_group</span></span>(<span>self, group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L333-L336" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(AstGroup)
+def emulate_group(self, group: AstGroup):
+    for sequence in group.sequences:
+        yield from self.emulate_sequence(sequence)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_label"><code class="name flex">
+<span>def <span class="ident">emulate_label</span></span>(<span>self, label)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L338-L340" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(AstLabel)
+def emulate_label(self, label: AstLabel):
+    yield from ()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_statement"><code class="name flex">
+<span>def <span class="ident">emulate_statement</span></span>(<span>self, statement)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L342-L347" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emulate_statement(self, statement: AstStatement):
+    try:
+        handler = self._register.handlers[statement.__class__]
+    except KeyError:
+        raise RuntimeError(statement)
+    yield from handler(self, statement)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate"><code class="name flex">
+<span>def <span class="ident">emulate</span></span>(<span>self, offset=0, name=None, command_line='', called=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/cef9fe1eb5eb59af380e28017d205218d56bd3d0/refinery/lib/batch/emulator.py#L349-L373" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emulate(self, offset: int = 0, name: str | None = None, command_line: str = &#39;&#39;, called: bool = False):
+    if name:
+        self.state.name = name
+    self.state.command_line = command_line
+    length = len(self.parser.lexer.code)
+    labels = self.parser.lexer.labels
+
+    while offset &lt; length:
+        try:
+            for sequence in self.parser.parse(offset):
+                yield from self.emulate_sequence(sequence)
+        except Goto as goto:
+            try:
+                offset = labels[goto.label.upper()]
+            except KeyError:
+                raise InvalidLabel(goto.label) from goto
+            continue
+        except Exit as exit:
+            self.state.ec = exit.code
+            if exit.exit and called:
+                raise
+            else:
+                break
+        else:
+            break</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.emulator.BatchEmulator" href="#refinery.lib.batch.emulator.BatchEmulator">BatchEmulator</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.delay_expand" href="#refinery.lib.batch.emulator.BatchEmulator.delay_expand">delay_expand</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.for_expand" href="#refinery.lib.batch.emulator.BatchEmulator.for_expand">for_expand</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_set" href="#refinery.lib.batch.emulator.BatchEmulator.execute_set">execute_set</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_command" href="#refinery.lib.batch.emulator.BatchEmulator.execute_command">execute_command</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_pipeline" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_pipeline">emulate_pipeline</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_sequence" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_sequence">emulate_sequence</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_if" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_if">emulate_if</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_for" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_for">emulate_for</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_group" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_group">emulate_group</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_label" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_label">emulate_label</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_statement" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_statement">emulate_statement</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate" href="#refinery.lib.batch.emulator.BatchEmulator.emulate">emulate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
