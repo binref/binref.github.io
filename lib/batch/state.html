@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.state documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.state</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L1-L274" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import ntpath
+
+from datetime import datetime
+from enum import Enum
+from random import randrange, seed
+from uuid import uuid4
+
+from refinery.lib.batch.model import MissingVariable
+from refinery.lib.dt import date_from_timestamp, isodate
+
+
+class ErrorZero(int, Enum):
+    Val = 0
+
+    def __bool__(self):
+        return True
+
+    def __str__(self):
+        return &#39;0&#39;
+
+    __repr__ = __str__
+
+
+class RetainVariable(str, Enum):
+    Val = &#39;&#39;
+
+
+_DEFAULT_ENVIRONMENT = {
+    &#39;ALLUSERSPROFILE&#39;           : r&#39;C:\ProgramData&#39;,
+    &#39;APPDATA&#39;                   : r&#39;C:\Users\{u}\AppData\Roaming&#39;,
+    &#39;CommonProgramFiles&#39;        : r&#39;C:\Program Files\Common Files&#39;,
+    &#39;CommonProgramFiles(x86)&#39;   : r&#39;C:\Program Files (x86)\Common Files&#39;,
+    &#39;CommonProgramW6432&#39;        : r&#39;C:\Program Files\Common Files&#39;,
+    &#39;COMPUTERNAME&#39;              : r&#39;{h}&#39;,
+    &#39;ComSpec&#39;                   : r&#39;C:\WINDOWS\system32\cmd.exe&#39;,
+    &#39;DriverData&#39;                : r&#39;C:\Windows\System32\Drivers\DriverData&#39;,
+    &#39;HOMEDRIVE&#39;                 : r&#39;C:&#39;,
+    &#39;HOMEPATH&#39;                  : r&#39;\Users\{u}&#39;,
+    &#39;LOCALAPPDATA&#39;              : r&#39;C:\Users\{u}\AppData\Local&#39;,
+    &#39;LOGONSERVER&#39;               : r&#39;\\{h}&#39;,
+    &#39;NUMBER_OF_PROCESSORS&#39;      : r&#39;16&#39;,
+    &#39;OneDrive&#39;                  : r&#39;C:\Users\{u}\OneDrive&#39;,
+    &#39;OS&#39;                        : r&#39;Windows_NT&#39;,
+    &#39;PATHEXT&#39;                   : r&#39;.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC&#39;,
+    &#39;PROCESSOR_ARCHITECTURE&#39;    : r&#39;AMD64&#39;,
+    &#39;PROCESSOR_IDENTIFIER&#39;      : r&#39;Intel64 Family 6 Model 158 Stepping 10, GenuineIntel&#39;,
+    &#39;PROCESSOR_LEVEL&#39;           : r&#39;6&#39;,
+    &#39;PROCESSOR_REVISION&#39;        : r&#39;99ff&#39;,
+    &#39;ProgramData&#39;               : r&#39;C:\ProgramData&#39;,
+    &#39;ProgramW6432&#39;              : r&#39;C:\Program Files&#39;,
+    &#39;ProgramFiles&#39;              : r&#39;C:\Program Files&#39;,
+    &#39;ProgramFiles(x86)&#39;         : r&#39;C:\Program Files (x86)&#39;,
+    &#39;PUBLIC&#39;                    : r&#39;C:\Users\Public&#39;,
+    &#39;SESSIONNAME&#39;               : r&#39;Console&#39;,
+    &#39;SystemDrive&#39;               : r&#39;C:&#39;,
+    &#39;SystemRoot&#39;                : r&#39;C:\WINDOWS&#39;,
+    &#39;TEMP&#39;                      : r&#39;C:\Users\{u}\AppData\Local\Temp&#39;,
+    &#39;TMP&#39;                       : r&#39;C:\Users\{u}\AppData\Local\Temp&#39;,
+    &#39;USERDOMAIN&#39;                : r&#39;{h}&#39;,
+    &#39;USERDOMAIN_ROAMINGPROFILE&#39; : r&#39;{h}&#39;,
+    &#39;USERNAME&#39;                  : r&#39;{u}&#39;,
+    &#39;USERPROFILE&#39;               : r&#39;C:\Users\{u}&#39;,
+    &#39;WINDIR&#39;                    : r&#39;C:\WINDOWS&#39;,
+    &#39;PATH&#39;: &#39;;&#39;.join(
+        [
+            r&#39;C:\Windows&#39;,
+            r&#39;C:\Windows\System32&#39;,
+            r&#39;C:\Windows\System32\Wbem&#39;,
+            r&#39;C:\Windows\System32\WindowsPowerShell\v1.0\\&#39;,
+            r&#39;C:\Windows\System32\OpenSSH\\&#39;,
+            r&#39;C:\Program Files\dotnet\\&#39;,
+        ]
+    ),
+}
+
+
+class BatchState:
+
+    name: str
+    args: list[str]
+
+    now: datetime
+    start_time: datetime
+
+    environment_stack: list[dict[str, str | RetainVariable]]
+    delayexpand_stack: list[bool]
+    cmdextended_stack: list[bool]
+
+    _for_loops: list[dict[str, str]]
+    file_system: dict[str, str]
+
+    def __init__(
+        self,
+        delayexpand: bool = False,
+        extensions_enabled: bool = True,
+        extensions_version: int = 2,
+        environment: dict | None = None,
+        file_system: dict | None = None,
+        username: str = &#39;Administrator&#39;,
+        hostname: str | None = None,
+        now: int | float | str | datetime | None = None,
+        cwd: str = &#39;C:\\&#39;,
+        filename: str | None = &#39;&#39;,
+        echo: bool = True,
+        codec: str = &#39;cp1252&#39;,
+    ):
+        self.extensions_version = extensions_version
+        file_system = file_system or {}
+        environment = environment or {}
+        if hostname is None:
+            hostname = str(uuid4())
+        for key, value in _DEFAULT_ENVIRONMENT.items():
+            environment.setdefault(
+                key.upper(),
+                value.format(h=hostname, u=username)
+            )
+        if isinstance(now, str):
+            now = isodate(now)
+        if isinstance(now, (int, float)):
+            now = date_from_timestamp(now)
+        if now is None:
+            now = datetime.now()
+        self.cwd = cwd
+        self.now = now
+        self.start_time = now
+        seed(self.now.timestamp())
+        self.hostname = hostname
+        self.username = username
+        self.labels = {}
+        self._for_loops = []
+        self.environment_stack = [environment]
+        self.delayexpand_stack = [delayexpand]
+        self.cmdextended_stack = [extensions_enabled]
+        self.file_system = file_system
+        self.dirstack = []
+        self.linebreaks = []
+        self.name = filename or F&#39;{uuid4()}.bat&#39;
+        self.args = []
+        self._cmd = &#39;&#39;
+        self.ec = None
+        self.echo = echo
+        self.codec = codec
+
+    @property
+    def cwd(self):
+        return self._cwd
+
+    @cwd.setter
+    def cwd(self, new: str):
+        new = new.replace(&#39;/&#39;, &#39;\\&#39;)
+        if not new.endswith(&#39;\\&#39;):
+            new = F&#39;{new}\\&#39;
+        if not ntpath.isabs(new):
+            new = ntpath.join(self.cwd, new)
+        if not ntpath.isabs(new):
+            raise ValueError(F&#39;Invalid absolute path: {new}&#39;)
+        self._cwd = ntpath.normcase(ntpath.normpath(new))
+
+    @property
+    def ec(self) -&gt; int | ErrorZero:
+        return self.errorlevel
+
+    @ec.setter
+    def ec(self, value: int | ErrorZero | None):
+        ec = value or 0
+        self.environment[&#39;ERRORLEVEL&#39;] = str(ec)
+        self.errorlevel = ec
+
+    @property
+    def command_line(self):
+        return self._cmd
+
+    @command_line.setter
+    def command_line(self, value: str):
+        self._cmd = value
+        self.args = value.split()
+
+    def envar(self, name: str, default: str | None = None) -&gt; str | RetainVariable:
+        name = name.upper()
+        if name in (e := self.environment):
+            return e[name]
+        elif name == &#39;DATE&#39;:
+            return self.now.strftime(&#39;%Y-%m-%d&#39;)
+        elif name == &#39;TIME&#39;:
+            time = self.now.strftime(&#39;%M:%S,%f&#39;)
+            return F&#39;{self.now.hour:2d}:{time:.8}&#39;
+        elif name == &#39;RANDOM&#39;:
+            return str(randrange(0, 32767))
+        elif name == &#39;ERRORLEVEL&#39;:
+            return str(self.ec)
+        elif name == &#39;CD&#39;:
+            return self.cwd
+        elif name == &#39;CMDCMDLINE&#39;:
+            line = self.envar(&#39;COMSPEC&#39;, &#39;cmd.exe&#39;)
+            if args := self.args:
+                args = &#39; &#39;.join(args)
+                line = F&#39;{line} /c &#34;{args}&#34;&#39;
+            return line
+        elif name == &#39;CMDEXTVERSION&#39;:
+            return str(self.extensions_version)
+        elif name == &#39;HIGHESTNUMANODENUMBER&#39;:
+            return &#39;0&#39;
+        elif default is not None:
+            return default
+        else:
+            raise MissingVariable
+
+    def resolve_path(self, path: str) -&gt; str:
+        if not ntpath.isabs(path):
+            path = F&#39;{self.cwd}{path}&#39;
+        return ntpath.normcase(ntpath.normpath(path))
+
+    def create_file(self, path: str, data: str = &#39;&#39;):
+        self.file_system[self.resolve_path(path)] = data
+
+    def append_file(self, path: str, data: str):
+        path = self.resolve_path(path)
+        if left := self.file_system.get(path, None):
+            data = F&#39;{left}{data}&#39;
+        self.file_system[path] = data
+
+    def remove_file(self, path: str):
+        self.file_system.pop(self.resolve_path(path), None)
+
+    def ingest_file(self, path: str) -&gt; str | None:
+        return self.file_system.get(self.resolve_path(path))
+
+    def exists_file(self, path: str) -&gt; bool:
+        return self.resolve_path(path) in self.file_system
+
+    def sizeof_file(self, path: str) -&gt; int:
+        if data := self.ingest_file(path):
+            return len(data)
+        return -1
+
+    def new_forloop(self) -&gt; dict[str, str]:
+        new = {}
+        old = self.for_loop_variables
+        if old is not None:
+            new.update(old)
+        self._for_loops.append(new)
+        return new
+
+    def end_forloop(self):
+        self._for_loops.pop()
+
+    @property
+    def environment(self):
+        return self.environment_stack[-1]
+
+    @property
+    def delayexpand(self):
+        return self.delayexpand_stack[-1]
+
+    @delayexpand.setter
+    def delayexpand(self, v):
+        self.delayexpand_stack[-1] = v
+
+    @property
+    def cmdextended(self):
+        return self.cmdextended_stack[-1]
+
+    @cmdextended.setter
+    def cmdextended(self, v):
+        self.cmdextended_stack[-1] = v
+
+    @property
+    def for_loop_variables(self):
+        if vars := self._for_loops:
+            return vars[-1]
+        else:
+            return None</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.state.ErrorZero"><code class="flex name class">
+<span>class <span class="ident">ErrorZero</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>int([x]) -&gt; integer
+int(x, base=10) -&gt; integer</p>
+<p>Convert a number or string to an integer, or return 0 if no arguments
+are given.
+If x is a number, return x.<strong>int</strong>().
+For floating-point
+numbers, this truncates towards zero.</p>
+<p>If x is not a number or if base is given, then x must be a string,
+bytes, or bytearray instance representing an integer literal in the
+given base.
+The literal can be preceded by '+' or '-' and be surrounded
+by whitespace.
+The base defaults to 10.
+Valid bases are 0 and 2-36.
+Base 0 means to interpret the base from the string as an integer literal.</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; int('0b100', base=0)
+4
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L14-L23" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ErrorZero(int, Enum):
+    Val = 0
+
+    def __bool__(self):
+        return True
+
+    def __str__(self):
+        return &#39;0&#39;
+
+    __repr__ = __str__</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.int</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.state.ErrorZero.Val"><code class="name">var <span class="ident">Val</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.state.RetainVariable"><code class="flex name class">
+<span>class <span class="ident">RetainVariable</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L26-L27" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RetainVariable(str, Enum):
+    Val = &#39;&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.state.RetainVariable.Val"><code class="name">var <span class="ident">Val</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState"><code class="flex name class">
+<span>class <span class="ident">BatchState</span></span>
+<span>(</span><span>delayexpand=False, extensions_enabled=True, extensions_version=2, environment=None, file_system=None, username='Administrator', hostname=None, now=None, cwd='C:\\', filename='', echo=True, codec='cp1252')</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L79-L274" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BatchState:
+
+    name: str
+    args: list[str]
+
+    now: datetime
+    start_time: datetime
+
+    environment_stack: list[dict[str, str | RetainVariable]]
+    delayexpand_stack: list[bool]
+    cmdextended_stack: list[bool]
+
+    _for_loops: list[dict[str, str]]
+    file_system: dict[str, str]
+
+    def __init__(
+        self,
+        delayexpand: bool = False,
+        extensions_enabled: bool = True,
+        extensions_version: int = 2,
+        environment: dict | None = None,
+        file_system: dict | None = None,
+        username: str = &#39;Administrator&#39;,
+        hostname: str | None = None,
+        now: int | float | str | datetime | None = None,
+        cwd: str = &#39;C:\\&#39;,
+        filename: str | None = &#39;&#39;,
+        echo: bool = True,
+        codec: str = &#39;cp1252&#39;,
+    ):
+        self.extensions_version = extensions_version
+        file_system = file_system or {}
+        environment = environment or {}
+        if hostname is None:
+            hostname = str(uuid4())
+        for key, value in _DEFAULT_ENVIRONMENT.items():
+            environment.setdefault(
+                key.upper(),
+                value.format(h=hostname, u=username)
+            )
+        if isinstance(now, str):
+            now = isodate(now)
+        if isinstance(now, (int, float)):
+            now = date_from_timestamp(now)
+        if now is None:
+            now = datetime.now()
+        self.cwd = cwd
+        self.now = now
+        self.start_time = now
+        seed(self.now.timestamp())
+        self.hostname = hostname
+        self.username = username
+        self.labels = {}
+        self._for_loops = []
+        self.environment_stack = [environment]
+        self.delayexpand_stack = [delayexpand]
+        self.cmdextended_stack = [extensions_enabled]
+        self.file_system = file_system
+        self.dirstack = []
+        self.linebreaks = []
+        self.name = filename or F&#39;{uuid4()}.bat&#39;
+        self.args = []
+        self._cmd = &#39;&#39;
+        self.ec = None
+        self.echo = echo
+        self.codec = codec
+
+    @property
+    def cwd(self):
+        return self._cwd
+
+    @cwd.setter
+    def cwd(self, new: str):
+        new = new.replace(&#39;/&#39;, &#39;\\&#39;)
+        if not new.endswith(&#39;\\&#39;):
+            new = F&#39;{new}\\&#39;
+        if not ntpath.isabs(new):
+            new = ntpath.join(self.cwd, new)
+        if not ntpath.isabs(new):
+            raise ValueError(F&#39;Invalid absolute path: {new}&#39;)
+        self._cwd = ntpath.normcase(ntpath.normpath(new))
+
+    @property
+    def ec(self) -&gt; int | ErrorZero:
+        return self.errorlevel
+
+    @ec.setter
+    def ec(self, value: int | ErrorZero | None):
+        ec = value or 0
+        self.environment[&#39;ERRORLEVEL&#39;] = str(ec)
+        self.errorlevel = ec
+
+    @property
+    def command_line(self):
+        return self._cmd
+
+    @command_line.setter
+    def command_line(self, value: str):
+        self._cmd = value
+        self.args = value.split()
+
+    def envar(self, name: str, default: str | None = None) -&gt; str | RetainVariable:
+        name = name.upper()
+        if name in (e := self.environment):
+            return e[name]
+        elif name == &#39;DATE&#39;:
+            return self.now.strftime(&#39;%Y-%m-%d&#39;)
+        elif name == &#39;TIME&#39;:
+            time = self.now.strftime(&#39;%M:%S,%f&#39;)
+            return F&#39;{self.now.hour:2d}:{time:.8}&#39;
+        elif name == &#39;RANDOM&#39;:
+            return str(randrange(0, 32767))
+        elif name == &#39;ERRORLEVEL&#39;:
+            return str(self.ec)
+        elif name == &#39;CD&#39;:
+            return self.cwd
+        elif name == &#39;CMDCMDLINE&#39;:
+            line = self.envar(&#39;COMSPEC&#39;, &#39;cmd.exe&#39;)
+            if args := self.args:
+                args = &#39; &#39;.join(args)
+                line = F&#39;{line} /c &#34;{args}&#34;&#39;
+            return line
+        elif name == &#39;CMDEXTVERSION&#39;:
+            return str(self.extensions_version)
+        elif name == &#39;HIGHESTNUMANODENUMBER&#39;:
+            return &#39;0&#39;
+        elif default is not None:
+            return default
+        else:
+            raise MissingVariable
+
+    def resolve_path(self, path: str) -&gt; str:
+        if not ntpath.isabs(path):
+            path = F&#39;{self.cwd}{path}&#39;
+        return ntpath.normcase(ntpath.normpath(path))
+
+    def create_file(self, path: str, data: str = &#39;&#39;):
+        self.file_system[self.resolve_path(path)] = data
+
+    def append_file(self, path: str, data: str):
+        path = self.resolve_path(path)
+        if left := self.file_system.get(path, None):
+            data = F&#39;{left}{data}&#39;
+        self.file_system[path] = data
+
+    def remove_file(self, path: str):
+        self.file_system.pop(self.resolve_path(path), None)
+
+    def ingest_file(self, path: str) -&gt; str | None:
+        return self.file_system.get(self.resolve_path(path))
+
+    def exists_file(self, path: str) -&gt; bool:
+        return self.resolve_path(path) in self.file_system
+
+    def sizeof_file(self, path: str) -&gt; int:
+        if data := self.ingest_file(path):
+            return len(data)
+        return -1
+
+    def new_forloop(self) -&gt; dict[str, str]:
+        new = {}
+        old = self.for_loop_variables
+        if old is not None:
+            new.update(old)
+        self._for_loops.append(new)
+        return new
+
+    def end_forloop(self):
+        self._for_loops.pop()
+
+    @property
+    def environment(self):
+        return self.environment_stack[-1]
+
+    @property
+    def delayexpand(self):
+        return self.delayexpand_stack[-1]
+
+    @delayexpand.setter
+    def delayexpand(self, v):
+        self.delayexpand_stack[-1] = v
+
+    @property
+    def cmdextended(self):
+        return self.cmdextended_stack[-1]
+
+    @cmdextended.setter
+    def cmdextended(self, v):
+        self.cmdextended_stack[-1] = v
+
+    @property
+    def for_loop_variables(self):
+        if vars := self._for_loops:
+            return vars[-1]
+        else:
+            return None</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.state.BatchState.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.args"><code class="name">var <span class="ident">args</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.now"><code class="name">var <span class="ident">now</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.start_time"><code class="name">var <span class="ident">start_time</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.environment_stack"><code class="name">var <span class="ident">environment_stack</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.delayexpand_stack"><code class="name">var <span class="ident">delayexpand_stack</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.cmdextended_stack"><code class="name">var <span class="ident">cmdextended_stack</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.file_system"><code class="name">var <span class="ident">file_system</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.state.BatchState.cwd"><code class="name">var <span class="ident">cwd</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L146-L148" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def cwd(self):
+    return self._cwd</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.ec"><code class="name">var <span class="ident">ec</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L161-L163" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def ec(self) -&gt; int | ErrorZero:
+    return self.errorlevel</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.command_line"><code class="name">var <span class="ident">command_line</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L171-L173" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def command_line(self):
+    return self._cmd</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.environment"><code class="name">var <span class="ident">environment</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L249-L251" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def environment(self):
+    return self.environment_stack[-1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.delayexpand"><code class="name">var <span class="ident">delayexpand</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L253-L255" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def delayexpand(self):
+    return self.delayexpand_stack[-1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.cmdextended"><code class="name">var <span class="ident">cmdextended</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L261-L263" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def cmdextended(self):
+    return self.cmdextended_stack[-1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.for_loop_variables"><code class="name">var <span class="ident">for_loop_variables</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L269-L274" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def for_loop_variables(self):
+    if vars := self._for_loops:
+        return vars[-1]
+    else:
+        return None</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.state.BatchState.envar"><code class="name flex">
+<span>def <span class="ident">envar</span></span>(<span>self, name, default=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L180-L208" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def envar(self, name: str, default: str | None = None) -&gt; str | RetainVariable:
+    name = name.upper()
+    if name in (e := self.environment):
+        return e[name]
+    elif name == &#39;DATE&#39;:
+        return self.now.strftime(&#39;%Y-%m-%d&#39;)
+    elif name == &#39;TIME&#39;:
+        time = self.now.strftime(&#39;%M:%S,%f&#39;)
+        return F&#39;{self.now.hour:2d}:{time:.8}&#39;
+    elif name == &#39;RANDOM&#39;:
+        return str(randrange(0, 32767))
+    elif name == &#39;ERRORLEVEL&#39;:
+        return str(self.ec)
+    elif name == &#39;CD&#39;:
+        return self.cwd
+    elif name == &#39;CMDCMDLINE&#39;:
+        line = self.envar(&#39;COMSPEC&#39;, &#39;cmd.exe&#39;)
+        if args := self.args:
+            args = &#39; &#39;.join(args)
+            line = F&#39;{line} /c &#34;{args}&#34;&#39;
+        return line
+    elif name == &#39;CMDEXTVERSION&#39;:
+        return str(self.extensions_version)
+    elif name == &#39;HIGHESTNUMANODENUMBER&#39;:
+        return &#39;0&#39;
+    elif default is not None:
+        return default
+    else:
+        raise MissingVariable</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.resolve_path"><code class="name flex">
+<span>def <span class="ident">resolve_path</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L210-L213" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def resolve_path(self, path: str) -&gt; str:
+    if not ntpath.isabs(path):
+        path = F&#39;{self.cwd}{path}&#39;
+    return ntpath.normcase(ntpath.normpath(path))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.create_file"><code class="name flex">
+<span>def <span class="ident">create_file</span></span>(<span>self, path, data='')</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L215-L216" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def create_file(self, path: str, data: str = &#39;&#39;):
+    self.file_system[self.resolve_path(path)] = data</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.append_file"><code class="name flex">
+<span>def <span class="ident">append_file</span></span>(<span>self, path, data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L218-L222" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def append_file(self, path: str, data: str):
+    path = self.resolve_path(path)
+    if left := self.file_system.get(path, None):
+        data = F&#39;{left}{data}&#39;
+    self.file_system[path] = data</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.remove_file"><code class="name flex">
+<span>def <span class="ident">remove_file</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L224-L225" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def remove_file(self, path: str):
+    self.file_system.pop(self.resolve_path(path), None)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.ingest_file"><code class="name flex">
+<span>def <span class="ident">ingest_file</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L227-L228" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def ingest_file(self, path: str) -&gt; str | None:
+    return self.file_system.get(self.resolve_path(path))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.exists_file"><code class="name flex">
+<span>def <span class="ident">exists_file</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L230-L231" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def exists_file(self, path: str) -&gt; bool:
+    return self.resolve_path(path) in self.file_system</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.sizeof_file"><code class="name flex">
+<span>def <span class="ident">sizeof_file</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L233-L236" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def sizeof_file(self, path: str) -&gt; int:
+    if data := self.ingest_file(path):
+        return len(data)
+    return -1</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.new_forloop"><code class="name flex">
+<span>def <span class="ident">new_forloop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L238-L244" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def new_forloop(self) -&gt; dict[str, str]:
+    new = {}
+    old = self.for_loop_variables
+    if old is not None:
+        new.update(old)
+    self._for_loops.append(new)
+    return new</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.state.BatchState.end_forloop"><code class="name flex">
+<span>def <span class="ident">end_forloop</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/state.py#L246-L247" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def end_forloop(self):
+    self._for_loops.pop()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.state.ErrorZero" href="#refinery.lib.batch.state.ErrorZero">ErrorZero</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.state.RetainVariable" href="#refinery.lib.batch.state.RetainVariable">RetainVariable</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.state.BatchState" href="#refinery.lib.batch.state.BatchState">BatchState</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.batch.state.BatchState.envar" href="#refinery.lib.batch.state.BatchState.envar">envar</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.resolve_path" href="#refinery.lib.batch.state.BatchState.resolve_path">resolve_path</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.create_file" href="#refinery.lib.batch.state.BatchState.create_file">create_file</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.append_file" href="#refinery.lib.batch.state.BatchState.append_file">append_file</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.remove_file" href="#refinery.lib.batch.state.BatchState.remove_file">remove_file</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.ingest_file" href="#refinery.lib.batch.state.BatchState.ingest_file">ingest_file</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.exists_file" href="#refinery.lib.batch.state.BatchState.exists_file">exists_file</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.sizeof_file" href="#refinery.lib.batch.state.BatchState.sizeof_file">sizeof_file</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.new_forloop" href="#refinery.lib.batch.state.BatchState.new_forloop">new_forloop</a></code></li>
+<li><code><a title="refinery.lib.batch.state.BatchState.end_forloop" href="#refinery.lib.batch.state.BatchState.end_forloop">end_forloop</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

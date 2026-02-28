@@ -1,0 +1,2868 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L1-L767" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import array
+import codecs
+import enum
+import io
+import itertools
+import ntpath
+import re
+
+from dataclasses import dataclass, field
+from typing import Callable, ClassVar, Generator
+
+from refinery.lib.batch.const import (
+    AMPERSAND,
+    ANGLE_CLOSE,
+    ANGLE_OPEN,
+    ANGLES,
+    ASTERIX,
+    AT,
+    CARET,
+    COLON,
+    COMMA,
+    DOLLAR,
+    EQUALS,
+    LINEBREAK,
+    NINE,
+    PAREN_CLOSE,
+    PAREN_OPEN,
+    PERCENT,
+    PIPE,
+    QUOTE,
+    SEMICOLON,
+    SEPARATORS,
+    SLASH,
+    WHITESPACE,
+    ZERO,
+)
+from refinery.lib.batch.model import (
+    ArgVar,
+    ArgVarFlags,
+    Ctrl,
+    EmulatorException,
+    MissingVariable,
+    Redirect,
+    RedirectIO,
+    Token,
+    UnexpectedEOF,
+    UnexpectedToken,
+    Word,
+)
+from refinery.lib.batch.state import BatchState
+from refinery.lib.batch.util import batchint, u16, uncaret, unquote
+from refinery.lib.types import buf
+
+
+class Mode(enum.IntEnum):
+    Text = 0
+    Whitespace = enum.auto()
+    Quote = enum.auto()
+    Label = enum.auto()
+    Gap = enum.auto()
+    SetStarted = enum.auto()
+    SetRegular = enum.auto()
+    SetQuoted = enum.auto()
+
+
+class EV(enum.IntEnum):
+    New = PERCENT
+    Env = DOLLAR
+    Mod = COLON
+
+
+SeparatorMap = {
+    AT          : Ctrl.At,
+    COMMA       : Ctrl.Comma,
+    EQUALS      : Ctrl.Equals,
+    PAREN_CLOSE : Ctrl.EndGroup,
+    PAREN_OPEN  : Ctrl.NewGroup,
+    SEMICOLON   : Ctrl.Semicolon,
+}
+
+
+@dataclass
+class BatchLexerCursor:
+    offset: int = 0
+    modes: list[Mode] = field(default_factory=list)
+    token: array.array[int] = field(
+        default_factory=lambda: array.array(&#39;H&#39;))
+    subst_offset: int = 0
+    subst_buffer: array.array[int] = field(
+        default_factory=lambda: array.array(&#39;H&#39;))
+
+    def eof(self, size: int):
+        if self.offset &lt; size:
+            return False
+        return (n := len(self.subst_buffer)) == 0 or self.subst_offset &gt;= n
+
+    def copy(self):
+        return self.__class__(
+            self.offset,
+            list(self.modes),
+            array.array(&#39;H&#39;, self.token),
+            self.subst_offset,
+            array.array(&#39;H&#39;, self.subst_buffer)
+        )
+
+    @property
+    def substituting(self):
+        return len(self.subst_buffer) &gt; 0
+
+
+class BatchLexer:
+
+    labels: dict[str, int]
+    code: memoryview
+
+    pending_redirect: RedirectIO | None
+
+    cursor: BatchLexerCursor
+    resume: BatchLexerCursor | None
+
+    class _register:
+        # A handler is given the current mode and char. It returns a boolean indicating
+        # whether or not the character was processed and may be consumed.
+        handlers: ClassVar[dict[Mode, Callable[
+            [BatchLexer, Mode, int], Generator[Token, None, bool]
+        ]]] = {}
+
+        def __init__(self, *modes: Mode):
+            self.modes = modes
+
+        def __call__(self, handler):
+            for mode in self.modes:
+                self.handlers[mode] = handler
+            return handler
+
+    def __init__(self, data: str | buf | BatchLexer, state: BatchState | None = None):
+        if isinstance(data, BatchLexer):
+            if state is not None:
+                raise NotImplementedError
+            self.text = data.text
+            self.code = data.code
+            self.labels = data.labels
+            self.state = data.state
+        else:
+            if state is None:
+                state = BatchState()
+            self.state = state
+            self.preparse(data)
+
+    def parse_group(self):
+        self.group += 1
+
+    def parse_label(self):
+        if (m := self.mode) != Mode.Text or len(self.modes) != 1:
+            raise EmulatorException(F&#39;Switching to LABEL while in mode {m.name}&#39;)
+        self.mode_switch(Mode.Label)
+
+    def parse_set(self):
+        if (m := self.mode) != Mode.Text or len(self.modes) != 1:
+            raise EmulatorException(F&#39;Switching to SET while in mode {m.name}&#39;)
+        self.mode_switch(Mode.SetStarted)
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    def parse_arg_variable(self, var: ArgVar):
+        &#34;&#34;&#34;
+        %* in a batch script refers to all the arguments (e.g. %1 %2 %3
+            %4 %5 ...)
+        Substitution of batch parameters (%n) has been enhanced.  You can
+        now use the following optional syntax:
+            %~1         - expands %1 removing any surrounding quotes (&#34;)
+            %~f1        - expands %1 to a fully qualified path name
+            %~d1        - expands %1 to a drive letter only
+            %~p1        - expands %1 to a path only
+            %~n1        - expands %1 to a file name only
+            %~x1        - expands %1 to a file extension only
+            %~s1        - expanded path contains short names only
+            %~a1        - expands %1 to file attributes
+            %~t1        - expands %1 to date/time of file
+            %~z1        - expands %1 to size of file
+            %~$PATH:1   - searches the directories listed in the PATH
+                           environment variable and expands %1 to the fully
+                           qualified name of the first one found.  If the
+                           environment variable name is not defined or the
+                           file is not found by the search, then this
+                           modifier expands to the empty string
+        The modifiers can be combined to get compound results:
+            %~dp1       - expands %1 to a drive letter and path only
+            %~nx1       - expands %1 to a file name and extension only
+            %~dp$PATH:1 - searches the directories listed in the PATH
+                           environment variable for %1 and expands to the
+                           drive letter and path of the first one found.
+            %~ftza1     - expands %1 to a DIR like output line
+        In the above examples %1 and PATH can be replaced by other
+        valid values.  The %~ syntax is terminated by a valid argument
+        number.  The %~ modifiers may not be used with %*
+        &#34;&#34;&#34;
+        state = self.state
+        flags = var.flags
+
+        if (k := var.offset) is (...):
+            return state.command_line
+        if (j := k - 1) &lt; 0:
+            argval = state.name
+        elif j &lt; len(args := state.args):
+            argval = args[j]
+        else:
+            return &#39;&#39;
+
+        if not flags:
+            return argval
+
+        has_path = 0 != ArgVarFlags.FullPath &amp; flags
+
+        if flags.StripQuotes and argval.startswith(&#39;&#34;&#39;) and argval.endswith(&#39;&#34;&#39;):
+            argval = argval[1:-1]
+
+        if flags.ShortName and not has_path:
+            flags |= ArgVarFlags.FullPath
+            has_path = True
+
+        with io.StringIO() as out:
+            if flags.Attributes:
+                out.write(&#39;--a--------&#39;) # TODO: placeholder
+            if flags.DateTime:
+                dt = state.start_time.isoformat(&#39; &#39;, &#39;minutes&#39;)
+                out.write(F&#39; {dt}&#39;)
+            if flags.FileSize:
+                out.write(F&#39; {state.sizeof_file(argval)}&#39;)
+            if has_path:
+                out.write(&#39; &#39;)
+                full_path = state.resolve_path(argval)
+                drv, rest = ntpath.splitdrive(full_path)
+                *pp, name = ntpath.split(rest)
+                name, ext = ntpath.splitext(name)
+                if flags.DriveLetter:
+                    out.write(drv)
+                if flags.FilePath:
+                    out.write(ntpath.join(*pp))
+                if flags.FileName:
+                    out.write(name)
+                if flags.FileExtension:
+                    out.write(ext)
+            return out.getvalue().lstrip()
+
+    @property
+    def modes(self):
+        return self.cursor.modes
+
+    def reset(self, offset: int):
+        self.quote = False
+        self.caret = False
+        self.white = False
+        self.first_after_gap = True
+        self.group = 0
+        self.cursor = BatchLexerCursor(offset)
+        self.modes.append(Mode.Text)
+        self.resume = None
+        self.pending_redirect = None
+
+    def mode_reset(self):
+        del self.modes[1:]
+
+    def mode_finish(self):
+        modes = self.modes
+        if len(modes) &lt;= 1:
+            raise RuntimeError(&#39;Trying to exit base mode.&#39;)
+        self.modes.pop()
+
+    def mode_switch(self, mode: Mode):
+        self.modes.append(mode)
+
+    @property
+    def mode(self):
+        return self.modes[-1]
+
+    @mode.setter
+    def mode(self, value: Mode):
+        self.modes[-1] = value
+
+    @property
+    def substituting(self):
+        return self.cursor.substituting
+
+    @property
+    def eof(self):
+        return (c := self.cursor).offset &gt;= len(self.code) and not c.subst_buffer
+
+    def quick_save(self):
+        self.resume = self.cursor.copy()
+
+    def quick_load(self):
+        if (resume := self.resume) is None:
+            raise RuntimeError
+        self.cursor = resume
+        self.resume = None
+
+    def current_char(self):
+        cursor = self.cursor
+        if not (subst := cursor.subst_buffer):
+            offset = cursor.offset
+            if self.code[offset] == PERCENT:
+                cursor.offset += 1
+                self.fill_substitution_buffer()
+                return self.current_char()
+        else:
+            offset = cursor.subst_offset
+            if offset &gt;= (n := len(subst)):
+                offset -= n
+                offset += cursor.offset
+            else:
+                return subst[offset]
+        try:
+            return self.code[offset]
+        except IndexError:
+            raise UnexpectedEOF
+
+    def consume_char(self):
+        cursor = self.cursor
+        if subst := cursor.subst_buffer:
+            offset = cursor.subst_offset + 1
+            if offset &gt;= len(subst):
+                del subst[:]
+                cursor.subst_offset = -1
+            else:
+                cursor.subst_offset = offset
+        else:
+            offset = cursor.offset + 1
+            if offset &gt; len(self.code):
+                raise EOFError(&#39;Consumed a character beyond EOF.&#39;)
+            cursor.offset = offset
+
+    def next_char(self):
+        self.consume_char()
+        return self.current_char()
+
+    def parse_env_variable(self, var: str):
+        if var == &#39;&#39;:
+            return &#39;%&#39;
+        name, _, modifier = var.partition(&#39;:&#39;)
+        base = self.state.envar(name)
+        if not modifier or not base:
+            return base
+        if &#39;=&#39; in modifier:
+            old, _, new = modifier.partition(&#39;=&#39;)
+            kwargs = {}
+            if old.startswith(&#39;~&#39;):
+                old = old[1:]
+                kwargs.update(count=1)
+            return base.replace(old, new, **kwargs)
+        else:
+            if not modifier.startswith(&#39;~&#39;):
+                raise EmulatorException
+            offset, _, length = modifier[1:].partition(&#39;,&#39;)
+            offset = batchint(offset)
+            if offset &lt; 0:
+                offset = max(0, len(base) + offset)
+            if length:
+                end = offset + batchint(length)
+            else:
+                end = len(base)
+            return base[offset:end]
+
+    def emit_token(self):
+        switched = False
+        if (buffer := self.cursor.token) and (token := u16(buffer)):
+            if (pr := self.pending_redirect):
+                pr.target = unquote(token)
+                self.pending_redirect = None
+                self.mode_switch(Mode.Gap)
+                yield pr
+                switched = True
+            else:
+                yield Word(token)
+        del buffer[:]
+        self.first_after_gap = False
+        return switched
+
+    def tokens(self, offset: int) -&gt; Generator[Token]:
+        self.reset(offset)
+        handlers = self._register.handlers
+        current_char = self.current_char
+        consume_char = self.consume_char
+        size = len(self.code)
+
+        while not self.cursor.eof(size):
+            c = current_char()
+            m = self.mode
+            h = handlers[m]
+            if (yield from h(self, m, c)):
+                consume_char()
+
+        if not self.first_after_gap:
+            yield from self.emit_token()
+
+    def check_line_break(self, mode: Mode, char: int):
+        if char != LINEBREAK:
+            return False
+        if not self.caret:
+            # caret is not reset until the next char!
+            yield from self.emit_token()
+            self.white = True
+            self.quote = False
+            self.mode_reset()
+            yield Ctrl.NewLine
+        self.consume_char()
+        return True
+
+    def check_caret(self, char: int):
+        if self.caret:
+            self.cursor.token.append(char)
+            self.caret = False
+            self.consume_char()
+            return True
+        elif char == CARET:
+            self.caret = True
+            self.consume_char()
+            return True
+        else:
+            return False
+
+    def check_command_separators(self, char: int):
+        if char == PAREN_CLOSE and (g := self.group) &gt; 0:
+            yield from self.emit_token()
+            yield Ctrl.EndGroup
+            self.mode_reset()
+            self.consume_char()
+            self.group = g - 1
+            return True
+        elif char == AMPERSAND:
+            tok = Ctrl.Ampersand
+        elif char == PIPE:
+            tok = Ctrl.Pipe
+        else:
+            return False
+        yield from self.emit_token()
+        self.mode_reset()
+        self.consume_char()
+        yield tok
+        return True
+
+    def check_quote_start(self, char: int):
+        if char != QUOTE:
+            return False
+        self.cursor.token.append(char)
+        self.mode_switch(Mode.Quote)
+        self.caret = False
+        self.consume_char()
+        return True
+
+    def check_redirect_io(self, char: int):
+        if char not in ANGLES:
+            return False
+
+        output = char != ANGLE_OPEN
+        token = self.cursor.token
+
+        if len(token) == 1 and (src := token[0] - ZERO) in range(10):
+            del token[:]
+            source = src
+        else:
+            source = int(output)
+
+        char = self.next_char()
+
+        if not output:
+            how = Redirect.In
+        elif char == ANGLE_CLOSE:
+            how = Redirect.OutAppend
+            char = self.next_char()
+        else:
+            how = Redirect.OutCreate
+
+        yield from self.emit_token()
+
+        if char != AMPERSAND:
+            self.pending_redirect = RedirectIO(how, source)
+            self.mode_switch(Mode.Gap)
+        else:
+            char = self.next_char()
+            if char not in range(ZERO, NINE + 1):
+                raise UnexpectedToken(char)
+            self.consume_char()
+            yield RedirectIO(how, source, char - ZERO)
+
+        return True
+
+    def fill_substitution_buffer(self):
+        if (cursor := self.cursor).substituting:
+            return
+
+        code = self.code
+        var_resume = -1
+        var_dollar = -1
+        var_cmdarg = ArgVar()
+        variable = None
+        phase = EV.New
+        q = ArgVarFlags.StripQuotes
+
+        for current in range((current := cursor.offset), len(code)):
+            char = code[current]
+            if char == LINEBREAK:
+                break
+            elif char == PERCENT:
+                try:
+                    var_name = u16(self.code[cursor.offset:current])
+                    variable = u16(self.parse_env_variable(var_name))
+                except MissingVariable:
+                    if var_resume &lt; 0:
+                        var_resume = current + 1
+                    break
+            elif var_cmdarg:
+                if ZERO &lt;= char &lt;= NINE:
+                    var_cmdarg.offset = char - ZERO
+                    variable = u16(self.parse_arg_variable(var_cmdarg))
+                elif char == ASTERIX and cursor.offset == current:
+                    var_cmdarg.offset = (...)
+                    variable = u16(self.parse_arg_variable(var_cmdarg))
+            if variable is not None:
+                cursor.subst_offset = 0
+                cursor.subst_buffer.extend(variable)
+                var_resume = current + 1
+                break
+            if phase == EV.Mod:
+                var_cmdarg = None
+            elif phase == EV.Env:
+                if char == COLON:
+                    if var_cmdarg:
+                        assert var_dollar &gt; 0
+                        var_cmdarg.path = u16(self.code[var_dollar:current])
+                    var_resume = current + 1
+            else:
+                if char == DOLLAR:
+                    var_dollar = current + 1
+                    phase = EV.Env
+                    continue
+                if char == COLON:
+                    var_cmdarg = None
+                    var_resume = current + 1
+                    phase = EV.Mod
+                    continue
+                if not var_cmdarg:
+                    continue
+                try:
+                    var_cmdarg.flags |= ArgVarFlags.FromToken(char)
+                except KeyError:
+                    var_cmdarg = None
+                    continue
+                if q not in var_cmdarg.flags:
+                    var_cmdarg = None
+        if var_resume &gt;= 0:
+            cursor.offset = var_resume
+
+    @_register(Mode.Label)
+    def gobble_label(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.check_line_break(mode, char)):
+            return False
+        self.cursor.token.append(char)
+        return True
+
+    @_register(Mode.Quote)
+    def gobble_quote(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.check_line_break(mode, char)):
+            return False
+        self.cursor.token.append(char)
+        if char == QUOTE:
+            self.mode_finish()
+        return True
+
+    @_register(Mode.Whitespace)
+    def gobble_whitespace(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if char in WHITESPACE:
+            self.cursor.token.append(char)
+            return True
+        self.mode_finish()
+        token = self.cursor.token
+        yield Word(u16(token))
+        del token[:]
+        return False
+
+    @_register(Mode.SetQuoted)
+    def gobble_quoted_set(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if char == QUOTE:
+            self.consume_char()
+            self.cursor.token.append(QUOTE)
+            self.quick_save()
+            return False
+
+        if char == LINEBREAK:
+            if self.resume is None:
+                yield from self.emit_token()
+                self.mode_reset()
+                yield Ctrl.NewLine
+                return True
+            elif self.caret:
+                self.caret = False
+                return True
+            else:
+                self.quick_load()
+                yield from self.emit_token()
+                return False
+
+        if self.resume is not None:
+            if char == CARET:
+                self.caret = not self.caret
+            elif not self.caret:
+                if (char == PAREN_CLOSE and self.group &gt; 0) or char in (PIPE, AMPERSAND):
+                    self.quick_load()
+                    yield from self.emit_token()
+                    self.mode_finish()
+                    # after a quick load, the ending quote was already consumed.
+                    return False
+
+        self.cursor.token.append(char)
+        return True
+
+    @_register(Mode.SetStarted)
+    def gobble_set(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        token = self.cursor.token
+        if (yield from self.check_line_break(mode, char)):
+            return False
+        if char in WHITESPACE:
+            yield from self.emit_token()
+            token.append(char)
+            self.mode_switch(Mode.Whitespace)
+            return True
+        if char == SLASH and not self.pending_redirect:
+            yield from self.emit_token()
+            token.append(char)
+            return True
+        if not token and char == QUOTE:
+            self.caret = False
+            token.append(char)
+            self.mode = Mode.SetQuoted
+            return True
+        if self.check_caret(char):
+            return False
+        if char == EQUALS:
+            yield from self.emit_token()
+            yield Ctrl.Equals
+            self.mode = Mode.SetRegular
+            return True
+        if self.check_quote_start(char):
+            return False
+        if (yield from self.check_command_separators(char)):
+            return False
+        if (yield from self.check_redirect_io(char)):
+            return False
+        token.append(char)
+        return True
+
+    def common_token_checks(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        return (False
+            or (yield from self.check_line_break(mode, char))
+            or self.check_caret(char)
+            or self.check_quote_start(char)
+            or (yield from self.check_command_separators(char))
+            or (yield from self.check_redirect_io(char)))
+
+    @_register(Mode.SetRegular)
+    def gobble_set_regular(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.common_token_checks(mode, char)):
+            return False
+        if (pr := self.pending_redirect) and char in WHITESPACE:
+            token = self.cursor.token
+            self.pending_redirect = None
+            pr.target = unquote(u16(token))
+            del token[:]
+            yield pr
+        self.cursor.token.append(char)
+        return True
+
+    @_register(Mode.Gap)
+    def gobble_gap(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        yield from ()
+        if char in SEPARATORS:
+            return True
+        self.mode_finish()
+        self.first_after_gap = True
+        return False
+
+    @_register(Mode.Text)
+    def gobble_txt(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.common_token_checks(mode, char)):
+            return False
+        if char in WHITESPACE:
+            yield from self.emit_token()
+            self.cursor.token.append(char)
+            self.mode_switch(Mode.Whitespace)
+            return True
+        if char == SLASH and not self.pending_redirect:
+            yield from self.emit_token()
+        if char == COLON:
+            if (yield from self.emit_token()):
+                return False
+            elif self.next_char() == COLON:
+                yield Ctrl.Comment
+                return True
+            else:
+                yield Ctrl.Label
+                return False
+        try:
+            token = SeparatorMap[char]
+        except KeyError:
+            pass
+        else:
+            if (yield from self.emit_token()):
+                return False
+            else:
+                yield token
+                return True
+        self.cursor.token.append(char)
+        return True
+
+    @staticmethod
+    def label(text: str, uppercase=True):
+        parts = re.split(&#39;([\x20\t\v])&#39;, text.lstrip())
+        for k, part in itertools.islice(enumerate(parts), 0, None, 2):
+            tq, part = uncaret(part, True)
+            if not tq:
+                parts[k] = part
+                del parts[k + 1:]
+                break
+            parts[k] = part[:-1]
+        label = &#39;&#39;.join(parts)
+        if uppercase:
+            label = label.upper()
+        return label
+
+    def preparse(self, text: str | buf):
+        self.labels = {}
+
+        if not isinstance(text, str):
+            text = codecs.decode(text, &#39;utf8&#39;, errors=&#39;replace&#39;)
+
+        _tail = text[-10:]
+        lines = text.splitlines(keepends=False)
+        utf16 = array.array(&#39;H&#39;)
+
+        if _tail.splitlines() != F&#39;{_tail}\n&#39;.splitlines():
+            # the text had a trailing line break, which is swallowed by the splitlines method
+            lines.append(&#39;&#39;)
+
+        for k, line in enumerate(lines):
+            if k &gt; 0:
+                utf16.append(LINEBREAK)
+            encoded = line.encode(&#39;utf-16le&#39;)
+            if not encoded:
+                continue
+            encoded = memoryview(encoded).cast(&#39;H&#39;)
+            offset = len(utf16)
+            prefix = re.search(&#39;^@?[\\s]*:&#39;, line)
+            if prefix:
+                p = prefix.end()
+                if lb := self.label(u16(encoded[p:])):
+                    self.labels.setdefault(lb, offset + p - 1)
+            utf16.extend(encoded)
+
+        self.text = text
+        self.code = memoryview(utf16)
+
+    if set(_register.handlers) != set(Mode):
+        raise NotImplementedError(&#39;Not all handlers were implemented.&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.lexer.Mode"><code class="flex name class">
+<span>class <span class="ident">Mode</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L57-L65" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Mode(enum.IntEnum):
+    Text = 0
+    Whitespace = enum.auto()
+    Quote = enum.auto()
+    Label = enum.auto()
+    Gap = enum.auto()
+    SetStarted = enum.auto()
+    SetRegular = enum.auto()
+    SetQuoted = enum.auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.Mode.Text"><code class="name">var <span class="ident">Text</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.Whitespace"><code class="name">var <span class="ident">Whitespace</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.Quote"><code class="name">var <span class="ident">Quote</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.Label"><code class="name">var <span class="ident">Label</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.Gap"><code class="name">var <span class="ident">Gap</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.SetStarted"><code class="name">var <span class="ident">SetStarted</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.SetRegular"><code class="name">var <span class="ident">SetRegular</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.Mode.SetQuoted"><code class="name">var <span class="ident">SetQuoted</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.lexer.EV"><code class="flex name class">
+<span>class <span class="ident">EV</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L68-L71" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class EV(enum.IntEnum):
+    New = PERCENT
+    Env = DOLLAR
+    Mod = COLON</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.EV.New"><code class="name">var <span class="ident">New</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.EV.Env"><code class="name">var <span class="ident">Env</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.EV.Mod"><code class="name">var <span class="ident">Mod</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor"><code class="flex name class">
+<span>class <span class="ident">BatchLexerCursor</span></span>
+<span>(</span><span>offset=0, modes=&lt;factory&gt;, token=&lt;factory&gt;, subst_offset=0, subst_buffer=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>BatchLexerCursor(offset: 'int' = 0, modes: 'list[Mode]' = <factory>, token: 'array.array[int]' = <factory>, subst_offset: 'int' = 0, subst_buffer: 'array.array[int]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L84-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class BatchLexerCursor:
+    offset: int = 0
+    modes: list[Mode] = field(default_factory=list)
+    token: array.array[int] = field(
+        default_factory=lambda: array.array(&#39;H&#39;))
+    subst_offset: int = 0
+    subst_buffer: array.array[int] = field(
+        default_factory=lambda: array.array(&#39;H&#39;))
+
+    def eof(self, size: int):
+        if self.offset &lt; size:
+            return False
+        return (n := len(self.subst_buffer)) == 0 or self.subst_offset &gt;= n
+
+    def copy(self):
+        return self.__class__(
+            self.offset,
+            list(self.modes),
+            array.array(&#39;H&#39;, self.token),
+            self.subst_offset,
+            array.array(&#39;H&#39;, self.subst_buffer)
+        )
+
+    @property
+    def substituting(self):
+        return len(self.subst_buffer) &gt; 0</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.modes"><code class="name">var <span class="ident">modes</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.token"><code class="name">var <span class="ident">token</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.subst_buffer"><code class="name">var <span class="ident">subst_buffer</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.offset"><code class="name">var <span class="ident">offset</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.subst_offset"><code class="name">var <span class="ident">subst_offset</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.substituting"><code class="name">var <span class="ident">substituting</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L108-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def substituting(self):
+    return len(self.subst_buffer) &gt; 0</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.eof"><code class="name flex">
+<span>def <span class="ident">eof</span></span>(<span>self, size)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L94-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def eof(self, size: int):
+    if self.offset &lt; size:
+        return False
+    return (n := len(self.subst_buffer)) == 0 or self.subst_offset &gt;= n</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexerCursor.copy"><code class="name flex">
+<span>def <span class="ident">copy</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L99-L106" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def copy(self):
+    return self.__class__(
+        self.offset,
+        list(self.modes),
+        array.array(&#39;H&#39;, self.token),
+        self.subst_offset,
+        array.array(&#39;H&#39;, self.subst_buffer)
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer"><code class="flex name class">
+<span>class <span class="ident">BatchLexer</span></span>
+<span>(</span><span>data, state=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L113-L767" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BatchLexer:
+
+    labels: dict[str, int]
+    code: memoryview
+
+    pending_redirect: RedirectIO | None
+
+    cursor: BatchLexerCursor
+    resume: BatchLexerCursor | None
+
+    class _register:
+        # A handler is given the current mode and char. It returns a boolean indicating
+        # whether or not the character was processed and may be consumed.
+        handlers: ClassVar[dict[Mode, Callable[
+            [BatchLexer, Mode, int], Generator[Token, None, bool]
+        ]]] = {}
+
+        def __init__(self, *modes: Mode):
+            self.modes = modes
+
+        def __call__(self, handler):
+            for mode in self.modes:
+                self.handlers[mode] = handler
+            return handler
+
+    def __init__(self, data: str | buf | BatchLexer, state: BatchState | None = None):
+        if isinstance(data, BatchLexer):
+            if state is not None:
+                raise NotImplementedError
+            self.text = data.text
+            self.code = data.code
+            self.labels = data.labels
+            self.state = data.state
+        else:
+            if state is None:
+                state = BatchState()
+            self.state = state
+            self.preparse(data)
+
+    def parse_group(self):
+        self.group += 1
+
+    def parse_label(self):
+        if (m := self.mode) != Mode.Text or len(self.modes) != 1:
+            raise EmulatorException(F&#39;Switching to LABEL while in mode {m.name}&#39;)
+        self.mode_switch(Mode.Label)
+
+    def parse_set(self):
+        if (m := self.mode) != Mode.Text or len(self.modes) != 1:
+            raise EmulatorException(F&#39;Switching to SET while in mode {m.name}&#39;)
+        self.mode_switch(Mode.SetStarted)
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    def parse_arg_variable(self, var: ArgVar):
+        &#34;&#34;&#34;
+        %* in a batch script refers to all the arguments (e.g. %1 %2 %3
+            %4 %5 ...)
+        Substitution of batch parameters (%n) has been enhanced.  You can
+        now use the following optional syntax:
+            %~1         - expands %1 removing any surrounding quotes (&#34;)
+            %~f1        - expands %1 to a fully qualified path name
+            %~d1        - expands %1 to a drive letter only
+            %~p1        - expands %1 to a path only
+            %~n1        - expands %1 to a file name only
+            %~x1        - expands %1 to a file extension only
+            %~s1        - expanded path contains short names only
+            %~a1        - expands %1 to file attributes
+            %~t1        - expands %1 to date/time of file
+            %~z1        - expands %1 to size of file
+            %~$PATH:1   - searches the directories listed in the PATH
+                           environment variable and expands %1 to the fully
+                           qualified name of the first one found.  If the
+                           environment variable name is not defined or the
+                           file is not found by the search, then this
+                           modifier expands to the empty string
+        The modifiers can be combined to get compound results:
+            %~dp1       - expands %1 to a drive letter and path only
+            %~nx1       - expands %1 to a file name and extension only
+            %~dp$PATH:1 - searches the directories listed in the PATH
+                           environment variable for %1 and expands to the
+                           drive letter and path of the first one found.
+            %~ftza1     - expands %1 to a DIR like output line
+        In the above examples %1 and PATH can be replaced by other
+        valid values.  The %~ syntax is terminated by a valid argument
+        number.  The %~ modifiers may not be used with %*
+        &#34;&#34;&#34;
+        state = self.state
+        flags = var.flags
+
+        if (k := var.offset) is (...):
+            return state.command_line
+        if (j := k - 1) &lt; 0:
+            argval = state.name
+        elif j &lt; len(args := state.args):
+            argval = args[j]
+        else:
+            return &#39;&#39;
+
+        if not flags:
+            return argval
+
+        has_path = 0 != ArgVarFlags.FullPath &amp; flags
+
+        if flags.StripQuotes and argval.startswith(&#39;&#34;&#39;) and argval.endswith(&#39;&#34;&#39;):
+            argval = argval[1:-1]
+
+        if flags.ShortName and not has_path:
+            flags |= ArgVarFlags.FullPath
+            has_path = True
+
+        with io.StringIO() as out:
+            if flags.Attributes:
+                out.write(&#39;--a--------&#39;) # TODO: placeholder
+            if flags.DateTime:
+                dt = state.start_time.isoformat(&#39; &#39;, &#39;minutes&#39;)
+                out.write(F&#39; {dt}&#39;)
+            if flags.FileSize:
+                out.write(F&#39; {state.sizeof_file(argval)}&#39;)
+            if has_path:
+                out.write(&#39; &#39;)
+                full_path = state.resolve_path(argval)
+                drv, rest = ntpath.splitdrive(full_path)
+                *pp, name = ntpath.split(rest)
+                name, ext = ntpath.splitext(name)
+                if flags.DriveLetter:
+                    out.write(drv)
+                if flags.FilePath:
+                    out.write(ntpath.join(*pp))
+                if flags.FileName:
+                    out.write(name)
+                if flags.FileExtension:
+                    out.write(ext)
+            return out.getvalue().lstrip()
+
+    @property
+    def modes(self):
+        return self.cursor.modes
+
+    def reset(self, offset: int):
+        self.quote = False
+        self.caret = False
+        self.white = False
+        self.first_after_gap = True
+        self.group = 0
+        self.cursor = BatchLexerCursor(offset)
+        self.modes.append(Mode.Text)
+        self.resume = None
+        self.pending_redirect = None
+
+    def mode_reset(self):
+        del self.modes[1:]
+
+    def mode_finish(self):
+        modes = self.modes
+        if len(modes) &lt;= 1:
+            raise RuntimeError(&#39;Trying to exit base mode.&#39;)
+        self.modes.pop()
+
+    def mode_switch(self, mode: Mode):
+        self.modes.append(mode)
+
+    @property
+    def mode(self):
+        return self.modes[-1]
+
+    @mode.setter
+    def mode(self, value: Mode):
+        self.modes[-1] = value
+
+    @property
+    def substituting(self):
+        return self.cursor.substituting
+
+    @property
+    def eof(self):
+        return (c := self.cursor).offset &gt;= len(self.code) and not c.subst_buffer
+
+    def quick_save(self):
+        self.resume = self.cursor.copy()
+
+    def quick_load(self):
+        if (resume := self.resume) is None:
+            raise RuntimeError
+        self.cursor = resume
+        self.resume = None
+
+    def current_char(self):
+        cursor = self.cursor
+        if not (subst := cursor.subst_buffer):
+            offset = cursor.offset
+            if self.code[offset] == PERCENT:
+                cursor.offset += 1
+                self.fill_substitution_buffer()
+                return self.current_char()
+        else:
+            offset = cursor.subst_offset
+            if offset &gt;= (n := len(subst)):
+                offset -= n
+                offset += cursor.offset
+            else:
+                return subst[offset]
+        try:
+            return self.code[offset]
+        except IndexError:
+            raise UnexpectedEOF
+
+    def consume_char(self):
+        cursor = self.cursor
+        if subst := cursor.subst_buffer:
+            offset = cursor.subst_offset + 1
+            if offset &gt;= len(subst):
+                del subst[:]
+                cursor.subst_offset = -1
+            else:
+                cursor.subst_offset = offset
+        else:
+            offset = cursor.offset + 1
+            if offset &gt; len(self.code):
+                raise EOFError(&#39;Consumed a character beyond EOF.&#39;)
+            cursor.offset = offset
+
+    def next_char(self):
+        self.consume_char()
+        return self.current_char()
+
+    def parse_env_variable(self, var: str):
+        if var == &#39;&#39;:
+            return &#39;%&#39;
+        name, _, modifier = var.partition(&#39;:&#39;)
+        base = self.state.envar(name)
+        if not modifier or not base:
+            return base
+        if &#39;=&#39; in modifier:
+            old, _, new = modifier.partition(&#39;=&#39;)
+            kwargs = {}
+            if old.startswith(&#39;~&#39;):
+                old = old[1:]
+                kwargs.update(count=1)
+            return base.replace(old, new, **kwargs)
+        else:
+            if not modifier.startswith(&#39;~&#39;):
+                raise EmulatorException
+            offset, _, length = modifier[1:].partition(&#39;,&#39;)
+            offset = batchint(offset)
+            if offset &lt; 0:
+                offset = max(0, len(base) + offset)
+            if length:
+                end = offset + batchint(length)
+            else:
+                end = len(base)
+            return base[offset:end]
+
+    def emit_token(self):
+        switched = False
+        if (buffer := self.cursor.token) and (token := u16(buffer)):
+            if (pr := self.pending_redirect):
+                pr.target = unquote(token)
+                self.pending_redirect = None
+                self.mode_switch(Mode.Gap)
+                yield pr
+                switched = True
+            else:
+                yield Word(token)
+        del buffer[:]
+        self.first_after_gap = False
+        return switched
+
+    def tokens(self, offset: int) -&gt; Generator[Token]:
+        self.reset(offset)
+        handlers = self._register.handlers
+        current_char = self.current_char
+        consume_char = self.consume_char
+        size = len(self.code)
+
+        while not self.cursor.eof(size):
+            c = current_char()
+            m = self.mode
+            h = handlers[m]
+            if (yield from h(self, m, c)):
+                consume_char()
+
+        if not self.first_after_gap:
+            yield from self.emit_token()
+
+    def check_line_break(self, mode: Mode, char: int):
+        if char != LINEBREAK:
+            return False
+        if not self.caret:
+            # caret is not reset until the next char!
+            yield from self.emit_token()
+            self.white = True
+            self.quote = False
+            self.mode_reset()
+            yield Ctrl.NewLine
+        self.consume_char()
+        return True
+
+    def check_caret(self, char: int):
+        if self.caret:
+            self.cursor.token.append(char)
+            self.caret = False
+            self.consume_char()
+            return True
+        elif char == CARET:
+            self.caret = True
+            self.consume_char()
+            return True
+        else:
+            return False
+
+    def check_command_separators(self, char: int):
+        if char == PAREN_CLOSE and (g := self.group) &gt; 0:
+            yield from self.emit_token()
+            yield Ctrl.EndGroup
+            self.mode_reset()
+            self.consume_char()
+            self.group = g - 1
+            return True
+        elif char == AMPERSAND:
+            tok = Ctrl.Ampersand
+        elif char == PIPE:
+            tok = Ctrl.Pipe
+        else:
+            return False
+        yield from self.emit_token()
+        self.mode_reset()
+        self.consume_char()
+        yield tok
+        return True
+
+    def check_quote_start(self, char: int):
+        if char != QUOTE:
+            return False
+        self.cursor.token.append(char)
+        self.mode_switch(Mode.Quote)
+        self.caret = False
+        self.consume_char()
+        return True
+
+    def check_redirect_io(self, char: int):
+        if char not in ANGLES:
+            return False
+
+        output = char != ANGLE_OPEN
+        token = self.cursor.token
+
+        if len(token) == 1 and (src := token[0] - ZERO) in range(10):
+            del token[:]
+            source = src
+        else:
+            source = int(output)
+
+        char = self.next_char()
+
+        if not output:
+            how = Redirect.In
+        elif char == ANGLE_CLOSE:
+            how = Redirect.OutAppend
+            char = self.next_char()
+        else:
+            how = Redirect.OutCreate
+
+        yield from self.emit_token()
+
+        if char != AMPERSAND:
+            self.pending_redirect = RedirectIO(how, source)
+            self.mode_switch(Mode.Gap)
+        else:
+            char = self.next_char()
+            if char not in range(ZERO, NINE + 1):
+                raise UnexpectedToken(char)
+            self.consume_char()
+            yield RedirectIO(how, source, char - ZERO)
+
+        return True
+
+    def fill_substitution_buffer(self):
+        if (cursor := self.cursor).substituting:
+            return
+
+        code = self.code
+        var_resume = -1
+        var_dollar = -1
+        var_cmdarg = ArgVar()
+        variable = None
+        phase = EV.New
+        q = ArgVarFlags.StripQuotes
+
+        for current in range((current := cursor.offset), len(code)):
+            char = code[current]
+            if char == LINEBREAK:
+                break
+            elif char == PERCENT:
+                try:
+                    var_name = u16(self.code[cursor.offset:current])
+                    variable = u16(self.parse_env_variable(var_name))
+                except MissingVariable:
+                    if var_resume &lt; 0:
+                        var_resume = current + 1
+                    break
+            elif var_cmdarg:
+                if ZERO &lt;= char &lt;= NINE:
+                    var_cmdarg.offset = char - ZERO
+                    variable = u16(self.parse_arg_variable(var_cmdarg))
+                elif char == ASTERIX and cursor.offset == current:
+                    var_cmdarg.offset = (...)
+                    variable = u16(self.parse_arg_variable(var_cmdarg))
+            if variable is not None:
+                cursor.subst_offset = 0
+                cursor.subst_buffer.extend(variable)
+                var_resume = current + 1
+                break
+            if phase == EV.Mod:
+                var_cmdarg = None
+            elif phase == EV.Env:
+                if char == COLON:
+                    if var_cmdarg:
+                        assert var_dollar &gt; 0
+                        var_cmdarg.path = u16(self.code[var_dollar:current])
+                    var_resume = current + 1
+            else:
+                if char == DOLLAR:
+                    var_dollar = current + 1
+                    phase = EV.Env
+                    continue
+                if char == COLON:
+                    var_cmdarg = None
+                    var_resume = current + 1
+                    phase = EV.Mod
+                    continue
+                if not var_cmdarg:
+                    continue
+                try:
+                    var_cmdarg.flags |= ArgVarFlags.FromToken(char)
+                except KeyError:
+                    var_cmdarg = None
+                    continue
+                if q not in var_cmdarg.flags:
+                    var_cmdarg = None
+        if var_resume &gt;= 0:
+            cursor.offset = var_resume
+
+    @_register(Mode.Label)
+    def gobble_label(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.check_line_break(mode, char)):
+            return False
+        self.cursor.token.append(char)
+        return True
+
+    @_register(Mode.Quote)
+    def gobble_quote(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.check_line_break(mode, char)):
+            return False
+        self.cursor.token.append(char)
+        if char == QUOTE:
+            self.mode_finish()
+        return True
+
+    @_register(Mode.Whitespace)
+    def gobble_whitespace(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if char in WHITESPACE:
+            self.cursor.token.append(char)
+            return True
+        self.mode_finish()
+        token = self.cursor.token
+        yield Word(u16(token))
+        del token[:]
+        return False
+
+    @_register(Mode.SetQuoted)
+    def gobble_quoted_set(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if char == QUOTE:
+            self.consume_char()
+            self.cursor.token.append(QUOTE)
+            self.quick_save()
+            return False
+
+        if char == LINEBREAK:
+            if self.resume is None:
+                yield from self.emit_token()
+                self.mode_reset()
+                yield Ctrl.NewLine
+                return True
+            elif self.caret:
+                self.caret = False
+                return True
+            else:
+                self.quick_load()
+                yield from self.emit_token()
+                return False
+
+        if self.resume is not None:
+            if char == CARET:
+                self.caret = not self.caret
+            elif not self.caret:
+                if (char == PAREN_CLOSE and self.group &gt; 0) or char in (PIPE, AMPERSAND):
+                    self.quick_load()
+                    yield from self.emit_token()
+                    self.mode_finish()
+                    # after a quick load, the ending quote was already consumed.
+                    return False
+
+        self.cursor.token.append(char)
+        return True
+
+    @_register(Mode.SetStarted)
+    def gobble_set(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        token = self.cursor.token
+        if (yield from self.check_line_break(mode, char)):
+            return False
+        if char in WHITESPACE:
+            yield from self.emit_token()
+            token.append(char)
+            self.mode_switch(Mode.Whitespace)
+            return True
+        if char == SLASH and not self.pending_redirect:
+            yield from self.emit_token()
+            token.append(char)
+            return True
+        if not token and char == QUOTE:
+            self.caret = False
+            token.append(char)
+            self.mode = Mode.SetQuoted
+            return True
+        if self.check_caret(char):
+            return False
+        if char == EQUALS:
+            yield from self.emit_token()
+            yield Ctrl.Equals
+            self.mode = Mode.SetRegular
+            return True
+        if self.check_quote_start(char):
+            return False
+        if (yield from self.check_command_separators(char)):
+            return False
+        if (yield from self.check_redirect_io(char)):
+            return False
+        token.append(char)
+        return True
+
+    def common_token_checks(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        return (False
+            or (yield from self.check_line_break(mode, char))
+            or self.check_caret(char)
+            or self.check_quote_start(char)
+            or (yield from self.check_command_separators(char))
+            or (yield from self.check_redirect_io(char)))
+
+    @_register(Mode.SetRegular)
+    def gobble_set_regular(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.common_token_checks(mode, char)):
+            return False
+        if (pr := self.pending_redirect) and char in WHITESPACE:
+            token = self.cursor.token
+            self.pending_redirect = None
+            pr.target = unquote(u16(token))
+            del token[:]
+            yield pr
+        self.cursor.token.append(char)
+        return True
+
+    @_register(Mode.Gap)
+    def gobble_gap(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        yield from ()
+        if char in SEPARATORS:
+            return True
+        self.mode_finish()
+        self.first_after_gap = True
+        return False
+
+    @_register(Mode.Text)
+    def gobble_txt(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+        if (yield from self.common_token_checks(mode, char)):
+            return False
+        if char in WHITESPACE:
+            yield from self.emit_token()
+            self.cursor.token.append(char)
+            self.mode_switch(Mode.Whitespace)
+            return True
+        if char == SLASH and not self.pending_redirect:
+            yield from self.emit_token()
+        if char == COLON:
+            if (yield from self.emit_token()):
+                return False
+            elif self.next_char() == COLON:
+                yield Ctrl.Comment
+                return True
+            else:
+                yield Ctrl.Label
+                return False
+        try:
+            token = SeparatorMap[char]
+        except KeyError:
+            pass
+        else:
+            if (yield from self.emit_token()):
+                return False
+            else:
+                yield token
+                return True
+        self.cursor.token.append(char)
+        return True
+
+    @staticmethod
+    def label(text: str, uppercase=True):
+        parts = re.split(&#39;([\x20\t\v])&#39;, text.lstrip())
+        for k, part in itertools.islice(enumerate(parts), 0, None, 2):
+            tq, part = uncaret(part, True)
+            if not tq:
+                parts[k] = part
+                del parts[k + 1:]
+                break
+            parts[k] = part[:-1]
+        label = &#39;&#39;.join(parts)
+        if uppercase:
+            label = label.upper()
+        return label
+
+    def preparse(self, text: str | buf):
+        self.labels = {}
+
+        if not isinstance(text, str):
+            text = codecs.decode(text, &#39;utf8&#39;, errors=&#39;replace&#39;)
+
+        _tail = text[-10:]
+        lines = text.splitlines(keepends=False)
+        utf16 = array.array(&#39;H&#39;)
+
+        if _tail.splitlines() != F&#39;{_tail}\n&#39;.splitlines():
+            # the text had a trailing line break, which is swallowed by the splitlines method
+            lines.append(&#39;&#39;)
+
+        for k, line in enumerate(lines):
+            if k &gt; 0:
+                utf16.append(LINEBREAK)
+            encoded = line.encode(&#39;utf-16le&#39;)
+            if not encoded:
+                continue
+            encoded = memoryview(encoded).cast(&#39;H&#39;)
+            offset = len(utf16)
+            prefix = re.search(&#39;^@?[\\s]*:&#39;, line)
+            if prefix:
+                p = prefix.end()
+                if lb := self.label(u16(encoded[p:])):
+                    self.labels.setdefault(lb, offset + p - 1)
+            utf16.extend(encoded)
+
+        self.text = text
+        self.code = memoryview(utf16)
+
+    if set(_register.handlers) != set(Mode):
+        raise NotImplementedError(&#39;Not all handlers were implemented.&#39;)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.BatchLexer.labels"><code class="name">var <span class="ident">labels</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.code"><code class="name">var <span class="ident">code</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.pending_redirect"><code class="name">var <span class="ident">pending_redirect</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.cursor"><code class="name">var <span class="ident">cursor</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.resume"><code class="name">var <span class="ident">resume</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.BatchLexer.label"><code class="name flex">
+<span>def <span class="ident">label</span></span>(<span>text, uppercase=True)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L719-L732" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@staticmethod
+def label(text: str, uppercase=True):
+    parts = re.split(&#39;([\x20\t\v])&#39;, text.lstrip())
+    for k, part in itertools.islice(enumerate(parts), 0, None, 2):
+        tq, part = uncaret(part, True)
+        if not tq:
+            parts[k] = part
+            del parts[k + 1:]
+            break
+        parts[k] = part[:-1]
+    label = &#39;&#39;.join(parts)
+    if uppercase:
+        label = label.upper()
+    return label</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.BatchLexer.environment"><code class="name">var <span class="ident">environment</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L165-L167" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def environment(self):
+    return self.state.environment</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.modes"><code class="name">var <span class="ident">modes</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L250-L252" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def modes(self):
+    return self.cursor.modes</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.mode"><code class="name">var <span class="ident">mode</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L277-L279" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def mode(self):
+    return self.modes[-1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.substituting"><code class="name">var <span class="ident">substituting</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L285-L287" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def substituting(self):
+    return self.cursor.substituting</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.eof"><code class="name">var <span class="ident">eof</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L289-L291" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def eof(self):
+    return (c := self.cursor).offset &gt;= len(self.code) and not c.subst_buffer</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.lexer.BatchLexer.parse_group"><code class="name flex">
+<span>def <span class="ident">parse_group</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L152-L153" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_group(self):
+    self.group += 1</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.parse_label"><code class="name flex">
+<span>def <span class="ident">parse_label</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L155-L158" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_label(self):
+    if (m := self.mode) != Mode.Text or len(self.modes) != 1:
+        raise EmulatorException(F&#39;Switching to LABEL while in mode {m.name}&#39;)
+    self.mode_switch(Mode.Label)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.parse_set"><code class="name flex">
+<span>def <span class="ident">parse_set</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L160-L163" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_set(self):
+    if (m := self.mode) != Mode.Text or len(self.modes) != 1:
+        raise EmulatorException(F&#39;Switching to SET while in mode {m.name}&#39;)
+    self.mode_switch(Mode.SetStarted)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.parse_arg_variable"><code class="name flex">
+<span>def <span class="ident">parse_arg_variable</span></span>(<span>self, var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>%<em> in a batch script refers to all the arguments (e.g. %1 %2 %3
+%4 %5 &hellip;)
+Substitution of batch parameters (%n) has been enhanced.
+You can
+now use the following optional syntax:
+%~1
+- expands %1 removing any surrounding quotes (")
+%~f1
+- expands %1 to a fully qualified path name
+%~d1
+- expands %1 to a drive letter only
+%~p1
+- expands %1 to a path only
+%~n1
+- expands %1 to a file name only
+%~x1
+- expands %1 to a file extension only
+%~s1
+- expanded path contains short names only
+%~a1
+- expands %1 to file attributes
+%~t1
+- expands %1 to date/time of file
+%~z1
+- expands %1 to size of file
+%~$PATH:1
+- searches the directories listed in the PATH
+environment variable and expands %1 to the fully
+qualified name of the first one found.
+If the
+environment variable name is not defined or the
+file is not found by the search, then this
+modifier expands to the empty string
+The modifiers can be combined to get compound results:
+%~dp1
+- expands %1 to a drive letter and path only
+%~nx1
+- expands %1 to a file name and extension only
+%~dp$PATH:1 - searches the directories listed in the PATH
+environment variable for %1 and expands to the
+drive letter and path of the first one found.
+%~ftza1
+- expands %1 to a DIR like output line
+In the above examples %1 and PATH can be replaced by other
+valid values.
+The %~ syntax is terminated by a valid argument
+number.
+The %~ modifiers may not be used with %</em></p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L169-L248" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_arg_variable(self, var: ArgVar):
+    &#34;&#34;&#34;
+    %* in a batch script refers to all the arguments (e.g. %1 %2 %3
+        %4 %5 ...)
+    Substitution of batch parameters (%n) has been enhanced.  You can
+    now use the following optional syntax:
+        %~1         - expands %1 removing any surrounding quotes (&#34;)
+        %~f1        - expands %1 to a fully qualified path name
+        %~d1        - expands %1 to a drive letter only
+        %~p1        - expands %1 to a path only
+        %~n1        - expands %1 to a file name only
+        %~x1        - expands %1 to a file extension only
+        %~s1        - expanded path contains short names only
+        %~a1        - expands %1 to file attributes
+        %~t1        - expands %1 to date/time of file
+        %~z1        - expands %1 to size of file
+        %~$PATH:1   - searches the directories listed in the PATH
+                       environment variable and expands %1 to the fully
+                       qualified name of the first one found.  If the
+                       environment variable name is not defined or the
+                       file is not found by the search, then this
+                       modifier expands to the empty string
+    The modifiers can be combined to get compound results:
+        %~dp1       - expands %1 to a drive letter and path only
+        %~nx1       - expands %1 to a file name and extension only
+        %~dp$PATH:1 - searches the directories listed in the PATH
+                       environment variable for %1 and expands to the
+                       drive letter and path of the first one found.
+        %~ftza1     - expands %1 to a DIR like output line
+    In the above examples %1 and PATH can be replaced by other
+    valid values.  The %~ syntax is terminated by a valid argument
+    number.  The %~ modifiers may not be used with %*
+    &#34;&#34;&#34;
+    state = self.state
+    flags = var.flags
+
+    if (k := var.offset) is (...):
+        return state.command_line
+    if (j := k - 1) &lt; 0:
+        argval = state.name
+    elif j &lt; len(args := state.args):
+        argval = args[j]
+    else:
+        return &#39;&#39;
+
+    if not flags:
+        return argval
+
+    has_path = 0 != ArgVarFlags.FullPath &amp; flags
+
+    if flags.StripQuotes and argval.startswith(&#39;&#34;&#39;) and argval.endswith(&#39;&#34;&#39;):
+        argval = argval[1:-1]
+
+    if flags.ShortName and not has_path:
+        flags |= ArgVarFlags.FullPath
+        has_path = True
+
+    with io.StringIO() as out:
+        if flags.Attributes:
+            out.write(&#39;--a--------&#39;) # TODO: placeholder
+        if flags.DateTime:
+            dt = state.start_time.isoformat(&#39; &#39;, &#39;minutes&#39;)
+            out.write(F&#39; {dt}&#39;)
+        if flags.FileSize:
+            out.write(F&#39; {state.sizeof_file(argval)}&#39;)
+        if has_path:
+            out.write(&#39; &#39;)
+            full_path = state.resolve_path(argval)
+            drv, rest = ntpath.splitdrive(full_path)
+            *pp, name = ntpath.split(rest)
+            name, ext = ntpath.splitext(name)
+            if flags.DriveLetter:
+                out.write(drv)
+            if flags.FilePath:
+                out.write(ntpath.join(*pp))
+            if flags.FileName:
+                out.write(name)
+            if flags.FileExtension:
+                out.write(ext)
+        return out.getvalue().lstrip()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self, offset)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L254-L263" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reset(self, offset: int):
+    self.quote = False
+    self.caret = False
+    self.white = False
+    self.first_after_gap = True
+    self.group = 0
+    self.cursor = BatchLexerCursor(offset)
+    self.modes.append(Mode.Text)
+    self.resume = None
+    self.pending_redirect = None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.mode_reset"><code class="name flex">
+<span>def <span class="ident">mode_reset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L265-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def mode_reset(self):
+    del self.modes[1:]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.mode_finish"><code class="name flex">
+<span>def <span class="ident">mode_finish</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L268-L272" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def mode_finish(self):
+    modes = self.modes
+    if len(modes) &lt;= 1:
+        raise RuntimeError(&#39;Trying to exit base mode.&#39;)
+    self.modes.pop()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.mode_switch"><code class="name flex">
+<span>def <span class="ident">mode_switch</span></span>(<span>self, mode)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L274-L275" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def mode_switch(self, mode: Mode):
+    self.modes.append(mode)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.quick_save"><code class="name flex">
+<span>def <span class="ident">quick_save</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L293-L294" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def quick_save(self):
+    self.resume = self.cursor.copy()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.quick_load"><code class="name flex">
+<span>def <span class="ident">quick_load</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L296-L300" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def quick_load(self):
+    if (resume := self.resume) is None:
+        raise RuntimeError
+    self.cursor = resume
+    self.resume = None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.current_char"><code class="name flex">
+<span>def <span class="ident">current_char</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L302-L320" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def current_char(self):
+    cursor = self.cursor
+    if not (subst := cursor.subst_buffer):
+        offset = cursor.offset
+        if self.code[offset] == PERCENT:
+            cursor.offset += 1
+            self.fill_substitution_buffer()
+            return self.current_char()
+    else:
+        offset = cursor.subst_offset
+        if offset &gt;= (n := len(subst)):
+            offset -= n
+            offset += cursor.offset
+        else:
+            return subst[offset]
+    try:
+        return self.code[offset]
+    except IndexError:
+        raise UnexpectedEOF</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.consume_char"><code class="name flex">
+<span>def <span class="ident">consume_char</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L322-L335" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def consume_char(self):
+    cursor = self.cursor
+    if subst := cursor.subst_buffer:
+        offset = cursor.subst_offset + 1
+        if offset &gt;= len(subst):
+            del subst[:]
+            cursor.subst_offset = -1
+        else:
+            cursor.subst_offset = offset
+    else:
+        offset = cursor.offset + 1
+        if offset &gt; len(self.code):
+            raise EOFError(&#39;Consumed a character beyond EOF.&#39;)
+        cursor.offset = offset</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.next_char"><code class="name flex">
+<span>def <span class="ident">next_char</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L337-L339" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def next_char(self):
+    self.consume_char()
+    return self.current_char()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.parse_env_variable"><code class="name flex">
+<span>def <span class="ident">parse_env_variable</span></span>(<span>self, var)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L341-L366" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_env_variable(self, var: str):
+    if var == &#39;&#39;:
+        return &#39;%&#39;
+    name, _, modifier = var.partition(&#39;:&#39;)
+    base = self.state.envar(name)
+    if not modifier or not base:
+        return base
+    if &#39;=&#39; in modifier:
+        old, _, new = modifier.partition(&#39;=&#39;)
+        kwargs = {}
+        if old.startswith(&#39;~&#39;):
+            old = old[1:]
+            kwargs.update(count=1)
+        return base.replace(old, new, **kwargs)
+    else:
+        if not modifier.startswith(&#39;~&#39;):
+            raise EmulatorException
+        offset, _, length = modifier[1:].partition(&#39;,&#39;)
+        offset = batchint(offset)
+        if offset &lt; 0:
+            offset = max(0, len(base) + offset)
+        if length:
+            end = offset + batchint(length)
+        else:
+            end = len(base)
+        return base[offset:end]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.emit_token"><code class="name flex">
+<span>def <span class="ident">emit_token</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L368-L381" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emit_token(self):
+    switched = False
+    if (buffer := self.cursor.token) and (token := u16(buffer)):
+        if (pr := self.pending_redirect):
+            pr.target = unquote(token)
+            self.pending_redirect = None
+            self.mode_switch(Mode.Gap)
+            yield pr
+            switched = True
+        else:
+            yield Word(token)
+    del buffer[:]
+    self.first_after_gap = False
+    return switched</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.tokens"><code class="name flex">
+<span>def <span class="ident">tokens</span></span>(<span>self, offset)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L383-L398" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokens(self, offset: int) -&gt; Generator[Token]:
+    self.reset(offset)
+    handlers = self._register.handlers
+    current_char = self.current_char
+    consume_char = self.consume_char
+    size = len(self.code)
+
+    while not self.cursor.eof(size):
+        c = current_char()
+        m = self.mode
+        h = handlers[m]
+        if (yield from h(self, m, c)):
+            consume_char()
+
+    if not self.first_after_gap:
+        yield from self.emit_token()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.check_line_break"><code class="name flex">
+<span>def <span class="ident">check_line_break</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L400-L411" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check_line_break(self, mode: Mode, char: int):
+    if char != LINEBREAK:
+        return False
+    if not self.caret:
+        # caret is not reset until the next char!
+        yield from self.emit_token()
+        self.white = True
+        self.quote = False
+        self.mode_reset()
+        yield Ctrl.NewLine
+    self.consume_char()
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.check_caret"><code class="name flex">
+<span>def <span class="ident">check_caret</span></span>(<span>self, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L413-L424" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check_caret(self, char: int):
+    if self.caret:
+        self.cursor.token.append(char)
+        self.caret = False
+        self.consume_char()
+        return True
+    elif char == CARET:
+        self.caret = True
+        self.consume_char()
+        return True
+    else:
+        return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.check_command_separators"><code class="name flex">
+<span>def <span class="ident">check_command_separators</span></span>(<span>self, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L426-L444" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check_command_separators(self, char: int):
+    if char == PAREN_CLOSE and (g := self.group) &gt; 0:
+        yield from self.emit_token()
+        yield Ctrl.EndGroup
+        self.mode_reset()
+        self.consume_char()
+        self.group = g - 1
+        return True
+    elif char == AMPERSAND:
+        tok = Ctrl.Ampersand
+    elif char == PIPE:
+        tok = Ctrl.Pipe
+    else:
+        return False
+    yield from self.emit_token()
+    self.mode_reset()
+    self.consume_char()
+    yield tok
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.check_quote_start"><code class="name flex">
+<span>def <span class="ident">check_quote_start</span></span>(<span>self, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L446-L453" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check_quote_start(self, char: int):
+    if char != QUOTE:
+        return False
+    self.cursor.token.append(char)
+    self.mode_switch(Mode.Quote)
+    self.caret = False
+    self.consume_char()
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.check_redirect_io"><code class="name flex">
+<span>def <span class="ident">check_redirect_io</span></span>(<span>self, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L455-L490" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check_redirect_io(self, char: int):
+    if char not in ANGLES:
+        return False
+
+    output = char != ANGLE_OPEN
+    token = self.cursor.token
+
+    if len(token) == 1 and (src := token[0] - ZERO) in range(10):
+        del token[:]
+        source = src
+    else:
+        source = int(output)
+
+    char = self.next_char()
+
+    if not output:
+        how = Redirect.In
+    elif char == ANGLE_CLOSE:
+        how = Redirect.OutAppend
+        char = self.next_char()
+    else:
+        how = Redirect.OutCreate
+
+    yield from self.emit_token()
+
+    if char != AMPERSAND:
+        self.pending_redirect = RedirectIO(how, source)
+        self.mode_switch(Mode.Gap)
+    else:
+        char = self.next_char()
+        if char not in range(ZERO, NINE + 1):
+            raise UnexpectedToken(char)
+        self.consume_char()
+        yield RedirectIO(how, source, char - ZERO)
+
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.fill_substitution_buffer"><code class="name flex">
+<span>def <span class="ident">fill_substitution_buffer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L492-L556" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def fill_substitution_buffer(self):
+    if (cursor := self.cursor).substituting:
+        return
+
+    code = self.code
+    var_resume = -1
+    var_dollar = -1
+    var_cmdarg = ArgVar()
+    variable = None
+    phase = EV.New
+    q = ArgVarFlags.StripQuotes
+
+    for current in range((current := cursor.offset), len(code)):
+        char = code[current]
+        if char == LINEBREAK:
+            break
+        elif char == PERCENT:
+            try:
+                var_name = u16(self.code[cursor.offset:current])
+                variable = u16(self.parse_env_variable(var_name))
+            except MissingVariable:
+                if var_resume &lt; 0:
+                    var_resume = current + 1
+                break
+        elif var_cmdarg:
+            if ZERO &lt;= char &lt;= NINE:
+                var_cmdarg.offset = char - ZERO
+                variable = u16(self.parse_arg_variable(var_cmdarg))
+            elif char == ASTERIX and cursor.offset == current:
+                var_cmdarg.offset = (...)
+                variable = u16(self.parse_arg_variable(var_cmdarg))
+        if variable is not None:
+            cursor.subst_offset = 0
+            cursor.subst_buffer.extend(variable)
+            var_resume = current + 1
+            break
+        if phase == EV.Mod:
+            var_cmdarg = None
+        elif phase == EV.Env:
+            if char == COLON:
+                if var_cmdarg:
+                    assert var_dollar &gt; 0
+                    var_cmdarg.path = u16(self.code[var_dollar:current])
+                var_resume = current + 1
+        else:
+            if char == DOLLAR:
+                var_dollar = current + 1
+                phase = EV.Env
+                continue
+            if char == COLON:
+                var_cmdarg = None
+                var_resume = current + 1
+                phase = EV.Mod
+                continue
+            if not var_cmdarg:
+                continue
+            try:
+                var_cmdarg.flags |= ArgVarFlags.FromToken(char)
+            except KeyError:
+                var_cmdarg = None
+                continue
+            if q not in var_cmdarg.flags:
+                var_cmdarg = None
+    if var_resume &gt;= 0:
+        cursor.offset = var_resume</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_label"><code class="name flex">
+<span>def <span class="ident">gobble_label</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L558-L563" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.Label)
+def gobble_label(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    if (yield from self.check_line_break(mode, char)):
+        return False
+    self.cursor.token.append(char)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_quote"><code class="name flex">
+<span>def <span class="ident">gobble_quote</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L565-L572" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.Quote)
+def gobble_quote(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    if (yield from self.check_line_break(mode, char)):
+        return False
+    self.cursor.token.append(char)
+    if char == QUOTE:
+        self.mode_finish()
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_whitespace"><code class="name flex">
+<span>def <span class="ident">gobble_whitespace</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L574-L583" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.Whitespace)
+def gobble_whitespace(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    if char in WHITESPACE:
+        self.cursor.token.append(char)
+        return True
+    self.mode_finish()
+    token = self.cursor.token
+    yield Word(u16(token))
+    del token[:]
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_quoted_set"><code class="name flex">
+<span>def <span class="ident">gobble_quoted_set</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L585-L619" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.SetQuoted)
+def gobble_quoted_set(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    if char == QUOTE:
+        self.consume_char()
+        self.cursor.token.append(QUOTE)
+        self.quick_save()
+        return False
+
+    if char == LINEBREAK:
+        if self.resume is None:
+            yield from self.emit_token()
+            self.mode_reset()
+            yield Ctrl.NewLine
+            return True
+        elif self.caret:
+            self.caret = False
+            return True
+        else:
+            self.quick_load()
+            yield from self.emit_token()
+            return False
+
+    if self.resume is not None:
+        if char == CARET:
+            self.caret = not self.caret
+        elif not self.caret:
+            if (char == PAREN_CLOSE and self.group &gt; 0) or char in (PIPE, AMPERSAND):
+                self.quick_load()
+                yield from self.emit_token()
+                self.mode_finish()
+                # after a quick load, the ending quote was already consumed.
+                return False
+
+    self.cursor.token.append(char)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_set"><code class="name flex">
+<span>def <span class="ident">gobble_set</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L621-L654" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.SetStarted)
+def gobble_set(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    token = self.cursor.token
+    if (yield from self.check_line_break(mode, char)):
+        return False
+    if char in WHITESPACE:
+        yield from self.emit_token()
+        token.append(char)
+        self.mode_switch(Mode.Whitespace)
+        return True
+    if char == SLASH and not self.pending_redirect:
+        yield from self.emit_token()
+        token.append(char)
+        return True
+    if not token and char == QUOTE:
+        self.caret = False
+        token.append(char)
+        self.mode = Mode.SetQuoted
+        return True
+    if self.check_caret(char):
+        return False
+    if char == EQUALS:
+        yield from self.emit_token()
+        yield Ctrl.Equals
+        self.mode = Mode.SetRegular
+        return True
+    if self.check_quote_start(char):
+        return False
+    if (yield from self.check_command_separators(char)):
+        return False
+    if (yield from self.check_redirect_io(char)):
+        return False
+    token.append(char)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.common_token_checks"><code class="name flex">
+<span>def <span class="ident">common_token_checks</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L656-L662" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def common_token_checks(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    return (False
+        or (yield from self.check_line_break(mode, char))
+        or self.check_caret(char)
+        or self.check_quote_start(char)
+        or (yield from self.check_command_separators(char))
+        or (yield from self.check_redirect_io(char)))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_set_regular"><code class="name flex">
+<span>def <span class="ident">gobble_set_regular</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L664-L675" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.SetRegular)
+def gobble_set_regular(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    if (yield from self.common_token_checks(mode, char)):
+        return False
+    if (pr := self.pending_redirect) and char in WHITESPACE:
+        token = self.cursor.token
+        self.pending_redirect = None
+        pr.target = unquote(u16(token))
+        del token[:]
+        yield pr
+    self.cursor.token.append(char)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_gap"><code class="name flex">
+<span>def <span class="ident">gobble_gap</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L677-L684" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.Gap)
+def gobble_gap(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    yield from ()
+    if char in SEPARATORS:
+        return True
+    self.mode_finish()
+    self.first_after_gap = True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.gobble_txt"><code class="name flex">
+<span>def <span class="ident">gobble_txt</span></span>(<span>self, mode, char)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L686-L717" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_register(Mode.Text)
+def gobble_txt(self, mode: Mode, char: int) -&gt; Generator[Token, None, bool]:
+    if (yield from self.common_token_checks(mode, char)):
+        return False
+    if char in WHITESPACE:
+        yield from self.emit_token()
+        self.cursor.token.append(char)
+        self.mode_switch(Mode.Whitespace)
+        return True
+    if char == SLASH and not self.pending_redirect:
+        yield from self.emit_token()
+    if char == COLON:
+        if (yield from self.emit_token()):
+            return False
+        elif self.next_char() == COLON:
+            yield Ctrl.Comment
+            return True
+        else:
+            yield Ctrl.Label
+            return False
+    try:
+        token = SeparatorMap[char]
+    except KeyError:
+        pass
+    else:
+        if (yield from self.emit_token()):
+            return False
+        else:
+            yield token
+            return True
+    self.cursor.token.append(char)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.lexer.BatchLexer.preparse"><code class="name flex">
+<span>def <span class="ident">preparse</span></span>(<span>self, text)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/lexer.py#L734-L764" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def preparse(self, text: str | buf):
+    self.labels = {}
+
+    if not isinstance(text, str):
+        text = codecs.decode(text, &#39;utf8&#39;, errors=&#39;replace&#39;)
+
+    _tail = text[-10:]
+    lines = text.splitlines(keepends=False)
+    utf16 = array.array(&#39;H&#39;)
+
+    if _tail.splitlines() != F&#39;{_tail}\n&#39;.splitlines():
+        # the text had a trailing line break, which is swallowed by the splitlines method
+        lines.append(&#39;&#39;)
+
+    for k, line in enumerate(lines):
+        if k &gt; 0:
+            utf16.append(LINEBREAK)
+        encoded = line.encode(&#39;utf-16le&#39;)
+        if not encoded:
+            continue
+        encoded = memoryview(encoded).cast(&#39;H&#39;)
+        offset = len(utf16)
+        prefix = re.search(&#39;^@?[\\s]*:&#39;, line)
+        if prefix:
+            p = prefix.end()
+            if lb := self.label(u16(encoded[p:])):
+                self.labels.setdefault(lb, offset + p - 1)
+        utf16.extend(encoded)
+
+    self.text = text
+    self.code = memoryview(utf16)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.lexer.Mode" href="#refinery.lib.batch.lexer.Mode">Mode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.lexer.EV" href="#refinery.lib.batch.lexer.EV">EV</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.lexer.BatchLexerCursor" href="#refinery.lib.batch.lexer.BatchLexerCursor">BatchLexerCursor</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.lexer.BatchLexerCursor.eof" href="#refinery.lib.batch.lexer.BatchLexerCursor.eof">eof</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexerCursor.copy" href="#refinery.lib.batch.lexer.BatchLexerCursor.copy">copy</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.lexer.BatchLexer" href="#refinery.lib.batch.lexer.BatchLexer">BatchLexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.label" href="#refinery.lib.batch.lexer.BatchLexer.label">label</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.parse_group" href="#refinery.lib.batch.lexer.BatchLexer.parse_group">parse_group</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.parse_label" href="#refinery.lib.batch.lexer.BatchLexer.parse_label">parse_label</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.parse_set" href="#refinery.lib.batch.lexer.BatchLexer.parse_set">parse_set</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.parse_arg_variable" href="#refinery.lib.batch.lexer.BatchLexer.parse_arg_variable">parse_arg_variable</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.reset" href="#refinery.lib.batch.lexer.BatchLexer.reset">reset</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.mode_reset" href="#refinery.lib.batch.lexer.BatchLexer.mode_reset">mode_reset</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.mode_finish" href="#refinery.lib.batch.lexer.BatchLexer.mode_finish">mode_finish</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.mode_switch" href="#refinery.lib.batch.lexer.BatchLexer.mode_switch">mode_switch</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.quick_save" href="#refinery.lib.batch.lexer.BatchLexer.quick_save">quick_save</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.quick_load" href="#refinery.lib.batch.lexer.BatchLexer.quick_load">quick_load</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.current_char" href="#refinery.lib.batch.lexer.BatchLexer.current_char">current_char</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.consume_char" href="#refinery.lib.batch.lexer.BatchLexer.consume_char">consume_char</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.next_char" href="#refinery.lib.batch.lexer.BatchLexer.next_char">next_char</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.parse_env_variable" href="#refinery.lib.batch.lexer.BatchLexer.parse_env_variable">parse_env_variable</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.emit_token" href="#refinery.lib.batch.lexer.BatchLexer.emit_token">emit_token</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.tokens" href="#refinery.lib.batch.lexer.BatchLexer.tokens">tokens</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.check_line_break" href="#refinery.lib.batch.lexer.BatchLexer.check_line_break">check_line_break</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.check_caret" href="#refinery.lib.batch.lexer.BatchLexer.check_caret">check_caret</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.check_command_separators" href="#refinery.lib.batch.lexer.BatchLexer.check_command_separators">check_command_separators</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.check_quote_start" href="#refinery.lib.batch.lexer.BatchLexer.check_quote_start">check_quote_start</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.check_redirect_io" href="#refinery.lib.batch.lexer.BatchLexer.check_redirect_io">check_redirect_io</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.fill_substitution_buffer" href="#refinery.lib.batch.lexer.BatchLexer.fill_substitution_buffer">fill_substitution_buffer</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_label" href="#refinery.lib.batch.lexer.BatchLexer.gobble_label">gobble_label</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_quote" href="#refinery.lib.batch.lexer.BatchLexer.gobble_quote">gobble_quote</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_whitespace" href="#refinery.lib.batch.lexer.BatchLexer.gobble_whitespace">gobble_whitespace</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_quoted_set" href="#refinery.lib.batch.lexer.BatchLexer.gobble_quoted_set">gobble_quoted_set</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_set" href="#refinery.lib.batch.lexer.BatchLexer.gobble_set">gobble_set</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.common_token_checks" href="#refinery.lib.batch.lexer.BatchLexer.common_token_checks">common_token_checks</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_set_regular" href="#refinery.lib.batch.lexer.BatchLexer.gobble_set_regular">gobble_set_regular</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_gap" href="#refinery.lib.batch.lexer.BatchLexer.gobble_gap">gobble_gap</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.gobble_txt" href="#refinery.lib.batch.lexer.BatchLexer.gobble_txt">gobble_txt</a></code></li>
+<li><code><a title="refinery.lib.batch.lexer.BatchLexer.preparse" href="#refinery.lib.batch.lexer.BatchLexer.preparse">preparse</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

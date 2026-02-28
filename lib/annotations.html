@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.annotations documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.annotations</code></h1>
+</header>
+<section id="section-intro">
+<p>This module exposes a method for backwards-compatible evaluation of modern type annotations.
+Starting with Python 3.10, this module only forwards standard library functions, but in earlier
+versions, annotations are converted to backwards-compatible expressions before evaluation. For
+example, consider the following modern type annotation:</p>
+<pre><code>list[list[int] | str | bool | float] | dict[str, int]
+</code></pre>
+<p>While this is valid as a type annotation with a <code>__future__</code> import, it does not evaluate as a
+Python expression at runtime before 3.10. Therefore, it would be transformed into the following
+anntoation before evaluation:</p>
+<pre><code>Union[List[Union[List[int], str, bool, float]], Dict[str, int]]
+</code></pre>
+<p>This backwards compatibility layer can be removed as soon as refinery has raised its minimum
+Python version requirement to Python 3.10 or higher.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/annotations.py#L1-L148" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+This module exposes a method for backwards-compatible evaluation of modern type annotations.
+Starting with Python 3.10, this module only forwards standard library functions, but in earlier
+versions, annotations are converted to backwards-compatible expressions before evaluation. For
+example, consider the following modern type annotation:
+
+    list[list[int] | str | bool | float] | dict[str, int]
+
+While this is valid as a type annotation with a `__future__` import, it does not evaluate as a
+Python expression at runtime before 3.10. Therefore, it would be transformed into the following
+anntoation before evaluation:
+
+    Union[List[Union[List[int], str, bool, float]], Dict[str, int]]
+
+This backwards compatibility layer can be removed as soon as refinery has raised its minimum
+Python version requirement to Python 3.10 or higher.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import sys
+import typing
+
+__pdoc__ = {
+    &#39;evaluate&#39;: (
+        &#39;The same as `eval` on Python 3.10 and beyond, otherwise a backwards-compatibility layer &#39;
+        &#39;that converts modern type hints back to compatible expressions.&#39;
+    ),
+    &#39;get_type_hints&#39;: (
+        &#39;Implements the same functionality as `typing.get_type_hints` but uses `evaluate` rather &#39;
+        &#39;than `eval` when the Python version is below 3.10.&#39;
+    ),
+}
+
+__all__ = [&#39;get_type_hints&#39;, &#39;evaluate&#39;]
+
+if sys.version_info &gt;= (3, 10):
+    get_type_hints = typing.get_type_hints
+    evaluate = eval
+else:
+    import ast
+
+    if sys.version_info &gt;= (3, 9):
+        def _index(n):
+            return n
+    elif typing.TYPE_CHECKING:
+        def _index(n: _T) -&gt; _T:
+            return typing.cast(_T, ast.Index(value=n))
+        _T = typing.TypeVar(&#39;_T&#39;, bound=ast.expr)
+    else:
+        def _index(n):
+            return ast.Index(value=n)
+
+    _TYPING_LOOKUP = {}
+    _TYPING_MODULE = &#39;_imp_typing&#39;
+
+    def _into_typing(name: str):
+        try:
+            alias = _TYPING_LOOKUP[(name := name.casefold())]
+        except KeyError:
+            for t in dir(typing):
+                if t.casefold() == name:
+                    _TYPING_LOOKUP[name] = alias = t
+                    break
+            else:
+                _TYPING_LOOKUP[name] = alias = None
+        return alias
+
+    def get_type_hints(obj):
+        if getattr(obj, &#39;__no_type_check__&#39;, None):
+            return {}
+        if isinstance(obj, type):
+            hints = {}
+            for base in reversed(obj.__mro__):
+                gns: dict = sys.modules[base.__module__].__dict__
+                ann: dict = base.__dict__.get(&#39;__annotations__&#39;, {})
+                for name, value in ann.items():
+                    hints[name] = evaluate(value, gns)
+            return hints
+        root = obj
+        while hasattr(root, &#39;__wrapped__&#39;):
+            root = root.__wrapped__
+        globalns = getattr(root, &#39;__globals__&#39;, {})
+        hints = getattr(obj, &#39;__annotations__&#39;, None)
+        if hints is None:
+            return {}
+        if not isinstance(hints, dict):
+            hints = dict(hints)
+        for name, value in hints.items():
+            hints[name] = evaluate(value, globalns)
+        return hints
+
+    def evaluate(annotation: str | None, globalns: dict | None = None, localns: dict | None = None):
+        if annotation is None:
+            return type(None)
+
+        if not isinstance(annotation, str):
+            return annotation
+
+        def _types(attr: str):
+            return ast.Attribute(
+                ctx=ast.Load(),
+                value=ast.Name(id=_TYPING_MODULE, ctx=ast.Load()),
+                attr=attr
+            )
+
+        class T(ast.NodeTransformer):
+
+            def visit_Subscript(self, node):
+                node.value = self.visit(node.value)
+                node.slice = self.visit(node.slice)
+                if isinstance(node.value, ast.Name):
+                    if downgrade := _into_typing(node.value.id):
+                        node.value = _types(downgrade)
+                return node
+
+            def visit_Call(self, node: ast.Call):
+                # do not descend into calls
+                return node
+
+            def visit_BinOp(self, node):
+                def collect(n: ast.expr):
+                    if isinstance(n, ast.BinOp) and isinstance(n.op, ast.BitOr):
+                        yield from collect(n.left)
+                        yield from collect(n.right)
+                    else:
+                        yield self.visit(n)
+                if not isinstance(node.op, ast.BitOr):
+                    return self.generic_visit(node)
+                return ast.Subscript(
+                    value=_types(&#39;Union&#39;),
+                    slice=_index(
+                        ast.Tuple(elts=list(collect(node)), ctx=ast.Load())),
+                    ctx=ast.Load()
+                )
+
+        if annotation.startswith(&#39;Param[&#39;):
+            if not globalns or &#39;Param&#39; not in globalns:
+                raise LookupError
+        try:
+            tree = ast.parse(annotation, mode=&#39;eval&#39;)
+            body = T().visit(tree.body)
+            ast.fix_missing_locations(body)
+            code = compile(ast.Expression(body=body), &#39;[annotation]&#39;, &#39;eval&#39;)
+            globalns = globalns or {}
+            globalns[_TYPING_MODULE] = typing
+            return eval(code, globalns, localns)
+        except Exception:
+            raise</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.annotations.get_type_hints"><code class="name flex">
+<span>def <span class="ident">get_type_hints</span></span>(<span>obj, globalns=None, localns=None, include_extras=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Implements the same functionality as <code>typing.get_type_hints</code> but uses <code><a title="refinery.lib.annotations.evaluate" href="#refinery.lib.annotations.evaluate">eval()</a></code> rather than <code>eval</code> when the Python version is below 3.10.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_type_hints(obj, globalns=None, localns=None, include_extras=False):
+    &#34;&#34;&#34;Return type hints for an object.
+
+    This is often the same as obj.__annotations__, but it handles
+    forward references encoded as string literals and recursively replaces all
+    &#39;Annotated[T, ...]&#39; with &#39;T&#39; (unless &#39;include_extras=True&#39;).
+
+    The argument may be a module, class, method, or function. The annotations
+    are returned as a dictionary. For classes, annotations include also
+    inherited members.
+
+    TypeError is raised if the argument is not of a type that can contain
+    annotations, and an empty dictionary is returned if no annotations are
+    present.
+
+    BEWARE -- the behavior of globalns and localns is counterintuitive
+    (unless you are familiar with how eval() and exec() work).  The
+    search order is locals first, then globals.
+
+    - If no dict arguments are passed, an attempt is made to use the
+      globals from obj (or the respective module&#39;s globals for classes),
+      and these are also used as the locals.  If the object does not appear
+      to have globals, an empty dictionary is used.  For classes, the search
+      order is globals first then locals.
+
+    - If one dict argument is passed, it is used for both globals and
+      locals.
+
+    - If two dict arguments are passed, they specify globals and
+      locals, respectively.
+    &#34;&#34;&#34;
+    if getattr(obj, &#39;__no_type_check__&#39;, None):
+        return {}
+    # Classes require a special treatment.
+    if isinstance(obj, type):
+        hints = {}
+        for base in reversed(obj.__mro__):
+            if globalns is None:
+                base_globals = getattr(sys.modules.get(base.__module__, None), &#39;__dict__&#39;, {})
+            else:
+                base_globals = globalns
+            ann = base.__dict__.get(&#39;__annotations__&#39;, {})
+            if isinstance(ann, types.GetSetDescriptorType):
+                ann = {}
+            base_locals = dict(vars(base)) if localns is None else localns
+            if localns is None and globalns is None:
+                # This is surprising, but required.  Before Python 3.10,
+                # get_type_hints only evaluated the globalns of
+                # a class.  To maintain backwards compatibility, we reverse
+                # the globalns and localns order so that eval() looks into
+                # *base_globals* first rather than *base_locals*.
+                # This only affects ForwardRefs.
+                base_globals, base_locals = base_locals, base_globals
+            for name, value in ann.items():
+                if value is None:
+                    value = type(None)
+                if isinstance(value, str):
+                    value = ForwardRef(value, is_argument=False, is_class=True)
+                value = _eval_type(value, base_globals, base_locals, base.__type_params__)
+                hints[name] = value
+        return hints if include_extras else {k: _strip_annotations(t) for k, t in hints.items()}
+
+    if globalns is None:
+        if isinstance(obj, types.ModuleType):
+            globalns = obj.__dict__
+        else:
+            nsobj = obj
+            # Find globalns for the unwrapped object.
+            while hasattr(nsobj, &#39;__wrapped__&#39;):
+                nsobj = nsobj.__wrapped__
+            globalns = getattr(nsobj, &#39;__globals__&#39;, {})
+        if localns is None:
+            localns = globalns
+    elif localns is None:
+        localns = globalns
+    hints = getattr(obj, &#39;__annotations__&#39;, None)
+    if hints is None:
+        # Return empty annotations for something that _could_ have them.
+        if isinstance(obj, _allowed_types):
+            return {}
+        else:
+            raise TypeError(&#39;{!r} is not a module, class, method, &#39;
+                            &#39;or function.&#39;.format(obj))
+    hints = dict(hints)
+    type_params = getattr(obj, &#34;__type_params__&#34;, ())
+    for name, value in hints.items():
+        if value is None:
+            value = type(None)
+        if isinstance(value, str):
+            # class-level forward refs were handled above, this must be either
+            # a module-level annotation or a function argument annotation
+            value = ForwardRef(
+                value,
+                is_argument=not isinstance(obj, types.ModuleType),
+                is_class=False,
+            )
+        hints[name] = _eval_type(value, globalns, localns, type_params)
+    return hints if include_extras else {k: _strip_annotations(t) for k, t in hints.items()}</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.annotations.evaluate"><code class="name flex">
+<span>def <span class="ident">evaluate</span></span>(<span>source, /, globals=None, locals=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The same as <code>eval</code> on Python 3.10 and beyond, otherwise a backwards-compatibility layer that converts modern type hints back to compatible expressions.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.annotations.get_type_hints" href="#refinery.lib.annotations.get_type_hints">get_type_hints</a></code></li>
+<li><code><a title="refinery.lib.annotations.evaluate" href="#refinery.lib.annotations.evaluate">evaluate</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

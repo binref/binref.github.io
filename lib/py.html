@@ -1,0 +1,1802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.py documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.py</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L1-L674" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import importlib.util
+import inspect
+import io
+import re
+import sys
+
+from types import CodeType
+from typing import Generator, NamedTuple, TypeVar, get_args, get_origin, overload
+
+from refinery.lib.shared.xdis import xdis
+from refinery.lib.structures import MemoryFile, StructReader
+from refinery.lib.tools import NoLogging, normalize_word_separators
+from refinery.lib.types import buf
+
+_T = TypeVar(&#39;_T&#39;)
+
+_MAX_MARSHAL_STACK_DEPTH = 2000
+
+SYS_PYTHON = (
+    sys.version_info.major,
+    sys.version_info.minor,
+    sys.version_info.micro,
+)
+
+
+class PyVer(NamedTuple):
+    major: int
+    minor: int
+    micro: int
+
+    def __str__(self):
+        return F&#39;{self.major}.{self.minor}.{self.micro}&#39;
+
+
+def version2tuple(v: str) -&gt; PyVer:
+    &#34;&#34;&#34;
+    Convert a version string of the form `3.12` or `3.12.0-final` to the tuple `(3,12,0)`.
+    &#34;&#34;&#34;
+    if m := re.match(r&#39;^(\d)\.(\d+)(?:\.(\d+))?&#39;, v):
+        major = int(m[1])
+        minor = int(m[2])
+        micro = m[3] and int(m[3]) or 0
+        return PyVer(major, minor, micro)
+    else:
+        raise ValueError(v)
+
+
+class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict
+
+
+def extract_code_from_buffer(buffer: buf, file_name: str | None = None) -&gt; Generator[Code]:
+    code_objects = {}
+    file_name = file_name or &#39;&lt;unknown&gt;&#39;
+    load = xdis.load.load_module_from_file_object
+    with NoLogging(NoLogging.Mode.STD_ERR):
+        version, timestamp, magic_int, codes, is_pypy, _, _ = load(MemoryFile(buffer), file_name, code_objects)
+    if not isinstance(codes, list):
+        codes = [codes]
+    for code in codes:
+        yield Code(version, timestamp, magic_int, code, is_pypy, code_objects)
+
+
+def disassemble_code(code: CodeType, version: str | float | tuple[int, ...] | None = None):
+    if version is None:
+        opc = None
+    else:
+        if isinstance(version, float):
+            version = str(version)
+        if isinstance(version, tuple):
+            version = xdis.version_info.version_tuple_to_str(version)
+        opc = xdis.op_imports.op_imports[version]
+    return xdis.std.Bytecode(code, opc=opc)
+
+
+def decompile_buffer(buffer: Code | buf, file_name: str | None = None) -&gt; buf:
+    errors = &#39;&#39;
+    python = &#39;&#39;
+
+    if not isinstance(buffer, Code):
+        codes = list(extract_code_from_buffer(buffer, file_name))
+    else:
+        codes = [buffer]
+
+    def _engines():
+        nonlocal errors
+        try:
+            from refinery.lib.shared.decompyle3 import decompyle3
+            dc = decompyle3.main.decompile
+        except ImportError:
+            errors += &#39;# The decompiler decompyle3 is not installed.\n&#39;
+        else:
+            yield &#39;decompyle3&#39;, dc
+        try:
+            from refinery.lib.shared.uncompyle6 import uncompyle6
+            dc = uncompyle6.main.decompile
+        except ImportError:
+            errors += &#39;# The decompiler decompyle3 is not installed.\n&#39;
+        else:
+            yield &#39;uncompyle6&#39;, dc
+
+    engines = dict(_engines())
+
+    if not engines:
+        errors += &#39;# (all missing, install one of the above to enable decompilation)&#39;
+
+    for code in codes:
+        for name, decompile in engines.items():
+            with io.StringIO(newline=&#39;&#39;) as output, NoLogging(NoLogging.Mode.ALL):
+                try:
+                    decompile(
+                        co=code.container,
+                        bytecode_version=code.version,
+                        out=output,
+                        timestamp=code.timestamp,
+                        code_objects=code.code_objects,
+                        is_pypy=code.is_pypi,
+                        magic_int=code.magic,
+                    )
+                except Exception as E:
+                    errors += &#39;\n&#39;.join(F&#39;# {line}&#39; for line in (
+                        F&#39;Error while decompiling with {name}:&#39;, *str(E).splitlines(True)))
+                    errors += &#39;\n&#39;
+                else:
+                    python = output.getvalue()
+                    break
+    if python:
+        # removes leading comments
+        python = python.splitlines(True)
+        python.reverse()
+        while python[-1].strip().startswith(&#39;#&#39;):
+            python.pop()
+        python.reverse()
+        python = &#39;&#39;.join(python)
+        return python.encode(&#39;utf8&#39;)
+    if not isinstance(buffer, Code):
+        embedded = max(re.findall(B&#39;[\\s!-~]+&#39;, buffer), key=len)
+        if len(buffer) - len(embedded) &lt; 0x20:
+            return embedded
+    disassembly = MemoryFile()
+    with io.TextIOWrapper(disassembly, &#39;utf8&#39;, newline=&#39;\n&#39;) as output:
+        output.write(errors)
+        output.write(&#39;# Generating Disassembly:\n\n&#39;)
+        for code in codes:
+            instructions = list(disassemble_code(code.container, code.version))
+            width_offset = max(len(str(i.offset)) for i in instructions)
+            for i in instructions:
+                opname = normalize_word_separators(i.opname, &#39;.&#39;).lower()
+                offset = F&#39;{i.offset:0{width_offset}d}&#39;
+                output.write(F&#39;# {offset:&gt;5} {opname:&lt;25} {i.argrepr}\n&#39;)
+        output.write(&#39;\n&#39;)
+    return disassembly.getvalue()
+
+
+class _MC(enum.IntEnum):
+    ASCII                = b&#39;a&#39;[0] # noqa
+    ASCII_INTERNED       = b&#39;A&#39;[0] # noqa
+    BINARY_COMPLEX       = b&#39;y&#39;[0] # noqa
+    BINARY_FLOAT         = b&#39;g&#39;[0] # noqa
+    CODE                 = b&#39;c&#39;[0] # noqa
+    CODE_OLD             = b&#39;C&#39;[0] # noqa
+    COMPLEX              = b&#39;x&#39;[0] # noqa
+    DICT                 = b&#39;{&#39;[0] # noqa
+    ELLIPSIS             = b&#39;.&#39;[0] # noqa
+    FALSE                = b&#39;F&#39;[0] # noqa
+    FLOAT                = b&#39;f&#39;[0] # noqa
+    FROZENSET            = b&#39;&gt;&#39;[0] # noqa
+    INT                  = b&#39;i&#39;[0] # noqa
+    INT64                = b&#39;I&#39;[0] # noqa
+    INTERNED             = b&#39;t&#39;[0] # noqa
+    LIST                 = b&#39;[&#39;[0] # noqa
+    LONG                 = b&#39;l&#39;[0] # noqa
+    NONE                 = b&#39;N&#39;[0] # noqa
+    NULL                 = b&#39;0&#39;[0] # noqa
+    REF                  = b&#39;r&#39;[0] # noqa
+    SET                  = b&#39;&lt;&#39;[0] # noqa
+    SHORT_ASCII          = b&#39;z&#39;[0] # noqa
+    SHORT_ASCII_INTERNED = b&#39;Z&#39;[0] # noqa
+    SLICE                = b&#39;:&#39;[0] # noqa
+    SMALL_TUPLE          = b&#39;)&#39;[0] # noqa
+    STOPITER             = b&#39;S&#39;[0] # noqa
+    STRING               = b&#39;s&#39;[0] # noqa
+    STRINGREF            = b&#39;R&#39;[0] # noqa
+    TRUE                 = b&#39;T&#39;[0] # noqa
+    TUPLE                = b&#39;(&#39;[0] # noqa
+    UNICODE              = b&#39;u&#39;[0] # noqa
+    UNKNOWN              = b&#39;?&#39;[0] # noqa
+
+
+class _CK(enum.IntFlag):
+    &#34;&#34;&#34;
+    Python variable kind flags.
+    &#34;&#34;&#34;
+    ArgPos = 0b0000_0010 # noqa 
+    ArgKw  = 0b0000_0100 # noqa 
+    ArgVar = 0b0000_1000 # noqa 
+    Arg    = 0b0000_1110 # noqa
+    Hidden = 0b0001_0000 # noqa
+    Local  = 0b0010_0000 # noqa
+    Cell   = 0b0100_0000 # noqa
+    Free   = 0b1000_0000 # noqa
+
+
+class PV(PyVer, enum.Enum):
+    V_1_00 = (1,  0, 0) # noqa
+    V_1_03 = (1,  3, 0) # noqa
+    V_1_05 = (1,  5, 0) # noqa
+    V_2_01 = (2,  1, 0) # noqa
+    V_2_03 = (2,  3, 0) # noqa switch to 32bit
+    V_3_00 = (3,  0, 0) # noqa
+    V_3_08 = (3,  8, 0) # noqa
+    V_3_10 = (3, 10, 0) # noqa
+    V_3_11 = (3, 11, 0) # noqa
+
+
+def code_header(version: tuple[int, int, int] | str | None = None) -&gt; bytearray:
+    &#34;&#34;&#34;
+    Produce a code object header for the given version.
+    &#34;&#34;&#34;
+    if version is None:
+        vt = SYS_PYTHON
+        magic = bytearray(importlib.util.MAGIC_NUMBER)
+    else:
+        if isinstance(version, str):
+            vs = version
+            vt = version2tuple(version)
+        else:
+            major, minor, micro = version
+            vs = F&#39;{major}.{minor}.{micro}&#39;
+            vt = version
+        magic = bytearray(xdis.magics.by_version[vs])
+
+    nulls = b&#39;\0\0\0\0&#39;
+    magic.extend(nulls)
+    # 1.0 - 3.2 [magic][timestamp]        4 bytes
+    # 3.3 - 3.6 [magic][timestamp][size]  8 bytes
+    # 3.7 - now [magic][flags][misc]     12 bytes
+    if vt &gt;= (3, 3):
+        magic.extend(nulls)
+    if vt &gt;= (3, 7):
+        magic.extend(nulls)
+    return magic
+
+
+class Null(RuntimeError):
+    &#34;&#34;&#34;
+    Raised when the unmarshal C implementation would return a null pointer.
+    &#34;&#34;&#34;
+
+
+class UnknownTypeCode(ValueError):
+    &#34;&#34;&#34;
+    Raised when an unknown type code is encountered during unmarshal.
+    &#34;&#34;&#34;
+    def __init__(self, code):
+        self.code = code
+        super().__init__(F&#39;Unknown marshal type code 0x{code:02X}.&#39;)
+
+
+class Marshal(StructReader[memoryview]):
+    &#34;&#34;&#34;
+    A specialization of the `refinery.lib.structures.StructReader` to read marshaled objects.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        data,
+        dumpcode: bool = False,
+        version: tuple[int, int, int] | tuple[int, int] | int | str | None = None
+    ):
+        super().__init__(memoryview(data))
+
+        if version is not None:
+            if isinstance(version, str):
+                version = version2tuple(version)
+            if isinstance(version, int):
+                version = (version, 0, 0)
+            if len(version) == 2:
+                major, minor, *_ = version
+                version = (major, minor, 0)
+
+        self.refs = []
+        self.version = version
+
+        _py_versions: list[PyVer] = []
+
+        for v in xdis.magics.by_version:
+            try:
+                _py_versions.append(version2tuple(v))
+            except Exception:
+                continue
+
+        self._py_versions = _py_versions = sorted(set(_py_versions))
+
+        self._min_version = _py_versions[+0]
+        self._max_version = _py_versions[~0]
+        self._depth = 0
+        self._dumpcode = dumpcode
+        self.strings: list[str] = []
+        self.buffers: list[bytes] = []
+        self._store_strings = True
+
+    def _quicksave(self):
+        return (
+            self.tell(),
+            len(self.buffers),
+            len(self.strings),
+            len(self.refs),
+        )
+
+    def _quickload(self, *args):
+        pos, bsc, usc, rc = args
+        self.buffers[bsc:] = ()
+        self.strings[usc:] = ()
+        self.refs[rc:] = ()
+        self.seekset(pos)
+
+    @overload
+    def object(self, typecheck: type[_T], store_strings: bool = True) -&gt; _T:
+        ...
+
+    @overload
+    def object(self, *, store_strings: bool = True) -&gt; object:
+        ...
+
+    def object(self, typecheck=None, store_strings=True):
+        &#34;&#34;&#34;
+        Read a marshaled object from the stream. The implementation attempts to be cross-version
+        compatible.
+        &#34;&#34;&#34;
+        depth = self._depth
+        store = self._store_strings
+        if depth &gt; _MAX_MARSHAL_STACK_DEPTH:
+            raise RuntimeError(
+                F&#39;The marshal stack depth limit of {_MAX_MARSHAL_STACK_DEPTH} was exceeded.&#39;)
+        self._depth = depth + 1
+        self._store_strings = store_strings
+        try:
+            o: object = self._load_object()
+        except Null:
+            raise
+        else:
+            if args := get_args(typecheck):
+                typecheck = tuple(get_origin(t) or t for t in args)
+            if typecheck and not isinstance(o, typecheck):
+                if isinstance(typecheck, tuple):
+                    expected = F&#39;one of {&#34;, &#34;.join(t.__name__ for t in typecheck)}&#39;
+                else:
+                    expected = typecheck.__name__
+                raise TypeError(
+                    F&#39;Unmarshelled object of type {o.__class__!r}, &#39;
+                    F&#39;expected {expected}.&#39;)
+            else:
+                return o
+        finally:
+            self._depth = depth
+            self._store_strings = store
+
+    def _load_object(self):
+        head = self.u8()
+        code = head &amp; 0x7F
+        flag = head &amp; 0x80
+        store_reference = bool(flag)
+        index = None
+
+        try:
+            code = _MC(code)
+        except Exception:
+            raise UnknownTypeCode(code)
+
+        def read_sequence(sequence_type):
+            def _sequence():
+                for _ in range(self.read_integer(prefix_size)):
+                    yield self.object()
+            nonlocal store_reference
+            if store_reference:
+                index = len(self.refs)
+                self.refs.append(None)
+                rv = sequence_type(_sequence())
+                self.refs[index] = rv
+                store_reference = False
+            else:
+                rv = sequence_type(_sequence())
+            return rv
+
+        prefix_size = 32
+        string_interned = False
+        string_codec = &#39;utf8&#39;
+
+        if code == _MC.CODE_OLD:
+            code = _MC.CODE
+
+        if code == _MC.SMALL_TUPLE:
+            code = _MC.TUPLE
+            prefix_size = 8
+
+        if code == _MC.ASCII_INTERNED:
+            code = _MC.ASCII
+            string_interned = True
+        if code == _MC.SHORT_ASCII_INTERNED:
+            code = _MC.SHORT_ASCII
+            string_interned = True
+        if code == _MC.SHORT_ASCII:
+            code = _MC.ASCII
+            prefix_size = 8
+        if code == _MC.INTERNED:
+            code = _MC.UNICODE
+            string_interned = True
+        if code == _MC.ASCII:
+            code = _MC.UNICODE
+            string_codec = &#39;latin1&#39;
+
+        if code == _MC.NULL:
+            raise Null
+        elif code == _MC.NONE:
+            return None
+        elif code == _MC.STOPITER:
+            return StopIteration
+        elif code == _MC.ELLIPSIS:
+            return (...)
+        elif code == _MC.FALSE:
+            return False
+        elif code == _MC.TRUE:
+            return True
+        elif code == _MC.INT:
+            rv = self.i32()
+        elif code == _MC.INT64:
+            rv = self.i64()
+        elif code == _MC.LONG:
+            rv = 0
+            for _ in range(self.u32()):
+                digit = self.u16()
+                if digit &gt;&gt; 15:
+                    raise ValueError(&#39;Python LONG digit has MSB set.&#39;)
+                rv &lt;&lt;= 15
+                rv |= digit
+        elif code == _MC.FLOAT:
+            rv = float(self.read_length_prefixed_ascii(8))
+        elif code == _MC.BINARY_FLOAT:
+            rv = self.f64()
+        elif code == _MC.COMPLEX:
+            im = float(self.read_length_prefixed_ascii(8))
+            rl = float(self.read_length_prefixed_ascii(8))
+            rv = complex(rl, im)
+        elif code == _MC.BINARY_COMPLEX:
+            im = self.f64()
+            rl = self.f64()
+            rv = complex(rl, im)
+        elif code == _MC.STRING:
+            rv = bytes(self.read_length_prefixed(32))
+            if self._store_strings:
+                self.buffers.append(rv)
+        elif code == _MC.UNICODE:
+            rv = self.read_length_prefixed(prefix_size, string_codec)
+            if self._store_strings:
+                self.strings.append(rv)
+            if string_interned:
+                rv = sys.intern(rv)
+        elif code == _MC.TUPLE:
+            return read_sequence(tuple)
+        elif code == _MC.LIST:
+            return read_sequence(list)
+        elif code == _MC.DICT:
+            rv = {}
+            if store_reference:
+                self.refs.append(rv)
+            while True:
+                try:
+                    key = self.object()
+                    val = self.object()
+                except Null:
+                    break
+                else:
+                    rv[key] = val
+            return rv
+        elif code == _MC.SET:
+            return read_sequence(set)
+        elif code == _MC.FROZENSET:
+            return read_sequence(frozenset)
+        elif code == _MC.REF:
+            try:
+                index = self.u32()
+                return self.refs[index]
+            except IndexError as IE:
+                raise ValueError(&#39;Invalid reference during unmarshal.&#39;) from IE
+        elif code == _MC.SLICE:
+            if store_reference:
+                index = len(self.refs)
+                self.refs.append(None)
+                rv = slice(self.object(), self.object(), self.object())
+                self.refs[index] = rv
+            else:
+                rv = slice(self.object(), self.object(), self.object())
+            return rv
+        elif code == _MC.CODE:
+
+            if store_reference:
+                index = len(self.refs)
+                self.refs.append(None)
+            try:
+                signature = inspect.signature(CodeType)
+            except ValueError:
+                if docs := CodeType.__doc__:
+                    docs = re.sub(r&#39;[\s\[\]]&#39;, &#39;&#39;, docs)
+                    spec = re.search(r&#39;(?i)code\w*\((\w+(?:,\w+)*)\)&#39;, docs)
+                    params = spec.group(1).split(&#39;,&#39;) if spec else []
+                else:
+                    raise
+            else:
+                params = list(signature.parameters)
+
+            arguments = {}
+            start, *qs = self._quicksave()
+
+            versions = [v] if (v := self.version) else PV
+
+            for version in versions:
+                if version &lt; self._min_version:
+                    continue
+                self._quickload(start, *qs)
+                intval = self.u32 if version &gt;= PV.V_2_03 else self.u16
+                arguments.clear()
+                arguments.update(
+                    name=&#39;&#39;,
+                    qualname=&#39;&#39;,
+                    filename=&#39;&#39;,
+                    argcount=0,
+                    posonlyargcount=0,
+                    kwonlyargcount=0,
+                    nlocals=0,
+                    flags=0,
+                    stacksize=1000,
+                    firstlineno=1,
+                    linetable=B&#39;&#39;,
+                    exceptiontable=B&#39;&#39;,
+                    constants=(),
+                    names=(),
+                    varnames=(),
+                    freevars=(),
+                    cellvars=(),
+                )
+                MAX_ARGS = 0x100
+                MAX_VARS = 0x10000
+                try:
+                    if PV.V_1_03 &lt;= version:
+                        if (n := intval()) &gt; MAX_ARGS:
+                            raise ValueError
+                        arguments.update(argcount=n)
+                    if PV.V_3_08 &lt;= version:
+                        if (n := intval()) &gt; MAX_ARGS:
+                            raise ValueError
+                        arguments.update(posonlyargcount=n)
+                    if PV.V_3_00 &lt;= version:
+                        if (n := intval()) &gt; MAX_ARGS:
+                            raise ValueError
+                        arguments.update(kwonlyargcount=n)
+                    if PV.V_1_03 &lt;= version &lt; PV.V_3_11:
+                        if (n := intval()) &gt; MAX_VARS:
+                            raise ValueError
+                        arguments.update(nlocals=n)
+                    if PV.V_1_05 &lt;= version:
+                        arguments.update(stacksize=intval())
+                    if PV.V_1_03 &lt;= version:
+                        arguments.update(flags=intval())
+                    if PV.V_1_00 &lt;= version:
+                        codestring = self.object(bytes, store_strings=False)
+                        arguments.update(codestring=codestring)
+                        arguments.update(constants=self.object(tuple))
+                        arguments.update(names=self.object(tuple))
+                    if PV.V_1_03 &lt;= version &lt; PV.V_3_11:
+                        arguments.update(varnames=self.object(tuple))
+                    if PV.V_2_01 &lt;= version &lt; PV.V_3_11:
+                        arguments.update(freevars=self.object(tuple))
+                        arguments.update(cellvars=self.object(tuple))
+                    if PV.V_3_11 &lt;= version:
+                        co_localsplusnames = self.object(tuple, store_strings=False)
+                        co_localspluskinds = self.object(bytes, store_strings=False)
+                        co_freevars = []
+                        co_cellvars = []
+                        co_varnames = []
+                        co_nlocals = 0
+                        for name, version_index in zip(co_localsplusnames, co_localspluskinds):
+                            kind = _CK(version_index)
+                            if kind &amp; _CK.Free:
+                                co_freevars.append(name)
+                                continue
+                            if kind &amp; _CK.Cell:
+                                co_cellvars.append(name)
+                                continue
+                            if kind &amp; _CK.Local:
+                                co_varnames.append(name)
+                                co_nlocals += 1
+                                continue
+                            raise TypeError(
+                                F&#39;Read unexpected unexpected variable kind {kind!r} while unmarshaling code.&#39;)
+                        arguments.update(freevars=tuple(co_freevars))
+                        arguments.update(cellvars=tuple(co_cellvars))
+                        arguments.update(varnames=tuple(co_varnames))
+                        arguments.update(nlocals=co_nlocals)
+                    if PV.V_1_00 &lt;= version:
+                        arguments.update(filename=self.object(str))
+                        arguments.update(name=self.object(str))
+                    if PV.V_3_11 &lt;= version:
+                        arguments.update(qualname=self.object(str))
+                    if PV.V_1_05 &lt;= version:
+                        arguments.update(firstlineno=intval())
+                    if PV.V_1_05 &lt;= version &lt; PV.V_3_10:
+                        lnotab = self.object(bytes, store_strings=False)
+                        if len(lnotab) % 2 != 0:
+                            raise ValueError
+                        arguments.update(linetable=lnotab)
+                    if PV.V_3_10 &lt;= version:
+                        arguments.update(linetable=self.object(bytes, store_strings=False))
+                    if PV.V_3_11 &lt;= version:
+                        arguments.update(exceptiontable=self.object(bytes, store_strings=False))
+                    if start == 1 and not self.eof:
+                        raise ValueError
+                except Exception:
+                    continue
+                else:
+                    if version &lt; self._min_version:
+                        continue
+                    self._min_version = version
+                    break
+            else:
+                raise RuntimeError(&#39;Failed to parse code object.&#39;)
+
+            try:
+                code_object = CodeType(*[arguments[p] for p in params])
+            except Exception:
+                code_object = None
+            else:
+                new_max = self._min_version
+                old_max = self._max_version
+                for v in self._py_versions:
+                    if v &lt; new_max:
+                        continue
+                    if v &gt; old_max:
+                        break
+                    try:
+                        for _ in disassemble_code(code_object, str(v)):
+                            pass
+                    except Exception:
+                        break
+                    else:
+                        new_max = v
+                self._max_version = new_max
+
+            if not self._dumpcode:
+                rv = code_object or arguments
+            else:
+                ch = code_header(self._max_version)
+                size = self.tell() - start
+                self.seekset(start)
+                rv = B&#39;%s%c%s&#39; % (ch, head, self.read(size))
+            if store_reference:
+                assert index is not None
+                self.refs[index] = rv
+            return rv
+        else:
+            raise UnknownTypeCode(code.value)
+
+        if store_reference:
+            self.refs.append(rv)
+
+        return rv</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.py.version2tuple"><code class="name flex">
+<span>def <span class="ident">version2tuple</span></span>(<span>v)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Convert a version string of the form <code>3.12</code> or <code>3.12.0-final</code> to the tuple <code>(3,12,0)</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L38-L48" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def version2tuple(v: str) -&gt; PyVer:
+    &#34;&#34;&#34;
+    Convert a version string of the form `3.12` or `3.12.0-final` to the tuple `(3,12,0)`.
+    &#34;&#34;&#34;
+    if m := re.match(r&#39;^(\d)\.(\d+)(?:\.(\d+))?&#39;, v):
+        major = int(m[1])
+        minor = int(m[2])
+        micro = m[3] and int(m[3]) or 0
+        return PyVer(major, minor, micro)
+    else:
+        raise ValueError(v)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.extract_code_from_buffer"><code class="name flex">
+<span>def <span class="ident">extract_code_from_buffer</span></span>(<span>buffer, file_name=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L60-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def extract_code_from_buffer(buffer: buf, file_name: str | None = None) -&gt; Generator[Code]:
+    code_objects = {}
+    file_name = file_name or &#39;&lt;unknown&gt;&#39;
+    load = xdis.load.load_module_from_file_object
+    with NoLogging(NoLogging.Mode.STD_ERR):
+        version, timestamp, magic_int, codes, is_pypy, _, _ = load(MemoryFile(buffer), file_name, code_objects)
+    if not isinstance(codes, list):
+        codes = [codes]
+    for code in codes:
+        yield Code(version, timestamp, magic_int, code, is_pypy, code_objects)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.disassemble_code"><code class="name flex">
+<span>def <span class="ident">disassemble_code</span></span>(<span>code, version=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L72-L81" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def disassemble_code(code: CodeType, version: str | float | tuple[int, ...] | None = None):
+    if version is None:
+        opc = None
+    else:
+        if isinstance(version, float):
+            version = str(version)
+        if isinstance(version, tuple):
+            version = xdis.version_info.version_tuple_to_str(version)
+        opc = xdis.op_imports.op_imports[version]
+    return xdis.std.Bytecode(code, opc=opc)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.decompile_buffer"><code class="name flex">
+<span>def <span class="ident">decompile_buffer</span></span>(<span>buffer, file_name=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L84-L160" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decompile_buffer(buffer: Code | buf, file_name: str | None = None) -&gt; buf:
+    errors = &#39;&#39;
+    python = &#39;&#39;
+
+    if not isinstance(buffer, Code):
+        codes = list(extract_code_from_buffer(buffer, file_name))
+    else:
+        codes = [buffer]
+
+    def _engines():
+        nonlocal errors
+        try:
+            from refinery.lib.shared.decompyle3 import decompyle3
+            dc = decompyle3.main.decompile
+        except ImportError:
+            errors += &#39;# The decompiler decompyle3 is not installed.\n&#39;
+        else:
+            yield &#39;decompyle3&#39;, dc
+        try:
+            from refinery.lib.shared.uncompyle6 import uncompyle6
+            dc = uncompyle6.main.decompile
+        except ImportError:
+            errors += &#39;# The decompiler decompyle3 is not installed.\n&#39;
+        else:
+            yield &#39;uncompyle6&#39;, dc
+
+    engines = dict(_engines())
+
+    if not engines:
+        errors += &#39;# (all missing, install one of the above to enable decompilation)&#39;
+
+    for code in codes:
+        for name, decompile in engines.items():
+            with io.StringIO(newline=&#39;&#39;) as output, NoLogging(NoLogging.Mode.ALL):
+                try:
+                    decompile(
+                        co=code.container,
+                        bytecode_version=code.version,
+                        out=output,
+                        timestamp=code.timestamp,
+                        code_objects=code.code_objects,
+                        is_pypy=code.is_pypi,
+                        magic_int=code.magic,
+                    )
+                except Exception as E:
+                    errors += &#39;\n&#39;.join(F&#39;# {line}&#39; for line in (
+                        F&#39;Error while decompiling with {name}:&#39;, *str(E).splitlines(True)))
+                    errors += &#39;\n&#39;
+                else:
+                    python = output.getvalue()
+                    break
+    if python:
+        # removes leading comments
+        python = python.splitlines(True)
+        python.reverse()
+        while python[-1].strip().startswith(&#39;#&#39;):
+            python.pop()
+        python.reverse()
+        python = &#39;&#39;.join(python)
+        return python.encode(&#39;utf8&#39;)
+    if not isinstance(buffer, Code):
+        embedded = max(re.findall(B&#39;[\\s!-~]+&#39;, buffer), key=len)
+        if len(buffer) - len(embedded) &lt; 0x20:
+            return embedded
+    disassembly = MemoryFile()
+    with io.TextIOWrapper(disassembly, &#39;utf8&#39;, newline=&#39;\n&#39;) as output:
+        output.write(errors)
+        output.write(&#39;# Generating Disassembly:\n\n&#39;)
+        for code in codes:
+            instructions = list(disassemble_code(code.container, code.version))
+            width_offset = max(len(str(i.offset)) for i in instructions)
+            for i in instructions:
+                opname = normalize_word_separators(i.opname, &#39;.&#39;).lower()
+                offset = F&#39;{i.offset:0{width_offset}d}&#39;
+                output.write(F&#39;# {offset:&gt;5} {opname:&lt;25} {i.argrepr}\n&#39;)
+        output.write(&#39;\n&#39;)
+    return disassembly.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.code_header"><code class="name flex">
+<span>def <span class="ident">code_header</span></span>(<span>version=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Produce a code object header for the given version.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L224-L250" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def code_header(version: tuple[int, int, int] | str | None = None) -&gt; bytearray:
+    &#34;&#34;&#34;
+    Produce a code object header for the given version.
+    &#34;&#34;&#34;
+    if version is None:
+        vt = SYS_PYTHON
+        magic = bytearray(importlib.util.MAGIC_NUMBER)
+    else:
+        if isinstance(version, str):
+            vs = version
+            vt = version2tuple(version)
+        else:
+            major, minor, micro = version
+            vs = F&#39;{major}.{minor}.{micro}&#39;
+            vt = version
+        magic = bytearray(xdis.magics.by_version[vs])
+
+    nulls = b&#39;\0\0\0\0&#39;
+    magic.extend(nulls)
+    # 1.0 - 3.2 [magic][timestamp]        4 bytes
+    # 3.3 - 3.6 [magic][timestamp][size]  8 bytes
+    # 3.7 - now [magic][flags][misc]     12 bytes
+    if vt &gt;= (3, 3):
+        magic.extend(nulls)
+    if vt &gt;= (3, 7):
+        magic.extend(nulls)
+    return magic</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.py.PyVer"><code class="flex name class">
+<span>class <span class="ident">PyVer</span></span>
+<span>(</span><span>major, minor, micro)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>PyVer(major, minor, micro)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L29-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class PyVer(NamedTuple):
+    major: int
+    minor: int
+    micro: int
+
+    def __str__(self):
+        return F&#39;{self.major}.{self.minor}.{self.micro}&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.py.PV" href="#refinery.lib.py.PV">PV</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.py.PyVer.major"><code class="name">var <span class="ident">major</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L29-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class PyVer(NamedTuple):
+    major: int
+    minor: int
+    micro: int
+
+    def __str__(self):
+        return F&#39;{self.major}.{self.minor}.{self.micro}&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.PyVer.minor"><code class="name">var <span class="ident">minor</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L29-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class PyVer(NamedTuple):
+    major: int
+    minor: int
+    micro: int
+
+    def __str__(self):
+        return F&#39;{self.major}.{self.minor}.{self.micro}&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.PyVer.micro"><code class="name">var <span class="ident">micro</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L29-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class PyVer(NamedTuple):
+    major: int
+    minor: int
+    micro: int
+
+    def __str__(self):
+        return F&#39;{self.major}.{self.minor}.{self.micro}&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.py.Code"><code class="flex name class">
+<span>class <span class="ident">Code</span></span>
+<span>(</span><span>version, timestamp, magic, container, is_pypi, code_objects)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Code(version, timestamp, magic, container, is_pypi, code_objects)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.py.Code.version"><code class="name">var <span class="ident">version</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.Code.timestamp"><code class="name">var <span class="ident">timestamp</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.Code.magic"><code class="name">var <span class="ident">magic</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.Code.container"><code class="name">var <span class="ident">container</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 3</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.Code.is_pypi"><code class="name">var <span class="ident">is_pypi</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 4</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.py.Code.code_objects"><code class="name">var <span class="ident">code_objects</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 5</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L51-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Code(NamedTuple):
+    version: tuple[int]
+    timestamp: int
+    magic: int
+    container: CodeType
+    is_pypi: bool
+    code_objects: dict</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.py.PV"><code class="flex name class">
+<span>class <span class="ident">PV</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>PyVer(major, minor, micro)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L212-L221" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class PV(PyVer, enum.Enum):
+    V_1_00 = (1,  0, 0) # noqa
+    V_1_03 = (1,  3, 0) # noqa
+    V_1_05 = (1,  5, 0) # noqa
+    V_2_01 = (2,  1, 0) # noqa
+    V_2_03 = (2,  3, 0) # noqa switch to 32bit
+    V_3_00 = (3,  0, 0) # noqa
+    V_3_08 = (3,  8, 0) # noqa
+    V_3_10 = (3, 10, 0) # noqa
+    V_3_11 = (3, 11, 0) # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.py.PyVer" href="#refinery.lib.py.PyVer">PyVer</a></li>
+<li>builtins.tuple</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.py.PV.V_1_00"><code class="name">var <span class="ident">V_1_00</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_1_03"><code class="name">var <span class="ident">V_1_03</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_1_05"><code class="name">var <span class="ident">V_1_05</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_2_01"><code class="name">var <span class="ident">V_2_01</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_2_03"><code class="name">var <span class="ident">V_2_03</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_3_00"><code class="name">var <span class="ident">V_3_00</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_3_08"><code class="name">var <span class="ident">V_3_08</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_3_10"><code class="name">var <span class="ident">V_3_10</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.py.PV.V_3_11"><code class="name">var <span class="ident">V_3_11</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.py.PyVer" href="#refinery.lib.py.PyVer">PyVer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.py.PyVer.major" href="#refinery.lib.py.PyVer.major">major</a></code></li>
+<li><code><a title="refinery.lib.py.PyVer.micro" href="#refinery.lib.py.PyVer.micro">micro</a></code></li>
+<li><code><a title="refinery.lib.py.PyVer.minor" href="#refinery.lib.py.PyVer.minor">minor</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.py.Null"><code class="flex name class">
+<span>class <span class="ident">Null</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Raised when the unmarshal C implementation would return a null pointer.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L253-L256" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Null(RuntimeError):
+    &#34;&#34;&#34;
+    Raised when the unmarshal C implementation would return a null pointer.
+    &#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.RuntimeError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.py.UnknownTypeCode"><code class="flex name class">
+<span>class <span class="ident">UnknownTypeCode</span></span>
+<span>(</span><span>code)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Raised when an unknown type code is encountered during unmarshal.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L259-L265" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UnknownTypeCode(ValueError):
+    &#34;&#34;&#34;
+    Raised when an unknown type code is encountered during unmarshal.
+    &#34;&#34;&#34;
+    def __init__(self, code):
+        self.code = code
+        super().__init__(F&#39;Unknown marshal type code 0x{code:02X}.&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.py.Marshal"><code class="flex name class">
+<span>class <span class="ident">Marshal</span></span>
+<span>(</span><span>data, dumpcode=False, version=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A specialization of the <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code> to read marshaled objects.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L268-L674" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Marshal(StructReader[memoryview]):
+    &#34;&#34;&#34;
+    A specialization of the `refinery.lib.structures.StructReader` to read marshaled objects.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        data,
+        dumpcode: bool = False,
+        version: tuple[int, int, int] | tuple[int, int] | int | str | None = None
+    ):
+        super().__init__(memoryview(data))
+
+        if version is not None:
+            if isinstance(version, str):
+                version = version2tuple(version)
+            if isinstance(version, int):
+                version = (version, 0, 0)
+            if len(version) == 2:
+                major, minor, *_ = version
+                version = (major, minor, 0)
+
+        self.refs = []
+        self.version = version
+
+        _py_versions: list[PyVer] = []
+
+        for v in xdis.magics.by_version:
+            try:
+                _py_versions.append(version2tuple(v))
+            except Exception:
+                continue
+
+        self._py_versions = _py_versions = sorted(set(_py_versions))
+
+        self._min_version = _py_versions[+0]
+        self._max_version = _py_versions[~0]
+        self._depth = 0
+        self._dumpcode = dumpcode
+        self.strings: list[str] = []
+        self.buffers: list[bytes] = []
+        self._store_strings = True
+
+    def _quicksave(self):
+        return (
+            self.tell(),
+            len(self.buffers),
+            len(self.strings),
+            len(self.refs),
+        )
+
+    def _quickload(self, *args):
+        pos, bsc, usc, rc = args
+        self.buffers[bsc:] = ()
+        self.strings[usc:] = ()
+        self.refs[rc:] = ()
+        self.seekset(pos)
+
+    @overload
+    def object(self, typecheck: type[_T], store_strings: bool = True) -&gt; _T:
+        ...
+
+    @overload
+    def object(self, *, store_strings: bool = True) -&gt; object:
+        ...
+
+    def object(self, typecheck=None, store_strings=True):
+        &#34;&#34;&#34;
+        Read a marshaled object from the stream. The implementation attempts to be cross-version
+        compatible.
+        &#34;&#34;&#34;
+        depth = self._depth
+        store = self._store_strings
+        if depth &gt; _MAX_MARSHAL_STACK_DEPTH:
+            raise RuntimeError(
+                F&#39;The marshal stack depth limit of {_MAX_MARSHAL_STACK_DEPTH} was exceeded.&#39;)
+        self._depth = depth + 1
+        self._store_strings = store_strings
+        try:
+            o: object = self._load_object()
+        except Null:
+            raise
+        else:
+            if args := get_args(typecheck):
+                typecheck = tuple(get_origin(t) or t for t in args)
+            if typecheck and not isinstance(o, typecheck):
+                if isinstance(typecheck, tuple):
+                    expected = F&#39;one of {&#34;, &#34;.join(t.__name__ for t in typecheck)}&#39;
+                else:
+                    expected = typecheck.__name__
+                raise TypeError(
+                    F&#39;Unmarshelled object of type {o.__class__!r}, &#39;
+                    F&#39;expected {expected}.&#39;)
+            else:
+                return o
+        finally:
+            self._depth = depth
+            self._store_strings = store
+
+    def _load_object(self):
+        head = self.u8()
+        code = head &amp; 0x7F
+        flag = head &amp; 0x80
+        store_reference = bool(flag)
+        index = None
+
+        try:
+            code = _MC(code)
+        except Exception:
+            raise UnknownTypeCode(code)
+
+        def read_sequence(sequence_type):
+            def _sequence():
+                for _ in range(self.read_integer(prefix_size)):
+                    yield self.object()
+            nonlocal store_reference
+            if store_reference:
+                index = len(self.refs)
+                self.refs.append(None)
+                rv = sequence_type(_sequence())
+                self.refs[index] = rv
+                store_reference = False
+            else:
+                rv = sequence_type(_sequence())
+            return rv
+
+        prefix_size = 32
+        string_interned = False
+        string_codec = &#39;utf8&#39;
+
+        if code == _MC.CODE_OLD:
+            code = _MC.CODE
+
+        if code == _MC.SMALL_TUPLE:
+            code = _MC.TUPLE
+            prefix_size = 8
+
+        if code == _MC.ASCII_INTERNED:
+            code = _MC.ASCII
+            string_interned = True
+        if code == _MC.SHORT_ASCII_INTERNED:
+            code = _MC.SHORT_ASCII
+            string_interned = True
+        if code == _MC.SHORT_ASCII:
+            code = _MC.ASCII
+            prefix_size = 8
+        if code == _MC.INTERNED:
+            code = _MC.UNICODE
+            string_interned = True
+        if code == _MC.ASCII:
+            code = _MC.UNICODE
+            string_codec = &#39;latin1&#39;
+
+        if code == _MC.NULL:
+            raise Null
+        elif code == _MC.NONE:
+            return None
+        elif code == _MC.STOPITER:
+            return StopIteration
+        elif code == _MC.ELLIPSIS:
+            return (...)
+        elif code == _MC.FALSE:
+            return False
+        elif code == _MC.TRUE:
+            return True
+        elif code == _MC.INT:
+            rv = self.i32()
+        elif code == _MC.INT64:
+            rv = self.i64()
+        elif code == _MC.LONG:
+            rv = 0
+            for _ in range(self.u32()):
+                digit = self.u16()
+                if digit &gt;&gt; 15:
+                    raise ValueError(&#39;Python LONG digit has MSB set.&#39;)
+                rv &lt;&lt;= 15
+                rv |= digit
+        elif code == _MC.FLOAT:
+            rv = float(self.read_length_prefixed_ascii(8))
+        elif code == _MC.BINARY_FLOAT:
+            rv = self.f64()
+        elif code == _MC.COMPLEX:
+            im = float(self.read_length_prefixed_ascii(8))
+            rl = float(self.read_length_prefixed_ascii(8))
+            rv = complex(rl, im)
+        elif code == _MC.BINARY_COMPLEX:
+            im = self.f64()
+            rl = self.f64()
+            rv = complex(rl, im)
+        elif code == _MC.STRING:
+            rv = bytes(self.read_length_prefixed(32))
+            if self._store_strings:
+                self.buffers.append(rv)
+        elif code == _MC.UNICODE:
+            rv = self.read_length_prefixed(prefix_size, string_codec)
+            if self._store_strings:
+                self.strings.append(rv)
+            if string_interned:
+                rv = sys.intern(rv)
+        elif code == _MC.TUPLE:
+            return read_sequence(tuple)
+        elif code == _MC.LIST:
+            return read_sequence(list)
+        elif code == _MC.DICT:
+            rv = {}
+            if store_reference:
+                self.refs.append(rv)
+            while True:
+                try:
+                    key = self.object()
+                    val = self.object()
+                except Null:
+                    break
+                else:
+                    rv[key] = val
+            return rv
+        elif code == _MC.SET:
+            return read_sequence(set)
+        elif code == _MC.FROZENSET:
+            return read_sequence(frozenset)
+        elif code == _MC.REF:
+            try:
+                index = self.u32()
+                return self.refs[index]
+            except IndexError as IE:
+                raise ValueError(&#39;Invalid reference during unmarshal.&#39;) from IE
+        elif code == _MC.SLICE:
+            if store_reference:
+                index = len(self.refs)
+                self.refs.append(None)
+                rv = slice(self.object(), self.object(), self.object())
+                self.refs[index] = rv
+            else:
+                rv = slice(self.object(), self.object(), self.object())
+            return rv
+        elif code == _MC.CODE:
+
+            if store_reference:
+                index = len(self.refs)
+                self.refs.append(None)
+            try:
+                signature = inspect.signature(CodeType)
+            except ValueError:
+                if docs := CodeType.__doc__:
+                    docs = re.sub(r&#39;[\s\[\]]&#39;, &#39;&#39;, docs)
+                    spec = re.search(r&#39;(?i)code\w*\((\w+(?:,\w+)*)\)&#39;, docs)
+                    params = spec.group(1).split(&#39;,&#39;) if spec else []
+                else:
+                    raise
+            else:
+                params = list(signature.parameters)
+
+            arguments = {}
+            start, *qs = self._quicksave()
+
+            versions = [v] if (v := self.version) else PV
+
+            for version in versions:
+                if version &lt; self._min_version:
+                    continue
+                self._quickload(start, *qs)
+                intval = self.u32 if version &gt;= PV.V_2_03 else self.u16
+                arguments.clear()
+                arguments.update(
+                    name=&#39;&#39;,
+                    qualname=&#39;&#39;,
+                    filename=&#39;&#39;,
+                    argcount=0,
+                    posonlyargcount=0,
+                    kwonlyargcount=0,
+                    nlocals=0,
+                    flags=0,
+                    stacksize=1000,
+                    firstlineno=1,
+                    linetable=B&#39;&#39;,
+                    exceptiontable=B&#39;&#39;,
+                    constants=(),
+                    names=(),
+                    varnames=(),
+                    freevars=(),
+                    cellvars=(),
+                )
+                MAX_ARGS = 0x100
+                MAX_VARS = 0x10000
+                try:
+                    if PV.V_1_03 &lt;= version:
+                        if (n := intval()) &gt; MAX_ARGS:
+                            raise ValueError
+                        arguments.update(argcount=n)
+                    if PV.V_3_08 &lt;= version:
+                        if (n := intval()) &gt; MAX_ARGS:
+                            raise ValueError
+                        arguments.update(posonlyargcount=n)
+                    if PV.V_3_00 &lt;= version:
+                        if (n := intval()) &gt; MAX_ARGS:
+                            raise ValueError
+                        arguments.update(kwonlyargcount=n)
+                    if PV.V_1_03 &lt;= version &lt; PV.V_3_11:
+                        if (n := intval()) &gt; MAX_VARS:
+                            raise ValueError
+                        arguments.update(nlocals=n)
+                    if PV.V_1_05 &lt;= version:
+                        arguments.update(stacksize=intval())
+                    if PV.V_1_03 &lt;= version:
+                        arguments.update(flags=intval())
+                    if PV.V_1_00 &lt;= version:
+                        codestring = self.object(bytes, store_strings=False)
+                        arguments.update(codestring=codestring)
+                        arguments.update(constants=self.object(tuple))
+                        arguments.update(names=self.object(tuple))
+                    if PV.V_1_03 &lt;= version &lt; PV.V_3_11:
+                        arguments.update(varnames=self.object(tuple))
+                    if PV.V_2_01 &lt;= version &lt; PV.V_3_11:
+                        arguments.update(freevars=self.object(tuple))
+                        arguments.update(cellvars=self.object(tuple))
+                    if PV.V_3_11 &lt;= version:
+                        co_localsplusnames = self.object(tuple, store_strings=False)
+                        co_localspluskinds = self.object(bytes, store_strings=False)
+                        co_freevars = []
+                        co_cellvars = []
+                        co_varnames = []
+                        co_nlocals = 0
+                        for name, version_index in zip(co_localsplusnames, co_localspluskinds):
+                            kind = _CK(version_index)
+                            if kind &amp; _CK.Free:
+                                co_freevars.append(name)
+                                continue
+                            if kind &amp; _CK.Cell:
+                                co_cellvars.append(name)
+                                continue
+                            if kind &amp; _CK.Local:
+                                co_varnames.append(name)
+                                co_nlocals += 1
+                                continue
+                            raise TypeError(
+                                F&#39;Read unexpected unexpected variable kind {kind!r} while unmarshaling code.&#39;)
+                        arguments.update(freevars=tuple(co_freevars))
+                        arguments.update(cellvars=tuple(co_cellvars))
+                        arguments.update(varnames=tuple(co_varnames))
+                        arguments.update(nlocals=co_nlocals)
+                    if PV.V_1_00 &lt;= version:
+                        arguments.update(filename=self.object(str))
+                        arguments.update(name=self.object(str))
+                    if PV.V_3_11 &lt;= version:
+                        arguments.update(qualname=self.object(str))
+                    if PV.V_1_05 &lt;= version:
+                        arguments.update(firstlineno=intval())
+                    if PV.V_1_05 &lt;= version &lt; PV.V_3_10:
+                        lnotab = self.object(bytes, store_strings=False)
+                        if len(lnotab) % 2 != 0:
+                            raise ValueError
+                        arguments.update(linetable=lnotab)
+                    if PV.V_3_10 &lt;= version:
+                        arguments.update(linetable=self.object(bytes, store_strings=False))
+                    if PV.V_3_11 &lt;= version:
+                        arguments.update(exceptiontable=self.object(bytes, store_strings=False))
+                    if start == 1 and not self.eof:
+                        raise ValueError
+                except Exception:
+                    continue
+                else:
+                    if version &lt; self._min_version:
+                        continue
+                    self._min_version = version
+                    break
+            else:
+                raise RuntimeError(&#39;Failed to parse code object.&#39;)
+
+            try:
+                code_object = CodeType(*[arguments[p] for p in params])
+            except Exception:
+                code_object = None
+            else:
+                new_max = self._min_version
+                old_max = self._max_version
+                for v in self._py_versions:
+                    if v &lt; new_max:
+                        continue
+                    if v &gt; old_max:
+                        break
+                    try:
+                        for _ in disassemble_code(code_object, str(v)):
+                            pass
+                    except Exception:
+                        break
+                    else:
+                        new_max = v
+                self._max_version = new_max
+
+            if not self._dumpcode:
+                rv = code_object or arguments
+            else:
+                ch = code_header(self._max_version)
+                size = self.tell() - start
+                self.seekset(start)
+                rv = B&#39;%s%c%s&#39; % (ch, head, self.read(size))
+            if store_reference:
+                assert index is not None
+                self.refs[index] = rv
+            return rv
+        else:
+            raise UnknownTypeCode(code.value)
+
+        if store_reference:
+            self.refs.append(rv)
+
+        return rv</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></li>
+<li><a title="refinery.lib.structures.MemoryFile" href="structures.html#refinery.lib.structures.MemoryFile">MemoryFile</a></li>
+<li><a title="refinery.lib.structures.MemoryFileMethods" href="structures.html#refinery.lib.structures.MemoryFileMethods">MemoryFileMethods</a></li>
+<li>typing.Generic</li>
+<li>_io.BytesIO</li>
+<li>_io._BufferedIOBase</li>
+<li>_io._IOBase</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.py.Marshal.object"><code class="name flex">
+<span>def <span class="ident">object</span></span>(<span>self, typecheck=None, store_strings=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read a marshaled object from the stream. The implementation attempts to be cross-version
+compatible.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/py.py#L334-L365" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def object(self, typecheck=None, store_strings=True):
+    &#34;&#34;&#34;
+    Read a marshaled object from the stream. The implementation attempts to be cross-version
+    compatible.
+    &#34;&#34;&#34;
+    depth = self._depth
+    store = self._store_strings
+    if depth &gt; _MAX_MARSHAL_STACK_DEPTH:
+        raise RuntimeError(
+            F&#39;The marshal stack depth limit of {_MAX_MARSHAL_STACK_DEPTH} was exceeded.&#39;)
+    self._depth = depth + 1
+    self._store_strings = store_strings
+    try:
+        o: object = self._load_object()
+    except Null:
+        raise
+    else:
+        if args := get_args(typecheck):
+            typecheck = tuple(get_origin(t) or t for t in args)
+        if typecheck and not isinstance(o, typecheck):
+            if isinstance(typecheck, tuple):
+                expected = F&#39;one of {&#34;, &#34;.join(t.__name__ for t in typecheck)}&#39;
+            else:
+                expected = typecheck.__name__
+            raise TypeError(
+                F&#39;Unmarshelled object of type {o.__class__!r}, &#39;
+                F&#39;expected {expected}.&#39;)
+        else:
+            return o
+    finally:
+        self._depth = depth
+        self._store_strings = store</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.structures.StructReader.SEEK" href="structures.html#refinery.lib.structures.MemoryFileMethods.SEEK">SEEK</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.Unaligned" href="structures.html#refinery.lib.structures.StructReader.Unaligned">Unaligned</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.byte_align" href="structures.html#refinery.lib.structures.StructReader.byte_align">byte_align</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_bit_field" href="structures.html#refinery.lib.structures.StructReader.read_bit_field">read_bit_field</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_bits" href="structures.html#refinery.lib.structures.StructReader.read_bits">read_bits</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_bytes" href="structures.html#refinery.lib.structures.StructReader.read_bytes">read_bytes</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_exactly" href="structures.html#refinery.lib.structures.StructReader.read_exactly">read_exactly</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_flags" href="structures.html#refinery.lib.structures.StructReader.read_flags">read_flags</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_integer" href="structures.html#refinery.lib.structures.StructReader.read_integer">read_integer</a></code></li>
+<li><code><a title="refinery.lib.structures.StructReader.read_struct" href="structures.html#refinery.lib.structures.StructReader.read_struct">read_struct</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.py.version2tuple" href="#refinery.lib.py.version2tuple">version2tuple</a></code></li>
+<li><code><a title="refinery.lib.py.extract_code_from_buffer" href="#refinery.lib.py.extract_code_from_buffer">extract_code_from_buffer</a></code></li>
+<li><code><a title="refinery.lib.py.disassemble_code" href="#refinery.lib.py.disassemble_code">disassemble_code</a></code></li>
+<li><code><a title="refinery.lib.py.decompile_buffer" href="#refinery.lib.py.decompile_buffer">decompile_buffer</a></code></li>
+<li><code><a title="refinery.lib.py.code_header" href="#refinery.lib.py.code_header">code_header</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.py.PyVer" href="#refinery.lib.py.PyVer">PyVer</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.py.Code" href="#refinery.lib.py.Code">Code</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.py.PV" href="#refinery.lib.py.PV">PV</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.py.Null" href="#refinery.lib.py.Null">Null</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.py.UnknownTypeCode" href="#refinery.lib.py.UnknownTypeCode">UnknownTypeCode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.py.Marshal" href="#refinery.lib.py.Marshal">Marshal</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.py.Marshal.object" href="#refinery.lib.py.Marshal.object">object</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

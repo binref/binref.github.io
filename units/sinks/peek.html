@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.sinks.peek documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.sinks.peek</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/sinks/peek.py#L1-L348" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import codecs
+import collections
+import itertools
+import os
+import sys
+import textwrap
+
+from typing import Generator
+
+from refinery.lib.colors import colored_text_bleach, colored_text_length, colored_text_truncate
+from refinery.lib.environment import environment
+from refinery.lib.meta import (
+    ByteStringWrapper,
+    CustomStringRepresentation,
+    LazyMetaOracle,
+    SizeInt,
+    metavars,
+)
+from refinery.lib.tools import get_terminal_size
+from refinery.lib.types import INF, Param, asbuffer
+from refinery.units import Chunk
+from refinery.units.sinks import Arg, HexViewer
+
+
+class peek(HexViewer):
+    &#34;&#34;&#34;
+    The unit extracts preview information of the input data and displays it on the standard error stream. If the standard
+    output of this unit is connected by a pipe, the incoming data is forwarded. However, if the unit outputs to a terminal,
+    the data is discarded instead.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        lines: Param[int | INF, Arg.Number(&#39;-l&#39;, group=&#39;SIZE&#39;,
+            help=&#39;Specify number N of lines in the preview, default is 10.&#39;)] = 10,
+        all: Param[bool, Arg.Switch(&#39;-a&#39;, group=&#39;SIZE&#39;,
+            help=&#39;Output all possible preview lines without restriction&#39;)] = False,
+        brief: Param[bool, Arg.Switch(&#39;-b&#39;, group=&#39;SIZE&#39;,
+            help=&#39;One line peek, implies --lines=1.&#39;)] = False,
+        decode: Param[int, Arg.Counts(&#39;-d&#39;, group=&#39;MODE&#39;, help=(
+            &#39;Attempt to decode and display printable data. Specify twice to enable line wrapping.&#39;))] = 0,
+        escape: Param[bool, Arg.Switch(&#39;-e&#39;, group=&#39;MODE&#39;,
+            help=&#39;Always peek data as string, escape characters if necessary.&#39;)] = False,
+        bare: Param[bool, Arg.Switch(&#39;-r&#39;, group=&#39;META&#39;,
+            help=&#39;Only peek the data itself, do not show a metadata preview.&#39;)] = False,
+        meta: Param[int, Arg.Counts(&#39;-m&#39;, group=&#39;META&#39;, help=(
+            &#39;Show more auto-derivable metadata. Specify multiple times to populate more variables.&#39;))] = 0,
+        gray: Param[bool, Arg.Switch(&#39;-g&#39;,
+            help=&#39;Do not colorize the output.&#39;)] = False,
+        index: Param[bool, Arg.Switch(&#39;-i&#39;,
+            help=&#39;Display the index of each chunk within the current frame.&#39;)] = False,
+        stdout: Param[bool, Arg.Switch(&#39;-2&#39;,
+            help=&#39;Print the peek to STDOUT rather than STDERR; the input data is lost.&#39;)] = False,
+        narrow=False, blocks=1, dense=False, expand=False, width=0
+    ):
+        if decode and escape:
+            raise ValueError(&#39;The decode and esc options are exclusive.&#39;)
+        if brief:
+            narrow = True
+        if environment.colorless.value:
+            gray = True
+        lines = 1 if brief else INF() if all else lines
+        super().__init__(
+            brief=brief,
+            gray=gray,
+            blocks=blocks,
+            decode=decode,
+            dense=dense,
+            index=index,
+            escape=escape,
+            expand=expand,
+            narrow=narrow,
+            lines=lines,
+            meta=meta,
+            bare=bare,
+            width=width,
+            stdout=stdout,
+        )
+
+    @HexViewer.Requires(&#39;colorama&#39;, [&#39;display&#39;, &#39;default&#39;, &#39;extended&#39;])
+    def _colorama():
+        import colorama
+        return colorama
+
+    def process(self, data):
+        colorize = not self.args.gray and not self.args.stdout
+        lines = self._peeklines(data, colorize)
+
+        if self.args.stdout:
+            for line in lines:
+                yield line.encode(self.codec)
+            return
+
+        stderr = sys.stderr
+
+        if colorize:
+            colorama = self._colorama
+            if os.name == &#39;nt&#39;:
+                stderr = colorama.AnsiToWin32(stderr).stream
+            _erase = &#39; &#39; * get_terminal_size()
+            _reset = F&#39;\r{colorama.Style.RESET_ALL}{_erase}\r&#39;
+        else:
+            _reset = &#39;&#39;
+
+        try:
+            for line in lines:
+                print(line, file=stderr)
+        except BaseException:
+            stderr.write(_reset)
+            raise
+        if not self.isatty():
+            self.log_info(&#39;forwarding input to next unit&#39;)
+            yield data
+
+    def _peekmeta(self, linewidth, sep, meta: LazyMetaOracle, peek=None) -&gt; Generator[str]:
+        if not meta and not peek:
+            return
+        width = max((len(name) for name in meta), default=0)
+        separators = iter([sep])
+        if peek is not None:
+            if len(peek) &gt; linewidth:
+                peek = peek[:linewidth - 3] + &#39;...&#39;
+            yield from separators
+            yield peek
+        for name in sorted(meta, key=lambda s: (len(s) &lt;= 3, s)):
+            if not self.args.index and name == LazyMetaOracle.IndexKey:
+                continue
+            value = meta[name]
+            if value is None:
+                continue
+            if isinstance(value, CustomStringRepresentation):
+                value = repr(value).strip()
+            elif (b := asbuffer(value)):
+                value = repr(ByteStringWrapper(b))
+            elif isinstance(value, int):
+                if value in range(-999, 1000):
+                    value = str(value)
+                elif value &gt; 0:
+                    value = F&#39;0x{value:X}&#39;
+                else:
+                    value = F&#39;-0x{-value:X}&#39;
+            elif isinstance(value, float):
+                value = F&#39;{value:.4f}&#39;
+            metavar = F&#39;{name:&gt;{width + 2}} = {value!s}&#39;
+            if len(metavar) &gt; linewidth:
+                metavar = metavar[:linewidth - 3] + &#39;...&#39;
+            yield from separators
+            yield metavar
+
+    def _trydecode(self, data, codec: str | None, width: int, linecount: int) -&gt; list[str] | None:
+        remaining = linecount
+        result = []
+        wrap = self.args.decode &gt; 1
+        if codec is None:
+            from refinery.units.encoding.esc import esc
+            decoded = data[:abs(width * linecount)]
+            decoded = str(decoded | -esc(bare=True))
+            limit = abs(min(linecount * width, len(decoded)))
+            for k in range(0, limit, width):
+                result.append(decoded[k:k + width])
+            return result
+        try:
+            import unicodedata
+            unprintable = {&#39;Cc&#39;, &#39;Cf&#39;, &#39;Co&#39;, &#39;Cs&#39;}
+            self.log_info(F&#39;trying to decode as {codec}.&#39;)
+            decoded = codecs.decode(data, codec, errors=&#39;strict&#39;)
+            count = sum(unicodedata.category(c) not in unprintable for c in decoded)
+            ratio = count / len(decoded)
+        except UnicodeDecodeError as DE:
+            self.log_info(&#39;decoding failed:&#39;, DE.reason)
+            return None
+        except ValueError as V:
+            self.log_info(&#39;decoding failed:&#39;, V)
+            return None
+        if ratio &lt; 0.8:
+            self.log_info(F&#39;data contains {ratio * 100:.2f}% printable characters, this is too low.&#39;)
+            return None
+        decoded = decoded.splitlines(False)
+        if not wrap:
+            for k, line in enumerate(decoded):
+                line = line.replace(&#39;\t&#39;, &#39;\x20&#39; * 4)
+                if colored_text_length(line) &lt;= width:
+                    continue
+                clipped = colored_text_truncate(line, width - 3)
+                if self.args.gray:
+                    color = &#39;&#39;
+                    reset = &#39;&#39;
+                else:
+                    colorama = self._colorama
+                    color = colorama.Fore.LIGHTRED_EX
+                    reset = colorama.Style.RESET_ALL
+                decoded[k] = F&#39;{clipped}{color}...{reset}&#39;
+            return decoded[:abs(linecount)]
+        for paragraph in decoded:
+            if not remaining:
+                break
+            wrapped = [
+                line for chunk in textwrap.wrap(
+                    colored_text_bleach(paragraph),
+                    width,
+                    break_long_words=True,
+                    break_on_hyphens=False,
+                    drop_whitespace=False,
+                    expand_tabs=True,
+                    max_lines=abs(remaining + 1),
+                    replace_whitespace=False,
+                    tabsize=4,
+                )
+                for line in chunk.splitlines(keepends=False)
+            ]
+            remaining -= len(wrapped)
+            result.extend(wrapped)
+        return result[:abs(linecount)]
+
+    def _peeklines(self, data: Chunk, colorize: bool) -&gt; Generator[str]:
+
+        meta = metavars(data)
+
+        codec = None
+        lines = None
+        final = data.temp or False
+        empty = True
+
+        if not self.args.index:
+            index = None
+        else:
+            index = meta.get(&#39;index&#39;, None)
+
+        if not self.args.brief:
+            padding = 0
+        else:
+            padding = SizeInt.width + 2
+            if index is not None:
+                padding += 6
+
+        metrics = self._get_metrics(len(data), self.args.lines, padding)
+
+        if self.args.brief:
+            metrics.address_width = 0
+            metrics.fit_to_width(allow_increase=True)
+
+        sepsize = metrics.hexdump_width
+        txtsize = self.args.width or sepsize
+
+        if self.args.lines and data:
+            if self.args.escape:
+                lines = self._trydecode(data, None, txtsize, metrics.line_count)
+            if self.args.decode &gt; 0:
+                for codec in (&#39;utf8&#39;, &#39;cp1251&#39;, &#39;cp1252&#39;, &#39;utf-16le&#39;, &#39;utf-16&#39;, &#39;utf-16be&#39;):
+                    lines = self._trydecode(data, codec, txtsize, metrics.line_count)
+                    if lines:
+                        codec = codec
+                        break
+                else:
+                    codec = None
+            if lines is None:
+                lines = list(self.hexdump(data, metrics, colorize))
+            else:
+                sepsize = txtsize
+
+        def separator(title=None):
+            if title is None or sepsize &lt;= len(title) + 8:
+                return sepsize * &#39;-&#39;
+            return &#39;-&#39; * (sepsize - len(title) - 5) + F&#39;[{title}]---&#39;
+
+        if self.args.brief:
+            final = False
+        elif not self.args.bare:
+            peek = repr(meta.size)
+            line = separator()
+            if len(data) &lt;= 5_000_000:
+                peek = F&#39;{peek}; {meta.entropy!r} entropy&#39;
+            peek = F&#39;{peek}; {meta.magic!s}&#39;
+            if self.args.lines == 0:
+                peek = None
+            elif not data:
+                peek = None
+                line = separator(&#39;empty chunk&#39;)
+            if self.args.meta &gt; 0:
+                meta.derive(&#39;size&#39;)
+                meta.derive(&#39;magic&#39;)
+                meta.derive(&#39;entropy&#39;)
+                peek = None
+            if self.args.meta &gt; 1:
+                meta.derive(&#39;crc32&#39;)
+                meta.derive(&#39;sha256&#39;)
+            if self.args.meta &gt; 2:
+                for name in meta.derivations:
+                    meta[name]
+            for line in self._peekmeta(metrics.hexdump_width, line, meta, peek=peek):
+                empty = False
+                yield line
+
+        if lines:
+            empty = False
+            if not self.args.brief:
+                yield separator(codec or None)
+                yield from lines
+            else:
+                brief = next(iter(lines))
+                brief = F&#39;{SizeInt(len(data))!r}: {brief}&#39;
+                if index is not None:
+                    brief = F&#39;#{index:03d}: {brief}&#39;
+                yield brief
+
+        if final and (self.args.bare or not empty):
+            yield separator()
+
+    def filter(self, chunks):
+        try:
+            self._colorama.init(wrap=False)
+        except ImportError:
+            pass
+
+        discarded = 0
+
+        if self.args.brief:
+            for chunk in chunks:
+                if not chunk.visible and self.isatty():
+                    discarded += 1
+                    continue
+                self.log_debug(chunk)
+                yield chunk
+        else:
+            it = iter(chunks)
+            buffer = collections.deque(itertools.islice(it, 0, 2))
+            buffer.reverse()
+            while buffer:
+                if self.isatty() and not buffer[0].visible:
+                    buffer.popleft()
+                    discarded += 1
+                else:
+                    item = buffer.pop()
+                    last = not bool(buffer)
+                    item.temp = last
+                    if not item.visible and self.isatty():
+                        discarded += 1
+                    else:
+                        yield item
+                try:
+                    buffer.appendleft(next(it))
+                except StopIteration:
+                    pass
+
+        if discarded:
+            self.log_warn(F&#39;discarded {discarded} invisible chunks to prevent them from leaking into the terminal.&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.sinks.peek.peek"><code class="flex name class">
+<span>class <span class="ident">peek</span></span>
+<span>(</span><span>lines=10, all=False, brief=False, decode=0, escape=False, bare=False, meta=0, gray=False, index=False, stdout=False, narrow=False, blocks=1, dense=False, expand=False, width=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The unit extracts preview information of the input data and displays it on the standard error stream. If the standard
+output of this unit is connected by a pipe, the incoming data is forwarded. However, if the unit outputs to a terminal,
+the data is discarded instead.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/sinks/peek.py#L27-L348" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class peek(HexViewer):
+    &#34;&#34;&#34;
+    The unit extracts preview information of the input data and displays it on the standard error stream. If the standard
+    output of this unit is connected by a pipe, the incoming data is forwarded. However, if the unit outputs to a terminal,
+    the data is discarded instead.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        lines: Param[int | INF, Arg.Number(&#39;-l&#39;, group=&#39;SIZE&#39;,
+            help=&#39;Specify number N of lines in the preview, default is 10.&#39;)] = 10,
+        all: Param[bool, Arg.Switch(&#39;-a&#39;, group=&#39;SIZE&#39;,
+            help=&#39;Output all possible preview lines without restriction&#39;)] = False,
+        brief: Param[bool, Arg.Switch(&#39;-b&#39;, group=&#39;SIZE&#39;,
+            help=&#39;One line peek, implies --lines=1.&#39;)] = False,
+        decode: Param[int, Arg.Counts(&#39;-d&#39;, group=&#39;MODE&#39;, help=(
+            &#39;Attempt to decode and display printable data. Specify twice to enable line wrapping.&#39;))] = 0,
+        escape: Param[bool, Arg.Switch(&#39;-e&#39;, group=&#39;MODE&#39;,
+            help=&#39;Always peek data as string, escape characters if necessary.&#39;)] = False,
+        bare: Param[bool, Arg.Switch(&#39;-r&#39;, group=&#39;META&#39;,
+            help=&#39;Only peek the data itself, do not show a metadata preview.&#39;)] = False,
+        meta: Param[int, Arg.Counts(&#39;-m&#39;, group=&#39;META&#39;, help=(
+            &#39;Show more auto-derivable metadata. Specify multiple times to populate more variables.&#39;))] = 0,
+        gray: Param[bool, Arg.Switch(&#39;-g&#39;,
+            help=&#39;Do not colorize the output.&#39;)] = False,
+        index: Param[bool, Arg.Switch(&#39;-i&#39;,
+            help=&#39;Display the index of each chunk within the current frame.&#39;)] = False,
+        stdout: Param[bool, Arg.Switch(&#39;-2&#39;,
+            help=&#39;Print the peek to STDOUT rather than STDERR; the input data is lost.&#39;)] = False,
+        narrow=False, blocks=1, dense=False, expand=False, width=0
+    ):
+        if decode and escape:
+            raise ValueError(&#39;The decode and esc options are exclusive.&#39;)
+        if brief:
+            narrow = True
+        if environment.colorless.value:
+            gray = True
+        lines = 1 if brief else INF() if all else lines
+        super().__init__(
+            brief=brief,
+            gray=gray,
+            blocks=blocks,
+            decode=decode,
+            dense=dense,
+            index=index,
+            escape=escape,
+            expand=expand,
+            narrow=narrow,
+            lines=lines,
+            meta=meta,
+            bare=bare,
+            width=width,
+            stdout=stdout,
+        )
+
+    @HexViewer.Requires(&#39;colorama&#39;, [&#39;display&#39;, &#39;default&#39;, &#39;extended&#39;])
+    def _colorama():
+        import colorama
+        return colorama
+
+    def process(self, data):
+        colorize = not self.args.gray and not self.args.stdout
+        lines = self._peeklines(data, colorize)
+
+        if self.args.stdout:
+            for line in lines:
+                yield line.encode(self.codec)
+            return
+
+        stderr = sys.stderr
+
+        if colorize:
+            colorama = self._colorama
+            if os.name == &#39;nt&#39;:
+                stderr = colorama.AnsiToWin32(stderr).stream
+            _erase = &#39; &#39; * get_terminal_size()
+            _reset = F&#39;\r{colorama.Style.RESET_ALL}{_erase}\r&#39;
+        else:
+            _reset = &#39;&#39;
+
+        try:
+            for line in lines:
+                print(line, file=stderr)
+        except BaseException:
+            stderr.write(_reset)
+            raise
+        if not self.isatty():
+            self.log_info(&#39;forwarding input to next unit&#39;)
+            yield data
+
+    def _peekmeta(self, linewidth, sep, meta: LazyMetaOracle, peek=None) -&gt; Generator[str]:
+        if not meta and not peek:
+            return
+        width = max((len(name) for name in meta), default=0)
+        separators = iter([sep])
+        if peek is not None:
+            if len(peek) &gt; linewidth:
+                peek = peek[:linewidth - 3] + &#39;...&#39;
+            yield from separators
+            yield peek
+        for name in sorted(meta, key=lambda s: (len(s) &lt;= 3, s)):
+            if not self.args.index and name == LazyMetaOracle.IndexKey:
+                continue
+            value = meta[name]
+            if value is None:
+                continue
+            if isinstance(value, CustomStringRepresentation):
+                value = repr(value).strip()
+            elif (b := asbuffer(value)):
+                value = repr(ByteStringWrapper(b))
+            elif isinstance(value, int):
+                if value in range(-999, 1000):
+                    value = str(value)
+                elif value &gt; 0:
+                    value = F&#39;0x{value:X}&#39;
+                else:
+                    value = F&#39;-0x{-value:X}&#39;
+            elif isinstance(value, float):
+                value = F&#39;{value:.4f}&#39;
+            metavar = F&#39;{name:&gt;{width + 2}} = {value!s}&#39;
+            if len(metavar) &gt; linewidth:
+                metavar = metavar[:linewidth - 3] + &#39;...&#39;
+            yield from separators
+            yield metavar
+
+    def _trydecode(self, data, codec: str | None, width: int, linecount: int) -&gt; list[str] | None:
+        remaining = linecount
+        result = []
+        wrap = self.args.decode &gt; 1
+        if codec is None:
+            from refinery.units.encoding.esc import esc
+            decoded = data[:abs(width * linecount)]
+            decoded = str(decoded | -esc(bare=True))
+            limit = abs(min(linecount * width, len(decoded)))
+            for k in range(0, limit, width):
+                result.append(decoded[k:k + width])
+            return result
+        try:
+            import unicodedata
+            unprintable = {&#39;Cc&#39;, &#39;Cf&#39;, &#39;Co&#39;, &#39;Cs&#39;}
+            self.log_info(F&#39;trying to decode as {codec}.&#39;)
+            decoded = codecs.decode(data, codec, errors=&#39;strict&#39;)
+            count = sum(unicodedata.category(c) not in unprintable for c in decoded)
+            ratio = count / len(decoded)
+        except UnicodeDecodeError as DE:
+            self.log_info(&#39;decoding failed:&#39;, DE.reason)
+            return None
+        except ValueError as V:
+            self.log_info(&#39;decoding failed:&#39;, V)
+            return None
+        if ratio &lt; 0.8:
+            self.log_info(F&#39;data contains {ratio * 100:.2f}% printable characters, this is too low.&#39;)
+            return None
+        decoded = decoded.splitlines(False)
+        if not wrap:
+            for k, line in enumerate(decoded):
+                line = line.replace(&#39;\t&#39;, &#39;\x20&#39; * 4)
+                if colored_text_length(line) &lt;= width:
+                    continue
+                clipped = colored_text_truncate(line, width - 3)
+                if self.args.gray:
+                    color = &#39;&#39;
+                    reset = &#39;&#39;
+                else:
+                    colorama = self._colorama
+                    color = colorama.Fore.LIGHTRED_EX
+                    reset = colorama.Style.RESET_ALL
+                decoded[k] = F&#39;{clipped}{color}...{reset}&#39;
+            return decoded[:abs(linecount)]
+        for paragraph in decoded:
+            if not remaining:
+                break
+            wrapped = [
+                line for chunk in textwrap.wrap(
+                    colored_text_bleach(paragraph),
+                    width,
+                    break_long_words=True,
+                    break_on_hyphens=False,
+                    drop_whitespace=False,
+                    expand_tabs=True,
+                    max_lines=abs(remaining + 1),
+                    replace_whitespace=False,
+                    tabsize=4,
+                )
+                for line in chunk.splitlines(keepends=False)
+            ]
+            remaining -= len(wrapped)
+            result.extend(wrapped)
+        return result[:abs(linecount)]
+
+    def _peeklines(self, data: Chunk, colorize: bool) -&gt; Generator[str]:
+
+        meta = metavars(data)
+
+        codec = None
+        lines = None
+        final = data.temp or False
+        empty = True
+
+        if not self.args.index:
+            index = None
+        else:
+            index = meta.get(&#39;index&#39;, None)
+
+        if not self.args.brief:
+            padding = 0
+        else:
+            padding = SizeInt.width + 2
+            if index is not None:
+                padding += 6
+
+        metrics = self._get_metrics(len(data), self.args.lines, padding)
+
+        if self.args.brief:
+            metrics.address_width = 0
+            metrics.fit_to_width(allow_increase=True)
+
+        sepsize = metrics.hexdump_width
+        txtsize = self.args.width or sepsize
+
+        if self.args.lines and data:
+            if self.args.escape:
+                lines = self._trydecode(data, None, txtsize, metrics.line_count)
+            if self.args.decode &gt; 0:
+                for codec in (&#39;utf8&#39;, &#39;cp1251&#39;, &#39;cp1252&#39;, &#39;utf-16le&#39;, &#39;utf-16&#39;, &#39;utf-16be&#39;):
+                    lines = self._trydecode(data, codec, txtsize, metrics.line_count)
+                    if lines:
+                        codec = codec
+                        break
+                else:
+                    codec = None
+            if lines is None:
+                lines = list(self.hexdump(data, metrics, colorize))
+            else:
+                sepsize = txtsize
+
+        def separator(title=None):
+            if title is None or sepsize &lt;= len(title) + 8:
+                return sepsize * &#39;-&#39;
+            return &#39;-&#39; * (sepsize - len(title) - 5) + F&#39;[{title}]---&#39;
+
+        if self.args.brief:
+            final = False
+        elif not self.args.bare:
+            peek = repr(meta.size)
+            line = separator()
+            if len(data) &lt;= 5_000_000:
+                peek = F&#39;{peek}; {meta.entropy!r} entropy&#39;
+            peek = F&#39;{peek}; {meta.magic!s}&#39;
+            if self.args.lines == 0:
+                peek = None
+            elif not data:
+                peek = None
+                line = separator(&#39;empty chunk&#39;)
+            if self.args.meta &gt; 0:
+                meta.derive(&#39;size&#39;)
+                meta.derive(&#39;magic&#39;)
+                meta.derive(&#39;entropy&#39;)
+                peek = None
+            if self.args.meta &gt; 1:
+                meta.derive(&#39;crc32&#39;)
+                meta.derive(&#39;sha256&#39;)
+            if self.args.meta &gt; 2:
+                for name in meta.derivations:
+                    meta[name]
+            for line in self._peekmeta(metrics.hexdump_width, line, meta, peek=peek):
+                empty = False
+                yield line
+
+        if lines:
+            empty = False
+            if not self.args.brief:
+                yield separator(codec or None)
+                yield from lines
+            else:
+                brief = next(iter(lines))
+                brief = F&#39;{SizeInt(len(data))!r}: {brief}&#39;
+                if index is not None:
+                    brief = F&#39;#{index:03d}: {brief}&#39;
+                yield brief
+
+        if final and (self.args.bare or not empty):
+            yield separator()
+
+    def filter(self, chunks):
+        try:
+            self._colorama.init(wrap=False)
+        except ImportError:
+            pass
+
+        discarded = 0
+
+        if self.args.brief:
+            for chunk in chunks:
+                if not chunk.visible and self.isatty():
+                    discarded += 1
+                    continue
+                self.log_debug(chunk)
+                yield chunk
+        else:
+            it = iter(chunks)
+            buffer = collections.deque(itertools.islice(it, 0, 2))
+            buffer.reverse()
+            while buffer:
+                if self.isatty() and not buffer[0].visible:
+                    buffer.popleft()
+                    discarded += 1
+                else:
+                    item = buffer.pop()
+                    last = not bool(buffer)
+                    item.temp = last
+                    if not item.visible and self.isatty():
+                        discarded += 1
+                    else:
+                        yield item
+                try:
+                    buffer.appendleft(next(it))
+                except StopIteration:
+                    pass
+
+        if discarded:
+            self.log_warn(F&#39;discarded {discarded} invisible chunks to prevent them from leaking into the terminal.&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.sinks.HexViewer" href="index.html#refinery.units.sinks.HexViewer">HexViewer</a></li>
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.sinks.peek.peek" href="#refinery.units.sinks.peek.peek">peek</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.sinks.peek.peek.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.sinks.HexViewer" href="index.html#refinery.units.sinks.HexViewer">HexViewer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.sinks.HexViewer.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.sinks" href="index.html">refinery.units.sinks</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.sinks.peek.peek" href="#refinery.units.sinks.peek.peek">peek</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

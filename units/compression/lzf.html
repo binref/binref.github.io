@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.compression.lzf documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.compression.lzf</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzf.py#L1-L203" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import itertools
+
+from refinery.lib.structures import MemoryFile, Struct, StructReader
+from refinery.lib.types import Param
+from refinery.units import Arg, RefineryPartialResult, Unit
+
+_MAX_LIT = 1 &lt;&lt; 5
+_MAX_OFF = 1 &lt;&lt; 13
+_MAX_REF = ((1 &lt;&lt; 8) + (1 &lt;&lt; 3))
+
+_HSLOG = 16
+_HSIZE = 1 &lt;&lt; _HSLOG
+
+
+class LZFHeader(Struct):
+    MAGIC = B&#39;ZV&#39;
+
+    def __init__(self, reader: StructReader):
+        if reader.read(2) != self.MAGIC:
+            raise ValueError(&#39;Invalid header magic.&#39;)
+        tmp = reader.read_byte()
+        if tmp and tmp != 1:
+            raise ValueError(F&#39;Invalid type code: {tmp}&#39;)
+        self.compressed = bool(tmp)
+        with reader.be:
+            tmp = reader.u16()
+            if self.compressed:
+                self.encoded_size = tmp
+                self.decoded_size = reader.u16()
+            else:
+                self.encoded_size = tmp
+                self.decoded_size = tmp
+
+
+class lzf(Unit):
+    &#34;&#34;&#34;
+    This unit implements LZF compression and decompression.
+    &#34;&#34;&#34;
+
+    def __init__(self, fast: Param[bool, Arg.Switch(&#39;-x&#39;, help=&#39;Enable fast compression mode.&#39;)] = False):
+        super().__init__(fast=fast)
+
+    def reverse(self, data):
+        def FRST(p: memoryview) -&gt; int:
+            return ((p[0]) &lt;&lt; 8) | p[1]
+
+        def NEXT(v: int, p: memoryview) -&gt; int:
+            return ((v &lt;&lt; 8) | p[2]) &amp; 0xFFFFFFFF
+
+        def DELTA(p: memoryview):
+            return view.nbytes - p.nbytes
+
+        if self.args.fast:
+            def HIDX(h: int) -&gt; int:
+                return (((h &gt;&gt; (3 * 8 - _HSLOG)) - h * 5) &amp; (_HSIZE - 1))
+        else:
+            def HIDX(h: int) -&gt; int:
+                q = (h ^ (h &lt;&lt; 5))
+                return (((q &gt;&gt; (3 * 8 - _HSLOG)) - h * 5) &amp; (_HSIZE - 1))
+
+        if not data:
+            return data
+
+        ip = view = memoryview(data)
+        op = bytearray()
+
+        if len(data) == 1:
+            op.append(0)
+            op.extend(data)
+            return op
+
+        hval = FRST(ip)
+        htab = [0] * _HSIZE
+        fast = 1 if self.args.fast else 0
+
+        lit = 0
+
+        def begin_literal():
+            nonlocal lit
+            op.append(0)
+            lit = 0
+
+        def advance_literal():
+            nonlocal lit, ip
+            lit += 1
+            op.append(ip[0])
+            ip = ip[1:]
+            if lit == _MAX_LIT:
+                op[-lit - 1] = lit - 1
+                begin_literal()
+
+        def commit_literal():
+            if lit &gt; 0:
+                op[-lit - 1] = lit - 1
+            else:
+                op.pop()
+
+        begin_literal()
+
+        while ip.nbytes &gt; 2:
+            hval = NEXT(hval, ip)
+            hpos = HIDX(hval)
+            ipos = DELTA(ip)
+            length = 2
+            r, htab[hpos] = htab[hpos], ipos
+            off = ipos - r - 1
+            ref = view[r:]
+
+            if off &gt;= _MAX_OFF or r &lt;= 0 or ref[:3] != ip[:3]:
+                advance_literal()
+                continue
+            else:
+                commit_literal()
+
+            maxlen = min(_MAX_REF, ip.nbytes - length)
+
+            while True:
+                length += 1
+                if length &gt;= maxlen or ref[length] != ip[length]:
+                    length -= 2
+                    break
+
+            if length &lt; 7:
+                op.append((off &gt;&gt; 8) + (length &lt;&lt; 5))
+            else:
+                op.append((off &gt;&gt; 8) + (7 &lt;&lt; 5))
+                op.append(length - 7)
+
+            op.append(off &amp; 0xFF)
+            begin_literal()
+
+            if ip.nbytes &lt;= length + 3:
+                ip = ip[length + 2:]
+                break
+            if fast:
+                ip = ip[length:]
+                hval = FRST(ip)
+                for _ in range(2):
+                    hval = NEXT(hval, ip)
+                    htab[HIDX(hval)] = DELTA(ip)
+                    ip = ip[1:]
+            else:
+                ip = ip[1:]
+                for _ in range(length + 1):
+                    hval = NEXT(hval, ip)
+                    htab[HIDX(hval)] = DELTA(ip)
+                    ip = ip[1:]
+        while ip.nbytes:
+            advance_literal()
+        commit_literal()
+        return op
+
+    def _decompress_chunk(self, data: memoryview, out: MemoryFile):
+        ip = StructReader(data)
+        while not ip.eof:
+            ctrl = ip.u8()
+            if ctrl &lt; 0B100000:
+                ctrl += 1
+                out.write(ip.read_exactly(ctrl))
+            else:
+                length = ctrl &gt;&gt; 5
+                offset = 1 + ((ctrl &amp; 0B11111) &lt;&lt; 8)
+                if length == 7:
+                    length += ip.u8()
+                offset += ip.u8()
+                length += 2
+                out.replay(offset, length)
+
+    def process(self, data):
+        mem = memoryview(data)
+        out = MemoryFile()
+
+        try:
+            reader = StructReader(mem)
+            header = LZFHeader(reader)
+        except Exception:
+            self.log_info(&#39;no header detected, decompressing as raw stream&#39;)
+            self._decompress_chunk(mem, out)
+            return out.getvalue()
+
+        for k in itertools.count(1):
+            self.log_info(F&#39;chunk: e=0x{header.encoded_size:04X} d=0x{header.decoded_size:04X}&#39;)
+            chunk = reader.read(header.encoded_size)
+            if header.compressed:
+                self._decompress_chunk(chunk, out)
+            else:
+                out.write(chunk)
+            if reader.eof:
+                break
+            try:
+                header = LZFHeader(reader)
+            except Exception as E:
+                msg = F&#39;failed parsing next header after {k} chunks: {E!s}&#39;
+                raise RefineryPartialResult(msg, out.getvalue())
+
+        return out.getvalue()
+
+    @classmethod
+    def handles(cls, data):
+        if data[:2] == LZFHeader.MAGIC:
+            return True</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.compression.lzf.LZFHeader"><code class="flex name class">
+<span>class <span class="ident">LZFHeader</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzf.py#L17-L34" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LZFHeader(Struct):
+    MAGIC = B&#39;ZV&#39;
+
+    def __init__(self, reader: StructReader):
+        if reader.read(2) != self.MAGIC:
+            raise ValueError(&#39;Invalid header magic.&#39;)
+        tmp = reader.read_byte()
+        if tmp and tmp != 1:
+            raise ValueError(F&#39;Invalid type code: {tmp}&#39;)
+        self.compressed = bool(tmp)
+        with reader.be:
+            tmp = reader.u16()
+            if self.compressed:
+                self.encoded_size = tmp
+                self.decoded_size = reader.u16()
+            else:
+                self.encoded_size = tmp
+                self.decoded_size = tmp</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzf.LZFHeader.MAGIC"><code class="name">var <span class="ident">MAGIC</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzf.LZFHeader.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzf.lzf"><code class="flex name class">
+<span>class <span class="ident">lzf</span></span>
+<span>(</span><span>fast=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>This unit implements LZF compression and decompression.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzf.py#L37-L203" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class lzf(Unit):
+    &#34;&#34;&#34;
+    This unit implements LZF compression and decompression.
+    &#34;&#34;&#34;
+
+    def __init__(self, fast: Param[bool, Arg.Switch(&#39;-x&#39;, help=&#39;Enable fast compression mode.&#39;)] = False):
+        super().__init__(fast=fast)
+
+    def reverse(self, data):
+        def FRST(p: memoryview) -&gt; int:
+            return ((p[0]) &lt;&lt; 8) | p[1]
+
+        def NEXT(v: int, p: memoryview) -&gt; int:
+            return ((v &lt;&lt; 8) | p[2]) &amp; 0xFFFFFFFF
+
+        def DELTA(p: memoryview):
+            return view.nbytes - p.nbytes
+
+        if self.args.fast:
+            def HIDX(h: int) -&gt; int:
+                return (((h &gt;&gt; (3 * 8 - _HSLOG)) - h * 5) &amp; (_HSIZE - 1))
+        else:
+            def HIDX(h: int) -&gt; int:
+                q = (h ^ (h &lt;&lt; 5))
+                return (((q &gt;&gt; (3 * 8 - _HSLOG)) - h * 5) &amp; (_HSIZE - 1))
+
+        if not data:
+            return data
+
+        ip = view = memoryview(data)
+        op = bytearray()
+
+        if len(data) == 1:
+            op.append(0)
+            op.extend(data)
+            return op
+
+        hval = FRST(ip)
+        htab = [0] * _HSIZE
+        fast = 1 if self.args.fast else 0
+
+        lit = 0
+
+        def begin_literal():
+            nonlocal lit
+            op.append(0)
+            lit = 0
+
+        def advance_literal():
+            nonlocal lit, ip
+            lit += 1
+            op.append(ip[0])
+            ip = ip[1:]
+            if lit == _MAX_LIT:
+                op[-lit - 1] = lit - 1
+                begin_literal()
+
+        def commit_literal():
+            if lit &gt; 0:
+                op[-lit - 1] = lit - 1
+            else:
+                op.pop()
+
+        begin_literal()
+
+        while ip.nbytes &gt; 2:
+            hval = NEXT(hval, ip)
+            hpos = HIDX(hval)
+            ipos = DELTA(ip)
+            length = 2
+            r, htab[hpos] = htab[hpos], ipos
+            off = ipos - r - 1
+            ref = view[r:]
+
+            if off &gt;= _MAX_OFF or r &lt;= 0 or ref[:3] != ip[:3]:
+                advance_literal()
+                continue
+            else:
+                commit_literal()
+
+            maxlen = min(_MAX_REF, ip.nbytes - length)
+
+            while True:
+                length += 1
+                if length &gt;= maxlen or ref[length] != ip[length]:
+                    length -= 2
+                    break
+
+            if length &lt; 7:
+                op.append((off &gt;&gt; 8) + (length &lt;&lt; 5))
+            else:
+                op.append((off &gt;&gt; 8) + (7 &lt;&lt; 5))
+                op.append(length - 7)
+
+            op.append(off &amp; 0xFF)
+            begin_literal()
+
+            if ip.nbytes &lt;= length + 3:
+                ip = ip[length + 2:]
+                break
+            if fast:
+                ip = ip[length:]
+                hval = FRST(ip)
+                for _ in range(2):
+                    hval = NEXT(hval, ip)
+                    htab[HIDX(hval)] = DELTA(ip)
+                    ip = ip[1:]
+            else:
+                ip = ip[1:]
+                for _ in range(length + 1):
+                    hval = NEXT(hval, ip)
+                    htab[HIDX(hval)] = DELTA(ip)
+                    ip = ip[1:]
+        while ip.nbytes:
+            advance_literal()
+        commit_literal()
+        return op
+
+    def _decompress_chunk(self, data: memoryview, out: MemoryFile):
+        ip = StructReader(data)
+        while not ip.eof:
+            ctrl = ip.u8()
+            if ctrl &lt; 0B100000:
+                ctrl += 1
+                out.write(ip.read_exactly(ctrl))
+            else:
+                length = ctrl &gt;&gt; 5
+                offset = 1 + ((ctrl &amp; 0B11111) &lt;&lt; 8)
+                if length == 7:
+                    length += ip.u8()
+                offset += ip.u8()
+                length += 2
+                out.replay(offset, length)
+
+    def process(self, data):
+        mem = memoryview(data)
+        out = MemoryFile()
+
+        try:
+            reader = StructReader(mem)
+            header = LZFHeader(reader)
+        except Exception:
+            self.log_info(&#39;no header detected, decompressing as raw stream&#39;)
+            self._decompress_chunk(mem, out)
+            return out.getvalue()
+
+        for k in itertools.count(1):
+            self.log_info(F&#39;chunk: e=0x{header.encoded_size:04X} d=0x{header.decoded_size:04X}&#39;)
+            chunk = reader.read(header.encoded_size)
+            if header.compressed:
+                self._decompress_chunk(chunk, out)
+            else:
+                out.write(chunk)
+            if reader.eof:
+                break
+            try:
+                header = LZFHeader(reader)
+            except Exception as E:
+                msg = F&#39;failed parsing next header after {k} chunks: {E!s}&#39;
+                raise RefineryPartialResult(msg, out.getvalue())
+
+        return out.getvalue()
+
+    @classmethod
+    def handles(cls, data):
+        if data[:2] == LZFHeader.MAGIC:
+            return True</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.compression.lzf.lzf" href="#refinery.units.compression.lzf.lzf">lzf</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.reverse" href="../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.compression" href="index.html">refinery.units.compression</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.compression.lzf.LZFHeader" href="#refinery.units.compression.lzf.LZFHeader">LZFHeader</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzf.LZFHeader.Parse" href="#refinery.units.compression.lzf.LZFHeader.Parse">Parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzf.lzf" href="#refinery.units.compression.lzf.lzf">lzf</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

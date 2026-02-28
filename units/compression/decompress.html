@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.compression.decompress documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.compression.decompress</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/decompress.py#L1-L361" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from enum import IntFlag
+
+import colorama
+
+from refinery.lib.id import get_structured_data_type
+from refinery.lib.tools import normalize_to_display
+from refinery.lib.types import INF, NamedTuple, Param, bounds, buf
+from refinery.units import Arg, RefineryPartialResult, Unit
+
+if True:
+    colorama.init()
+
+from colorama import Fore, Style
+
+from .ap import aplib
+from .blz import blz
+from .brotli import brotli
+from .bz2 import bz2
+from .flz import flz
+from .jcalg import jcalg
+from .lz import _auto_decompress_lzma as lzma
+from .lz4 import lz4
+from .lzf import lzf
+from .lzjb import lzjb
+from .lznt1 import lznt1
+from .lzo import lzo
+from .lzw import lzw
+from .mscf import MODE as MSCF_MODE
+from .mscf import mscf
+from .nrv import nrv2b, nrv2d, nrv2e
+from .pkw import pkw
+from .qlz import qlz
+from .szdd import szdd
+from .zl import zl
+from .zstd import zstd
+
+_COLOR_FAILURE = Fore.LIGHTRED_EX
+_COLOR_SUCCESS = Fore.LIGHTCYAN_EX
+_COLOR_WARNING = Fore.LIGHTYELLOW_EX
+_CR = Style.RESET_ALL
+
+_NO_PREFIX = {&#39;pkw&#39;}
+
+
+class _R(IntFlag):
+    InvalidData    = 0b000000  # noqa
+    NotMangled     = 0b000001  # noqa
+    ValidData      = 0b000010  # noqa
+    KnownFormat    = 0b000100  # noqa
+    HadOutput      = 0b001000  # noqa
+    HadNoErrors    = 0b010000  # noqa
+    Candidate      = 0b000110  # noqa
+    Successful     = 0b011000  # noqa
+    KnownFormatOut = 0b100000  # noqa
+
+    @property
+    def total(self):
+        return self.value.bit_count()
+
+    @property
+    def summary(self):
+        if self is _R.InvalidData:
+            return F&#39;{_COLOR_FAILURE}invalid{_CR}&#39;
+        elif _R.HadNoErrors &amp; self:
+            return F&#39;{_COLOR_SUCCESS}success{_CR}&#39;
+        elif _R.HadOutput &amp; self:
+            return F&#39;{_COLOR_WARNING}partial{_CR}&#39;
+        else:
+            return F&#39;{_COLOR_FAILURE}failure{_CR}&#39;
+
+    @property
+    def brief(self):
+        return &#39;&#39;.join(
+            t if self &amp; x else &#39;\x20&#39;
+            for t, x in {
+                &#39;M&#39;: _R.KnownFormatOut,
+                &#39;V&#39;: _R.ValidData,
+                &#39;F&#39;: _R.KnownFormat,
+                &#39;O&#39;: _R.HadOutput,
+                &#39;K&#39;: _R.HadNoErrors
+            }.items()
+        )
+
+
+class decompress(Unit):
+    &#34;&#34;&#34;
+    Attempts all available decompression units against the input and returns
+    the output of the first successful one. If none succeeds, the data is
+    returned unaltered. The process is heavily biased against LZNT1 decompression
+    due to a large tendency for LZNT1 false positives.
+    &#34;&#34;&#34;
+    def __init__(
+        self,
+        prepend: Param[bool, Arg.Switch(&#39;-P&#39;, &#39;--no-prepend&#39;, off=True, help=(
+            &#39;By default, if decompression fails, the unit attempts to prefix &#39;
+            &#39;the data with all possible values of a single byte and decompress &#39;
+            &#39;the result. This behavior can be disabled with this flag.&#39;)
+        )] = True,
+        tolerance: Param[int, Arg.Number(&#39;-t&#39;, help=(
+            &#39;Maximum number of bytes to strip from the beginning of the data; &#39;
+            &#39;The default value is 12.&#39;)
+        )] = 12,
+        max_ratio: Param[float, Arg.Double(&#39;-m&#39;, metavar=&#39;R&#39;, help=(
+            &#39;To determine whether a decompression algorithm was successful, the &#39;
+            &#39;ratio of compressed size to decompressed size may at most be as large &#39;
+            &#39;as this number, a floating point value R; default value is {default}.&#39;)
+        )] = 1.0,
+        min_ratio: Param[float, Arg.Double(&#39;-n&#39;, metavar=&#39;R&#39;, help=(
+            &#39;Require that compression ratios must be at least as large as R. This &#39;
+            &#39;is a &#34;too good to be true&#34; heuristic against algorithms like lznt1 &#39;
+            &#39;that can produce false positives. The default is {default}.&#39;)
+        )] = 0.0001,
+        expand_limits: Param[slice, Arg.Bounds(&#39;-d&#39;, metavar=&#39;a:b&#39;, help=(
+            &#39;Ratio limits are expanded for sizes of input data in the given range, &#39;
+            &#39;the default being 0:0x100. The reason for this is that small buffers &#39;
+            &#39;can increase in size when compressed under many formats. Set this to :0 &#39;
+            &#39;or use strict limits to disable this setting.&#39;)
+        )] = range(0, 0x101),
+        expand_factor: Param[float, Arg.Double(&#39;-k&#39;, help=(
+            &#39;The number by which the maximum compression ratio is multiplied for &#39;
+            &#39;small buffers. The default is {default}.&#39;
+        ))] = 1.75,
+        strict_limits: Param[bool, Arg.Switch(&#39;-l&#39;, help=(
+            &#39;For recognized formats i.e. when a magic signature is present, the &#39;
+            &#39;above limits are disabled by default. Activate this flag to enforce &#39;
+            &#39;them in every case.&#39;)
+        )] = False
+
+    ):
+        if min_ratio &lt;= 0:
+            raise ValueError(&#39;The compression factor must be nonnegative.&#39;)
+        super().__init__(
+            tolerance=tolerance,
+            prepend=prepend,
+            min_ratio=min_ratio,
+            max_ratio=max_ratio,
+            strict_limits=strict_limits,
+            expand_limits=expand_limits,
+            expand_factor=expand_factor,
+        )
+        self.engines: dict[str, Unit] = {}
+        for mode in (
+            MSCF_MODE.XPRESS,
+            MSCF_MODE.XPRESS_HUFF,
+        ):
+            mode = normalize_to_display(mode.name).casefold()
+            unit = mscf.assemble(mode)
+            self.engines[F&#39;{unit.name}[{mode}]&#39;] = unit
+        for engine in [
+            mscf,
+            pkw,
+            zstd,
+            szdd,
+            bz2,
+            zl,
+            lzf,
+            flz,
+            lzma,
+            lzw,
+            jcalg,
+            lzo,
+            aplib,
+            qlz,
+            brotli,
+            blz,
+            lzjb,
+            lz4,
+            lznt1,
+            nrv2e,
+            nrv2d,
+            nrv2b,
+        ]:
+            unit: Unit = engine.assemble()
+            _, _, name = unit.name.rpartition(&#39;auto-decompress-&#39;)
+            self.engines[name] = unit
+        for unit in self.engines.values():
+            unit.log_detach()
+
+    def process(self, data):
+
+        data = memoryview(data)
+        tiny = bounds[self.args.expand_limits]
+
+        class Decompression(NamedTuple):
+            method: str
+            engine: Unit
+            rating: _R
+            result: buf | None = None
+            cutoff: int = 0
+            prefix: int | None = None
+            magic: str | None = None
+
+            def __str__(self):
+                status = self.rating.summary
+                method = self.method
+                prefix = self.prefix
+                if prefix is not None:
+                    prefix = F&#39;{_COLOR_WARNING}0x{prefix:02X}{_CR}&#39;
+                if cutoff := self.cutoff:
+                    cutoff = F&#39;{_COLOR_WARNING}0x{cutoff:02X}{_CR}&#39;
+                else:
+                    cutoff = R&#39;0x00&#39;
+                return F&#39;prefix={prefix}, cutoff={cutoff}, [{status}] method={method}&#39;
+
+            def __len__(self):
+                if not self.result:
+                    return 0
+                return len(self.result)
+
+            @property
+            def ratio(self):
+                if not self.result:
+                    return INF()
+                return (len(data) + int(bool(self.prefix)) - self.cutoff) / len(self)
+
+            @property
+            def unmodified(self):
+                return self.prefix is None and self.cutoff == 0
+
+        if self.args.prepend:
+            buffer = bytearray(1 + len(data))
+            buffer[1:] = data
+
+        best_by_rating: dict[_R, Decompression] = {}
+
+        def best_current_rating():
+            return max(best_by_rating, default=_R.InvalidData)
+
+        def decompress(method: str, engine: Unit, cutoff: int = 0, prefix: int | None = None, careful: bool = False):
+            ingest = data[cutoff:]
+            rating = _R.ValidData
+            magic = None
+            if cutoff == 0 and prefix is None and not careful:
+                rating |= _R.NotMangled
+            if prefix is not None:
+                buffer[0] = prefix
+                ingest = buffer
+            is_handled = engine.handles(ingest)
+            if is_handled is True:
+                rating |= _R.KnownFormat
+            if is_handled is False:
+                return Decompression(method, engine, _R.InvalidData, None, cutoff, prefix)
+            try:
+                result = next(engine.act(ingest))
+            except RefineryPartialResult as pr:
+                rating |= _R.HadOutput
+                result = pr.partial
+            except Exception:
+                result = None
+            else:
+                rating |= _R.Successful
+                magic = get_structured_data_type(result)
+                if magic is not None:
+                    magic = magic.mnemonic
+                    rating |= _R.KnownFormatOut
+
+            return Decompression(method, engine, rating, result, cutoff, prefix, magic)
+
+        def update(new: Decompression, discard_if_too_good=False):
+            if not new.result:
+                return
+            ratio = new.ratio
+            known = new.rating &amp; _R.KnownFormat
+            strict = self.args.strict_limits
+            max_ratio = self.args.max_ratio
+            min_ratio = self.args.min_ratio
+            if not strict and len(data) in tiny:
+                max_ratio *= self.args.expand_factor
+                min_ratio /= self.args.expand_factor
+            if (strict or not known) and not (min_ratio &lt;= ratio &lt;= max_ratio):
+                return
+            best = best_by_rating.get(new.rating, None)
+            prefix = new.prefix
+            if prefix is not None:
+                prefix = F&#39;0x{prefix:02X}&#39;
+            if new.unmodified and best and not best.unmodified:
+                threshold = 1.00
+            else:
+                threshold = 0.95
+
+            if not best:
+                q = 0
+            elif (q := len(best) / len(new)) &gt; 1:
+                # This is unexpected, but indicates that we may have produced incorrect output
+                # before: What seems to work best is to force a reset at this point, although
+                # it seems like there should be a better solution than this.
+                q = -1
+                assert best.result
+                vb = memoryview(best.result)
+                vn = memoryview(new.result)
+                # This looks like we have skipped part of the compressed stream; At this point
+                # we can abort and not force an update.
+                if new.cutoff and vb[-len(vn):] == vn:
+                    return
+
+            if q &lt; threshold:
+                if best and discard_if_too_good:
+                    if q &lt; 0.5:
+                        return
+                    if new.rating &amp; _R.Successful != _R.Successful:
+                        return
+                best_by_rating[new.rating] = new
+                logger = self.log_info
+                _color = _COLOR_SUCCESS
+            else:
+                logger = self.log_info
+                _color = _COLOR_FAILURE
+            if ratio &gt;= 9:
+                rs = &#39;USELESS&#39;
+                rc = _COLOR_FAILURE
+            else:
+                rs = F&#39;{ratio * 100:6.2f}%&#39;
+                if ratio &gt;= 1.1:
+                    rc = _COLOR_FAILURE
+                elif ratio &gt;= 1.0:
+                    rc = _COLOR_WARNING
+                else:
+                    rc = _COLOR_SUCCESS
+            if q &lt; 0:
+                qs = &#39;RESTART&#39;
+            else:
+                qs = F&#39;{q:07.4f}&#39;
+            logger(lambda: (
+                F&#39;[{new.rating.brief}] [{rc}{rs}{_CR}] [q={_color}{qs}{_CR}] {new!s}&#39;))
+
+        for method, engine in self.engines.items():
+            self.log_debug(F&#39;attempting engine: {method}&#39;)
+            careful = isinstance(engine, (lznt1, flz, lzjb))
+            for t in range(self.args.tolerance + 1):
+                if best_current_rating() &gt;= _R.Successful and careful and t &gt; 0:
+                    break
+                update(decompress(method, engine, t, None, careful), careful)
+            if self.args.prepend and method not in _NO_PREFIX and best_current_rating() &lt; _R.Successful:
+                for p in range(0x100):
+                    update(decompress(method, engine, 0, p, careful), careful)
+
+        for r, u in best_by_rating.items():
+            self.log_debug(r, u.method)
+
+        for r in sorted(best_by_rating, reverse=True):
+            if dc := best_by_rating[r]:
+                if not dc.rating &amp; _R.HadOutput:
+                    continue
+                self.log_info(F&#39;settling on {dc.method} decompression, cutoff={dc.cutoff} and prefix={dc.prefix}.&#39;)
+                if dc.rating &amp; _R.NotMangled:
+                    self.log_info(&#39;supporting evidence: no modifications to the buffer were necessary&#39;)
+                if dc.rating &amp; _R.KnownFormat:
+                    self.log_info(&#39;supporting evidence: found a known magic signature&#39;)
+                if dc.rating &amp; _R.HadNoErrors:
+                    self.log_info(&#39;supporting evidence: engine produced output without errors&#39;)
+                elif dc.rating &amp; _R.HadOutput:
+                    self.log_info(&#39;supporting evidence: there were errors, but the engine produced output&#39;)
+                if not dc.rating &amp; _R.Successful:
+                    self.log_info(&#39;the only decompression with result returned only a partial result.&#39;)
+                if dc.rating &amp; _R.KnownFormatOut and (magic := dc.magic):
+                    self.log_info(F&#39;the decompressed result had a known format: {magic}&#39;)
+                return self.labelled(dc.result, method=dc.method)
+
+        raise ValueError(&#39;no compression engine worked&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.compression.decompress.decompress"><code class="flex name class">
+<span>class <span class="ident">decompress</span></span>
+<span>(</span><span>prepend=True, tolerance=12, max_ratio=1.0, min_ratio=0.0001, expand_limits=range(0, 257), expand_factor=1.75, strict_limits=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Attempts all available decompression units against the input and returns
+the output of the first successful one. If none succeeds, the data is
+returned unaltered. The process is heavily biased against LZNT1 decompression
+due to a large tendency for LZNT1 false positives.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/decompress.py#L87-L361" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class decompress(Unit):
+    &#34;&#34;&#34;
+    Attempts all available decompression units against the input and returns
+    the output of the first successful one. If none succeeds, the data is
+    returned unaltered. The process is heavily biased against LZNT1 decompression
+    due to a large tendency for LZNT1 false positives.
+    &#34;&#34;&#34;
+    def __init__(
+        self,
+        prepend: Param[bool, Arg.Switch(&#39;-P&#39;, &#39;--no-prepend&#39;, off=True, help=(
+            &#39;By default, if decompression fails, the unit attempts to prefix &#39;
+            &#39;the data with all possible values of a single byte and decompress &#39;
+            &#39;the result. This behavior can be disabled with this flag.&#39;)
+        )] = True,
+        tolerance: Param[int, Arg.Number(&#39;-t&#39;, help=(
+            &#39;Maximum number of bytes to strip from the beginning of the data; &#39;
+            &#39;The default value is 12.&#39;)
+        )] = 12,
+        max_ratio: Param[float, Arg.Double(&#39;-m&#39;, metavar=&#39;R&#39;, help=(
+            &#39;To determine whether a decompression algorithm was successful, the &#39;
+            &#39;ratio of compressed size to decompressed size may at most be as large &#39;
+            &#39;as this number, a floating point value R; default value is {default}.&#39;)
+        )] = 1.0,
+        min_ratio: Param[float, Arg.Double(&#39;-n&#39;, metavar=&#39;R&#39;, help=(
+            &#39;Require that compression ratios must be at least as large as R. This &#39;
+            &#39;is a &#34;too good to be true&#34; heuristic against algorithms like lznt1 &#39;
+            &#39;that can produce false positives. The default is {default}.&#39;)
+        )] = 0.0001,
+        expand_limits: Param[slice, Arg.Bounds(&#39;-d&#39;, metavar=&#39;a:b&#39;, help=(
+            &#39;Ratio limits are expanded for sizes of input data in the given range, &#39;
+            &#39;the default being 0:0x100. The reason for this is that small buffers &#39;
+            &#39;can increase in size when compressed under many formats. Set this to :0 &#39;
+            &#39;or use strict limits to disable this setting.&#39;)
+        )] = range(0, 0x101),
+        expand_factor: Param[float, Arg.Double(&#39;-k&#39;, help=(
+            &#39;The number by which the maximum compression ratio is multiplied for &#39;
+            &#39;small buffers. The default is {default}.&#39;
+        ))] = 1.75,
+        strict_limits: Param[bool, Arg.Switch(&#39;-l&#39;, help=(
+            &#39;For recognized formats i.e. when a magic signature is present, the &#39;
+            &#39;above limits are disabled by default. Activate this flag to enforce &#39;
+            &#39;them in every case.&#39;)
+        )] = False
+
+    ):
+        if min_ratio &lt;= 0:
+            raise ValueError(&#39;The compression factor must be nonnegative.&#39;)
+        super().__init__(
+            tolerance=tolerance,
+            prepend=prepend,
+            min_ratio=min_ratio,
+            max_ratio=max_ratio,
+            strict_limits=strict_limits,
+            expand_limits=expand_limits,
+            expand_factor=expand_factor,
+        )
+        self.engines: dict[str, Unit] = {}
+        for mode in (
+            MSCF_MODE.XPRESS,
+            MSCF_MODE.XPRESS_HUFF,
+        ):
+            mode = normalize_to_display(mode.name).casefold()
+            unit = mscf.assemble(mode)
+            self.engines[F&#39;{unit.name}[{mode}]&#39;] = unit
+        for engine in [
+            mscf,
+            pkw,
+            zstd,
+            szdd,
+            bz2,
+            zl,
+            lzf,
+            flz,
+            lzma,
+            lzw,
+            jcalg,
+            lzo,
+            aplib,
+            qlz,
+            brotli,
+            blz,
+            lzjb,
+            lz4,
+            lznt1,
+            nrv2e,
+            nrv2d,
+            nrv2b,
+        ]:
+            unit: Unit = engine.assemble()
+            _, _, name = unit.name.rpartition(&#39;auto-decompress-&#39;)
+            self.engines[name] = unit
+        for unit in self.engines.values():
+            unit.log_detach()
+
+    def process(self, data):
+
+        data = memoryview(data)
+        tiny = bounds[self.args.expand_limits]
+
+        class Decompression(NamedTuple):
+            method: str
+            engine: Unit
+            rating: _R
+            result: buf | None = None
+            cutoff: int = 0
+            prefix: int | None = None
+            magic: str | None = None
+
+            def __str__(self):
+                status = self.rating.summary
+                method = self.method
+                prefix = self.prefix
+                if prefix is not None:
+                    prefix = F&#39;{_COLOR_WARNING}0x{prefix:02X}{_CR}&#39;
+                if cutoff := self.cutoff:
+                    cutoff = F&#39;{_COLOR_WARNING}0x{cutoff:02X}{_CR}&#39;
+                else:
+                    cutoff = R&#39;0x00&#39;
+                return F&#39;prefix={prefix}, cutoff={cutoff}, [{status}] method={method}&#39;
+
+            def __len__(self):
+                if not self.result:
+                    return 0
+                return len(self.result)
+
+            @property
+            def ratio(self):
+                if not self.result:
+                    return INF()
+                return (len(data) + int(bool(self.prefix)) - self.cutoff) / len(self)
+
+            @property
+            def unmodified(self):
+                return self.prefix is None and self.cutoff == 0
+
+        if self.args.prepend:
+            buffer = bytearray(1 + len(data))
+            buffer[1:] = data
+
+        best_by_rating: dict[_R, Decompression] = {}
+
+        def best_current_rating():
+            return max(best_by_rating, default=_R.InvalidData)
+
+        def decompress(method: str, engine: Unit, cutoff: int = 0, prefix: int | None = None, careful: bool = False):
+            ingest = data[cutoff:]
+            rating = _R.ValidData
+            magic = None
+            if cutoff == 0 and prefix is None and not careful:
+                rating |= _R.NotMangled
+            if prefix is not None:
+                buffer[0] = prefix
+                ingest = buffer
+            is_handled = engine.handles(ingest)
+            if is_handled is True:
+                rating |= _R.KnownFormat
+            if is_handled is False:
+                return Decompression(method, engine, _R.InvalidData, None, cutoff, prefix)
+            try:
+                result = next(engine.act(ingest))
+            except RefineryPartialResult as pr:
+                rating |= _R.HadOutput
+                result = pr.partial
+            except Exception:
+                result = None
+            else:
+                rating |= _R.Successful
+                magic = get_structured_data_type(result)
+                if magic is not None:
+                    magic = magic.mnemonic
+                    rating |= _R.KnownFormatOut
+
+            return Decompression(method, engine, rating, result, cutoff, prefix, magic)
+
+        def update(new: Decompression, discard_if_too_good=False):
+            if not new.result:
+                return
+            ratio = new.ratio
+            known = new.rating &amp; _R.KnownFormat
+            strict = self.args.strict_limits
+            max_ratio = self.args.max_ratio
+            min_ratio = self.args.min_ratio
+            if not strict and len(data) in tiny:
+                max_ratio *= self.args.expand_factor
+                min_ratio /= self.args.expand_factor
+            if (strict or not known) and not (min_ratio &lt;= ratio &lt;= max_ratio):
+                return
+            best = best_by_rating.get(new.rating, None)
+            prefix = new.prefix
+            if prefix is not None:
+                prefix = F&#39;0x{prefix:02X}&#39;
+            if new.unmodified and best and not best.unmodified:
+                threshold = 1.00
+            else:
+                threshold = 0.95
+
+            if not best:
+                q = 0
+            elif (q := len(best) / len(new)) &gt; 1:
+                # This is unexpected, but indicates that we may have produced incorrect output
+                # before: What seems to work best is to force a reset at this point, although
+                # it seems like there should be a better solution than this.
+                q = -1
+                assert best.result
+                vb = memoryview(best.result)
+                vn = memoryview(new.result)
+                # This looks like we have skipped part of the compressed stream; At this point
+                # we can abort and not force an update.
+                if new.cutoff and vb[-len(vn):] == vn:
+                    return
+
+            if q &lt; threshold:
+                if best and discard_if_too_good:
+                    if q &lt; 0.5:
+                        return
+                    if new.rating &amp; _R.Successful != _R.Successful:
+                        return
+                best_by_rating[new.rating] = new
+                logger = self.log_info
+                _color = _COLOR_SUCCESS
+            else:
+                logger = self.log_info
+                _color = _COLOR_FAILURE
+            if ratio &gt;= 9:
+                rs = &#39;USELESS&#39;
+                rc = _COLOR_FAILURE
+            else:
+                rs = F&#39;{ratio * 100:6.2f}%&#39;
+                if ratio &gt;= 1.1:
+                    rc = _COLOR_FAILURE
+                elif ratio &gt;= 1.0:
+                    rc = _COLOR_WARNING
+                else:
+                    rc = _COLOR_SUCCESS
+            if q &lt; 0:
+                qs = &#39;RESTART&#39;
+            else:
+                qs = F&#39;{q:07.4f}&#39;
+            logger(lambda: (
+                F&#39;[{new.rating.brief}] [{rc}{rs}{_CR}] [q={_color}{qs}{_CR}] {new!s}&#39;))
+
+        for method, engine in self.engines.items():
+            self.log_debug(F&#39;attempting engine: {method}&#39;)
+            careful = isinstance(engine, (lznt1, flz, lzjb))
+            for t in range(self.args.tolerance + 1):
+                if best_current_rating() &gt;= _R.Successful and careful and t &gt; 0:
+                    break
+                update(decompress(method, engine, t, None, careful), careful)
+            if self.args.prepend and method not in _NO_PREFIX and best_current_rating() &lt; _R.Successful:
+                for p in range(0x100):
+                    update(decompress(method, engine, 0, p, careful), careful)
+
+        for r, u in best_by_rating.items():
+            self.log_debug(r, u.method)
+
+        for r in sorted(best_by_rating, reverse=True):
+            if dc := best_by_rating[r]:
+                if not dc.rating &amp; _R.HadOutput:
+                    continue
+                self.log_info(F&#39;settling on {dc.method} decompression, cutoff={dc.cutoff} and prefix={dc.prefix}.&#39;)
+                if dc.rating &amp; _R.NotMangled:
+                    self.log_info(&#39;supporting evidence: no modifications to the buffer were necessary&#39;)
+                if dc.rating &amp; _R.KnownFormat:
+                    self.log_info(&#39;supporting evidence: found a known magic signature&#39;)
+                if dc.rating &amp; _R.HadNoErrors:
+                    self.log_info(&#39;supporting evidence: engine produced output without errors&#39;)
+                elif dc.rating &amp; _R.HadOutput:
+                    self.log_info(&#39;supporting evidence: there were errors, but the engine produced output&#39;)
+                if not dc.rating &amp; _R.Successful:
+                    self.log_info(&#39;the only decompression with result returned only a partial result.&#39;)
+                if dc.rating &amp; _R.KnownFormatOut and (magic := dc.magic):
+                    self.log_info(F&#39;the decompressed result had a known format: {magic}&#39;)
+                return self.labelled(dc.result, method=dc.method)
+
+        raise ValueError(&#39;no compression engine worked&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.compression.decompress.decompress" href="#refinery.units.compression.decompress.decompress">decompress</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.decompress.decompress.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.compression" href="index.html">refinery.units.compression</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.compression.decompress.decompress" href="#refinery.units.compression.decompress.decompress">decompress</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

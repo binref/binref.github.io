@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.formats.msi documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.formats.msi</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L1-L469" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import codecs
+import collections
+import enum
+import re
+import struct
+
+from functools import cached_property
+from typing import NamedTuple
+
+from refinery.lib import chunks, json
+from refinery.lib.cab import Cabinet
+from refinery.lib.id import buffer_offset, is_likely_msi, is_likely_pe
+from refinery.lib.structures import StructReader
+from refinery.lib.types import Param, buf
+from refinery.units import Arg
+from refinery.units.formats.csv import csv
+from refinery.units.formats.office.xtdoc import UnpackResult, xtdoc
+
+
+class MsiType(enum.IntEnum):
+    &#34;&#34;&#34;
+    Known data types for MSI table cell entries.
+    &#34;&#34;&#34;
+
+    Long = 0x104
+    Short = 0x502
+    Binary = 0x900
+    String = 0xD00
+    StringLocalized = 0xF00
+    Unknown = 0
+
+    def __str__(self):
+        return self.name
+
+
+class MSITableColumnInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Represents information about an MSI table column. See also:
+    https://doxygen.reactos.org/db/de4/msipriv_8h.html
+    &#34;&#34;&#34;
+    number: int
+    attributes: int
+
+    @property
+    def type(self) -&gt; MsiType:
+        try:
+            if self.is_integer:
+                return MsiType(self.attributes &amp; 0xFFF)
+            else:
+                return MsiType(self.attributes &amp; 0xF00)
+        except Exception:
+            return MsiType.Unknown
+
+    @property
+    def is_integer(self) -&gt; bool:
+        return self.attributes &amp; 0x0F00 &lt; 0x800
+
+    @property
+    def is_key(self) -&gt; bool:
+        return self.attributes &amp; 0x2000 == 0x2000
+
+    @property
+    def is_nullable(self) -&gt; bool:
+        return self.attributes &amp; 0x1000 == 0x1000
+
+    @property
+    def length(self) -&gt; int:
+        vt = self.type
+        if vt is MsiType.Long:
+            return 4
+        if vt is MsiType.Short:
+            return 2
+        return self.attributes &amp; 0xFF
+
+    @property
+    def struct_format(self) -&gt; str:
+        vt = self.type
+        if vt is MsiType.Long:
+            return &#39;I&#39;
+        elif vt is MsiType.Short:
+            return &#39;H&#39;
+        else:
+            return &#39;H&#39;
+
+
+_NEGATED_MSI_SIGNATURE = B&#39;\x2F\x30\xEE\x1F\x5E\x4E\xE5\x1E&#39;
+
+
+class MSIStringData:
+    def __init__(self, string_data: buf, string_pool: buf):
+        data = StructReader(string_data)
+        pool = StructReader(string_pool)
+        self.strings: list[bytes] = []
+        self.provided_ref_count: list[int] = []
+        self.computed_ref_count: list[int] = []
+        self.codepage = pool.u16()
+        self._unknown = pool.u16()
+        while not pool.eof:
+            size = pool.u16()
+            rc = pool.u16()
+            if size == 0 and rc != 0:
+                size = pool.u32()
+            string = data.read_bytes(size)
+            self.strings.append(string)
+            self.provided_ref_count.append(rc)
+            self.computed_ref_count.append(0)
+
+    @cached_property
+    def codec(self):
+        try:
+            return codecs.lookup(F&#39;cp{self.codepage}&#39;).name
+        except Exception:
+            xtmsi.log_info(&#39;failed looking up codec&#39;, self.codepage)
+            return &#39;latin1&#39;
+
+    def __len__(self):
+        return len(self.strings)
+
+    def __iter__(self):
+        yield from range(1, len(self) + 1)
+
+    def __contains__(self, index):
+        return 0 &lt; index &lt;= len(self)
+
+    def ref(self, index: int, increment=True) -&gt; str:
+        assert index &gt; 0
+        index -= 1
+        if increment:
+            self.computed_ref_count[index] += 1
+        string = self.strings[index]
+        try:
+            return string.decode(self.codec)
+        except UnicodeDecodeError:
+            return string.decode(&#39;latin1&#39;)
+
+
+class xtmsi(xtdoc):
+    &#34;&#34;&#34;
+    Extract files and metadata from Microsoft Installer (MSI) archives. The synthetic file {FN} contains
+    parsed MSI table information, similar to the output of the Orca tool. Binary streams are placed in a
+    virtual folder called &#34;Binary&#34;, and extracted scripts from custom actions are separately extracted in
+    a virtual folder named &#34;Action&#34;.
+    &#34;&#34;&#34;
+
+    _SYNTHETIC_STREAMS_FILENAME = &#39;MsiTables.json&#39;
+    _SYNTHETIC_STREAMS_TOPLEVEL = &#39;MsiTables&#39;
+
+    # https://learn.microsoft.com/en-us/windows/win32/msi/summary-list-of-all-custom-action-types
+    _CUSTOM_ACTION_TYPES = {
+        0x01: &#39;DLL file stored in a Binary table stream.&#39;,
+        0x02: &#39;EXE file stored in a Binary table stream.&#39;,
+        0x05: &#39;JScript file stored in a Binary table stream.&#39;,
+        0x06: &#39;VBScript file stored in a Binary table stream.&#39;,
+        0x11: &#39;DLL file that is installed with a product.&#39;,
+        0x12: &#39;EXE file that is installed with a product.&#39;,
+        0x13: &#39;Displays a specified error message and returns failure, terminating the installation.&#39;,
+        0x15: &#39;JScript file that is installed with a product.&#39;,
+        0x16: &#39;VBScript file that is installed with a product.&#39;,
+        0x22: &#39;EXE file having a path referencing a directory.&#39;,
+        0x23: &#39;Directory set with formatted text.&#39;,
+        0x25: &#39;JScript text stored in this sequence table.&#39;,
+        0x26: &#39;VBScript text stored in this sequence table.&#39;,
+        0x32: &#39;EXE file having a path specified by a property value.&#39;,
+        0x33: &#39;Property set with formatted text.&#39;,
+        0x35: &#39;JScript text specified by a property value.&#39;,
+        0x36: &#39;VBScript text specified by a property value.&#39;,
+    }
+
+    def __init__(
+        self, *paths,
+        list=False, path=b&#39;path&#39;, join_path=False, drop_path=False, fuzzy=0, exact=False, regex=False,
+        nocab: Param[bool, Arg.Switch(&#39;-N&#39;, help=&#39;Do not list and extract embedded CAB archives.&#39;)] = False,
+        **keywords,
+    ):
+        super().__init__(
+            *paths,
+            list=list,
+            path=path,
+            join_path=join_path,
+            drop_path=drop_path,
+            nocab=nocab,
+            fuzzy=fuzzy,
+            exact=exact,
+            regex=regex,
+            **keywords,
+        )
+
+    def unpack(self, data: buf):
+        streams = {
+            result.path: result
+            for result in super().unpack(self._get_msi_from_overlay(data))
+        }
+
+        def stream(name: str):
+            return streams.pop(name).get_data()
+
+        def column_formats(table: dict[str, MSITableColumnInfo]) -&gt; str:
+            return &#39;&#39;.join(v.struct_format for v in table.values())
+
+        def stream_to_rows(data: buf, row_format: str):
+            row_size = struct.calcsize(F&#39;&lt;{row_format}&#39;)
+            row_count = int(len(data) / row_size)
+            reader = StructReader(data)
+            columns = [reader.read_struct(F&#39;&lt;{sc * row_count}&#39;) for sc in row_format]
+            for i in range(row_count):
+                yield [int(c[i]) for c in columns]
+
+        tables: dict[str, dict[str, MSITableColumnInfo]] = collections.defaultdict(collections.OrderedDict)
+        strings = MSIStringData(stream(&#39;!_StringData&#39;), stream(&#39;!_StringPool&#39;))
+
+        for tbl_name_id, col_number, col_name_id, col_attributes in stream_to_rows(stream(&#39;!_Columns&#39;), &#39;HHHH&#39;):
+            tbl_name = strings.ref(tbl_name_id)
+            col_name = strings.ref(col_name_id)
+            tables[tbl_name][col_name] = MSITableColumnInfo(col_number, col_attributes)
+
+        table_names_given = {strings.ref(k) for k in chunks.unpack(stream(&#39;!_Tables&#39;), 2, False)}
+        table_names_known = set(tables)
+
+        for name in table_names_known - table_names_given:
+            self.log_warn(F&#39;table name known but not given: {name}&#39;)
+        for name in table_names_given - table_names_known:
+            self.log_warn(F&#39;table name given but not known: {name}&#39;)
+
+        class ScriptItem(NamedTuple):
+            row_index: int
+            extension: str | None
+
+        processed_table_data: dict[str, list[dict[str, str]]] = {}
+        tbl_properties: dict[str, str] = {}
+        tbl_files: dict[str, str] = {}
+        tbl_components: dict[str, str] = {}
+        postprocessing: list[ScriptItem] = []
+
+        def format_string(string: str):
+            # https://learn.microsoft.com/en-us/windows/win32/msi/formatted
+            def _replace(match: re.Match[str]):
+                nonlocal _replace_done
+                _replace_done = False
+                prefix, name = match.groups()
+                if not prefix:
+                    tbl = tbl_properties
+                elif prefix in &#39;%&#39;:
+                    name = name.rstrip(&#39;%&#39;).upper()
+                    return F&#39;%{name}%&#39;
+                elif prefix in &#39;!#&#39;:
+                    tbl = tbl_files
+                elif prefix in &#39;$&#39;:
+                    tbl = tbl_components
+                else:
+                    raise ValueError
+                return tbl.get(name, &#39;&#39;)
+            while True:
+                _replace_done = True
+                string = re.sub(R&#39;&#39;&#39;(?x)
+                    \[             # open square bracket
+                      (?![~\\])    # not followed by escapes
+                      ([%$!#]?)    # any of the valid prefix characters
+                      ([^[\]{}]+)  # no brackets or braces
+                    \]&#39;&#39;&#39;, _replace, string)
+                if _replace_done:
+                    break
+            string = re.sub(r&#39;\[\\(.)\]&#39;, r&#39;\1&#39;, string)
+            string = string.replace(&#39;[~]&#39;, &#39;\0&#39;)
+            return string
+
+        for table_name, table in tables.items():
+            stream_name = F&#39;!{table_name}&#39;
+            if stream_name not in streams:
+                continue
+            processed = []
+            info = list(table.values())
+            keys = list(table.keys())
+            temp = [k.strip(&#39;_&#39;) for k in keys]
+            if len(set(keys)) == len(set(temp)):
+                keys = temp
+            for r, row in enumerate(stream_to_rows(stream(stream_name), column_formats(table))):
+                values = []
+                for index, value in enumerate(row):
+                    vt = info[index].type
+                    if vt is MsiType.Long:
+                        if value != 0:
+                            value -= 0x80000000
+                    elif vt is MsiType.Short:
+                        if value != 0:
+                            value -= 0x8000
+                    elif value in strings:
+                        value = strings.ref(value)
+                    elif not info[index].is_integer:
+                        value = &#39;&#39;
+                    values.append(value)
+                if table_name == &#39;Property&#39;:
+                    tbl_properties[values[0]] = values[1]
+                if table_name == &#39;File&#39;:
+                    tbl_properties[values[0]] = values[2]
+                if table_name == &#39;Component&#39;:
+                    tbl_properties[values[0]] = F&#39;%{values[2]}%&#39;
+                entry = dict(zip(keys, values))
+                einfo = {t: i for t, i in zip(keys, info)}
+                if table_name == &#39;MsiFileHash&#39;:
+                    entry[&#39;Hash&#39;] = struct.pack(
+                        &#39;&lt;IIII&#39;,
+                        row[2] ^ 0x80000000,
+                        row[3] ^ 0x80000000,
+                        row[4] ^ 0x80000000,
+                        row[5] ^ 0x80000000,
+                    ).hex()
+                if table_name == &#39;CustomAction&#39;:
+                    code = row[1] &amp; 0x3F
+                    try:
+                        entry[&#39;Comment&#39;] = self._CUSTOM_ACTION_TYPES[code]
+                    except LookupError:
+                        pass
+                    t = einfo.get(&#39;Target&#39;)
+                    c = {0x25: &#39;js&#39;, 0x26: &#39;vbs&#39;, 0x33: None}
+                    if code in c and t and not t.is_integer:
+                        postprocessing.append(ScriptItem(r, c[code]))
+                processed.append(entry)
+            if processed:
+                processed_table_data[table_name] = processed
+
+        if ca := processed_table_data.get(&#39;CustomAction&#39;):
+            for item in postprocessing:
+                entry = ca[item.row_index]
+                try:
+                    action: str = entry[&#39;Action&#39;]
+                    target: str = entry[&#39;Target&#39;]
+                except KeyError:
+                    continue
+                root = F&#39;Action/{action}&#39;
+                if item.extension:
+                    action = F&#39;{root}.{item.extension}&#39;
+                    streams[action] = UnpackResult(action, target.encode(self.codec))
+                    continue
+                target = format_string(target)
+                parts = [part.partition(&#39;\x02&#39;) for part in target.split(&#39;\x01&#39;)]
+                if not all(part[1] == &#39;\x02&#39; for part in parts):
+                    continue
+                for name, _, script in parts:
+                    if not name.lower().startswith(&#39;script&#39;):
+                        continue
+                    if not script:
+                        continue
+                    action = F&#39;{root}.{name}&#39;
+                    streams[action] = UnpackResult(action, script.encode(self.codec))
+
+        for ignored_stream in [
+            &#39;SummaryInformation&#39;,
+            &#39;DocumentSummaryInformation&#39;,
+            &#39;DigitalSignature&#39;,
+            &#39;MsiDigitalSignatureEx&#39;
+        ]:
+            if r := streams.pop(F&#39;[5]{ignored_stream}&#39;, None):
+                r.path = F&#39;Meta/{ignored_stream}&#39;
+                yield r
+
+        inconsistencies = 0
+        w1 = len(str(len(strings)))
+        w2 = len(str(max(max(strings.computed_ref_count), max(strings.provided_ref_count))))
+        for k in range(len(strings)):
+            c = strings.computed_ref_count[k]
+            p = strings.provided_ref_count[k]
+            if c != p and not self.log_debug(F&#39;string {k:0{w1}d} reference count computed={c:0{w2}d} provided={p:0{w2}d}&#39;):
+                inconsistencies += 1
+        if inconsistencies:
+            self.log_info(F&#39;found {inconsistencies} incorrect string reference counts&#39;)
+
+        def fix_msi_path(path: str):
+            prefix, dot, name = path.partition(&#39;.&#39;)
+            if dot == &#39;.&#39; and prefix in processed_table_data:
+                path = F&#39;{prefix}/{name}&#39;
+            return path
+
+        if self.args.nocab:
+            cabs = {}
+        else:
+            def _iscab(path):
+                return media_info and any(item.get(&#39;Cabinet&#39;, &#39;&#39;) == F&#39;#{path}&#39; for item in media_info)
+            media_info = processed_table_data.get(&#39;Media&#39;, [])
+            cabs: dict[str, UnpackResult] = {
+                path: item for path, item in streams.items() if _iscab(path)}
+            for cab in cabs:
+                self.log_info(F&#39;found cab file: {cab}&#39;)
+        if cabs:
+            file_names: dict[str, str] = {}
+
+            for file_info in processed_table_data.get(&#39;File&#39;, []):
+                try:
+                    src_name = file_info[&#39;File&#39;]
+                    dst_name = file_info[&#39;FileName&#39;]
+                except KeyError:
+                    continue
+                _, _, long = dst_name.partition(&#39;|&#39;)
+                dst_name = long or dst_name
+                file_names[src_name] = dst_name
+
+            for path, cab in cabs.items():
+                try:
+                    _cabinet = Cabinet(memoryview(cab.get_data()))
+                    unpacked = _cabinet.process().get_files()
+                except Exception as e:
+                    self.log_info(F&#39;unable to extract embedded cab file: {e!s}&#39;)
+                    continue
+                base, dot, ext = path.rpartition(&#39;.&#39;)
+                if dot == &#39;.&#39; and ext.lower() == &#39;cab&#39;:
+                    path = base
+                else:
+                    del streams[path]
+                    cab.path = F&#39;{path}.cab&#39;
+                    streams[cab.path] = cab
+                for result in unpacked:
+                    sub_path = file_names.get(result.name, result.name)
+                    sub_path = self._get_path_separator().join((path, sub_path))
+                    streams[sub_path] = UnpackResult(sub_path, lambda r=result: r.decompress())
+
+        streams = {fix_msi_path(path): item for path, item in streams.items()}
+        ds = UnpackResult(self._SYNTHETIC_STREAMS_FILENAME, json.dumps(processed_table_data))
+        streams[ds.path] = ds
+
+        converter = csv()
+        for key, jd in processed_table_data.items():
+            sk = key.strip(&#39;_&#39;)
+            if sk not in processed_table_data:
+                key = sk
+            try:
+                tbl = UnpackResult(F&#39;{self._SYNTHETIC_STREAMS_TOPLEVEL}/{key}.csv&#39;, converter.json_to_csv(jd))
+            except Exception:
+                continue
+            streams[tbl.path] = tbl
+
+        for path in sorted(streams):
+            streams[path].path = path
+            yield streams[path]
+
+    @classmethod
+    def _get_msi_from_overlay(cls, data: buf) -&gt; buf:
+        if is_likely_pe(data):
+            from refinery.units.formats.pe import get_pe_size
+            view = memoryview(data)
+            overlay = view[get_pe_size(data):]
+            if is_likely_msi(overlay):
+                return overlay
+            if (start := buffer_offset(overlay, _NEGATED_MSI_SIGNATURE, 0, 0x1000)) &gt;= 0:
+                if (nulls := buffer_offset(overlay, bytes(8), start, start + 0x1000)) &gt;= 0:
+                    from refinery.units.blockwise.neg import neg
+                    decoded = overlay[start:nulls] | neg | bytearray
+                    decoded.extend(overlay[nulls:])
+                    if is_likely_msi(decoded):
+                        return decoded
+        return data
+
+    @classmethod
+    def handles(cls, data):
+        if is_likely_msi(data):
+            return True
+        if is_likely_pe(data):
+            from refinery.units.formats.pe import get_pe_size
+            view = memoryview(data)
+            overlay = view[get_pe_size(data):]
+            if is_likely_msi(overlay):
+                return True
+            if overlay[:8] == _NEGATED_MSI_SIGNATURE:
+                return True
+        return False
+
+
+if _d := xtmsi.__doc__:
+    xtmsi.__doc__ = _d.format(FN=xtmsi._SYNTHETIC_STREAMS_FILENAME)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.formats.msi.MsiType"><code class="flex name class">
+<span>class <span class="ident">MsiType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Known data types for MSI table cell entries.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L22-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MsiType(enum.IntEnum):
+    &#34;&#34;&#34;
+    Known data types for MSI table cell entries.
+    &#34;&#34;&#34;
+
+    Long = 0x104
+    Short = 0x502
+    Binary = 0x900
+    String = 0xD00
+    StringLocalized = 0xF00
+    Unknown = 0
+
+    def __str__(self):
+        return self.name</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.formats.msi.MsiType.Long"><code class="name">var <span class="ident">Long</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.msi.MsiType.Short"><code class="name">var <span class="ident">Short</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.msi.MsiType.Binary"><code class="name">var <span class="ident">Binary</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.msi.MsiType.String"><code class="name">var <span class="ident">String</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.msi.MsiType.StringLocalized"><code class="name">var <span class="ident">StringLocalized</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.msi.MsiType.Unknown"><code class="name">var <span class="ident">Unknown</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo"><code class="flex name class">
+<span>class <span class="ident">MSITableColumnInfo</span></span>
+<span>(</span><span>number, attributes)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Represents information about an MSI table column. See also:
+<a href="https://doxygen.reactos.org/db/de4/msipriv_8h.html">https://doxygen.reactos.org/db/de4/msipriv_8h.html</a></p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L38-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MSITableColumnInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Represents information about an MSI table column. See also:
+    https://doxygen.reactos.org/db/de4/msipriv_8h.html
+    &#34;&#34;&#34;
+    number: int
+    attributes: int
+
+    @property
+    def type(self) -&gt; MsiType:
+        try:
+            if self.is_integer:
+                return MsiType(self.attributes &amp; 0xFFF)
+            else:
+                return MsiType(self.attributes &amp; 0xF00)
+        except Exception:
+            return MsiType.Unknown
+
+    @property
+    def is_integer(self) -&gt; bool:
+        return self.attributes &amp; 0x0F00 &lt; 0x800
+
+    @property
+    def is_key(self) -&gt; bool:
+        return self.attributes &amp; 0x2000 == 0x2000
+
+    @property
+    def is_nullable(self) -&gt; bool:
+        return self.attributes &amp; 0x1000 == 0x1000
+
+    @property
+    def length(self) -&gt; int:
+        vt = self.type
+        if vt is MsiType.Long:
+            return 4
+        if vt is MsiType.Short:
+            return 2
+        return self.attributes &amp; 0xFF
+
+    @property
+    def struct_format(self) -&gt; str:
+        vt = self.type
+        if vt is MsiType.Long:
+            return &#39;I&#39;
+        elif vt is MsiType.Short:
+            return &#39;H&#39;
+        else:
+            return &#39;H&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.number"><code class="name">var <span class="ident">number</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L38-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MSITableColumnInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Represents information about an MSI table column. See also:
+    https://doxygen.reactos.org/db/de4/msipriv_8h.html
+    &#34;&#34;&#34;
+    number: int
+    attributes: int
+
+    @property
+    def type(self) -&gt; MsiType:
+        try:
+            if self.is_integer:
+                return MsiType(self.attributes &amp; 0xFFF)
+            else:
+                return MsiType(self.attributes &amp; 0xF00)
+        except Exception:
+            return MsiType.Unknown
+
+    @property
+    def is_integer(self) -&gt; bool:
+        return self.attributes &amp; 0x0F00 &lt; 0x800
+
+    @property
+    def is_key(self) -&gt; bool:
+        return self.attributes &amp; 0x2000 == 0x2000
+
+    @property
+    def is_nullable(self) -&gt; bool:
+        return self.attributes &amp; 0x1000 == 0x1000
+
+    @property
+    def length(self) -&gt; int:
+        vt = self.type
+        if vt is MsiType.Long:
+            return 4
+        if vt is MsiType.Short:
+            return 2
+        return self.attributes &amp; 0xFF
+
+    @property
+    def struct_format(self) -&gt; str:
+        vt = self.type
+        if vt is MsiType.Long:
+            return &#39;I&#39;
+        elif vt is MsiType.Short:
+            return &#39;H&#39;
+        else:
+            return &#39;H&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.attributes"><code class="name">var <span class="ident">attributes</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L38-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MSITableColumnInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Represents information about an MSI table column. See also:
+    https://doxygen.reactos.org/db/de4/msipriv_8h.html
+    &#34;&#34;&#34;
+    number: int
+    attributes: int
+
+    @property
+    def type(self) -&gt; MsiType:
+        try:
+            if self.is_integer:
+                return MsiType(self.attributes &amp; 0xFFF)
+            else:
+                return MsiType(self.attributes &amp; 0xF00)
+        except Exception:
+            return MsiType.Unknown
+
+    @property
+    def is_integer(self) -&gt; bool:
+        return self.attributes &amp; 0x0F00 &lt; 0x800
+
+    @property
+    def is_key(self) -&gt; bool:
+        return self.attributes &amp; 0x2000 == 0x2000
+
+    @property
+    def is_nullable(self) -&gt; bool:
+        return self.attributes &amp; 0x1000 == 0x1000
+
+    @property
+    def length(self) -&gt; int:
+        vt = self.type
+        if vt is MsiType.Long:
+            return 4
+        if vt is MsiType.Short:
+            return 2
+        return self.attributes &amp; 0xFF
+
+    @property
+    def struct_format(self) -&gt; str:
+        vt = self.type
+        if vt is MsiType.Long:
+            return &#39;I&#39;
+        elif vt is MsiType.Short:
+            return &#39;H&#39;
+        else:
+            return &#39;H&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.type"><code class="name">var <span class="ident">type</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L46-L54" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def type(self) -&gt; MsiType:
+    try:
+        if self.is_integer:
+            return MsiType(self.attributes &amp; 0xFFF)
+        else:
+            return MsiType(self.attributes &amp; 0xF00)
+    except Exception:
+        return MsiType.Unknown</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.is_integer"><code class="name">var <span class="ident">is_integer</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L56-L58" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_integer(self) -&gt; bool:
+    return self.attributes &amp; 0x0F00 &lt; 0x800</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.is_key"><code class="name">var <span class="ident">is_key</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L60-L62" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_key(self) -&gt; bool:
+    return self.attributes &amp; 0x2000 == 0x2000</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.is_nullable"><code class="name">var <span class="ident">is_nullable</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L64-L66" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_nullable(self) -&gt; bool:
+    return self.attributes &amp; 0x1000 == 0x1000</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.length"><code class="name">var <span class="ident">length</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L68-L75" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def length(self) -&gt; int:
+    vt = self.type
+    if vt is MsiType.Long:
+        return 4
+    if vt is MsiType.Short:
+        return 2
+    return self.attributes &amp; 0xFF</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.msi.MSITableColumnInfo.struct_format"><code class="name">var <span class="ident">struct_format</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L77-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def struct_format(self) -&gt; str:
+    vt = self.type
+    if vt is MsiType.Long:
+        return &#39;I&#39;
+    elif vt is MsiType.Short:
+        return &#39;H&#39;
+    else:
+        return &#39;H&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.msi.MSIStringData"><code class="flex name class">
+<span>class <span class="ident">MSIStringData</span></span>
+<span>(</span><span>string_data, string_pool)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L91-L136" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MSIStringData:
+    def __init__(self, string_data: buf, string_pool: buf):
+        data = StructReader(string_data)
+        pool = StructReader(string_pool)
+        self.strings: list[bytes] = []
+        self.provided_ref_count: list[int] = []
+        self.computed_ref_count: list[int] = []
+        self.codepage = pool.u16()
+        self._unknown = pool.u16()
+        while not pool.eof:
+            size = pool.u16()
+            rc = pool.u16()
+            if size == 0 and rc != 0:
+                size = pool.u32()
+            string = data.read_bytes(size)
+            self.strings.append(string)
+            self.provided_ref_count.append(rc)
+            self.computed_ref_count.append(0)
+
+    @cached_property
+    def codec(self):
+        try:
+            return codecs.lookup(F&#39;cp{self.codepage}&#39;).name
+        except Exception:
+            xtmsi.log_info(&#39;failed looking up codec&#39;, self.codepage)
+            return &#39;latin1&#39;
+
+    def __len__(self):
+        return len(self.strings)
+
+    def __iter__(self):
+        yield from range(1, len(self) + 1)
+
+    def __contains__(self, index):
+        return 0 &lt; index &lt;= len(self)
+
+    def ref(self, index: int, increment=True) -&gt; str:
+        assert index &gt; 0
+        index -= 1
+        if increment:
+            self.computed_ref_count[index] += 1
+        string = self.strings[index]
+        try:
+            return string.decode(self.codec)
+        except UnicodeDecodeError:
+            return string.decode(&#39;latin1&#39;)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.formats.msi.MSIStringData.codec"><code class="name">var <span class="ident">codec</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L110-L116" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def codec(self):
+    try:
+        return codecs.lookup(F&#39;cp{self.codepage}&#39;).name
+    except Exception:
+        xtmsi.log_info(&#39;failed looking up codec&#39;, self.codepage)
+        return &#39;latin1&#39;</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.formats.msi.MSIStringData.ref"><code class="name flex">
+<span>def <span class="ident">ref</span></span>(<span>self, index, increment=True)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L127-L136" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def ref(self, index: int, increment=True) -&gt; str:
+    assert index &gt; 0
+    index -= 1
+    if increment:
+        self.computed_ref_count[index] += 1
+    string = self.strings[index]
+    try:
+        return string.decode(self.codec)
+    except UnicodeDecodeError:
+        return string.decode(&#39;latin1&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.msi.xtmsi"><code class="flex name class">
+<span>class <span class="ident">xtmsi</span></span>
+<span>(</span><span>*paths, list=False, path=b'path', join_path=False, drop_path=False, fuzzy=0, exact=False, regex=False, nocab=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Extract files and metadata from Microsoft Installer (MSI) archives. The synthetic file MsiTables.json contains
+parsed MSI table information, similar to the output of the Orca tool. Binary streams are placed in a
+virtual folder called "Binary", and extracted scripts from custom actions are separately extracted in
+a virtual folder named "Action".</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L139-L465" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class xtmsi(xtdoc):
+    &#34;&#34;&#34;
+    Extract files and metadata from Microsoft Installer (MSI) archives. The synthetic file {FN} contains
+    parsed MSI table information, similar to the output of the Orca tool. Binary streams are placed in a
+    virtual folder called &#34;Binary&#34;, and extracted scripts from custom actions are separately extracted in
+    a virtual folder named &#34;Action&#34;.
+    &#34;&#34;&#34;
+
+    _SYNTHETIC_STREAMS_FILENAME = &#39;MsiTables.json&#39;
+    _SYNTHETIC_STREAMS_TOPLEVEL = &#39;MsiTables&#39;
+
+    # https://learn.microsoft.com/en-us/windows/win32/msi/summary-list-of-all-custom-action-types
+    _CUSTOM_ACTION_TYPES = {
+        0x01: &#39;DLL file stored in a Binary table stream.&#39;,
+        0x02: &#39;EXE file stored in a Binary table stream.&#39;,
+        0x05: &#39;JScript file stored in a Binary table stream.&#39;,
+        0x06: &#39;VBScript file stored in a Binary table stream.&#39;,
+        0x11: &#39;DLL file that is installed with a product.&#39;,
+        0x12: &#39;EXE file that is installed with a product.&#39;,
+        0x13: &#39;Displays a specified error message and returns failure, terminating the installation.&#39;,
+        0x15: &#39;JScript file that is installed with a product.&#39;,
+        0x16: &#39;VBScript file that is installed with a product.&#39;,
+        0x22: &#39;EXE file having a path referencing a directory.&#39;,
+        0x23: &#39;Directory set with formatted text.&#39;,
+        0x25: &#39;JScript text stored in this sequence table.&#39;,
+        0x26: &#39;VBScript text stored in this sequence table.&#39;,
+        0x32: &#39;EXE file having a path specified by a property value.&#39;,
+        0x33: &#39;Property set with formatted text.&#39;,
+        0x35: &#39;JScript text specified by a property value.&#39;,
+        0x36: &#39;VBScript text specified by a property value.&#39;,
+    }
+
+    def __init__(
+        self, *paths,
+        list=False, path=b&#39;path&#39;, join_path=False, drop_path=False, fuzzy=0, exact=False, regex=False,
+        nocab: Param[bool, Arg.Switch(&#39;-N&#39;, help=&#39;Do not list and extract embedded CAB archives.&#39;)] = False,
+        **keywords,
+    ):
+        super().__init__(
+            *paths,
+            list=list,
+            path=path,
+            join_path=join_path,
+            drop_path=drop_path,
+            nocab=nocab,
+            fuzzy=fuzzy,
+            exact=exact,
+            regex=regex,
+            **keywords,
+        )
+
+    def unpack(self, data: buf):
+        streams = {
+            result.path: result
+            for result in super().unpack(self._get_msi_from_overlay(data))
+        }
+
+        def stream(name: str):
+            return streams.pop(name).get_data()
+
+        def column_formats(table: dict[str, MSITableColumnInfo]) -&gt; str:
+            return &#39;&#39;.join(v.struct_format for v in table.values())
+
+        def stream_to_rows(data: buf, row_format: str):
+            row_size = struct.calcsize(F&#39;&lt;{row_format}&#39;)
+            row_count = int(len(data) / row_size)
+            reader = StructReader(data)
+            columns = [reader.read_struct(F&#39;&lt;{sc * row_count}&#39;) for sc in row_format]
+            for i in range(row_count):
+                yield [int(c[i]) for c in columns]
+
+        tables: dict[str, dict[str, MSITableColumnInfo]] = collections.defaultdict(collections.OrderedDict)
+        strings = MSIStringData(stream(&#39;!_StringData&#39;), stream(&#39;!_StringPool&#39;))
+
+        for tbl_name_id, col_number, col_name_id, col_attributes in stream_to_rows(stream(&#39;!_Columns&#39;), &#39;HHHH&#39;):
+            tbl_name = strings.ref(tbl_name_id)
+            col_name = strings.ref(col_name_id)
+            tables[tbl_name][col_name] = MSITableColumnInfo(col_number, col_attributes)
+
+        table_names_given = {strings.ref(k) for k in chunks.unpack(stream(&#39;!_Tables&#39;), 2, False)}
+        table_names_known = set(tables)
+
+        for name in table_names_known - table_names_given:
+            self.log_warn(F&#39;table name known but not given: {name}&#39;)
+        for name in table_names_given - table_names_known:
+            self.log_warn(F&#39;table name given but not known: {name}&#39;)
+
+        class ScriptItem(NamedTuple):
+            row_index: int
+            extension: str | None
+
+        processed_table_data: dict[str, list[dict[str, str]]] = {}
+        tbl_properties: dict[str, str] = {}
+        tbl_files: dict[str, str] = {}
+        tbl_components: dict[str, str] = {}
+        postprocessing: list[ScriptItem] = []
+
+        def format_string(string: str):
+            # https://learn.microsoft.com/en-us/windows/win32/msi/formatted
+            def _replace(match: re.Match[str]):
+                nonlocal _replace_done
+                _replace_done = False
+                prefix, name = match.groups()
+                if not prefix:
+                    tbl = tbl_properties
+                elif prefix in &#39;%&#39;:
+                    name = name.rstrip(&#39;%&#39;).upper()
+                    return F&#39;%{name}%&#39;
+                elif prefix in &#39;!#&#39;:
+                    tbl = tbl_files
+                elif prefix in &#39;$&#39;:
+                    tbl = tbl_components
+                else:
+                    raise ValueError
+                return tbl.get(name, &#39;&#39;)
+            while True:
+                _replace_done = True
+                string = re.sub(R&#39;&#39;&#39;(?x)
+                    \[             # open square bracket
+                      (?![~\\])    # not followed by escapes
+                      ([%$!#]?)    # any of the valid prefix characters
+                      ([^[\]{}]+)  # no brackets or braces
+                    \]&#39;&#39;&#39;, _replace, string)
+                if _replace_done:
+                    break
+            string = re.sub(r&#39;\[\\(.)\]&#39;, r&#39;\1&#39;, string)
+            string = string.replace(&#39;[~]&#39;, &#39;\0&#39;)
+            return string
+
+        for table_name, table in tables.items():
+            stream_name = F&#39;!{table_name}&#39;
+            if stream_name not in streams:
+                continue
+            processed = []
+            info = list(table.values())
+            keys = list(table.keys())
+            temp = [k.strip(&#39;_&#39;) for k in keys]
+            if len(set(keys)) == len(set(temp)):
+                keys = temp
+            for r, row in enumerate(stream_to_rows(stream(stream_name), column_formats(table))):
+                values = []
+                for index, value in enumerate(row):
+                    vt = info[index].type
+                    if vt is MsiType.Long:
+                        if value != 0:
+                            value -= 0x80000000
+                    elif vt is MsiType.Short:
+                        if value != 0:
+                            value -= 0x8000
+                    elif value in strings:
+                        value = strings.ref(value)
+                    elif not info[index].is_integer:
+                        value = &#39;&#39;
+                    values.append(value)
+                if table_name == &#39;Property&#39;:
+                    tbl_properties[values[0]] = values[1]
+                if table_name == &#39;File&#39;:
+                    tbl_properties[values[0]] = values[2]
+                if table_name == &#39;Component&#39;:
+                    tbl_properties[values[0]] = F&#39;%{values[2]}%&#39;
+                entry = dict(zip(keys, values))
+                einfo = {t: i for t, i in zip(keys, info)}
+                if table_name == &#39;MsiFileHash&#39;:
+                    entry[&#39;Hash&#39;] = struct.pack(
+                        &#39;&lt;IIII&#39;,
+                        row[2] ^ 0x80000000,
+                        row[3] ^ 0x80000000,
+                        row[4] ^ 0x80000000,
+                        row[5] ^ 0x80000000,
+                    ).hex()
+                if table_name == &#39;CustomAction&#39;:
+                    code = row[1] &amp; 0x3F
+                    try:
+                        entry[&#39;Comment&#39;] = self._CUSTOM_ACTION_TYPES[code]
+                    except LookupError:
+                        pass
+                    t = einfo.get(&#39;Target&#39;)
+                    c = {0x25: &#39;js&#39;, 0x26: &#39;vbs&#39;, 0x33: None}
+                    if code in c and t and not t.is_integer:
+                        postprocessing.append(ScriptItem(r, c[code]))
+                processed.append(entry)
+            if processed:
+                processed_table_data[table_name] = processed
+
+        if ca := processed_table_data.get(&#39;CustomAction&#39;):
+            for item in postprocessing:
+                entry = ca[item.row_index]
+                try:
+                    action: str = entry[&#39;Action&#39;]
+                    target: str = entry[&#39;Target&#39;]
+                except KeyError:
+                    continue
+                root = F&#39;Action/{action}&#39;
+                if item.extension:
+                    action = F&#39;{root}.{item.extension}&#39;
+                    streams[action] = UnpackResult(action, target.encode(self.codec))
+                    continue
+                target = format_string(target)
+                parts = [part.partition(&#39;\x02&#39;) for part in target.split(&#39;\x01&#39;)]
+                if not all(part[1] == &#39;\x02&#39; for part in parts):
+                    continue
+                for name, _, script in parts:
+                    if not name.lower().startswith(&#39;script&#39;):
+                        continue
+                    if not script:
+                        continue
+                    action = F&#39;{root}.{name}&#39;
+                    streams[action] = UnpackResult(action, script.encode(self.codec))
+
+        for ignored_stream in [
+            &#39;SummaryInformation&#39;,
+            &#39;DocumentSummaryInformation&#39;,
+            &#39;DigitalSignature&#39;,
+            &#39;MsiDigitalSignatureEx&#39;
+        ]:
+            if r := streams.pop(F&#39;[5]{ignored_stream}&#39;, None):
+                r.path = F&#39;Meta/{ignored_stream}&#39;
+                yield r
+
+        inconsistencies = 0
+        w1 = len(str(len(strings)))
+        w2 = len(str(max(max(strings.computed_ref_count), max(strings.provided_ref_count))))
+        for k in range(len(strings)):
+            c = strings.computed_ref_count[k]
+            p = strings.provided_ref_count[k]
+            if c != p and not self.log_debug(F&#39;string {k:0{w1}d} reference count computed={c:0{w2}d} provided={p:0{w2}d}&#39;):
+                inconsistencies += 1
+        if inconsistencies:
+            self.log_info(F&#39;found {inconsistencies} incorrect string reference counts&#39;)
+
+        def fix_msi_path(path: str):
+            prefix, dot, name = path.partition(&#39;.&#39;)
+            if dot == &#39;.&#39; and prefix in processed_table_data:
+                path = F&#39;{prefix}/{name}&#39;
+            return path
+
+        if self.args.nocab:
+            cabs = {}
+        else:
+            def _iscab(path):
+                return media_info and any(item.get(&#39;Cabinet&#39;, &#39;&#39;) == F&#39;#{path}&#39; for item in media_info)
+            media_info = processed_table_data.get(&#39;Media&#39;, [])
+            cabs: dict[str, UnpackResult] = {
+                path: item for path, item in streams.items() if _iscab(path)}
+            for cab in cabs:
+                self.log_info(F&#39;found cab file: {cab}&#39;)
+        if cabs:
+            file_names: dict[str, str] = {}
+
+            for file_info in processed_table_data.get(&#39;File&#39;, []):
+                try:
+                    src_name = file_info[&#39;File&#39;]
+                    dst_name = file_info[&#39;FileName&#39;]
+                except KeyError:
+                    continue
+                _, _, long = dst_name.partition(&#39;|&#39;)
+                dst_name = long or dst_name
+                file_names[src_name] = dst_name
+
+            for path, cab in cabs.items():
+                try:
+                    _cabinet = Cabinet(memoryview(cab.get_data()))
+                    unpacked = _cabinet.process().get_files()
+                except Exception as e:
+                    self.log_info(F&#39;unable to extract embedded cab file: {e!s}&#39;)
+                    continue
+                base, dot, ext = path.rpartition(&#39;.&#39;)
+                if dot == &#39;.&#39; and ext.lower() == &#39;cab&#39;:
+                    path = base
+                else:
+                    del streams[path]
+                    cab.path = F&#39;{path}.cab&#39;
+                    streams[cab.path] = cab
+                for result in unpacked:
+                    sub_path = file_names.get(result.name, result.name)
+                    sub_path = self._get_path_separator().join((path, sub_path))
+                    streams[sub_path] = UnpackResult(sub_path, lambda r=result: r.decompress())
+
+        streams = {fix_msi_path(path): item for path, item in streams.items()}
+        ds = UnpackResult(self._SYNTHETIC_STREAMS_FILENAME, json.dumps(processed_table_data))
+        streams[ds.path] = ds
+
+        converter = csv()
+        for key, jd in processed_table_data.items():
+            sk = key.strip(&#39;_&#39;)
+            if sk not in processed_table_data:
+                key = sk
+            try:
+                tbl = UnpackResult(F&#39;{self._SYNTHETIC_STREAMS_TOPLEVEL}/{key}.csv&#39;, converter.json_to_csv(jd))
+            except Exception:
+                continue
+            streams[tbl.path] = tbl
+
+        for path in sorted(streams):
+            streams[path].path = path
+            yield streams[path]
+
+    @classmethod
+    def _get_msi_from_overlay(cls, data: buf) -&gt; buf:
+        if is_likely_pe(data):
+            from refinery.units.formats.pe import get_pe_size
+            view = memoryview(data)
+            overlay = view[get_pe_size(data):]
+            if is_likely_msi(overlay):
+                return overlay
+            if (start := buffer_offset(overlay, _NEGATED_MSI_SIGNATURE, 0, 0x1000)) &gt;= 0:
+                if (nulls := buffer_offset(overlay, bytes(8), start, start + 0x1000)) &gt;= 0:
+                    from refinery.units.blockwise.neg import neg
+                    decoded = overlay[start:nulls] | neg | bytearray
+                    decoded.extend(overlay[nulls:])
+                    if is_likely_msi(decoded):
+                        return decoded
+        return data
+
+    @classmethod
+    def handles(cls, data):
+        if is_likely_msi(data):
+            return True
+        if is_likely_pe(data):
+            from refinery.units.formats.pe import get_pe_size
+            view = memoryview(data)
+            overlay = view[get_pe_size(data):]
+            if is_likely_msi(overlay):
+                return True
+            if overlay[:8] == _NEGATED_MSI_SIGNATURE:
+                return True
+        return False</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.office.xtdoc.xtdoc" href="office/xtdoc.html#refinery.units.formats.office.xtdoc.xtdoc">xtdoc</a></li>
+<li><a title="refinery.units.formats.PathExtractorUnit" href="index.html#refinery.units.formats.PathExtractorUnit">PathExtractorUnit</a></li>
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.msi.xtmsi" href="#refinery.units.formats.msi.xtmsi">xtmsi</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.formats.msi.xtmsi.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/msi.py#L190-L434" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, data: buf):
+    streams = {
+        result.path: result
+        for result in super().unpack(self._get_msi_from_overlay(data))
+    }
+
+    def stream(name: str):
+        return streams.pop(name).get_data()
+
+    def column_formats(table: dict[str, MSITableColumnInfo]) -&gt; str:
+        return &#39;&#39;.join(v.struct_format for v in table.values())
+
+    def stream_to_rows(data: buf, row_format: str):
+        row_size = struct.calcsize(F&#39;&lt;{row_format}&#39;)
+        row_count = int(len(data) / row_size)
+        reader = StructReader(data)
+        columns = [reader.read_struct(F&#39;&lt;{sc * row_count}&#39;) for sc in row_format]
+        for i in range(row_count):
+            yield [int(c[i]) for c in columns]
+
+    tables: dict[str, dict[str, MSITableColumnInfo]] = collections.defaultdict(collections.OrderedDict)
+    strings = MSIStringData(stream(&#39;!_StringData&#39;), stream(&#39;!_StringPool&#39;))
+
+    for tbl_name_id, col_number, col_name_id, col_attributes in stream_to_rows(stream(&#39;!_Columns&#39;), &#39;HHHH&#39;):
+        tbl_name = strings.ref(tbl_name_id)
+        col_name = strings.ref(col_name_id)
+        tables[tbl_name][col_name] = MSITableColumnInfo(col_number, col_attributes)
+
+    table_names_given = {strings.ref(k) for k in chunks.unpack(stream(&#39;!_Tables&#39;), 2, False)}
+    table_names_known = set(tables)
+
+    for name in table_names_known - table_names_given:
+        self.log_warn(F&#39;table name known but not given: {name}&#39;)
+    for name in table_names_given - table_names_known:
+        self.log_warn(F&#39;table name given but not known: {name}&#39;)
+
+    class ScriptItem(NamedTuple):
+        row_index: int
+        extension: str | None
+
+    processed_table_data: dict[str, list[dict[str, str]]] = {}
+    tbl_properties: dict[str, str] = {}
+    tbl_files: dict[str, str] = {}
+    tbl_components: dict[str, str] = {}
+    postprocessing: list[ScriptItem] = []
+
+    def format_string(string: str):
+        # https://learn.microsoft.com/en-us/windows/win32/msi/formatted
+        def _replace(match: re.Match[str]):
+            nonlocal _replace_done
+            _replace_done = False
+            prefix, name = match.groups()
+            if not prefix:
+                tbl = tbl_properties
+            elif prefix in &#39;%&#39;:
+                name = name.rstrip(&#39;%&#39;).upper()
+                return F&#39;%{name}%&#39;
+            elif prefix in &#39;!#&#39;:
+                tbl = tbl_files
+            elif prefix in &#39;$&#39;:
+                tbl = tbl_components
+            else:
+                raise ValueError
+            return tbl.get(name, &#39;&#39;)
+        while True:
+            _replace_done = True
+            string = re.sub(R&#39;&#39;&#39;(?x)
+                \[             # open square bracket
+                  (?![~\\])    # not followed by escapes
+                  ([%$!#]?)    # any of the valid prefix characters
+                  ([^[\]{}]+)  # no brackets or braces
+                \]&#39;&#39;&#39;, _replace, string)
+            if _replace_done:
+                break
+        string = re.sub(r&#39;\[\\(.)\]&#39;, r&#39;\1&#39;, string)
+        string = string.replace(&#39;[~]&#39;, &#39;\0&#39;)
+        return string
+
+    for table_name, table in tables.items():
+        stream_name = F&#39;!{table_name}&#39;
+        if stream_name not in streams:
+            continue
+        processed = []
+        info = list(table.values())
+        keys = list(table.keys())
+        temp = [k.strip(&#39;_&#39;) for k in keys]
+        if len(set(keys)) == len(set(temp)):
+            keys = temp
+        for r, row in enumerate(stream_to_rows(stream(stream_name), column_formats(table))):
+            values = []
+            for index, value in enumerate(row):
+                vt = info[index].type
+                if vt is MsiType.Long:
+                    if value != 0:
+                        value -= 0x80000000
+                elif vt is MsiType.Short:
+                    if value != 0:
+                        value -= 0x8000
+                elif value in strings:
+                    value = strings.ref(value)
+                elif not info[index].is_integer:
+                    value = &#39;&#39;
+                values.append(value)
+            if table_name == &#39;Property&#39;:
+                tbl_properties[values[0]] = values[1]
+            if table_name == &#39;File&#39;:
+                tbl_properties[values[0]] = values[2]
+            if table_name == &#39;Component&#39;:
+                tbl_properties[values[0]] = F&#39;%{values[2]}%&#39;
+            entry = dict(zip(keys, values))
+            einfo = {t: i for t, i in zip(keys, info)}
+            if table_name == &#39;MsiFileHash&#39;:
+                entry[&#39;Hash&#39;] = struct.pack(
+                    &#39;&lt;IIII&#39;,
+                    row[2] ^ 0x80000000,
+                    row[3] ^ 0x80000000,
+                    row[4] ^ 0x80000000,
+                    row[5] ^ 0x80000000,
+                ).hex()
+            if table_name == &#39;CustomAction&#39;:
+                code = row[1] &amp; 0x3F
+                try:
+                    entry[&#39;Comment&#39;] = self._CUSTOM_ACTION_TYPES[code]
+                except LookupError:
+                    pass
+                t = einfo.get(&#39;Target&#39;)
+                c = {0x25: &#39;js&#39;, 0x26: &#39;vbs&#39;, 0x33: None}
+                if code in c and t and not t.is_integer:
+                    postprocessing.append(ScriptItem(r, c[code]))
+            processed.append(entry)
+        if processed:
+            processed_table_data[table_name] = processed
+
+    if ca := processed_table_data.get(&#39;CustomAction&#39;):
+        for item in postprocessing:
+            entry = ca[item.row_index]
+            try:
+                action: str = entry[&#39;Action&#39;]
+                target: str = entry[&#39;Target&#39;]
+            except KeyError:
+                continue
+            root = F&#39;Action/{action}&#39;
+            if item.extension:
+                action = F&#39;{root}.{item.extension}&#39;
+                streams[action] = UnpackResult(action, target.encode(self.codec))
+                continue
+            target = format_string(target)
+            parts = [part.partition(&#39;\x02&#39;) for part in target.split(&#39;\x01&#39;)]
+            if not all(part[1] == &#39;\x02&#39; for part in parts):
+                continue
+            for name, _, script in parts:
+                if not name.lower().startswith(&#39;script&#39;):
+                    continue
+                if not script:
+                    continue
+                action = F&#39;{root}.{name}&#39;
+                streams[action] = UnpackResult(action, script.encode(self.codec))
+
+    for ignored_stream in [
+        &#39;SummaryInformation&#39;,
+        &#39;DocumentSummaryInformation&#39;,
+        &#39;DigitalSignature&#39;,
+        &#39;MsiDigitalSignatureEx&#39;
+    ]:
+        if r := streams.pop(F&#39;[5]{ignored_stream}&#39;, None):
+            r.path = F&#39;Meta/{ignored_stream}&#39;
+            yield r
+
+    inconsistencies = 0
+    w1 = len(str(len(strings)))
+    w2 = len(str(max(max(strings.computed_ref_count), max(strings.provided_ref_count))))
+    for k in range(len(strings)):
+        c = strings.computed_ref_count[k]
+        p = strings.provided_ref_count[k]
+        if c != p and not self.log_debug(F&#39;string {k:0{w1}d} reference count computed={c:0{w2}d} provided={p:0{w2}d}&#39;):
+            inconsistencies += 1
+    if inconsistencies:
+        self.log_info(F&#39;found {inconsistencies} incorrect string reference counts&#39;)
+
+    def fix_msi_path(path: str):
+        prefix, dot, name = path.partition(&#39;.&#39;)
+        if dot == &#39;.&#39; and prefix in processed_table_data:
+            path = F&#39;{prefix}/{name}&#39;
+        return path
+
+    if self.args.nocab:
+        cabs = {}
+    else:
+        def _iscab(path):
+            return media_info and any(item.get(&#39;Cabinet&#39;, &#39;&#39;) == F&#39;#{path}&#39; for item in media_info)
+        media_info = processed_table_data.get(&#39;Media&#39;, [])
+        cabs: dict[str, UnpackResult] = {
+            path: item for path, item in streams.items() if _iscab(path)}
+        for cab in cabs:
+            self.log_info(F&#39;found cab file: {cab}&#39;)
+    if cabs:
+        file_names: dict[str, str] = {}
+
+        for file_info in processed_table_data.get(&#39;File&#39;, []):
+            try:
+                src_name = file_info[&#39;File&#39;]
+                dst_name = file_info[&#39;FileName&#39;]
+            except KeyError:
+                continue
+            _, _, long = dst_name.partition(&#39;|&#39;)
+            dst_name = long or dst_name
+            file_names[src_name] = dst_name
+
+        for path, cab in cabs.items():
+            try:
+                _cabinet = Cabinet(memoryview(cab.get_data()))
+                unpacked = _cabinet.process().get_files()
+            except Exception as e:
+                self.log_info(F&#39;unable to extract embedded cab file: {e!s}&#39;)
+                continue
+            base, dot, ext = path.rpartition(&#39;.&#39;)
+            if dot == &#39;.&#39; and ext.lower() == &#39;cab&#39;:
+                path = base
+            else:
+                del streams[path]
+                cab.path = F&#39;{path}.cab&#39;
+                streams[cab.path] = cab
+            for result in unpacked:
+                sub_path = file_names.get(result.name, result.name)
+                sub_path = self._get_path_separator().join((path, sub_path))
+                streams[sub_path] = UnpackResult(sub_path, lambda r=result: r.decompress())
+
+    streams = {fix_msi_path(path): item for path, item in streams.items()}
+    ds = UnpackResult(self._SYNTHETIC_STREAMS_FILENAME, json.dumps(processed_table_data))
+    streams[ds.path] = ds
+
+    converter = csv()
+    for key, jd in processed_table_data.items():
+        sk = key.strip(&#39;_&#39;)
+        if sk not in processed_table_data:
+            key = sk
+        try:
+            tbl = UnpackResult(F&#39;{self._SYNTHETIC_STREAMS_TOPLEVEL}/{key}.csv&#39;, converter.json_to_csv(jd))
+        except Exception:
+            continue
+        streams[tbl.path] = tbl
+
+    for path in sorted(streams):
+        streams[path].path = path
+        yield streams[path]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.formats.office.xtdoc.xtdoc" href="office/xtdoc.html#refinery.units.formats.office.xtdoc.xtdoc">xtdoc</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.CustomJoinBehaviour" href="index.html#refinery.units.formats.PathExtractorUnit.CustomJoinBehaviour">CustomJoinBehaviour</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.CustomPathSeparator" href="index.html#refinery.units.formats.PathExtractorUnit.CustomPathSeparator">CustomPathSeparator</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.reverse" href="office/xtdoc.html#refinery.units.formats.office.xtdoc.xtdoc.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.formats.office.xtdoc.xtdoc.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.formats" href="index.html">refinery.units.formats</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.formats.msi.MsiType" href="#refinery.units.formats.msi.MsiType">MsiType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.msi.MSITableColumnInfo" href="#refinery.units.formats.msi.MSITableColumnInfo">MSITableColumnInfo</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.msi.MSIStringData" href="#refinery.units.formats.msi.MSIStringData">MSIStringData</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.msi.MSIStringData.ref" href="#refinery.units.formats.msi.MSIStringData.ref">ref</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.msi.xtmsi" href="#refinery.units.formats.msi.xtmsi">xtmsi</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.msi.xtmsi.unpack" href="#refinery.units.formats.msi.xtmsi.unpack">unpack</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

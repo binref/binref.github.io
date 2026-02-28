@@ -1,0 +1,1526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.compression.lzip documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.compression.lzip</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L1-L374" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from itertools import count
+from typing import ClassVar, overload
+from zlib import crc32
+
+from refinery.lib.structures import MemoryFile, Struct, StructReader
+from refinery.units import Unit
+
+
+class State:
+    Count: ClassVar[int] = 12
+
+    __slots__ = &#39;__value&#39;,
+
+    def __init__(self):
+        self.__value = 0
+
+    def set_char(self):
+        self.__value = (0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 4, 5)[self.__value]
+
+    def __index__(self):
+        return self.__value
+
+    @property
+    def is_char(self):
+        return self.__value &lt; 7
+
+    def set_match(self):
+        self.__value = 7 if self.is_char else 10
+
+    def set_rep(self):
+        self.__value = 8 if self.is_char else 11
+
+    def set_short_rep(self):
+        self.__value = 9 if self.is_char else 11
+
+
+_MIN_DICT_SIZE        = 1 &lt;&lt; 12                      # noqa
+_MAX_DICT_SIZE        = 1 &lt;&lt; 29                      # noqa
+_LITERAL_CONTEXT_BITS = 3                            # noqa
+_POS_STATE_BITS       = 2                            # noqa
+_POS_STATES           = 1 &lt;&lt; _POS_STATE_BITS         # noqa
+_POS_STATE_MASK       = _POS_STATES - 1              # noqa
+_LEN_STATES           = 4                            # noqa
+_DIS_SLOT_BITS        = 6                            # noqa
+_START_DIS_MODEL      = 4                            # noqa
+_END_DIS_MODEL        = 14                           # noqa
+_MODELED_DISTANCES    = 1 &lt;&lt; (_END_DIS_MODEL // 2)   # noqa
+_DIS_ALIGN_BITS       = 4                            # noqa
+_DIS_ALIGN_SIZE       = 1 &lt;&lt; _DIS_ALIGN_BITS         # noqa
+_LEN_L_BITS           = 3                            # noqa
+_LEN_M_BITS           = 3                            # noqa
+_LEN_H_BITS           = 8                            # noqa
+_LEN_L_SYMB           = 1 &lt;&lt; _LEN_L_BITS             # noqa
+_LEN_M_SYMB           = 1 &lt;&lt; _LEN_M_BITS             # noqa
+_LEN_H_SYMB           = 1 &lt;&lt; _LEN_H_BITS             # noqa
+_MIN_MATCH_LEN        = 2                            # noqa
+_BIT_MODEL_MOVE_BITS  = 5                            # noqa
+_BIT_MODEL_TOTAL_BITS = 11                           # noqa
+_BIT_MODEL_TOTAL      = 1 &lt;&lt; _BIT_MODEL_TOTAL_BITS   # noqa
+
+
+class BitModel:
+    probability: int
+    __slots__ = &#39;probability&#39;,
+
+    def __init__(self):
+        self.probability = _BIT_MODEL_TOTAL // 2
+
+    @overload
+    @classmethod
+    def Array(cls, x: int) -&gt; list[BitModel]:
+        ...
+
+    @overload
+    @classmethod
+    def Array(cls, x: int, y: int) -&gt; list[list[BitModel]]:
+        ...
+
+    @classmethod
+    def Array(cls, x: int, y: int | None = None):
+        if y is None:
+            return [cls() for _ in range(x)]
+        return [cls.Array(y) for _ in range(x)]
+
+
+class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)
+
+
+class RangeDecoder(Struct):
+    member_pos: int
+    code: int
+    range: int
+
+    def __init__(self, reader: StructReader):
+        self.member_pos = 6
+        self.code = 0
+        self.range = 0xFFFFFFFF
+        self.reader = reader
+        for _ in range(5):
+            self.code = (self.code &lt;&lt; 8) | self.get_byte()
+
+    def get_byte(self):
+        self.member_pos += 1
+        return self.reader.read_byte()
+
+    def decode(self, num_bits: int) -&gt; int:
+        symbol = 0
+        for _ in range(num_bits):
+            self.range &gt;&gt;= 1
+            symbol &lt;&lt;= 1
+            if (self.code &gt;= self.range):
+                self.code -= self.range
+                symbol |= 1
+            if (self.range &lt;= 0x00FFFFFF):
+                self.range &lt;&lt;= 8
+                self.code = (self.code &lt;&lt; 8) | self.get_byte()
+        return symbol
+
+    def decode_bit(self, bm: BitModel):
+        symbol = 0
+        bound = (self.range &gt;&gt; _BIT_MODEL_TOTAL_BITS) * bm.probability
+        if (self.code &lt; bound):
+            self.range = bound
+            bm.probability += (_BIT_MODEL_TOTAL - bm.probability) &gt;&gt; _BIT_MODEL_MOVE_BITS
+            symbol = 0
+        else:
+            self.range -= bound
+            self.code -= bound
+            bm.probability -= bm.probability &gt;&gt; _BIT_MODEL_MOVE_BITS
+            symbol = 1
+        if (self.range &lt;= 0x00FFFFFF):
+            self.range &lt;&lt;= 8
+            self.code = (self.code &lt;&lt; 8) | self.get_byte()
+        return symbol
+
+    def decode_tree(self, bm: list[BitModel], num_bits: int, bmx: int = 0) -&gt; int:
+        symbol = 1
+        for _ in range(num_bits):
+            symbol = (symbol &lt;&lt; 1) | self.decode_bit(bm[bmx + symbol])
+        return symbol - (1 &lt;&lt; num_bits)
+
+    def decode_tree_reversed(self, bm: list[BitModel], num_bits: int, bmx: int = 0) -&gt; int:
+        symbol = self.decode_tree(bm, num_bits, bmx)
+        reversed_symbol = 0
+        for i in range(num_bits):
+            reversed_symbol = (reversed_symbol &lt;&lt; 1) | (symbol &amp; 1)
+            symbol &gt;&gt;= 1
+        return reversed_symbol
+
+    def decode_matched(self, bm: list[BitModel], match_byte: int) -&gt; int:
+        symbol = 1
+        for i in range(7, -1, -1):
+            match_bit = (match_byte &gt;&gt; i) &amp; 1
+            bit = self.decode_bit(bm[symbol + (match_bit &lt;&lt; 8) + 0x100])
+            symbol = (symbol &lt;&lt; 1) | bit
+            if match_bit != bit:
+                while symbol &lt; 0x100:
+                    symbol = (symbol &lt;&lt; 1) | self.decode_bit(bm[symbol])
+                break
+        return symbol &amp; 0xFF
+
+    def decode_len(self, lm: LenModel, pos_state: int):
+        if self.decode_bit(lm.choice1) == 0:
+            return self.decode_tree(lm.bm_low[pos_state], _LEN_L_BITS)
+        if self.decode_bit(lm.choice2) == 0:
+            return _LEN_L_SYMB + self.decode_tree(lm.bm_mid[pos_state], _LEN_M_BITS)
+        return _LEN_L_SYMB + _LEN_M_SYMB + self.decode_tree(lm.bm_high, _LEN_H_BITS)
+
+
+class MemberDecoder:
+    partial_data_pos: int
+    rdec: RangeDecoder
+    dictionary_size: int
+    buffer: bytearray
+    pos: int
+    stream_pos: int
+    crc32: int
+    pos_wrapped: bool
+
+    reader: StructReader
+    output: MemoryFile
+
+    def flush_data(self):
+        if self.pos &gt; self.stream_pos:
+            v = memoryview(self.buffer)
+            b = v[self.stream_pos:self.pos]
+            self.crc32 = crc32(b, self.crc32)
+        self.output.write(b)
+        if self.pos &gt;= self.dictionary_size:
+            self.partial_data_pos += self.pos
+            self.pos = 0
+            self.pos_wrapped = True
+        self.stream_pos = self.pos
+
+    def peek(self, distance: int):
+        if self.pos &gt; distance:
+            return self.buffer[self.pos - distance - 1]
+        if self.pos_wrapped:
+            return self.buffer[self.dictionary_size + self.pos - distance - 1]
+        return 0
+
+    def put_byte(self, b: int):
+        self.buffer[self.pos] = b
+        self.pos += 1
+        if self.pos &gt;= self.dictionary_size:
+            self.flush_data()
+
+    def __init__(self, dict_size: int, reader: StructReader, output: MemoryFile):
+        self.reader = reader
+        self.output = output
+        self.rdec = RangeDecoder(reader)
+        self.partial_data_pos = 0
+        self.dictionary_size = dict_size
+        self.buffer = bytearray(dict_size)
+        self.pos = 0
+        self.stream_pos = 0
+        self.crc32 = 0
+        self.pos_wrapped = False
+
+    @property
+    def data_position(self):
+        return self.partial_data_pos + self.pos
+
+    @property
+    def member_position(self):
+        return self.rdec.member_pos
+
+    def __call__(self) -&gt; bool:
+        bm_literal = BitModel.Array(1 &lt;&lt; _LITERAL_CONTEXT_BITS, 0x300)
+        bm_match = BitModel.Array(State.Count, _POS_STATES)
+        bm_rep = BitModel.Array(State.Count)
+        bm_rep0 = BitModel.Array(State.Count)
+        bm_rep1 = BitModel.Array(State.Count)
+        bm_rep2 = BitModel.Array(State.Count)
+        bm_len = BitModel.Array(State.Count, _POS_STATES)
+        bm_dis_slot = BitModel.Array(_LEN_STATES, 1 &lt;&lt; _DIS_SLOT_BITS)
+        bm_dis = BitModel.Array(_MODELED_DISTANCES - _END_DIS_MODEL + 1)
+        bm_align = BitModel.Array(_DIS_ALIGN_SIZE)
+
+        match_len_model = LenModel()
+        rep_len_model = LenModel()
+
+        rep0 = 0
+        rep1 = 0
+        rep2 = 0
+        rep3 = 0
+        state = State()
+
+        while not self.reader.eof:
+            pos_state = self.data_position &amp; _POS_STATE_MASK
+            if self.rdec.decode_bit(bm_match[state][pos_state]) == 0:
+                prev_byte = self.peek(0)
+                literal_state = prev_byte &gt;&gt; (8 - _LITERAL_CONTEXT_BITS)
+                bm = bm_literal[literal_state]
+                if state.is_char:
+                    self.put_byte(self.rdec.decode_tree(bm, 8))
+                else:
+                    self.put_byte(self.rdec.decode_matched(bm, self.peek(rep0)))
+                state.set_char()
+                continue
+
+            if self.rdec.decode_bit(bm_rep[state]) != 0:
+                if self.rdec.decode_bit(bm_rep0[state]) == 0:
+                    if self.rdec.decode_bit(bm_len[state][pos_state]) == 0:
+                        state.set_short_rep()
+                        self.put_byte(self.peek(rep0))
+                        continue
+                else:
+                    if self.rdec.decode_bit(bm_rep1[state]) == 0:
+                        distance = rep1
+                    else:
+                        if self.rdec.decode_bit(bm_rep2[state]) == 0:
+                            distance = rep2
+                        else:
+                            distance = rep3
+                            rep3 = rep2
+                        rep2 = rep1
+                    rep1 = rep0
+                    rep0 = distance
+                state.set_rep()
+                lit_len = _MIN_MATCH_LEN + self.rdec.decode_len(rep_len_model, pos_state)
+            else:
+                rep3 = rep2
+                rep2 = rep1
+                rep1 = rep0
+                lit_len = _MIN_MATCH_LEN + self.rdec.decode_len(match_len_model, pos_state)
+                len_state = min(lit_len - _MIN_MATCH_LEN, _LEN_STATES - 1)
+                rep0 = self.rdec.decode_tree(bm_dis_slot[len_state], _DIS_SLOT_BITS)
+                if rep0 &gt;= _START_DIS_MODEL:
+                    dis_slot = rep0
+                    direct_bits = (dis_slot &gt;&gt; 1) - 1
+                    rep0 = (2 | (dis_slot &amp; 1)) &lt;&lt; direct_bits
+                    if dis_slot &lt; _END_DIS_MODEL:
+                        rep0 += self.rdec.decode_tree_reversed(bm_dis, direct_bits, bmx=rep0 - dis_slot)
+                    else:
+                        rep0 += self.rdec.decode(direct_bits - _DIS_ALIGN_BITS) &lt;&lt; _DIS_ALIGN_BITS
+                        rep0 += self.rdec.decode_tree_reversed(bm_align, _DIS_ALIGN_BITS)
+                        if rep0 == 0xFFFFFFFF:
+                            self.flush_data()
+                            return lit_len == _MIN_MATCH_LEN
+                state.set_match()
+                if rep0 &gt;= self.dictionary_size or (rep0 &gt;= self.pos and not self.pos_wrapped):
+                    self.flush_data()
+                    return False
+            for i in range(lit_len):
+                self.put_byte(self.peek(rep0))
+        self.flush_data()
+        return False
+
+
+class lzip(Unit):
+    &#34;&#34;&#34;
+    LZIP decompression
+    &#34;&#34;&#34;
+    def process(self, data: bytearray):
+        view = memoryview(data)
+        with MemoryFile() as output, StructReader(view) as reader:
+            for k in count(1):
+                if reader.eof:
+                    break
+                trailing_size = len(data) - reader.tell()
+                try:
+                    ID, VN, DS = reader.read_struct(&#39;4sBB&#39;)
+                    if ID != B&#39;LZIP&#39;:
+                        if k &gt; 1:
+                            raise EOFError
+                        else:
+                            self.log_warn(F&#39;ignoring invalid LZIP signature: {ID.hex()}&#39;)
+                    if VN != 1:
+                        self.log_warn(F&#39;ignoring invalid LZIP version: {VN}&#39;)
+                    dict_size = 1 &lt;&lt; (DS &amp; 0x1F)
+                    dict_size -= (dict_size // 16) * ((DS &gt;&gt; 5) &amp; 7)
+                    if dict_size not in range(_MIN_DICT_SIZE, _MAX_DICT_SIZE + 1):
+                        raise ValueError(
+                            F&#39;The dictionary size {dict_size} is out of the valid range &#39;
+                            F&#39;[{_MIN_DICT_SIZE}, {_MAX_DICT_SIZE}]; unable to proceed.&#39;
+                        )
+                    decoder = MemberDecoder(dict_size, reader, output)
+                    if not decoder():
+                        raise ValueError(F&#39;Data error in stream {k}.&#39;)
+                    crc32, data_size, member_size = reader.read_struct(&#39;&lt;LQQ&#39;)
+                    if crc32 != decoder.crc32:
+                        self.log_warn(F&#39;checksum in stream {k} was {decoder.crc:08X}, should have been {crc32:08X}.&#39;)
+                    if member_size - 20 != decoder.member_position:
+                        self.log_warn(F&#39;member size in stream {k} was {decoder.member_position}, should have been {member_size}.&#39;)
+                    if data_size != decoder.data_position:
+                        self.log_warn(F&#39;data size in stream {k} was {decoder.data_position}, should have been {data_size}.&#39;)
+                except EOFError:
+                    if k &lt;= 1:
+                        raise
+                    self.log_info(F&#39;silently ignoring {trailing_size} bytes of trailing data&#39;)
+                    break
+
+            return output.getvalue()
+
+    @classmethod
+    def handles(cls, data):
+        return data[:4] == B&#39;LZIP&#39;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.compression.lzip.State"><code class="flex name class">
+<span>class <span class="ident">State</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L11-L36" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class State:
+    Count: ClassVar[int] = 12
+
+    __slots__ = &#39;__value&#39;,
+
+    def __init__(self):
+        self.__value = 0
+
+    def set_char(self):
+        self.__value = (0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 4, 5)[self.__value]
+
+    def __index__(self):
+        return self.__value
+
+    @property
+    def is_char(self):
+        return self.__value &lt; 7
+
+    def set_match(self):
+        self.__value = 7 if self.is_char else 10
+
+    def set_rep(self):
+        self.__value = 8 if self.is_char else 11
+
+    def set_short_rep(self):
+        self.__value = 9 if self.is_char else 11</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.State.Count"><code class="name">var <span class="ident">Count</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.State.is_char"><code class="name">var <span class="ident">is_char</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L25-L27" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_char(self):
+    return self.__value &lt; 7</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.State.set_char"><code class="name flex">
+<span>def <span class="ident">set_char</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L19-L20" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def set_char(self):
+    self.__value = (0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 4, 5)[self.__value]</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.State.set_match"><code class="name flex">
+<span>def <span class="ident">set_match</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L29-L30" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def set_match(self):
+    self.__value = 7 if self.is_char else 10</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.State.set_rep"><code class="name flex">
+<span>def <span class="ident">set_rep</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L32-L33" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def set_rep(self):
+    self.__value = 8 if self.is_char else 11</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.State.set_short_rep"><code class="name flex">
+<span>def <span class="ident">set_short_rep</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L35-L36" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def set_short_rep(self):
+    self.__value = 9 if self.is_char else 11</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzip.BitModel"><code class="flex name class">
+<span>class <span class="ident">BitModel</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L64-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BitModel:
+    probability: int
+    __slots__ = &#39;probability&#39;,
+
+    def __init__(self):
+        self.probability = _BIT_MODEL_TOTAL // 2
+
+    @overload
+    @classmethod
+    def Array(cls, x: int) -&gt; list[BitModel]:
+        ...
+
+    @overload
+    @classmethod
+    def Array(cls, x: int, y: int) -&gt; list[list[BitModel]]:
+        ...
+
+    @classmethod
+    def Array(cls, x: int, y: int | None = None):
+        if y is None:
+            return [cls() for _ in range(x)]
+        return [cls.Array(y) for _ in range(x)]</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.BitModel.Array"><code class="name flex">
+<span>def <span class="ident">Array</span></span>(<span>x, y=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.BitModel.probability"><code class="name">var <span class="ident">probability</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L64-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BitModel:
+    probability: int
+    __slots__ = &#39;probability&#39;,
+
+    def __init__(self):
+        self.probability = _BIT_MODEL_TOTAL // 2
+
+    @overload
+    @classmethod
+    def Array(cls, x: int) -&gt; list[BitModel]:
+        ...
+
+    @overload
+    @classmethod
+    def Array(cls, x: int, y: int) -&gt; list[list[BitModel]]:
+        ...
+
+    @classmethod
+    def Array(cls, x: int, y: int | None = None):
+        if y is None:
+            return [cls() for _ in range(x)]
+        return [cls.Array(y) for _ in range(x)]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzip.LenModel"><code class="flex name class">
+<span>class <span class="ident">LenModel</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L88-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.LenModel.bm_high"><code class="name">var <span class="ident">bm_high</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L88-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.LenModel.bm_low"><code class="name">var <span class="ident">bm_low</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L88-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.LenModel.bm_mid"><code class="name">var <span class="ident">bm_mid</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L88-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.LenModel.choice1"><code class="name">var <span class="ident">choice1</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L88-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.LenModel.choice2"><code class="name">var <span class="ident">choice2</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L88-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LenModel:
+    __slots__ = (
+        &#39;choice1&#39;,
+        &#39;choice2&#39;,
+        &#39;bm_low&#39;,
+        &#39;bm_mid&#39;,
+        &#39;bm_high&#39;
+    )
+
+    def __init__(self):
+        self.choice1 = BitModel()
+        self.choice2 = BitModel()
+        self.bm_low = BitModel.Array(_POS_STATES, _LEN_L_SYMB)
+        self.bm_mid = BitModel.Array(_POS_STATES, _LEN_M_SYMB)
+        self.bm_high = BitModel.Array(_LEN_H_SYMB)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder"><code class="flex name class">
+<span>class <span class="ident">RangeDecoder</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L105-L183" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RangeDecoder(Struct):
+    member_pos: int
+    code: int
+    range: int
+
+    def __init__(self, reader: StructReader):
+        self.member_pos = 6
+        self.code = 0
+        self.range = 0xFFFFFFFF
+        self.reader = reader
+        for _ in range(5):
+            self.code = (self.code &lt;&lt; 8) | self.get_byte()
+
+    def get_byte(self):
+        self.member_pos += 1
+        return self.reader.read_byte()
+
+    def decode(self, num_bits: int) -&gt; int:
+        symbol = 0
+        for _ in range(num_bits):
+            self.range &gt;&gt;= 1
+            symbol &lt;&lt;= 1
+            if (self.code &gt;= self.range):
+                self.code -= self.range
+                symbol |= 1
+            if (self.range &lt;= 0x00FFFFFF):
+                self.range &lt;&lt;= 8
+                self.code = (self.code &lt;&lt; 8) | self.get_byte()
+        return symbol
+
+    def decode_bit(self, bm: BitModel):
+        symbol = 0
+        bound = (self.range &gt;&gt; _BIT_MODEL_TOTAL_BITS) * bm.probability
+        if (self.code &lt; bound):
+            self.range = bound
+            bm.probability += (_BIT_MODEL_TOTAL - bm.probability) &gt;&gt; _BIT_MODEL_MOVE_BITS
+            symbol = 0
+        else:
+            self.range -= bound
+            self.code -= bound
+            bm.probability -= bm.probability &gt;&gt; _BIT_MODEL_MOVE_BITS
+            symbol = 1
+        if (self.range &lt;= 0x00FFFFFF):
+            self.range &lt;&lt;= 8
+            self.code = (self.code &lt;&lt; 8) | self.get_byte()
+        return symbol
+
+    def decode_tree(self, bm: list[BitModel], num_bits: int, bmx: int = 0) -&gt; int:
+        symbol = 1
+        for _ in range(num_bits):
+            symbol = (symbol &lt;&lt; 1) | self.decode_bit(bm[bmx + symbol])
+        return symbol - (1 &lt;&lt; num_bits)
+
+    def decode_tree_reversed(self, bm: list[BitModel], num_bits: int, bmx: int = 0) -&gt; int:
+        symbol = self.decode_tree(bm, num_bits, bmx)
+        reversed_symbol = 0
+        for i in range(num_bits):
+            reversed_symbol = (reversed_symbol &lt;&lt; 1) | (symbol &amp; 1)
+            symbol &gt;&gt;= 1
+        return reversed_symbol
+
+    def decode_matched(self, bm: list[BitModel], match_byte: int) -&gt; int:
+        symbol = 1
+        for i in range(7, -1, -1):
+            match_bit = (match_byte &gt;&gt; i) &amp; 1
+            bit = self.decode_bit(bm[symbol + (match_bit &lt;&lt; 8) + 0x100])
+            symbol = (symbol &lt;&lt; 1) | bit
+            if match_bit != bit:
+                while symbol &lt; 0x100:
+                    symbol = (symbol &lt;&lt; 1) | self.decode_bit(bm[symbol])
+                break
+        return symbol &amp; 0xFF
+
+    def decode_len(self, lm: LenModel, pos_state: int):
+        if self.decode_bit(lm.choice1) == 0:
+            return self.decode_tree(lm.bm_low[pos_state], _LEN_L_BITS)
+        if self.decode_bit(lm.choice2) == 0:
+            return _LEN_L_SYMB + self.decode_tree(lm.bm_mid[pos_state], _LEN_M_BITS)
+        return _LEN_L_SYMB + _LEN_M_SYMB + self.decode_tree(lm.bm_high, _LEN_H_BITS)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.RangeDecoder.member_pos"><code class="name">var <span class="ident">member_pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.code"><code class="name">var <span class="ident">code</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.range"><code class="name">var <span class="ident">range</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.RangeDecoder.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.RangeDecoder.get_byte"><code class="name flex">
+<span>def <span class="ident">get_byte</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L118-L120" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def get_byte(self):
+    self.member_pos += 1
+    return self.reader.read_byte()</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.decode"><code class="name flex">
+<span>def <span class="ident">decode</span></span>(<span>self, num_bits)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L122-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode(self, num_bits: int) -&gt; int:
+    symbol = 0
+    for _ in range(num_bits):
+        self.range &gt;&gt;= 1
+        symbol &lt;&lt;= 1
+        if (self.code &gt;= self.range):
+            self.code -= self.range
+            symbol |= 1
+        if (self.range &lt;= 0x00FFFFFF):
+            self.range &lt;&lt;= 8
+            self.code = (self.code &lt;&lt; 8) | self.get_byte()
+    return symbol</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.decode_bit"><code class="name flex">
+<span>def <span class="ident">decode_bit</span></span>(<span>self, bm)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L135-L150" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_bit(self, bm: BitModel):
+    symbol = 0
+    bound = (self.range &gt;&gt; _BIT_MODEL_TOTAL_BITS) * bm.probability
+    if (self.code &lt; bound):
+        self.range = bound
+        bm.probability += (_BIT_MODEL_TOTAL - bm.probability) &gt;&gt; _BIT_MODEL_MOVE_BITS
+        symbol = 0
+    else:
+        self.range -= bound
+        self.code -= bound
+        bm.probability -= bm.probability &gt;&gt; _BIT_MODEL_MOVE_BITS
+        symbol = 1
+    if (self.range &lt;= 0x00FFFFFF):
+        self.range &lt;&lt;= 8
+        self.code = (self.code &lt;&lt; 8) | self.get_byte()
+    return symbol</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.decode_tree"><code class="name flex">
+<span>def <span class="ident">decode_tree</span></span>(<span>self, bm, num_bits, bmx=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L152-L156" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_tree(self, bm: list[BitModel], num_bits: int, bmx: int = 0) -&gt; int:
+    symbol = 1
+    for _ in range(num_bits):
+        symbol = (symbol &lt;&lt; 1) | self.decode_bit(bm[bmx + symbol])
+    return symbol - (1 &lt;&lt; num_bits)</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.decode_tree_reversed"><code class="name flex">
+<span>def <span class="ident">decode_tree_reversed</span></span>(<span>self, bm, num_bits, bmx=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L158-L164" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_tree_reversed(self, bm: list[BitModel], num_bits: int, bmx: int = 0) -&gt; int:
+    symbol = self.decode_tree(bm, num_bits, bmx)
+    reversed_symbol = 0
+    for i in range(num_bits):
+        reversed_symbol = (reversed_symbol &lt;&lt; 1) | (symbol &amp; 1)
+        symbol &gt;&gt;= 1
+    return reversed_symbol</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.decode_matched"><code class="name flex">
+<span>def <span class="ident">decode_matched</span></span>(<span>self, bm, match_byte)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L166-L176" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_matched(self, bm: list[BitModel], match_byte: int) -&gt; int:
+    symbol = 1
+    for i in range(7, -1, -1):
+        match_bit = (match_byte &gt;&gt; i) &amp; 1
+        bit = self.decode_bit(bm[symbol + (match_bit &lt;&lt; 8) + 0x100])
+        symbol = (symbol &lt;&lt; 1) | bit
+        if match_bit != bit:
+            while symbol &lt; 0x100:
+                symbol = (symbol &lt;&lt; 1) | self.decode_bit(bm[symbol])
+            break
+    return symbol &amp; 0xFF</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.RangeDecoder.decode_len"><code class="name flex">
+<span>def <span class="ident">decode_len</span></span>(<span>self, lm, pos_state)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L178-L183" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_len(self, lm: LenModel, pos_state: int):
+    if self.decode_bit(lm.choice1) == 0:
+        return self.decode_tree(lm.bm_low[pos_state], _LEN_L_BITS)
+    if self.decode_bit(lm.choice2) == 0:
+        return _LEN_L_SYMB + self.decode_tree(lm.bm_mid[pos_state], _LEN_M_BITS)
+    return _LEN_L_SYMB + _LEN_M_SYMB + self.decode_tree(lm.bm_high, _LEN_H_BITS)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder"><code class="flex name class">
+<span>class <span class="ident">MemberDecoder</span></span>
+<span>(</span><span>dict_size, reader, output)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L186-L324" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MemberDecoder:
+    partial_data_pos: int
+    rdec: RangeDecoder
+    dictionary_size: int
+    buffer: bytearray
+    pos: int
+    stream_pos: int
+    crc32: int
+    pos_wrapped: bool
+
+    reader: StructReader
+    output: MemoryFile
+
+    def flush_data(self):
+        if self.pos &gt; self.stream_pos:
+            v = memoryview(self.buffer)
+            b = v[self.stream_pos:self.pos]
+            self.crc32 = crc32(b, self.crc32)
+        self.output.write(b)
+        if self.pos &gt;= self.dictionary_size:
+            self.partial_data_pos += self.pos
+            self.pos = 0
+            self.pos_wrapped = True
+        self.stream_pos = self.pos
+
+    def peek(self, distance: int):
+        if self.pos &gt; distance:
+            return self.buffer[self.pos - distance - 1]
+        if self.pos_wrapped:
+            return self.buffer[self.dictionary_size + self.pos - distance - 1]
+        return 0
+
+    def put_byte(self, b: int):
+        self.buffer[self.pos] = b
+        self.pos += 1
+        if self.pos &gt;= self.dictionary_size:
+            self.flush_data()
+
+    def __init__(self, dict_size: int, reader: StructReader, output: MemoryFile):
+        self.reader = reader
+        self.output = output
+        self.rdec = RangeDecoder(reader)
+        self.partial_data_pos = 0
+        self.dictionary_size = dict_size
+        self.buffer = bytearray(dict_size)
+        self.pos = 0
+        self.stream_pos = 0
+        self.crc32 = 0
+        self.pos_wrapped = False
+
+    @property
+    def data_position(self):
+        return self.partial_data_pos + self.pos
+
+    @property
+    def member_position(self):
+        return self.rdec.member_pos
+
+    def __call__(self) -&gt; bool:
+        bm_literal = BitModel.Array(1 &lt;&lt; _LITERAL_CONTEXT_BITS, 0x300)
+        bm_match = BitModel.Array(State.Count, _POS_STATES)
+        bm_rep = BitModel.Array(State.Count)
+        bm_rep0 = BitModel.Array(State.Count)
+        bm_rep1 = BitModel.Array(State.Count)
+        bm_rep2 = BitModel.Array(State.Count)
+        bm_len = BitModel.Array(State.Count, _POS_STATES)
+        bm_dis_slot = BitModel.Array(_LEN_STATES, 1 &lt;&lt; _DIS_SLOT_BITS)
+        bm_dis = BitModel.Array(_MODELED_DISTANCES - _END_DIS_MODEL + 1)
+        bm_align = BitModel.Array(_DIS_ALIGN_SIZE)
+
+        match_len_model = LenModel()
+        rep_len_model = LenModel()
+
+        rep0 = 0
+        rep1 = 0
+        rep2 = 0
+        rep3 = 0
+        state = State()
+
+        while not self.reader.eof:
+            pos_state = self.data_position &amp; _POS_STATE_MASK
+            if self.rdec.decode_bit(bm_match[state][pos_state]) == 0:
+                prev_byte = self.peek(0)
+                literal_state = prev_byte &gt;&gt; (8 - _LITERAL_CONTEXT_BITS)
+                bm = bm_literal[literal_state]
+                if state.is_char:
+                    self.put_byte(self.rdec.decode_tree(bm, 8))
+                else:
+                    self.put_byte(self.rdec.decode_matched(bm, self.peek(rep0)))
+                state.set_char()
+                continue
+
+            if self.rdec.decode_bit(bm_rep[state]) != 0:
+                if self.rdec.decode_bit(bm_rep0[state]) == 0:
+                    if self.rdec.decode_bit(bm_len[state][pos_state]) == 0:
+                        state.set_short_rep()
+                        self.put_byte(self.peek(rep0))
+                        continue
+                else:
+                    if self.rdec.decode_bit(bm_rep1[state]) == 0:
+                        distance = rep1
+                    else:
+                        if self.rdec.decode_bit(bm_rep2[state]) == 0:
+                            distance = rep2
+                        else:
+                            distance = rep3
+                            rep3 = rep2
+                        rep2 = rep1
+                    rep1 = rep0
+                    rep0 = distance
+                state.set_rep()
+                lit_len = _MIN_MATCH_LEN + self.rdec.decode_len(rep_len_model, pos_state)
+            else:
+                rep3 = rep2
+                rep2 = rep1
+                rep1 = rep0
+                lit_len = _MIN_MATCH_LEN + self.rdec.decode_len(match_len_model, pos_state)
+                len_state = min(lit_len - _MIN_MATCH_LEN, _LEN_STATES - 1)
+                rep0 = self.rdec.decode_tree(bm_dis_slot[len_state], _DIS_SLOT_BITS)
+                if rep0 &gt;= _START_DIS_MODEL:
+                    dis_slot = rep0
+                    direct_bits = (dis_slot &gt;&gt; 1) - 1
+                    rep0 = (2 | (dis_slot &amp; 1)) &lt;&lt; direct_bits
+                    if dis_slot &lt; _END_DIS_MODEL:
+                        rep0 += self.rdec.decode_tree_reversed(bm_dis, direct_bits, bmx=rep0 - dis_slot)
+                    else:
+                        rep0 += self.rdec.decode(direct_bits - _DIS_ALIGN_BITS) &lt;&lt; _DIS_ALIGN_BITS
+                        rep0 += self.rdec.decode_tree_reversed(bm_align, _DIS_ALIGN_BITS)
+                        if rep0 == 0xFFFFFFFF:
+                            self.flush_data()
+                            return lit_len == _MIN_MATCH_LEN
+                state.set_match()
+                if rep0 &gt;= self.dictionary_size or (rep0 &gt;= self.pos and not self.pos_wrapped):
+                    self.flush_data()
+                    return False
+            for i in range(lit_len):
+                self.put_byte(self.peek(rep0))
+        self.flush_data()
+        return False</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.MemberDecoder.partial_data_pos"><code class="name">var <span class="ident">partial_data_pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.rdec"><code class="name">var <span class="ident">rdec</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.dictionary_size"><code class="name">var <span class="ident">dictionary_size</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.buffer"><code class="name">var <span class="ident">buffer</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.stream_pos"><code class="name">var <span class="ident">stream_pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.crc32"><code class="name">var <span class="ident">crc32</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.pos_wrapped"><code class="name">var <span class="ident">pos_wrapped</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.reader"><code class="name">var <span class="ident">reader</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.output"><code class="name">var <span class="ident">output</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.MemberDecoder.data_position"><code class="name">var <span class="ident">data_position</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L236-L238" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def data_position(self):
+    return self.partial_data_pos + self.pos</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.member_position"><code class="name">var <span class="ident">member_position</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L240-L242" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def member_position(self):
+    return self.rdec.member_pos</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.MemberDecoder.flush_data"><code class="name flex">
+<span>def <span class="ident">flush_data</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L199-L209" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def flush_data(self):
+    if self.pos &gt; self.stream_pos:
+        v = memoryview(self.buffer)
+        b = v[self.stream_pos:self.pos]
+        self.crc32 = crc32(b, self.crc32)
+    self.output.write(b)
+    if self.pos &gt;= self.dictionary_size:
+        self.partial_data_pos += self.pos
+        self.pos = 0
+        self.pos_wrapped = True
+    self.stream_pos = self.pos</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.peek"><code class="name flex">
+<span>def <span class="ident">peek</span></span>(<span>self, distance)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L211-L216" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def peek(self, distance: int):
+    if self.pos &gt; distance:
+        return self.buffer[self.pos - distance - 1]
+    if self.pos_wrapped:
+        return self.buffer[self.dictionary_size + self.pos - distance - 1]
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.compression.lzip.MemberDecoder.put_byte"><code class="name flex">
+<span>def <span class="ident">put_byte</span></span>(<span>self, b)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L218-L222" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def put_byte(self, b: int):
+    self.buffer[self.pos] = b
+    self.pos += 1
+    if self.pos &gt;= self.dictionary_size:
+        self.flush_data()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzip.lzip"><code class="flex name class">
+<span>class <span class="ident">lzip</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>LZIP decompression</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzip.py#L327-L374" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class lzip(Unit):
+    &#34;&#34;&#34;
+    LZIP decompression
+    &#34;&#34;&#34;
+    def process(self, data: bytearray):
+        view = memoryview(data)
+        with MemoryFile() as output, StructReader(view) as reader:
+            for k in count(1):
+                if reader.eof:
+                    break
+                trailing_size = len(data) - reader.tell()
+                try:
+                    ID, VN, DS = reader.read_struct(&#39;4sBB&#39;)
+                    if ID != B&#39;LZIP&#39;:
+                        if k &gt; 1:
+                            raise EOFError
+                        else:
+                            self.log_warn(F&#39;ignoring invalid LZIP signature: {ID.hex()}&#39;)
+                    if VN != 1:
+                        self.log_warn(F&#39;ignoring invalid LZIP version: {VN}&#39;)
+                    dict_size = 1 &lt;&lt; (DS &amp; 0x1F)
+                    dict_size -= (dict_size // 16) * ((DS &gt;&gt; 5) &amp; 7)
+                    if dict_size not in range(_MIN_DICT_SIZE, _MAX_DICT_SIZE + 1):
+                        raise ValueError(
+                            F&#39;The dictionary size {dict_size} is out of the valid range &#39;
+                            F&#39;[{_MIN_DICT_SIZE}, {_MAX_DICT_SIZE}]; unable to proceed.&#39;
+                        )
+                    decoder = MemberDecoder(dict_size, reader, output)
+                    if not decoder():
+                        raise ValueError(F&#39;Data error in stream {k}.&#39;)
+                    crc32, data_size, member_size = reader.read_struct(&#39;&lt;LQQ&#39;)
+                    if crc32 != decoder.crc32:
+                        self.log_warn(F&#39;checksum in stream {k} was {decoder.crc:08X}, should have been {crc32:08X}.&#39;)
+                    if member_size - 20 != decoder.member_position:
+                        self.log_warn(F&#39;member size in stream {k} was {decoder.member_position}, should have been {member_size}.&#39;)
+                    if data_size != decoder.data_position:
+                        self.log_warn(F&#39;data size in stream {k} was {decoder.data_position}, should have been {data_size}.&#39;)
+                except EOFError:
+                    if k &lt;= 1:
+                        raise
+                    self.log_info(F&#39;silently ignoring {trailing_size} bytes of trailing data&#39;)
+                    break
+
+            return output.getvalue()
+
+    @classmethod
+    def handles(cls, data):
+        return data[:4] == B&#39;LZIP&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.compression.lzip.lzip" href="#refinery.units.compression.lzip.lzip">lzip</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzip.lzip.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.compression" href="index.html">refinery.units.compression</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.compression.lzip.State" href="#refinery.units.compression.lzip.State">State</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzip.State.set_char" href="#refinery.units.compression.lzip.State.set_char">set_char</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.State.set_match" href="#refinery.units.compression.lzip.State.set_match">set_match</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.State.set_rep" href="#refinery.units.compression.lzip.State.set_rep">set_rep</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.State.set_short_rep" href="#refinery.units.compression.lzip.State.set_short_rep">set_short_rep</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzip.BitModel" href="#refinery.units.compression.lzip.BitModel">BitModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzip.BitModel.Array" href="#refinery.units.compression.lzip.BitModel.Array">Array</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzip.LenModel" href="#refinery.units.compression.lzip.LenModel">LenModel</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzip.RangeDecoder" href="#refinery.units.compression.lzip.RangeDecoder">RangeDecoder</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.Parse" href="#refinery.units.compression.lzip.RangeDecoder.Parse">Parse</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.get_byte" href="#refinery.units.compression.lzip.RangeDecoder.get_byte">get_byte</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.decode" href="#refinery.units.compression.lzip.RangeDecoder.decode">decode</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.decode_bit" href="#refinery.units.compression.lzip.RangeDecoder.decode_bit">decode_bit</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.decode_tree" href="#refinery.units.compression.lzip.RangeDecoder.decode_tree">decode_tree</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.decode_tree_reversed" href="#refinery.units.compression.lzip.RangeDecoder.decode_tree_reversed">decode_tree_reversed</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.decode_matched" href="#refinery.units.compression.lzip.RangeDecoder.decode_matched">decode_matched</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.RangeDecoder.decode_len" href="#refinery.units.compression.lzip.RangeDecoder.decode_len">decode_len</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzip.MemberDecoder" href="#refinery.units.compression.lzip.MemberDecoder">MemberDecoder</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzip.MemberDecoder.flush_data" href="#refinery.units.compression.lzip.MemberDecoder.flush_data">flush_data</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.MemberDecoder.peek" href="#refinery.units.compression.lzip.MemberDecoder.peek">peek</a></code></li>
+<li><code><a title="refinery.units.compression.lzip.MemberDecoder.put_byte" href="#refinery.units.compression.lzip.MemberDecoder.put_byte">put_byte</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzip.lzip" href="#refinery.units.compression.lzip.lzip">lzip</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

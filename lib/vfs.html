@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.vfs documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.vfs</code></h1>
+</header>
+<section id="section-intro">
+<p>Certain libraries insist on reading data from a file on disk which has to be specified by passing
+a file path, and sometimes they will not accept a stream object or any other way to input data to
+them. This module implements a <strong>virtual file system</strong> which allows us to pass in-memory data to
+these libraries without having to actually write anything to disk. It works by hooking the
+standard library functions <code>builtins.open</code>, <code>os.stat</code>, and <code>mmap.mmap</code>.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L1-L233" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Certain libraries insist on reading data from a file on disk which has to be specified by passing
+a file path, and sometimes they will not accept a stream object or any other way to input data to
+them. This module implements a **virtual file system** which allows us to pass in-memory data to
+these libraries without having to actually write anything to disk. It works by hooking the
+standard library functions `builtins.open`, `os.stat`, and `mmap.mmap`.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import builtins
+import io
+import mmap
+import os
+import os.path
+import stat
+import threading
+import uuid
+
+from refinery.lib.structures import MemoryFile, MemoryFileMethods
+from refinery.lib.types import buf
+
+
+class VirtualFile:
+    &#34;&#34;&#34;
+    Represents a file in the virtual file system. It is linked to a `refinery.lib.vfs.VirtualFileSystem`
+    and may be initialized with a chunk of binary data. It is possible to leave `data` as `None`,
+    specificall to create a virtual file that would be written to, rather than read from. In that case,
+    the data written to the virtual file can be extracted as a binary string later. Additionally, it
+    is possible to specify a file extension that the virtual file should use in its randomly generated
+    path; this is useful in case the reader insists on a specific file extension or uses the file
+    extension to deduce a mode of operation.
+    &#34;&#34;&#34;
+    name: str
+    data: buf | None
+
+    def __init__(self, fs: VirtualFileSystem, data: buf | None = None, extension: str | None = None):
+        extension = extension and F&#39;.{extension}&#39; or &#39;&#39;
+        self.uuid = uuid.uuid4()
+        self.name = F&#39;{self.uuid!s}{extension}&#39;
+        self.data = data
+        fs.install(self)
+
+    def __repr__(self):
+        return F&#39;&lt;VirtualFile/{self.name}&gt;&#39;
+
+    @property
+    def node(self) -&gt; int:
+        return self.uuid.fields[1]
+
+    def mmap(self, length: int = 0, offset: int = 0) -&gt; MemoryFileMethods:
+        &#34;&#34;&#34;
+        Emulate the result of an `mmap` call to the virtual file.
+        &#34;&#34;&#34;
+        if (data := self.data) is None:
+            raise ValueError(&#39;Attempt to map a virtual file with no associated data.&#39;)
+        view = memoryview(data)
+        node = self.node
+        if length:
+            view = view[offset:offset + length]
+
+        class _MappedView(bytearray, MemoryFileMethods[bytearray, bytes]):
+            def __init__(self):
+                MemoryFileMethods.__init__(self, data=self, output=bytes, fileno=node)
+
+        mapped = _MappedView()
+        mapped[:] = view
+        return mapped
+
+    def open(self, mode: str) -&gt; MemoryFile:
+        &#34;&#34;&#34;
+        Open the virtual file.
+        &#34;&#34;&#34;
+        if self.data is None:
+            self.data = bytearray()
+        fd = MemoryFile(self.data, output=bytes, fileno=self.node)
+        fd.name = self.path
+        return fd
+
+    def __len__(self):
+        if self.data is None:
+            raise FileNotFoundError
+        return len(self.data)
+
+    def __fspath__(self):
+        return self.path
+
+    @property
+    def path(self):
+        &#34;&#34;&#34;
+        Returns the absolute path to this virtual file. The virtual file is given a randomly
+        generated, uuid-formatted file name in the current working directory.
+        &#34;&#34;&#34;
+        return os.path.join(os.getcwd(), self.name)
+
+    def stat(self):
+        &#34;&#34;&#34;
+        Return a stat result for this virtual file. It has all permission bits set and accurately
+        reports the size of the file.
+        &#34;&#34;&#34;
+        if self.data is None:
+            raise FileNotFoundError(F&#39;virtual file does not exist: {self.name}&#39;)
+        M = stat.S_IMODE(0xFFFF) | stat.S_IFREG
+        S = len(self.data)
+        return os.stat_result((
+            M,  # ST_MODE
+            0,  # ST_INO
+            0,  # ST_DEV
+            1,  # ST_NLINK
+            0,  # ST_UID
+            0,  # ST_GID
+            S,  # ST_SIZE
+            0,  # ST_ATIME
+            0,  # ST_MTIME
+            0,  # ST_CTIME
+        ))
+
+
+class VirtualFileSystem:
+    &#34;&#34;&#34;
+    The main class and context handler for a virtual file system. It implements the hooking of
+    system library functions and maps any number of `refinery.lib.vfs.VirtualFile` instances to
+    randomly generated file paths. It is used as follows:
+
+        with VirtualFileSystem() as vfs:
+            vf = VirtualFile(vfs, data, &#39;exe&#39;)
+            parsed = external_library.open(vf.path)
+
+    A `refinery.lib.vfs.VirtualFile` is given a UUID-based random name, and any query to the
+    virtual file system that does not correspond to a known `refinery.lib.vfs.VirtualFile` will
+    be forwarded to the original `builtins.open`, `os.stat`, or `mmap.mmap` function.
+
+    Nevertheless, units should attempt to spend **as little time as possible** inside the context
+    handler; hooking builtin, file system related functions is a dangerous business.
+    &#34;&#34;&#34;
+
+    _VFS_LOCK = threading.Lock()
+
+    def __init__(self):
+        self._lock: threading.RLock = threading.RLock()
+        self._by_name: dict[str, VirtualFile] = {}
+        self._by_node: dict[int, VirtualFile] = {}
+
+    def new(self, data: buf | None = None, extension: str | None = None):
+        return VirtualFile(self, data, extension)
+
+    def install(self, file: VirtualFile):
+        &#34;&#34;&#34;
+        Add a new virtual file into the file system. This function is called by the constructor
+        of `refinery.lib.vfs.VirtualFile` and usually does not have to be called manually.
+        &#34;&#34;&#34;
+        with self._lock:
+            self._by_name[file.name] = file
+            self._by_node[file.node] = file
+
+    def acquire(self):
+        self._VFS_LOCK.acquire()
+
+        def hook_isfile(path):
+            try:
+                with self._lock:
+                    self._by_name[os.path.basename(path)]
+            except BaseException:
+                return self._isfile(path)
+            else:
+                return True
+
+        def hook_open(file, *args, **kwargs):
+            try:
+                with self._lock:
+                    vf = self._by_name[os.path.basename(file)]
+            except BaseException:
+                return self._builtins_open(file, *args, **kwargs)
+            else:
+                return vf.open(args[0])
+
+        def hook_stat(file):
+            try:
+                with self._lock:
+                    vf = self._by_name[os.path.basename(file)]
+            except BaseException:
+                return self._os_stat(file)
+            else:
+                return vf.stat()
+
+        def hook_mmap(fileno, length: int, *args, **kwargs):
+            try:
+                with self._lock:
+                    vf = self._by_node[fileno]
+            except BaseException:
+                return self._mmap_mmap(fileno, length, *args, **kwargs)
+            else:
+                return vf.mmap(length, kwargs.get(&#39;offset&#39;, 0))
+
+        def hook_exists(path):
+            try:
+                with self._lock:
+                    return os.path.basename(path) in self._by_name
+            except BaseException:
+                return self._exists(path)
+
+        self._builtins_open = builtins.open
+        self._os_stat = os.stat
+        self._mmap_mmap = mmap.mmap
+        self._io_open = io.open
+        self._isfile = os.path.isfile
+        self._exists = os.path.exists
+        builtins.open = hook_open
+        io.open = hook_open
+        os.stat = hook_stat
+        mmap.mmap = hook_mmap
+        os.path.isfile = hook_isfile
+        os.path.exists = hook_exists
+        return self
+
+    def release(self):
+        os.path.isfile = self._isfile
+        os.path.exists = self._exists
+        builtins.open = self._builtins_open
+        os.stat = self._os_stat
+        mmap.mmap = self._mmap_mmap
+        io.open = self._io_open
+        self._VFS_LOCK.release()
+
+    def __enter__(self):
+        &#34;&#34;&#34;
+        The context handler for the virtual file system initializes all hooks and releases them
+        when the context is left.
+        &#34;&#34;&#34;
+        return self.acquire()
+
+    def __exit__(self, *args):
+        self.release()
+        return False</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.vfs.VirtualFile"><code class="flex name class">
+<span>class <span class="ident">VirtualFile</span></span>
+<span>(</span><span>fs, data=None, extension=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Represents a file in the virtual file system. It is linked to a <code><a title="refinery.lib.vfs.VirtualFileSystem" href="#refinery.lib.vfs.VirtualFileSystem">VirtualFileSystem</a></code>
+and may be initialized with a chunk of binary data. It is possible to leave <code>data</code> as <code>None</code>,
+specificall to create a virtual file that would be written to, rather than read from. In that case,
+the data written to the virtual file can be extracted as a binary string later. Additionally, it
+is possible to specify a file extension that the virtual file should use in its randomly generated
+path; this is useful in case the reader insists on a specific file extension or uses the file
+extension to deduce a mode of operation.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L23-L115" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class VirtualFile:
+    &#34;&#34;&#34;
+    Represents a file in the virtual file system. It is linked to a `refinery.lib.vfs.VirtualFileSystem`
+    and may be initialized with a chunk of binary data. It is possible to leave `data` as `None`,
+    specificall to create a virtual file that would be written to, rather than read from. In that case,
+    the data written to the virtual file can be extracted as a binary string later. Additionally, it
+    is possible to specify a file extension that the virtual file should use in its randomly generated
+    path; this is useful in case the reader insists on a specific file extension or uses the file
+    extension to deduce a mode of operation.
+    &#34;&#34;&#34;
+    name: str
+    data: buf | None
+
+    def __init__(self, fs: VirtualFileSystem, data: buf | None = None, extension: str | None = None):
+        extension = extension and F&#39;.{extension}&#39; or &#39;&#39;
+        self.uuid = uuid.uuid4()
+        self.name = F&#39;{self.uuid!s}{extension}&#39;
+        self.data = data
+        fs.install(self)
+
+    def __repr__(self):
+        return F&#39;&lt;VirtualFile/{self.name}&gt;&#39;
+
+    @property
+    def node(self) -&gt; int:
+        return self.uuid.fields[1]
+
+    def mmap(self, length: int = 0, offset: int = 0) -&gt; MemoryFileMethods:
+        &#34;&#34;&#34;
+        Emulate the result of an `mmap` call to the virtual file.
+        &#34;&#34;&#34;
+        if (data := self.data) is None:
+            raise ValueError(&#39;Attempt to map a virtual file with no associated data.&#39;)
+        view = memoryview(data)
+        node = self.node
+        if length:
+            view = view[offset:offset + length]
+
+        class _MappedView(bytearray, MemoryFileMethods[bytearray, bytes]):
+            def __init__(self):
+                MemoryFileMethods.__init__(self, data=self, output=bytes, fileno=node)
+
+        mapped = _MappedView()
+        mapped[:] = view
+        return mapped
+
+    def open(self, mode: str) -&gt; MemoryFile:
+        &#34;&#34;&#34;
+        Open the virtual file.
+        &#34;&#34;&#34;
+        if self.data is None:
+            self.data = bytearray()
+        fd = MemoryFile(self.data, output=bytes, fileno=self.node)
+        fd.name = self.path
+        return fd
+
+    def __len__(self):
+        if self.data is None:
+            raise FileNotFoundError
+        return len(self.data)
+
+    def __fspath__(self):
+        return self.path
+
+    @property
+    def path(self):
+        &#34;&#34;&#34;
+        Returns the absolute path to this virtual file. The virtual file is given a randomly
+        generated, uuid-formatted file name in the current working directory.
+        &#34;&#34;&#34;
+        return os.path.join(os.getcwd(), self.name)
+
+    def stat(self):
+        &#34;&#34;&#34;
+        Return a stat result for this virtual file. It has all permission bits set and accurately
+        reports the size of the file.
+        &#34;&#34;&#34;
+        if self.data is None:
+            raise FileNotFoundError(F&#39;virtual file does not exist: {self.name}&#39;)
+        M = stat.S_IMODE(0xFFFF) | stat.S_IFREG
+        S = len(self.data)
+        return os.stat_result((
+            M,  # ST_MODE
+            0,  # ST_INO
+            0,  # ST_DEV
+            1,  # ST_NLINK
+            0,  # ST_UID
+            0,  # ST_GID
+            S,  # ST_SIZE
+            0,  # ST_ATIME
+            0,  # ST_MTIME
+            0,  # ST_CTIME
+        ))</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.vfs.VirtualFile.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFile.data"><code class="name">var <span class="ident">data</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.vfs.VirtualFile.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L46-L48" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def node(self) -&gt; int:
+    return self.uuid.fields[1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFile.path"><code class="name">var <span class="ident">path</span></code></dt>
+<dd>
+<section class="desc"><p>Returns the absolute path to this virtual file. The virtual file is given a randomly
+generated, uuid-formatted file name in the current working directory.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L87-L93" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def path(self):
+    &#34;&#34;&#34;
+    Returns the absolute path to this virtual file. The virtual file is given a randomly
+    generated, uuid-formatted file name in the current working directory.
+    &#34;&#34;&#34;
+    return os.path.join(os.getcwd(), self.name)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.vfs.VirtualFile.mmap"><code class="name flex">
+<span>def <span class="ident">mmap</span></span>(<span>self, length=0, offset=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Emulate the result of an <code>mmap</code> call to the virtual file.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L50-L67" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def mmap(self, length: int = 0, offset: int = 0) -&gt; MemoryFileMethods:
+    &#34;&#34;&#34;
+    Emulate the result of an `mmap` call to the virtual file.
+    &#34;&#34;&#34;
+    if (data := self.data) is None:
+        raise ValueError(&#39;Attempt to map a virtual file with no associated data.&#39;)
+    view = memoryview(data)
+    node = self.node
+    if length:
+        view = view[offset:offset + length]
+
+    class _MappedView(bytearray, MemoryFileMethods[bytearray, bytes]):
+        def __init__(self):
+            MemoryFileMethods.__init__(self, data=self, output=bytes, fileno=node)
+
+    mapped = _MappedView()
+    mapped[:] = view
+    return mapped</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFile.open"><code class="name flex">
+<span>def <span class="ident">open</span></span>(<span>self, mode)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Open the virtual file.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L69-L77" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def open(self, mode: str) -&gt; MemoryFile:
+    &#34;&#34;&#34;
+    Open the virtual file.
+    &#34;&#34;&#34;
+    if self.data is None:
+        self.data = bytearray()
+    fd = MemoryFile(self.data, output=bytes, fileno=self.node)
+    fd.name = self.path
+    return fd</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFile.stat"><code class="name flex">
+<span>def <span class="ident">stat</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return a stat result for this virtual file. It has all permission bits set and accurately
+reports the size of the file.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L95-L115" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def stat(self):
+    &#34;&#34;&#34;
+    Return a stat result for this virtual file. It has all permission bits set and accurately
+    reports the size of the file.
+    &#34;&#34;&#34;
+    if self.data is None:
+        raise FileNotFoundError(F&#39;virtual file does not exist: {self.name}&#39;)
+    M = stat.S_IMODE(0xFFFF) | stat.S_IFREG
+    S = len(self.data)
+    return os.stat_result((
+        M,  # ST_MODE
+        0,  # ST_INO
+        0,  # ST_DEV
+        1,  # ST_NLINK
+        0,  # ST_UID
+        0,  # ST_GID
+        S,  # ST_SIZE
+        0,  # ST_ATIME
+        0,  # ST_MTIME
+        0,  # ST_CTIME
+    ))</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFileSystem"><code class="flex name class">
+<span>class <span class="ident">VirtualFileSystem</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>The main class and context handler for a virtual file system. It implements the hooking of
+system library functions and maps any number of <code><a title="refinery.lib.vfs.VirtualFile" href="#refinery.lib.vfs.VirtualFile">VirtualFile</a></code> instances to
+randomly generated file paths. It is used as follows:</p>
+<pre><code>with VirtualFileSystem() as vfs:
+    vf = VirtualFile(vfs, data, 'exe')
+    parsed = external_library.open(vf.path)
+</code></pre>
+<p>A <code><a title="refinery.lib.vfs.VirtualFile" href="#refinery.lib.vfs.VirtualFile">VirtualFile</a></code> is given a UUID-based random name, and any query to the
+virtual file system that does not correspond to a known <code><a title="refinery.lib.vfs.VirtualFile" href="#refinery.lib.vfs.VirtualFile">VirtualFile</a></code> will
+be forwarded to the original <code>builtins.open</code>, <code>os.stat</code>, or <code>mmap.mmap</code> function.</p>
+<p>Nevertheless, units should attempt to spend <strong>as little time as possible</strong> inside the context
+handler; hooking builtin, file system related functions is a dangerous business.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L118-L233" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class VirtualFileSystem:
+    &#34;&#34;&#34;
+    The main class and context handler for a virtual file system. It implements the hooking of
+    system library functions and maps any number of `refinery.lib.vfs.VirtualFile` instances to
+    randomly generated file paths. It is used as follows:
+
+        with VirtualFileSystem() as vfs:
+            vf = VirtualFile(vfs, data, &#39;exe&#39;)
+            parsed = external_library.open(vf.path)
+
+    A `refinery.lib.vfs.VirtualFile` is given a UUID-based random name, and any query to the
+    virtual file system that does not correspond to a known `refinery.lib.vfs.VirtualFile` will
+    be forwarded to the original `builtins.open`, `os.stat`, or `mmap.mmap` function.
+
+    Nevertheless, units should attempt to spend **as little time as possible** inside the context
+    handler; hooking builtin, file system related functions is a dangerous business.
+    &#34;&#34;&#34;
+
+    _VFS_LOCK = threading.Lock()
+
+    def __init__(self):
+        self._lock: threading.RLock = threading.RLock()
+        self._by_name: dict[str, VirtualFile] = {}
+        self._by_node: dict[int, VirtualFile] = {}
+
+    def new(self, data: buf | None = None, extension: str | None = None):
+        return VirtualFile(self, data, extension)
+
+    def install(self, file: VirtualFile):
+        &#34;&#34;&#34;
+        Add a new virtual file into the file system. This function is called by the constructor
+        of `refinery.lib.vfs.VirtualFile` and usually does not have to be called manually.
+        &#34;&#34;&#34;
+        with self._lock:
+            self._by_name[file.name] = file
+            self._by_node[file.node] = file
+
+    def acquire(self):
+        self._VFS_LOCK.acquire()
+
+        def hook_isfile(path):
+            try:
+                with self._lock:
+                    self._by_name[os.path.basename(path)]
+            except BaseException:
+                return self._isfile(path)
+            else:
+                return True
+
+        def hook_open(file, *args, **kwargs):
+            try:
+                with self._lock:
+                    vf = self._by_name[os.path.basename(file)]
+            except BaseException:
+                return self._builtins_open(file, *args, **kwargs)
+            else:
+                return vf.open(args[0])
+
+        def hook_stat(file):
+            try:
+                with self._lock:
+                    vf = self._by_name[os.path.basename(file)]
+            except BaseException:
+                return self._os_stat(file)
+            else:
+                return vf.stat()
+
+        def hook_mmap(fileno, length: int, *args, **kwargs):
+            try:
+                with self._lock:
+                    vf = self._by_node[fileno]
+            except BaseException:
+                return self._mmap_mmap(fileno, length, *args, **kwargs)
+            else:
+                return vf.mmap(length, kwargs.get(&#39;offset&#39;, 0))
+
+        def hook_exists(path):
+            try:
+                with self._lock:
+                    return os.path.basename(path) in self._by_name
+            except BaseException:
+                return self._exists(path)
+
+        self._builtins_open = builtins.open
+        self._os_stat = os.stat
+        self._mmap_mmap = mmap.mmap
+        self._io_open = io.open
+        self._isfile = os.path.isfile
+        self._exists = os.path.exists
+        builtins.open = hook_open
+        io.open = hook_open
+        os.stat = hook_stat
+        mmap.mmap = hook_mmap
+        os.path.isfile = hook_isfile
+        os.path.exists = hook_exists
+        return self
+
+    def release(self):
+        os.path.isfile = self._isfile
+        os.path.exists = self._exists
+        builtins.open = self._builtins_open
+        os.stat = self._os_stat
+        mmap.mmap = self._mmap_mmap
+        io.open = self._io_open
+        self._VFS_LOCK.release()
+
+    def __enter__(self):
+        &#34;&#34;&#34;
+        The context handler for the virtual file system initializes all hooks and releases them
+        when the context is left.
+        &#34;&#34;&#34;
+        return self.acquire()
+
+    def __exit__(self, *args):
+        self.release()
+        return False</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.vfs.VirtualFileSystem.new"><code class="name flex">
+<span>def <span class="ident">new</span></span>(<span>self, data=None, extension=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L143-L144" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def new(self, data: buf | None = None, extension: str | None = None):
+    return VirtualFile(self, data, extension)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFileSystem.install"><code class="name flex">
+<span>def <span class="ident">install</span></span>(<span>self, file)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Add a new virtual file into the file system. This function is called by the constructor
+of <code><a title="refinery.lib.vfs.VirtualFile" href="#refinery.lib.vfs.VirtualFile">VirtualFile</a></code> and usually does not have to be called manually.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L146-L153" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def install(self, file: VirtualFile):
+    &#34;&#34;&#34;
+    Add a new virtual file into the file system. This function is called by the constructor
+    of `refinery.lib.vfs.VirtualFile` and usually does not have to be called manually.
+    &#34;&#34;&#34;
+    with self._lock:
+        self._by_name[file.name] = file
+        self._by_node[file.node] = file</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFileSystem.acquire"><code class="name flex">
+<span>def <span class="ident">acquire</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L155-L213" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def acquire(self):
+    self._VFS_LOCK.acquire()
+
+    def hook_isfile(path):
+        try:
+            with self._lock:
+                self._by_name[os.path.basename(path)]
+        except BaseException:
+            return self._isfile(path)
+        else:
+            return True
+
+    def hook_open(file, *args, **kwargs):
+        try:
+            with self._lock:
+                vf = self._by_name[os.path.basename(file)]
+        except BaseException:
+            return self._builtins_open(file, *args, **kwargs)
+        else:
+            return vf.open(args[0])
+
+    def hook_stat(file):
+        try:
+            with self._lock:
+                vf = self._by_name[os.path.basename(file)]
+        except BaseException:
+            return self._os_stat(file)
+        else:
+            return vf.stat()
+
+    def hook_mmap(fileno, length: int, *args, **kwargs):
+        try:
+            with self._lock:
+                vf = self._by_node[fileno]
+        except BaseException:
+            return self._mmap_mmap(fileno, length, *args, **kwargs)
+        else:
+            return vf.mmap(length, kwargs.get(&#39;offset&#39;, 0))
+
+    def hook_exists(path):
+        try:
+            with self._lock:
+                return os.path.basename(path) in self._by_name
+        except BaseException:
+            return self._exists(path)
+
+    self._builtins_open = builtins.open
+    self._os_stat = os.stat
+    self._mmap_mmap = mmap.mmap
+    self._io_open = io.open
+    self._isfile = os.path.isfile
+    self._exists = os.path.exists
+    builtins.open = hook_open
+    io.open = hook_open
+    os.stat = hook_stat
+    mmap.mmap = hook_mmap
+    os.path.isfile = hook_isfile
+    os.path.exists = hook_exists
+    return self</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.vfs.VirtualFileSystem.release"><code class="name flex">
+<span>def <span class="ident">release</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/vfs.py#L215-L222" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def release(self):
+    os.path.isfile = self._isfile
+    os.path.exists = self._exists
+    builtins.open = self._builtins_open
+    os.stat = self._os_stat
+    mmap.mmap = self._mmap_mmap
+    io.open = self._io_open
+    self._VFS_LOCK.release()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.vfs.VirtualFile" href="#refinery.lib.vfs.VirtualFile">VirtualFile</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.vfs.VirtualFile.mmap" href="#refinery.lib.vfs.VirtualFile.mmap">mmap</a></code></li>
+<li><code><a title="refinery.lib.vfs.VirtualFile.open" href="#refinery.lib.vfs.VirtualFile.open">open</a></code></li>
+<li><code><a title="refinery.lib.vfs.VirtualFile.stat" href="#refinery.lib.vfs.VirtualFile.stat">stat</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.vfs.VirtualFileSystem" href="#refinery.lib.vfs.VirtualFileSystem">VirtualFileSystem</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.vfs.VirtualFileSystem.new" href="#refinery.lib.vfs.VirtualFileSystem.new">new</a></code></li>
+<li><code><a title="refinery.lib.vfs.VirtualFileSystem.install" href="#refinery.lib.vfs.VirtualFileSystem.install">install</a></code></li>
+<li><code><a title="refinery.lib.vfs.VirtualFileSystem.acquire" href="#refinery.lib.vfs.VirtualFileSystem.acquire">acquire</a></code></li>
+<li><code><a title="refinery.lib.vfs.VirtualFileSystem.release" href="#refinery.lib.vfs.VirtualFileSystem.release">release</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

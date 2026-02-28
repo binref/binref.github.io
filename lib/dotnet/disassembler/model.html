@@ -1,0 +1,1321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.dotnet.disassembler.model documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.dotnet.disassembler.model</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L1-L251" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import abc
+import enum
+
+from struct import unpack
+
+
+class OpArgument(abc.ABC):
+    def __init__(
+        self,
+        size: int = 4,
+        has_target: bool = False,
+        is_num: bool = False,
+        is_idx: bool = False,
+        is_arg_num: bool = False,
+        is_casecnt: bool = False,
+        is_caseargs: bool = False,
+    ):
+        self._size = size
+        self.has_target = has_target
+        self.is_num = is_num
+        self.is_idx = is_idx
+        self.is_arg_num = is_arg_num
+        self.is_casecnt = is_casecnt
+        self.is_caseargs = is_caseargs
+
+    def __len__(self):
+        return self._size
+
+    def __repr__(self):
+        bool_args = []
+        if self.has_target:
+            bool_args.append(&#39;has_target&#39;)
+        if self.is_num:
+            bool_args.append(&#39;is_num&#39;)
+        if self.is_idx:
+            bool_args.append(&#39;is_idx&#39;)
+        if self.is_arg_num:
+            bool_args.append(&#39;is_arg_num&#39;)
+        if self.is_casecnt:
+            bool_args.append(&#39;is_casecnt&#39;)
+        if self.is_caseargs:
+            bool_args.append(&#39;is_caseargs&#39;)
+        bool_str = &#39;&#39; if len(bool_args) == 0 else f&#34; {&#39;,&#39;.join(bool_args)}&#34;
+
+        return f&#34;&lt;{self.__class__.__name__} size={self._size}{bool_str}&gt;&#34;
+
+    def unpack(self, value) -&gt; int:
+        return unpack(&#39;&lt;I&#39;, value)[0]
+
+
+class Int8(OpArgument):
+    def __init__(self, has_target: bool = False, is_num: bool = False):
+        super().__init__(1, has_target=has_target, is_num=is_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;b&#39;, value)[0]
+
+
+class Int32(OpArgument):
+    def __init__(
+        self, has_target: bool = False, is_num: bool = False, is_caseargs: bool = False
+    ):
+        super().__init__(4, has_target, is_num=is_num, is_caseargs=is_caseargs)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;i&#39;, value)[0]
+
+
+class Int64(OpArgument):
+    def __init__(self, is_num: bool = False):
+        super().__init__(8, is_num=is_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;q&#39;, value)[0]
+
+
+class UInt8(OpArgument):
+    def __init__(self, is_num: bool = False, is_idx: bool = False, is_arg_num=True):
+        super().__init__(1, is_num=is_num, is_idx=is_idx, is_arg_num=is_arg_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;B&#39;, value)[0]
+
+
+class UInt16(OpArgument):
+    def __init__(
+        self, is_num: bool = False, is_idx: bool = False, is_arg_num: bool = False
+    ):
+        super().__init__(2, is_num=is_num, is_idx=is_idx, is_arg_num=is_arg_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;H&#39;, value)[0]
+
+
+class UInt32(OpArgument):
+    def __init__(self, is_casecnt: bool = False):
+        super().__init__(4, is_casecnt=is_casecnt)
+
+
+class Float32(OpArgument):
+    def __init__(self, is_num: bool = False):
+        super().__init__(4, is_num=is_num)
+
+
+class Float64(OpArgument):
+    def __init__(self, is_num: bool = False):
+        super().__init__(8, is_num=is_num)
+
+
+class String(OpArgument):
+    def unpack(self, value) -&gt; int:
+        return unpack(&#39;&lt;I&#39;, value[:-1] + b&#39;\0&#39;)[0]
+
+
+class TypeTok(OpArgument):
+    pass
+
+
+class Field(OpArgument):
+    pass
+
+
+class Class(OpArgument):
+    pass
+
+
+class Method(OpArgument):
+    pass
+
+
+class ValueType(OpArgument):
+    pass
+
+
+class ThisType(OpArgument):
+    pass
+
+
+class CallSiteDescr(OpArgument):
+    pass
+
+
+class Token(OpArgument):
+    pass
+
+
+class Etype(OpArgument):
+    pass
+
+
+class Ctor(OpArgument):
+    pass
+
+
+class Type(OpArgument):
+    pass
+
+
+class TokenLabel:
+    def __init__(self, tid: int, value: str):
+        self._tid = tid
+        self._value = value
+
+
+class OpType(str, enum.Enum):
+    BASE = &#39;Base&#39;
+    OBJECT_MODEL = &#39;ObjectModel&#39;
+    PREFIX_TO = &#39;PrefixTo&#39;
+
+
+class Op(abc.ABC):
+    &#34;&#34;&#34;
+    Specifier for a Common Intermediate Language (CIL) instruction. It is used to specify a complete list of all
+    available instructions in the OpRepository. Instances of this class do not represent concrete instructions during
+    disassembly, that what the Instruction class is for.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        op_type: OpType,
+        code: bytes,
+        mnemonic: str,
+        arguments: list[OpArgument],
+        description: str,
+        is_switch: bool = False,
+        is_alias: bool = False,
+    ):
+        self.op_type = op_type
+        self.code = code
+        self.mnemonic = mnemonic
+        self.arguments = arguments
+        self.description = description
+        self.is_switch = is_switch
+        self.is_alias = is_alias
+
+    def __len__(self):
+        return len(self.code) + sum(len(argument) for argument in self.arguments)
+
+    def __repr__(self):
+        return f&#34;&lt;Op{self.op_type.value} {self.mnemonic} arguments={self.arguments}&gt;&#34;
+
+    @property
+    def fixed_length(self):
+        return not self.is_switch
+
+
+class Argument:
+    &#34;&#34;&#34;
+    Represents a concrete argument including value during dissassembly. Refer to `OpArgument` for the abstract
+    description of an argument.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: bytes, op_argument: OpArgument):
+        self._data = data
+        self._op_argument = op_argument
+
+    @property
+    def value(self):
+        return self._op_argument.unpack(self._data)
+
+    def __repr__(self):
+        return f&#34;&lt;Argument {self._op_argument.__class__.__name__}=0x{self.value:x}&gt;&#34;
+
+
+class Instruction:
+    &#34;&#34;&#34;
+    Represent a concrete instruction in memory. The `op` field carries the corresponding abstract `Op` instance
+    describing the data in memory.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: bytes, offset: int, op: Op, arguments: list[Argument]):
+        self.data = data
+        self.offset = offset
+        self.op = op
+        self.arguments = arguments
+
+    def __len__(self):
+        return len(self.data)
+
+    def __repr__(self):
+        return f&#34;&lt;Instruction op={self.op} offset={self.offset} arguments={self.arguments}&gt;&#34;
+
+
+class UnknownInstruction(Exception):
+    pass
+
+
+class DisassemblerException(Exception):
+    pass</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.OpArgument"><code class="flex name class">
+<span>class <span class="ident">OpArgument</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L9-L50" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class OpArgument(abc.ABC):
+    def __init__(
+        self,
+        size: int = 4,
+        has_target: bool = False,
+        is_num: bool = False,
+        is_idx: bool = False,
+        is_arg_num: bool = False,
+        is_casecnt: bool = False,
+        is_caseargs: bool = False,
+    ):
+        self._size = size
+        self.has_target = has_target
+        self.is_num = is_num
+        self.is_idx = is_idx
+        self.is_arg_num = is_arg_num
+        self.is_casecnt = is_casecnt
+        self.is_caseargs = is_caseargs
+
+    def __len__(self):
+        return self._size
+
+    def __repr__(self):
+        bool_args = []
+        if self.has_target:
+            bool_args.append(&#39;has_target&#39;)
+        if self.is_num:
+            bool_args.append(&#39;is_num&#39;)
+        if self.is_idx:
+            bool_args.append(&#39;is_idx&#39;)
+        if self.is_arg_num:
+            bool_args.append(&#39;is_arg_num&#39;)
+        if self.is_casecnt:
+            bool_args.append(&#39;is_casecnt&#39;)
+        if self.is_caseargs:
+            bool_args.append(&#39;is_caseargs&#39;)
+        bool_str = &#39;&#39; if len(bool_args) == 0 else f&#34; {&#39;,&#39;.join(bool_args)}&#34;
+
+        return f&#34;&lt;{self.__class__.__name__} size={self._size}{bool_str}&gt;&#34;
+
+    def unpack(self, value) -&gt; int:
+        return unpack(&#39;&lt;I&#39;, value)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.CallSiteDescr" href="#refinery.lib.dotnet.disassembler.model.CallSiteDescr">CallSiteDescr</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Class" href="#refinery.lib.dotnet.disassembler.model.Class">Class</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Ctor" href="#refinery.lib.dotnet.disassembler.model.Ctor">Ctor</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Etype" href="#refinery.lib.dotnet.disassembler.model.Etype">Etype</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Field" href="#refinery.lib.dotnet.disassembler.model.Field">Field</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Float32" href="#refinery.lib.dotnet.disassembler.model.Float32">Float32</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Float64" href="#refinery.lib.dotnet.disassembler.model.Float64">Float64</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Int32" href="#refinery.lib.dotnet.disassembler.model.Int32">Int32</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Int64" href="#refinery.lib.dotnet.disassembler.model.Int64">Int64</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Int8" href="#refinery.lib.dotnet.disassembler.model.Int8">Int8</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Method" href="#refinery.lib.dotnet.disassembler.model.Method">Method</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.String" href="#refinery.lib.dotnet.disassembler.model.String">String</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.ThisType" href="#refinery.lib.dotnet.disassembler.model.ThisType">ThisType</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Token" href="#refinery.lib.dotnet.disassembler.model.Token">Token</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.Type" href="#refinery.lib.dotnet.disassembler.model.Type">Type</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.TypeTok" href="#refinery.lib.dotnet.disassembler.model.TypeTok">TypeTok</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.UInt16" href="#refinery.lib.dotnet.disassembler.model.UInt16">UInt16</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.UInt32" href="#refinery.lib.dotnet.disassembler.model.UInt32">UInt32</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.UInt8" href="#refinery.lib.dotnet.disassembler.model.UInt8">UInt8</a></li>
+<li><a title="refinery.lib.dotnet.disassembler.model.ValueType" href="#refinery.lib.dotnet.disassembler.model.ValueType">ValueType</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.OpArgument.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L49-L50" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value) -&gt; int:
+    return unpack(&#39;&lt;I&#39;, value)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Int8"><code class="flex name class">
+<span>class <span class="ident">Int8</span></span>
+<span>(</span><span>has_target=False, is_num=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L53-L58" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Int8(OpArgument):
+    def __init__(self, has_target: bool = False, is_num: bool = False):
+        super().__init__(1, has_target=has_target, is_num=is_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;b&#39;, value)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.Int8.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L57-L58" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value: bytes) -&gt; int:
+    return unpack(&#39;&lt;b&#39;, value)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Int32"><code class="flex name class">
+<span>class <span class="ident">Int32</span></span>
+<span>(</span><span>has_target=False, is_num=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L61-L68" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Int32(OpArgument):
+    def __init__(
+        self, has_target: bool = False, is_num: bool = False, is_caseargs: bool = False
+    ):
+        super().__init__(4, has_target, is_num=is_num, is_caseargs=is_caseargs)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;i&#39;, value)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.Int32.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L67-L68" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value: bytes) -&gt; int:
+    return unpack(&#39;&lt;i&#39;, value)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Int64"><code class="flex name class">
+<span>class <span class="ident">Int64</span></span>
+<span>(</span><span>is_num=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L71-L76" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Int64(OpArgument):
+    def __init__(self, is_num: bool = False):
+        super().__init__(8, is_num=is_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;q&#39;, value)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.Int64.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L75-L76" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value: bytes) -&gt; int:
+    return unpack(&#39;&lt;q&#39;, value)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.UInt8"><code class="flex name class">
+<span>class <span class="ident">UInt8</span></span>
+<span>(</span><span>is_num=False, is_idx=False, is_arg_num=True)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L79-L84" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UInt8(OpArgument):
+    def __init__(self, is_num: bool = False, is_idx: bool = False, is_arg_num=True):
+        super().__init__(1, is_num=is_num, is_idx=is_idx, is_arg_num=is_arg_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;B&#39;, value)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.UInt8.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L83-L84" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value: bytes) -&gt; int:
+    return unpack(&#39;&lt;B&#39;, value)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.UInt16"><code class="flex name class">
+<span>class <span class="ident">UInt16</span></span>
+<span>(</span><span>is_num=False, is_idx=False, is_arg_num=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L87-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UInt16(OpArgument):
+    def __init__(
+        self, is_num: bool = False, is_idx: bool = False, is_arg_num: bool = False
+    ):
+        super().__init__(2, is_num=is_num, is_idx=is_idx, is_arg_num=is_arg_num)
+
+    def unpack(self, value: bytes) -&gt; int:
+        return unpack(&#39;&lt;H&#39;, value)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.UInt16.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L93-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value: bytes) -&gt; int:
+    return unpack(&#39;&lt;H&#39;, value)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.UInt32"><code class="flex name class">
+<span>class <span class="ident">UInt32</span></span>
+<span>(</span><span>is_casecnt=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L97-L99" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UInt32(OpArgument):
+    def __init__(self, is_casecnt: bool = False):
+        super().__init__(4, is_casecnt=is_casecnt)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Float32"><code class="flex name class">
+<span>class <span class="ident">Float32</span></span>
+<span>(</span><span>is_num=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L102-L104" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Float32(OpArgument):
+    def __init__(self, is_num: bool = False):
+        super().__init__(4, is_num=is_num)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Float64"><code class="flex name class">
+<span>class <span class="ident">Float64</span></span>
+<span>(</span><span>is_num=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L107-L109" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Float64(OpArgument):
+    def __init__(self, is_num: bool = False):
+        super().__init__(8, is_num=is_num)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.String"><code class="flex name class">
+<span>class <span class="ident">String</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L112-L114" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class String(OpArgument):
+    def unpack(self, value) -&gt; int:
+        return unpack(&#39;&lt;I&#39;, value[:-1] + b&#39;\0&#39;)[0]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.String.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L113-L114" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, value) -&gt; int:
+    return unpack(&#39;&lt;I&#39;, value[:-1] + b&#39;\0&#39;)[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.TypeTok"><code class="flex name class">
+<span>class <span class="ident">TypeTok</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L117-L118" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TypeTok(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Field"><code class="flex name class">
+<span>class <span class="ident">Field</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L121-L122" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Field(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Class"><code class="flex name class">
+<span>class <span class="ident">Class</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L125-L126" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Class(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Method"><code class="flex name class">
+<span>class <span class="ident">Method</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L129-L130" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Method(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.ValueType"><code class="flex name class">
+<span>class <span class="ident">ValueType</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L133-L134" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ValueType(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.ThisType"><code class="flex name class">
+<span>class <span class="ident">ThisType</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L137-L138" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ThisType(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.CallSiteDescr"><code class="flex name class">
+<span>class <span class="ident">CallSiteDescr</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L141-L142" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CallSiteDescr(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Token"><code class="flex name class">
+<span>class <span class="ident">Token</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L145-L146" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Token(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Etype"><code class="flex name class">
+<span>class <span class="ident">Etype</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L149-L150" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Etype(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Ctor"><code class="flex name class">
+<span>class <span class="ident">Ctor</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L153-L154" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ctor(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Type"><code class="flex name class">
+<span>class <span class="ident">Type</span></span>
+<span>(</span><span>size=4, has_target=False, is_num=False, is_idx=False, is_arg_num=False, is_casecnt=False, is_caseargs=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L157-L158" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Type(OpArgument):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></li>
+<li>abc.ABC</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.TokenLabel"><code class="flex name class">
+<span>class <span class="ident">TokenLabel</span></span>
+<span>(</span><span>tid, value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L161-L164" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TokenLabel:
+    def __init__(self, tid: int, value: str):
+        self._tid = tid
+        self._value = value</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.OpType"><code class="flex name class">
+<span>class <span class="ident">OpType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L167-L170" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class OpType(str, enum.Enum):
+    BASE = &#39;Base&#39;
+    OBJECT_MODEL = &#39;ObjectModel&#39;
+    PREFIX_TO = &#39;PrefixTo&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.OpType.BASE"><code class="name">var <span class="ident">BASE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.OpType.OBJECT_MODEL"><code class="name">var <span class="ident">OBJECT_MODEL</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.OpType.PREFIX_TO"><code class="name">var <span class="ident">PREFIX_TO</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Op"><code class="flex name class">
+<span>class <span class="ident">Op</span></span>
+<span>(</span><span>op_type, code, mnemonic, arguments, description, is_switch=False, is_alias=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Specifier for a Common Intermediate Language (CIL) instruction. It is used to specify a complete list of all
+available instructions in the OpRepository. Instances of this class do not represent concrete instructions during
+disassembly, that what the Instruction class is for.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L173-L206" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Op(abc.ABC):
+    &#34;&#34;&#34;
+    Specifier for a Common Intermediate Language (CIL) instruction. It is used to specify a complete list of all
+    available instructions in the OpRepository. Instances of this class do not represent concrete instructions during
+    disassembly, that what the Instruction class is for.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        op_type: OpType,
+        code: bytes,
+        mnemonic: str,
+        arguments: list[OpArgument],
+        description: str,
+        is_switch: bool = False,
+        is_alias: bool = False,
+    ):
+        self.op_type = op_type
+        self.code = code
+        self.mnemonic = mnemonic
+        self.arguments = arguments
+        self.description = description
+        self.is_switch = is_switch
+        self.is_alias = is_alias
+
+    def __len__(self):
+        return len(self.code) + sum(len(argument) for argument in self.arguments)
+
+    def __repr__(self):
+        return f&#34;&lt;Op{self.op_type.value} {self.mnemonic} arguments={self.arguments}&gt;&#34;
+
+    @property
+    def fixed_length(self):
+        return not self.is_switch</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.Op.fixed_length"><code class="name">var <span class="ident">fixed_length</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L204-L206" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def fixed_length(self):
+    return not self.is_switch</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Argument"><code class="flex name class">
+<span>class <span class="ident">Argument</span></span>
+<span>(</span><span>data, op_argument)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Represents a concrete argument including value during dissassembly. Refer to <code><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></code> for the abstract
+description of an argument.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L209-L224" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Argument:
+    &#34;&#34;&#34;
+    Represents a concrete argument including value during dissassembly. Refer to `OpArgument` for the abstract
+    description of an argument.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: bytes, op_argument: OpArgument):
+        self._data = data
+        self._op_argument = op_argument
+
+    @property
+    def value(self):
+        return self._op_argument.unpack(self._data)
+
+    def __repr__(self):
+        return f&#34;&lt;Argument {self._op_argument.__class__.__name__}=0x{self.value:x}&gt;&#34;</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.dotnet.disassembler.model.Argument.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L219-L221" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def value(self):
+    return self._op_argument.unpack(self._data)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.Instruction"><code class="flex name class">
+<span>class <span class="ident">Instruction</span></span>
+<span>(</span><span>data, offset, op, arguments)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Represent a concrete instruction in memory. The <code>op</code> field carries the corresponding abstract <code><a title="refinery.lib.dotnet.disassembler.model.Op" href="#refinery.lib.dotnet.disassembler.model.Op">Op</a></code> instance
+describing the data in memory.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L227-L243" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Instruction:
+    &#34;&#34;&#34;
+    Represent a concrete instruction in memory. The `op` field carries the corresponding abstract `Op` instance
+    describing the data in memory.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: bytes, offset: int, op: Op, arguments: list[Argument]):
+        self.data = data
+        self.offset = offset
+        self.op = op
+        self.arguments = arguments
+
+    def __len__(self):
+        return len(self.data)
+
+    def __repr__(self):
+        return f&#34;&lt;Instruction op={self.op} offset={self.offset} arguments={self.arguments}&gt;&#34;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.UnknownInstruction"><code class="flex name class">
+<span>class <span class="ident">UnknownInstruction</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L246-L247" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class UnknownInstruction(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.dotnet.disassembler.model.DisassemblerException"><code class="flex name class">
+<span>class <span class="ident">DisassemblerException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dotnet/disassembler/model.py#L250-L251" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class DisassemblerException(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.dotnet.disassembler" href="index.html">refinery.lib.dotnet.disassembler</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.OpArgument" href="#refinery.lib.dotnet.disassembler.model.OpArgument">OpArgument</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.OpArgument.unpack" href="#refinery.lib.dotnet.disassembler.model.OpArgument.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Int8" href="#refinery.lib.dotnet.disassembler.model.Int8">Int8</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.Int8.unpack" href="#refinery.lib.dotnet.disassembler.model.Int8.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Int32" href="#refinery.lib.dotnet.disassembler.model.Int32">Int32</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.Int32.unpack" href="#refinery.lib.dotnet.disassembler.model.Int32.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Int64" href="#refinery.lib.dotnet.disassembler.model.Int64">Int64</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.Int64.unpack" href="#refinery.lib.dotnet.disassembler.model.Int64.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.UInt8" href="#refinery.lib.dotnet.disassembler.model.UInt8">UInt8</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.UInt8.unpack" href="#refinery.lib.dotnet.disassembler.model.UInt8.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.UInt16" href="#refinery.lib.dotnet.disassembler.model.UInt16">UInt16</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.UInt16.unpack" href="#refinery.lib.dotnet.disassembler.model.UInt16.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.UInt32" href="#refinery.lib.dotnet.disassembler.model.UInt32">UInt32</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Float32" href="#refinery.lib.dotnet.disassembler.model.Float32">Float32</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Float64" href="#refinery.lib.dotnet.disassembler.model.Float64">Float64</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.String" href="#refinery.lib.dotnet.disassembler.model.String">String</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dotnet.disassembler.model.String.unpack" href="#refinery.lib.dotnet.disassembler.model.String.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.TypeTok" href="#refinery.lib.dotnet.disassembler.model.TypeTok">TypeTok</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Field" href="#refinery.lib.dotnet.disassembler.model.Field">Field</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Class" href="#refinery.lib.dotnet.disassembler.model.Class">Class</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Method" href="#refinery.lib.dotnet.disassembler.model.Method">Method</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.ValueType" href="#refinery.lib.dotnet.disassembler.model.ValueType">ValueType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.ThisType" href="#refinery.lib.dotnet.disassembler.model.ThisType">ThisType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.CallSiteDescr" href="#refinery.lib.dotnet.disassembler.model.CallSiteDescr">CallSiteDescr</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Token" href="#refinery.lib.dotnet.disassembler.model.Token">Token</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Etype" href="#refinery.lib.dotnet.disassembler.model.Etype">Etype</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Ctor" href="#refinery.lib.dotnet.disassembler.model.Ctor">Ctor</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Type" href="#refinery.lib.dotnet.disassembler.model.Type">Type</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.TokenLabel" href="#refinery.lib.dotnet.disassembler.model.TokenLabel">TokenLabel</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.OpType" href="#refinery.lib.dotnet.disassembler.model.OpType">OpType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Op" href="#refinery.lib.dotnet.disassembler.model.Op">Op</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Argument" href="#refinery.lib.dotnet.disassembler.model.Argument">Argument</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.Instruction" href="#refinery.lib.dotnet.disassembler.model.Instruction">Instruction</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.UnknownInstruction" href="#refinery.lib.dotnet.disassembler.model.UnknownInstruction">UnknownInstruction</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dotnet.disassembler.model.DisassemblerException" href="#refinery.lib.dotnet.disassembler.model.DisassemblerException">DisassemblerException</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

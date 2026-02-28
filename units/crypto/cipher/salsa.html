@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.crypto.cipher.salsa documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.crypto.cipher.salsa</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L1-L201" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import struct
+
+from abc import ABC, abstractmethod
+from typing import Iterable, Sequence, TypeVar
+
+from Cryptodome.Cipher import Salsa20
+
+from refinery.lib.crypto import PyCryptoFactoryWrapper, rotl32
+from refinery.lib.types import asbuffer, buf
+from refinery.units.crypto.cipher import LatinCipherStandardUnit, LatinCipherUnit
+
+
+class LatinCipher(ABC):
+    _idx_magic: slice
+    _idx_key16: slice
+    _idx_key32: slice
+    _idx_nonce: slice
+    _idx_count: slice
+    _round_access_pattern: tuple[
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+    ]
+
+    @classmethod
+    def FromState(cls, state: Sequence[int] | buf):
+        if b := asbuffer(state):
+            state = struct.unpack(&#39;&lt;16L&#39;, b)
+        else:
+            state = list(state)
+        if len(state) != 16:
+            raise ValueError(&#39;State must contain 16 DWORDs&#39;)
+        key = struct.pack(
+            &#39;&lt;8L&#39;, *state[cls._idx_key16], *state[cls._idx_key32])
+        nonce = struct.pack(
+            &#39;&lt;2L&#39;, *state[cls._idx_nonce])
+        magic = struct.pack(
+            &#39;&lt;4L&#39;, *state[cls._idx_magic])
+        count = int.from_bytes(struct.pack(
+            &#39;&lt;2L&#39;, *state[cls._idx_count]), &#39;little&#39;)
+        return cls(key, nonce, magic, counter=count)
+
+    def __init__(self, key: buf, nonce: buf, magic: buf | None = None, rounds: int = 20, counter: int = 0):
+        if len(key) == 16:
+            key = 2 * bytes(key)
+        elif len(key) != 32:
+            raise ValueError(&#39;The key must be of length 16 or 32.&#39;)
+        if rounds % 2:
+            raise ValueError(&#39;The number of rounds has to be even.&#39;)
+        if not nonce:
+            nonce = bytearray(8)
+        elif len(nonce) != 8:
+            raise ValueError(&#39;The nonce must be of length 8.&#39;)
+        if not magic:
+            magic = B&#39;expand %d-byte k&#39; % len(key)
+        elif len(magic) != 16:
+            raise ValueError(&#39;The initialization magic must be 16 bytes in length.&#39;)
+        _key = struct.unpack(&#39;&lt;8L&#39;, key)
+        self.key16 = _key[:4]
+        self.key32 = _key[4:]
+        self.magic = struct.unpack(&#39;&lt;4L&#39;, magic)
+        self.nonce = struct.unpack(&#39;&lt;2L&#39;, nonce)
+        self.state: list[int] = [0] * 4 * 4
+        self.rounds = rounds // 2
+        self.reset(counter)
+
+    def reset(self, index=0) -&gt; None:
+        state = self.state
+        self.counter = [index &amp; 0xFFFFFFFF, index &gt;&gt; 32 &amp; 0xFFFFFFFF]
+        state[self._idx_magic] = self.magic
+        state[self._idx_key16] = self.key16
+        state[self._idx_key32] = self.key32
+        state[self._idx_nonce] = self.nonce
+        state[self._idx_count] = self.counter
+        assert len(state) == 4 * 4
+
+    def count(self):
+        lo, hi = self.counter
+        lo = lo + 1 &amp; 0xFFFFFFFF
+        if not lo:
+            hi = hi + 1 &amp; 0xFFFFFFFF
+        self.state[self._idx_count] = self.counter = lo, hi
+
+    @staticmethod
+    @abstractmethod
+    def quarter(x: list[int], a: int, b: int, c: int, d: int):
+        raise NotImplementedError
+
+    def permute(self, x: list[int]):
+        for a, b, c, d in self.rounds * self._round_access_pattern:
+            self.quarter(x, a, b, c, d)
+
+    def __iter__(self):
+        x = [0] * len(self.state)
+        while True:
+            x[:] = self.state
+            self.permute(x)
+            yield from struct.pack(&#39;&lt;16L&#39;, *(
+                (a + b) &amp; 0xFFFFFFFF for a, b in zip(x, self.state)))
+            self.count()
+
+
+class SalsaCipher(LatinCipher):
+    _idx_magic = slice(0x00, 0x10, 0x05)
+    _idx_key16 = slice(0x01, 0x05)
+    _idx_key32 = slice(0x0B, 0x0F)
+    _idx_nonce = slice(0x06, 0x08)
+    _idx_count = slice(0x08, 0x0A)
+    _round_access_pattern = (
+        (0x0, 0x4, 0x8, 0xC),
+        (0x5, 0x9, 0xD, 0x1),
+        (0xA, 0xE, 0x2, 0x6),
+        (0xF, 0x3, 0x7, 0xB),
+        (0x0, 0x1, 0x2, 0x3),
+        (0x5, 0x6, 0x7, 0x4),
+        (0xA, 0xB, 0x8, 0x9),
+        (0xF, 0xC, 0xD, 0xE),
+    )
+
+    @staticmethod
+    def quarter(x: list[int], a: int, b: int, c: int, d: int) -&gt; None:
+        x[b] ^= rotl32(x[a] + x[d] &amp; 0xFFFFFFFF, 0x07)
+        x[c] ^= rotl32(x[b] + x[a] &amp; 0xFFFFFFFF, 0x09)
+        x[d] ^= rotl32(x[c] + x[b] &amp; 0xFFFFFFFF, 0x0D)
+        x[a] ^= rotl32(x[d] + x[c] &amp; 0xFFFFFFFF, 0x12)
+
+
+_X = TypeVar(&#39;_X&#39;, bound=LatinCipher)
+
+
+def LatinX(
+    cipher: type[_X],
+    blocks: Iterable[int],
+    key: buf,
+    kdn: buf,
+    kdp: int,
+    nonce: buf,
+    magic: buf,
+    rounds: int,
+    offset: int,
+) -&gt; _X:
+    from refinery.lib import chunks
+    kd = cipher(key, kdn, magic, rounds, kdp)
+    kd.permute(kd.state)
+    key = chunks.pack((kd.state[i] for i in blocks), 4)
+    return cipher(key, nonce, magic, rounds, offset)
+
+
+class salsa(LatinCipherUnit):
+    &#34;&#34;&#34;
+    Salsa encryption and decryption. The nonce must be 8 bytes long. When 64 bytes are provided
+    as the key, this data is interpreted as the initial state box and all other parameters are
+    ignored.
+    &#34;&#34;&#34;
+    def keystream(self) -&gt; Iterable[int]:
+        key = self.args.key
+        if len(key) == 64:
+            it = SalsaCipher.FromState(key)
+        else:
+            it = SalsaCipher(
+                key,
+                self.args.nonce,
+                self.args.magic,
+                self.args.rounds,
+                self.args.offset,
+            )
+        yield from it
+
+
+class xsalsa(LatinCipherUnit):
+    &#34;&#34;&#34;
+    XSalsa encryption and decryption. The nonce must be 24 bytes long.
+    &#34;&#34;&#34;
+    def keystream(self) -&gt; Iterable[int]:
+        kdn, kdp, nonce = struct.unpack(&#39;&lt;8sQ8s&#39;, self.args.nonce)
+        yield from LatinX(
+            SalsaCipher,
+            (0, 5, 10, 15, 6, 7, 8, 9),
+            self.args.key,
+            kdn,
+            kdp,
+            nonce,
+            self.args.magic,
+            self.args.rounds,
+            self.args.offset,
+        )
+
+
+class salsa20(LatinCipherStandardUnit, cipher=PyCryptoFactoryWrapper(Salsa20)):
+    &#34;&#34;&#34;
+    Salsa20 encryption and decryption. This unit is functionally equivalent to `refinery.salsa`
+    with 20 rounds, but it uses the PyCryptodome library C implementation rather than the pure
+    Python implementation used by `refinery.salsa`.
+    &#34;&#34;&#34;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.LatinX"><code class="name flex">
+<span>def <span class="ident">LatinX</span></span>(<span>cipher, blocks, key, kdn, kdp, nonce, magic, rounds, offset)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L138-L153" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def LatinX(
+    cipher: type[_X],
+    blocks: Iterable[int],
+    key: buf,
+    kdn: buf,
+    kdp: int,
+    nonce: buf,
+    magic: buf,
+    rounds: int,
+    offset: int,
+) -&gt; _X:
+    from refinery.lib import chunks
+    kd = cipher(key, kdn, magic, rounds, kdp)
+    kd.permute(kd.state)
+    key = chunks.pack((kd.state[i] for i in blocks), 4)
+    return cipher(key, nonce, magic, rounds, offset)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.LatinCipher"><code class="flex name class">
+<span>class <span class="ident">LatinCipher</span></span>
+<span>(</span><span>key, nonce, magic=None, rounds=20, counter=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L15-L107" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LatinCipher(ABC):
+    _idx_magic: slice
+    _idx_key16: slice
+    _idx_key32: slice
+    _idx_nonce: slice
+    _idx_count: slice
+    _round_access_pattern: tuple[
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+        tuple[int, int, int, int],
+    ]
+
+    @classmethod
+    def FromState(cls, state: Sequence[int] | buf):
+        if b := asbuffer(state):
+            state = struct.unpack(&#39;&lt;16L&#39;, b)
+        else:
+            state = list(state)
+        if len(state) != 16:
+            raise ValueError(&#39;State must contain 16 DWORDs&#39;)
+        key = struct.pack(
+            &#39;&lt;8L&#39;, *state[cls._idx_key16], *state[cls._idx_key32])
+        nonce = struct.pack(
+            &#39;&lt;2L&#39;, *state[cls._idx_nonce])
+        magic = struct.pack(
+            &#39;&lt;4L&#39;, *state[cls._idx_magic])
+        count = int.from_bytes(struct.pack(
+            &#39;&lt;2L&#39;, *state[cls._idx_count]), &#39;little&#39;)
+        return cls(key, nonce, magic, counter=count)
+
+    def __init__(self, key: buf, nonce: buf, magic: buf | None = None, rounds: int = 20, counter: int = 0):
+        if len(key) == 16:
+            key = 2 * bytes(key)
+        elif len(key) != 32:
+            raise ValueError(&#39;The key must be of length 16 or 32.&#39;)
+        if rounds % 2:
+            raise ValueError(&#39;The number of rounds has to be even.&#39;)
+        if not nonce:
+            nonce = bytearray(8)
+        elif len(nonce) != 8:
+            raise ValueError(&#39;The nonce must be of length 8.&#39;)
+        if not magic:
+            magic = B&#39;expand %d-byte k&#39; % len(key)
+        elif len(magic) != 16:
+            raise ValueError(&#39;The initialization magic must be 16 bytes in length.&#39;)
+        _key = struct.unpack(&#39;&lt;8L&#39;, key)
+        self.key16 = _key[:4]
+        self.key32 = _key[4:]
+        self.magic = struct.unpack(&#39;&lt;4L&#39;, magic)
+        self.nonce = struct.unpack(&#39;&lt;2L&#39;, nonce)
+        self.state: list[int] = [0] * 4 * 4
+        self.rounds = rounds // 2
+        self.reset(counter)
+
+    def reset(self, index=0) -&gt; None:
+        state = self.state
+        self.counter = [index &amp; 0xFFFFFFFF, index &gt;&gt; 32 &amp; 0xFFFFFFFF]
+        state[self._idx_magic] = self.magic
+        state[self._idx_key16] = self.key16
+        state[self._idx_key32] = self.key32
+        state[self._idx_nonce] = self.nonce
+        state[self._idx_count] = self.counter
+        assert len(state) == 4 * 4
+
+    def count(self):
+        lo, hi = self.counter
+        lo = lo + 1 &amp; 0xFFFFFFFF
+        if not lo:
+            hi = hi + 1 &amp; 0xFFFFFFFF
+        self.state[self._idx_count] = self.counter = lo, hi
+
+    @staticmethod
+    @abstractmethod
+    def quarter(x: list[int], a: int, b: int, c: int, d: int):
+        raise NotImplementedError
+
+    def permute(self, x: list[int]):
+        for a, b, c, d in self.rounds * self._round_access_pattern:
+            self.quarter(x, a, b, c, d)
+
+    def __iter__(self):
+        x = [0] * len(self.state)
+        while True:
+            x[:] = self.state
+            self.permute(x)
+            yield from struct.pack(&#39;&lt;16L&#39;, *(
+                (a + b) &amp; 0xFFFFFFFF for a, b in zip(x, self.state)))
+            self.count()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.chacha.ChaChaCipher" href="chacha.html#refinery.units.crypto.cipher.chacha.ChaChaCipher">ChaChaCipher</a></li>
+<li><a title="refinery.units.crypto.cipher.salsa.SalsaCipher" href="#refinery.units.crypto.cipher.salsa.SalsaCipher">SalsaCipher</a></li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.LatinCipher.FromState"><code class="name flex">
+<span>def <span class="ident">FromState</span></span>(<span>state)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.LatinCipher.quarter"><code class="name flex">
+<span>def <span class="ident">quarter</span></span>(<span>x, a, b, c, d)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L91-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@staticmethod
+@abstractmethod
+def quarter(x: list[int], a: int, b: int, c: int, d: int):
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.LatinCipher.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self, index=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L74-L82" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reset(self, index=0) -&gt; None:
+    state = self.state
+    self.counter = [index &amp; 0xFFFFFFFF, index &gt;&gt; 32 &amp; 0xFFFFFFFF]
+    state[self._idx_magic] = self.magic
+    state[self._idx_key16] = self.key16
+    state[self._idx_key32] = self.key32
+    state[self._idx_nonce] = self.nonce
+    state[self._idx_count] = self.counter
+    assert len(state) == 4 * 4</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.LatinCipher.count"><code class="name flex">
+<span>def <span class="ident">count</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L84-L89" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def count(self):
+    lo, hi = self.counter
+    lo = lo + 1 &amp; 0xFFFFFFFF
+    if not lo:
+        hi = hi + 1 &amp; 0xFFFFFFFF
+    self.state[self._idx_count] = self.counter = lo, hi</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.LatinCipher.permute"><code class="name flex">
+<span>def <span class="ident">permute</span></span>(<span>self, x)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L96-L98" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def permute(self, x: list[int]):
+    for a, b, c, d in self.rounds * self._round_access_pattern:
+        self.quarter(x, a, b, c, d)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.SalsaCipher"><code class="flex name class">
+<span>class <span class="ident">SalsaCipher</span></span>
+<span>(</span><span>key, nonce, magic=None, rounds=20, counter=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Helper class that provides a standard way to create an ABC using
+inheritance.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L110-L132" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SalsaCipher(LatinCipher):
+    _idx_magic = slice(0x00, 0x10, 0x05)
+    _idx_key16 = slice(0x01, 0x05)
+    _idx_key32 = slice(0x0B, 0x0F)
+    _idx_nonce = slice(0x06, 0x08)
+    _idx_count = slice(0x08, 0x0A)
+    _round_access_pattern = (
+        (0x0, 0x4, 0x8, 0xC),
+        (0x5, 0x9, 0xD, 0x1),
+        (0xA, 0xE, 0x2, 0x6),
+        (0xF, 0x3, 0x7, 0xB),
+        (0x0, 0x1, 0x2, 0x3),
+        (0x5, 0x6, 0x7, 0x4),
+        (0xA, 0xB, 0x8, 0x9),
+        (0xF, 0xC, 0xD, 0xE),
+    )
+
+    @staticmethod
+    def quarter(x: list[int], a: int, b: int, c: int, d: int) -&gt; None:
+        x[b] ^= rotl32(x[a] + x[d] &amp; 0xFFFFFFFF, 0x07)
+        x[c] ^= rotl32(x[b] + x[a] &amp; 0xFFFFFFFF, 0x09)
+        x[d] ^= rotl32(x[c] + x[b] &amp; 0xFFFFFFFF, 0x0D)
+        x[a] ^= rotl32(x[d] + x[c] &amp; 0xFFFFFFFF, 0x12)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.salsa.LatinCipher" href="#refinery.units.crypto.cipher.salsa.LatinCipher">LatinCipher</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.SalsaCipher.quarter"><code class="name flex">
+<span>def <span class="ident">quarter</span></span>(<span>x, a, b, c, d)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L127-L132" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@staticmethod
+def quarter(x: list[int], a: int, b: int, c: int, d: int) -&gt; None:
+    x[b] ^= rotl32(x[a] + x[d] &amp; 0xFFFFFFFF, 0x07)
+    x[c] ^= rotl32(x[b] + x[a] &amp; 0xFFFFFFFF, 0x09)
+    x[d] ^= rotl32(x[c] + x[b] &amp; 0xFFFFFFFF, 0x0D)
+    x[a] ^= rotl32(x[d] + x[c] &amp; 0xFFFFFFFF, 0x12)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.salsa"><code class="flex name class">
+<span>class <span class="ident">salsa</span></span>
+<span>(</span><span>key, stateful=False, discard=0, nonce=b'REFINERY', magic=b'', offset=0, rounds=20)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Salsa encryption and decryption. The nonce must be 8 bytes long. When 64 bytes are provided
+as the key, this data is interpreted as the initial state box and all other parameters are
+ignored.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L156-L174" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class salsa(LatinCipherUnit):
+    &#34;&#34;&#34;
+    Salsa encryption and decryption. The nonce must be 8 bytes long. When 64 bytes are provided
+    as the key, this data is interpreted as the initial state box and all other parameters are
+    ignored.
+    &#34;&#34;&#34;
+    def keystream(self) -&gt; Iterable[int]:
+        key = self.args.key
+        if len(key) == 64:
+            it = SalsaCipher.FromState(key)
+        else:
+            it = SalsaCipher(
+                key,
+                self.args.nonce,
+                self.args.magic,
+                self.args.rounds,
+                self.args.offset,
+            )
+        yield from it</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.LatinCipherUnit" href="index.html#refinery.units.crypto.cipher.LatinCipherUnit">LatinCipherUnit</a></li>
+<li><a title="refinery.units.crypto.cipher.StreamCipherUnit" href="index.html#refinery.units.crypto.cipher.StreamCipherUnit">StreamCipherUnit</a></li>
+<li><a title="refinery.units.crypto.cipher.CipherUnit" href="index.html#refinery.units.crypto.cipher.CipherUnit">CipherUnit</a></li>
+<li><a title="refinery.units.Unit" href="../../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.salsa.salsa" href="#refinery.units.crypto.cipher.salsa.salsa">salsa</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.salsa.keystream"><code class="name flex">
+<span>def <span class="ident">keystream</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L162-L174" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def keystream(self) -&gt; Iterable[int]:
+    key = self.args.key
+    if len(key) == 64:
+        it = SalsaCipher.FromState(key)
+    else:
+        it = SalsaCipher(
+            key,
+            self.args.nonce,
+            self.args.magic,
+            self.args.rounds,
+            self.args.offset,
+        )
+    yield from it</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.crypto.cipher.LatinCipherUnit" href="index.html#refinery.units.crypto.cipher.LatinCipherUnit">LatinCipherUnit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.FilterEverything" href="../../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.Requires" href="../../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.act" href="../../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.assemble" href="../../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.block_size" href="index.html#refinery.units.crypto.cipher.CipherUnit.block_size">block_size</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.codec" href="../../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.console" href="../../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.filter" href="../../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.finish" href="../../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.handles" href="../../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.is_quiet" href="../../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.is_reversible" href="../../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.isatty" href="../../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.key_size" href="index.html#refinery.units.crypto.cipher.CipherUnit.key_size">key_size</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.labelled" href="../../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.leniency" href="../../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_always" href="../../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_debug" href="../../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_detach" href="../../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_fail" href="../../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_info" href="../../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_level" href="../../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_warn" href="../../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.logger" href="../../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.name" href="../../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.nozzle" href="../../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.optional_dependencies" href="../../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.process" href="../../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.read" href="../../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.read1" href="../../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.required_dependencies" href="../../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.reset" href="../../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.reverse" href="../../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.run" href="../../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.source" href="../../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.superinit" href="../../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.xsalsa"><code class="flex name class">
+<span>class <span class="ident">xsalsa</span></span>
+<span>(</span><span>key, stateful=False, discard=0, nonce=b'REFINERY', magic=b'', offset=0, rounds=20)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>XSalsa encryption and decryption. The nonce must be 24 bytes long.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L177-L193" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class xsalsa(LatinCipherUnit):
+    &#34;&#34;&#34;
+    XSalsa encryption and decryption. The nonce must be 24 bytes long.
+    &#34;&#34;&#34;
+    def keystream(self) -&gt; Iterable[int]:
+        kdn, kdp, nonce = struct.unpack(&#39;&lt;8sQ8s&#39;, self.args.nonce)
+        yield from LatinX(
+            SalsaCipher,
+            (0, 5, 10, 15, 6, 7, 8, 9),
+            self.args.key,
+            kdn,
+            kdp,
+            nonce,
+            self.args.magic,
+            self.args.rounds,
+            self.args.offset,
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.LatinCipherUnit" href="index.html#refinery.units.crypto.cipher.LatinCipherUnit">LatinCipherUnit</a></li>
+<li><a title="refinery.units.crypto.cipher.StreamCipherUnit" href="index.html#refinery.units.crypto.cipher.StreamCipherUnit">StreamCipherUnit</a></li>
+<li><a title="refinery.units.crypto.cipher.CipherUnit" href="index.html#refinery.units.crypto.cipher.CipherUnit">CipherUnit</a></li>
+<li><a title="refinery.units.Unit" href="../../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.salsa.xsalsa" href="#refinery.units.crypto.cipher.salsa.xsalsa">xsalsa</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.crypto.cipher.salsa.xsalsa.keystream"><code class="name flex">
+<span>def <span class="ident">keystream</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L181-L193" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def keystream(self) -&gt; Iterable[int]:
+    kdn, kdp, nonce = struct.unpack(&#39;&lt;8sQ8s&#39;, self.args.nonce)
+    yield from LatinX(
+        SalsaCipher,
+        (0, 5, 10, 15, 6, 7, 8, 9),
+        self.args.key,
+        kdn,
+        kdp,
+        nonce,
+        self.args.magic,
+        self.args.rounds,
+        self.args.offset,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.crypto.cipher.LatinCipherUnit" href="index.html#refinery.units.crypto.cipher.LatinCipherUnit">LatinCipherUnit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.FilterEverything" href="../../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.Requires" href="../../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.act" href="../../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.assemble" href="../../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.block_size" href="index.html#refinery.units.crypto.cipher.CipherUnit.block_size">block_size</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.codec" href="../../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.console" href="../../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.filter" href="../../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.finish" href="../../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.handles" href="../../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.is_quiet" href="../../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.is_reversible" href="../../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.isatty" href="../../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.key_size" href="index.html#refinery.units.crypto.cipher.CipherUnit.key_size">key_size</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.labelled" href="../../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.leniency" href="../../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_always" href="../../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_debug" href="../../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_detach" href="../../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_fail" href="../../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_info" href="../../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_level" href="../../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.log_warn" href="../../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.logger" href="../../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.name" href="../../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.nozzle" href="../../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.optional_dependencies" href="../../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.process" href="../../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.read" href="../../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.read1" href="../../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.required_dependencies" href="../../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.reset" href="../../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.reverse" href="../../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.run" href="../../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.source" href="../../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherUnit.superinit" href="../../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.units.crypto.cipher.salsa.salsa20"><code class="flex name class">
+<span>class <span class="ident">salsa20</span></span>
+<span>(</span><span>key, nonce=b'REFINERY')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Salsa20 encryption and decryption. This unit is functionally equivalent to <code><a title="refinery.salsa" href="../../../index.html#refinery.salsa">salsa</a></code>
+with 20 rounds, but it uses the PyCryptodome library C implementation rather than the pure
+Python implementation used by <code><a title="refinery.salsa" href="../../../index.html#refinery.salsa">salsa</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/crypto/cipher/salsa.py#L196-L201" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class salsa20(LatinCipherStandardUnit, cipher=PyCryptoFactoryWrapper(Salsa20)):
+    &#34;&#34;&#34;
+    Salsa20 encryption and decryption. This unit is functionally equivalent to `refinery.salsa`
+    with 20 rounds, but it uses the PyCryptodome library C implementation rather than the pure
+    Python implementation used by `refinery.salsa`.
+    &#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit" href="index.html#refinery.units.crypto.cipher.LatinCipherStandardUnit">LatinCipherStandardUnit</a></li>
+<li><a title="refinery.units.crypto.cipher.StandardCipherUnit" href="index.html#refinery.units.crypto.cipher.StandardCipherUnit">StandardCipherUnit</a></li>
+<li><a title="refinery.units.crypto.cipher.CipherUnit" href="index.html#refinery.units.crypto.cipher.CipherUnit">CipherUnit</a></li>
+<li><a title="refinery.units.Unit" href="../../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.crypto.cipher.salsa.salsa20" href="#refinery.units.crypto.cipher.salsa.salsa20">salsa20</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit" href="index.html#refinery.units.crypto.cipher.LatinCipherStandardUnit">LatinCipherStandardUnit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.FilterEverything" href="../../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.Requires" href="../../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.act" href="../../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.assemble" href="../../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.block_size" href="index.html#refinery.units.crypto.cipher.CipherUnit.block_size">block_size</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.codec" href="../../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.console" href="../../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.filter" href="../../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.finish" href="../../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.handles" href="../../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.is_quiet" href="../../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.is_reversible" href="../../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.isatty" href="../../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.key_size" href="index.html#refinery.units.crypto.cipher.CipherUnit.key_size">key_size</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.labelled" href="../../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.leniency" href="../../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_always" href="../../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_debug" href="../../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_detach" href="../../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_fail" href="../../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_info" href="../../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_level" href="../../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.log_warn" href="../../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.logger" href="../../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.name" href="../../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.nozzle" href="../../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.optional_dependencies" href="../../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.process" href="../../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.read" href="../../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.read1" href="../../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.required_dependencies" href="../../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.reset" href="../../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.reverse" href="../../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.run" href="../../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.source" href="../../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.LatinCipherStandardUnit.superinit" href="../../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.crypto.cipher" href="index.html">refinery.units.crypto.cipher</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.units.crypto.cipher.salsa.LatinX" href="#refinery.units.crypto.cipher.salsa.LatinX">LatinX</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.crypto.cipher.salsa.LatinCipher" href="#refinery.units.crypto.cipher.salsa.LatinCipher">LatinCipher</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.crypto.cipher.salsa.LatinCipher.FromState" href="#refinery.units.crypto.cipher.salsa.LatinCipher.FromState">FromState</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.salsa.LatinCipher.quarter" href="#refinery.units.crypto.cipher.salsa.LatinCipher.quarter">quarter</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.salsa.LatinCipher.reset" href="#refinery.units.crypto.cipher.salsa.LatinCipher.reset">reset</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.salsa.LatinCipher.count" href="#refinery.units.crypto.cipher.salsa.LatinCipher.count">count</a></code></li>
+<li><code><a title="refinery.units.crypto.cipher.salsa.LatinCipher.permute" href="#refinery.units.crypto.cipher.salsa.LatinCipher.permute">permute</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.crypto.cipher.salsa.SalsaCipher" href="#refinery.units.crypto.cipher.salsa.SalsaCipher">SalsaCipher</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.crypto.cipher.salsa.SalsaCipher.quarter" href="#refinery.units.crypto.cipher.salsa.SalsaCipher.quarter">quarter</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.crypto.cipher.salsa.salsa" href="#refinery.units.crypto.cipher.salsa.salsa">salsa</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.crypto.cipher.salsa.salsa.keystream" href="#refinery.units.crypto.cipher.salsa.salsa.keystream">keystream</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.crypto.cipher.salsa.xsalsa" href="#refinery.units.crypto.cipher.salsa.xsalsa">xsalsa</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.crypto.cipher.salsa.xsalsa.keystream" href="#refinery.units.crypto.cipher.salsa.xsalsa.keystream">keystream</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.crypto.cipher.salsa.salsa20" href="#refinery.units.crypto.cipher.salsa.salsa20">salsa20</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

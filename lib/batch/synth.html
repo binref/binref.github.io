@@ -1,0 +1,2051 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.synth documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.synth</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L1-L344" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import abc
+import enum
+import io
+import itertools
+
+from typing import Generic, TypeVar, overload
+
+from refinery.lib.batch.model import (
+    AstCommand,
+    AstFor,
+    AstForOptions,
+    AstForVariant,
+    AstGroup,
+    AstIf,
+    AstLabel,
+    AstNode,
+    AstPipeline,
+    AstSequence,
+    AstStatement,
+)
+from refinery.lib.batch.util import enquote, unquote
+
+_A = TypeVar(&#39;_A&#39;, bound=AstNode)
+
+
+class K(str, enum.Enum):
+    DO = &#39;DO&#39;
+    ELSE = &#39;ELSE&#39;
+    FOR = &#39;FOR&#39;
+    IF = &#39;IF&#39;
+    IN = &#39;IN&#39;
+    NOT = &#39;NOT&#39;
+    SP = &#39;\x20&#39;
+
+    def __str__(self):
+        return self.value
+
+
+class SynNodeBase(Generic[_A], abc.ABC):
+    __slots__ = &#39;ast&#39;, &#39;tab&#39;
+
+    def __init__(self, ast: _A):
+        self.ast = ast
+        self.tab = 4 * K.SP
+
+    @abc.abstractmethod
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False) -&gt; bool:
+        ...
+
+    @abc.abstractmethod
+    def oneline(self) -&gt; bool:
+        ...
+
+    def __str__(self) -&gt; str:
+        with io.StringIO() as out:
+            self.pretty(out)
+            return out.getvalue()
+
+    __repr__ = __str__
+
+
+class SynNode(SynNodeBase[_A]):
+
+    @abc.abstractmethod
+    def __str__(self) -&gt; str:
+        ...
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        if not indented:
+            out.write(indent * self.tab)
+        out.write(str(self))
+        return True
+
+
+class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()
+
+
+class SynGroup(SynNodeBase[AstGroup]):
+    def oneline(self) -&gt; bool:
+        ast = self.ast
+        if (pl := ast.parent) and (seq := pl.parent) and isinstance(seq.parent, (AstFor, AstIf)):
+            return False
+        fragments = self.ast.fragments
+        if len(fragments) == 0:
+            return True
+        if len(fragments) &gt; 1:
+            return False
+        return synthesize(fragments[0]).oneline()
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        tab = indent * self.tab
+        fragments = self.ast.fragments
+        if not indented:
+            out.write(tab)
+        out.write(&#39;(&#39;)
+        if self.oneline():
+            synthesize(fragments[0]).pretty(out, indent, True)
+        else:
+            for seq in fragments:
+                out.write(&#39;\n&#39;)
+                synthesize(seq).pretty(out, indent + 1, False)
+            out.write(&#39;\n&#39;)
+            out.write(tab)
+        out.write(&#39;)&#39;)
+        for rd in self.ast.redirects.values():
+            out.write(K.SP)
+            out.write(str(rd))
+        return True
+
+
+class SynPipeline(SynNodeBase[AstPipeline]):
+    def oneline(self) -&gt; bool:
+        return all(
+            synthesize(part).oneline() for part in self.ast.parts
+        )
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        tab = indent * self.tab
+        if not indented:
+            indented = True
+            out.write(tab)
+        for k, part in enumerate(self.ast.parts):
+            if k &gt; 0:
+                out.write(&#39;|&#39;)
+                out.write(K.SP)
+            indented = synthesize(part).pretty(out, indent, indented)
+        return indented
+
+
+class SynLabel(SynNode[AstLabel]):
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        prefix = &#39;::&#39; if self.ast.comment else &#39;:&#39;
+        return F&#39;{prefix}{self.ast.label}&#39;
+
+
+class SynFor(SynNodeBase[AstFor]):
+    def oneline(self) -&gt; bool:
+        return synthesize(self.ast.body).oneline()
+
+    def options(self, opt: AstForOptions) -&gt; str:
+        options = []
+        if opt.usebackq:
+            options.append(&#39;usebackq&#39;)
+        if (ast := opt.asterisk) or opt.tokens != (0,):
+            tokens = &#39;,&#39;.join(str(t) for t in opt.tokens)
+            if ast:
+                tokens = F&#39;{tokens}*&#39;
+            options.append(F&#39;tokens={tokens}&#39;)
+        if c := opt.comment:
+            options.append(F&#39;eol={c}&#39;)
+        if s := opt.skip:
+            options.append(F&#39;skip={s}&#39;)
+        if (d := opt.delims) != &#39;\x20\t&#39;:
+            options.append(F&#39;delims={d}&#39;)
+        if not options:
+            return &#39;&#39;
+        options = &#39; &#39;.join(options)
+        return F&#39; &#34;{options}&#34;&#39;
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        if not indented:
+            out.write(self.tab * indent)
+        if flag := (ast := self.ast).variant:
+            out.write(F&#39;{K.FOR} /&#39;)
+            out.write(flag.value)
+            if flag == AstForVariant.FileParsing:
+                out.write(self.options(ast.options))
+            elif flag == AstForVariant.DescendRecursively and (path := ast.path):
+                out.write(K.SP)
+                out.write(path)
+        else:
+            out.write(K.FOR)
+        out.write(&#39; %&#39;)
+        out.write(ast.variable)
+        out.write(F&#39; {K.IN} (&#39;)
+        out.write(ast.spec_string)
+        out.write(F&#39;) {K.DO} &#39;)
+        return synthesize(ast.body).pretty(out, indent, True)
+
+
+class SynIf(SynNodeBase[AstIf]):
+    def oneline(self) -&gt; bool:
+        ast = self.ast
+        if not synthesize(ast.then_do).oneline():
+            return False
+        elif (else_do := ast.else_do):
+            return synthesize(else_do).oneline()
+        else:
+            return True
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        ast = self.ast
+        if not indented:
+            out.write(indent * self.tab)
+        out.write(K.IF)
+        if ast.casefold:
+            out.write(&#39; /I&#39;)
+        if ast.negated:
+            out.write(K.SP)
+            out.write(K.NOT)
+        if var := ast.variant:
+            out.write(K.SP)
+            out.write(var.value)
+            out.write(K.SP)
+            out.write(str(ast.lhs))
+        else:
+            cmp = ast.cmp
+            assert cmp is not None
+            out.write(F&#39; {ast.lhs!s} {cmp.value} {ast.rhs!s}&#39;)
+        out.write(K.SP)
+        indented = synthesize(ast.then_do).pretty(out, indent, True)
+        if else_do := ast.else_do:
+            out.write(K.SP)
+            out.write(K.ELSE)
+            out.write(K.SP)
+            indented = synthesize(else_do).pretty(out, indent, indented)
+        return indented
+
+
+class SynSequence(SynNodeBase[AstSequence]):
+    def oneline(self) -&gt; bool:
+        ast = self.ast
+        if not synthesize(ast.head).oneline():
+            return False
+        return all(synthesize(cmd.statement).oneline() for cmd in ast.tail)
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        ast = self.ast
+        indented = synthesize(ast.head).pretty(out, indent, indented)
+        for cmd in ast.tail:
+            out.write(cmd.condition)
+            out.write(K.SP)
+            indented = synthesize(cmd.statement).pretty(out, indent, indented)
+        return indented
+
+
+SynMap = {
+    AstFor: SynFor,
+    AstIf: SynIf,
+    AstSequence: SynSequence,
+    AstGroup: SynGroup,
+    AstCommand: SynCommand,
+    AstLabel: SynLabel,
+    AstPipeline: SynPipeline,
+}
+
+
+@overload # noqa
+def synthesize(ast: AstFor) -&gt; SynFor:
+    ...
+@overload # noqa
+def synthesize(ast: AstIf) -&gt; SynIf:
+    ...
+@overload # noqa
+def synthesize(ast: AstSequence) -&gt; SynSequence:
+    ...
+@overload # noqa
+def synthesize(ast: AstGroup) -&gt; SynGroup:
+    ...
+@overload # noqa
+def synthesize(ast: AstCommand) -&gt; SynCommand:
+    ...
+@overload # noqa
+def synthesize(ast: AstLabel) -&gt; SynLabel:
+    ...
+@overload # noqa
+def synthesize(ast: AstPipeline) -&gt; SynPipeline:
+    ...
+@overload # noqa
+def synthesize(ast: AstStatement) -&gt; SynLabel | SynCommand | SynGroup | SynPipeline | SynFor | SynIf:
+    ...
+@overload # noqa
+def synthesize(ast: AstNode) -&gt; SynNodeBase:
+    ...
+
+
+def synthesize(ast: AstNode):
+    try:
+        wrapper = SynMap[ast.__class__]
+    except KeyError as KE:
+        raise TypeError from KE
+    else:
+        return wrapper(ast)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.batch.synth.synthesize"><code class="name flex">
+<span>def <span class="ident">synthesize</span></span>(<span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L338-L344" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def synthesize(ast: AstNode):
+    try:
+        wrapper = SynMap[ast.__class__]
+    except KeyError as KE:
+        raise TypeError from KE
+    else:
+        return wrapper(ast)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.synth.K"><code class="flex name class">
+<span>class <span class="ident">K</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L28-L38" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class K(str, enum.Enum):
+    DO = &#39;DO&#39;
+    ELSE = &#39;ELSE&#39;
+    FOR = &#39;FOR&#39;
+    IF = &#39;IF&#39;
+    IN = &#39;IN&#39;
+    NOT = &#39;NOT&#39;
+    SP = &#39;\x20&#39;
+
+    def __str__(self):
+        return self.value</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.K.DO"><code class="name">var <span class="ident">DO</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.synth.K.ELSE"><code class="name">var <span class="ident">ELSE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.synth.K.FOR"><code class="name">var <span class="ident">FOR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.synth.K.IF"><code class="name">var <span class="ident">IF</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.synth.K.IN"><code class="name">var <span class="ident">IN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.synth.K.NOT"><code class="name">var <span class="ident">NOT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.synth.K.SP"><code class="name">var <span class="ident">SP</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynNodeBase"><code class="flex name class">
+<span>class <span class="ident">SynNodeBase</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L41-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynNodeBase(Generic[_A], abc.ABC):
+    __slots__ = &#39;ast&#39;, &#39;tab&#39;
+
+    def __init__(self, ast: _A):
+        self.ast = ast
+        self.tab = 4 * K.SP
+
+    @abc.abstractmethod
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False) -&gt; bool:
+        ...
+
+    @abc.abstractmethod
+    def oneline(self) -&gt; bool:
+        ...
+
+    def __str__(self) -&gt; str:
+        with io.StringIO() as out:
+            self.pretty(out)
+            return out.getvalue()
+
+    __repr__ = __str__</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynFor" href="#refinery.lib.batch.synth.SynFor">SynFor</a></li>
+<li><a title="refinery.lib.batch.synth.SynGroup" href="#refinery.lib.batch.synth.SynGroup">SynGroup</a></li>
+<li><a title="refinery.lib.batch.synth.SynIf" href="#refinery.lib.batch.synth.SynIf">SynIf</a></li>
+<li><a title="refinery.lib.batch.synth.SynNode" href="#refinery.lib.batch.synth.SynNode">SynNode</a></li>
+<li><a title="refinery.lib.batch.synth.SynPipeline" href="#refinery.lib.batch.synth.SynPipeline">SynPipeline</a></li>
+<li><a title="refinery.lib.batch.synth.SynSequence" href="#refinery.lib.batch.synth.SynSequence">SynSequence</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynNodeBase.ast"><code class="name">var <span class="ident">ast</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L41-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynNodeBase(Generic[_A], abc.ABC):
+    __slots__ = &#39;ast&#39;, &#39;tab&#39;
+
+    def __init__(self, ast: _A):
+        self.ast = ast
+        self.tab = 4 * K.SP
+
+    @abc.abstractmethod
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False) -&gt; bool:
+        ...
+
+    @abc.abstractmethod
+    def oneline(self) -&gt; bool:
+        ...
+
+    def __str__(self) -&gt; str:
+        with io.StringIO() as out:
+            self.pretty(out)
+            return out.getvalue()
+
+    __repr__ = __str__</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynNodeBase.tab"><code class="name">var <span class="ident">tab</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L41-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynNodeBase(Generic[_A], abc.ABC):
+    __slots__ = &#39;ast&#39;, &#39;tab&#39;
+
+    def __init__(self, ast: _A):
+        self.ast = ast
+        self.tab = 4 * K.SP
+
+    @abc.abstractmethod
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False) -&gt; bool:
+        ...
+
+    @abc.abstractmethod
+    def oneline(self) -&gt; bool:
+        ...
+
+    def __str__(self) -&gt; str:
+        with io.StringIO() as out:
+            self.pretty(out)
+            return out.getvalue()
+
+    __repr__ = __str__</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynNodeBase.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L48-L50" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@abc.abstractmethod
+def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False) -&gt; bool:
+    ...</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynNodeBase.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L52-L54" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@abc.abstractmethod
+def oneline(self) -&gt; bool:
+    ...</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynNode"><code class="flex name class">
+<span>class <span class="ident">SynNode</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L64-L74" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynNode(SynNodeBase[_A]):
+
+    @abc.abstractmethod
+    def __str__(self) -&gt; str:
+        ...
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        if not indented:
+            out.write(indent * self.tab)
+        out.write(str(self))
+        return True</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynCommand" href="#refinery.lib.batch.synth.SynCommand">SynCommand</a></li>
+<li><a title="refinery.lib.batch.synth.SynLabel" href="#refinery.lib.batch.synth.SynLabel">SynLabel</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynNode.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L70-L74" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+    if not indented:
+        out.write(indent * self.tab)
+    out.write(str(self))
+    return True</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand"><code class="flex name class">
+<span>class <span class="ident">SynCommand</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNode" href="#refinery.lib.batch.synth.SynNode">SynNode</a></li>
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynCommand.args"><code class="name">var <span class="ident">args</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand.argument_offset"><code class="name">var <span class="ident">argument_offset</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand.argument_string"><code class="name">var <span class="ident">argument_string</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand.junk"><code class="name">var <span class="ident">junk</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand.silent"><code class="name">var <span class="ident">silent</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand.trailing_spaces"><code class="name">var <span class="ident">trailing_spaces</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynCommand.verb"><code class="name">var <span class="ident">verb</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L77-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynCommand(SynNode[AstCommand]):
+    __slots__ = (
+        &#39;args&#39;,
+        &#39;junk&#39;,
+        &#39;verb&#39;,
+        &#39;silent&#39;,
+        &#39;argument_string&#39;,
+        &#39;argument_offset&#39;,
+        &#39;trailing_spaces&#39;,
+    )
+
+    args: list[str]
+    verb: str
+    junk: bool
+
+    def __init__(self, ast: AstCommand):
+        super().__init__(ast)
+        self.silent = False
+        self.args = []
+        self.verb = &#39;&#39;
+        self.junk = False
+        arg_string = io.StringIO()
+        arg_offset = 0
+        spaces = []
+        for k, token in enumerate(self.ast.fragments):
+            if token.isspace():
+                if self.verb:
+                    arg_string.write(token)
+                spaces.append(token)
+                continue
+            if not self.verb:
+                self.verb = unquote(token.strip())
+                continue
+            self.args.append(token)
+            arg_string.write(token)
+            arg_offset = arg_offset or k
+            spaces.clear()
+        if not self.verb:
+            raise ValueError(&#39;Empty Command&#39;)
+        self.argument_string = arg_string.getvalue().lstrip()
+        self.argument_offset = arg_offset
+        self.trailing_spaces = spaces
+
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        with io.StringIO() as out:
+            for rd in self.ast.redirects.values():
+                out.write(str(rd))
+                out.write(K.SP)
+            if self.ast.silenced:
+                out.write(&#39;@&#39;)
+            out.write(enquote(self.verb))
+            for a in itertools.islice(self.ast.fragments, 1, None):
+                out.write(a)
+            return out.getvalue()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynCommand.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L120-L121" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    return True</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynGroup"><code class="flex name class">
+<span>class <span class="ident">SynGroup</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L136-L166" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynGroup(SynNodeBase[AstGroup]):
+    def oneline(self) -&gt; bool:
+        ast = self.ast
+        if (pl := ast.parent) and (seq := pl.parent) and isinstance(seq.parent, (AstFor, AstIf)):
+            return False
+        fragments = self.ast.fragments
+        if len(fragments) == 0:
+            return True
+        if len(fragments) &gt; 1:
+            return False
+        return synthesize(fragments[0]).oneline()
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        tab = indent * self.tab
+        fragments = self.ast.fragments
+        if not indented:
+            out.write(tab)
+        out.write(&#39;(&#39;)
+        if self.oneline():
+            synthesize(fragments[0]).pretty(out, indent, True)
+        else:
+            for seq in fragments:
+                out.write(&#39;\n&#39;)
+                synthesize(seq).pretty(out, indent + 1, False)
+            out.write(&#39;\n&#39;)
+            out.write(tab)
+        out.write(&#39;)&#39;)
+        for rd in self.ast.redirects.values():
+            out.write(K.SP)
+            out.write(str(rd))
+        return True</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynGroup.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L137-L146" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    ast = self.ast
+    if (pl := ast.parent) and (seq := pl.parent) and isinstance(seq.parent, (AstFor, AstIf)):
+        return False
+    fragments = self.ast.fragments
+    if len(fragments) == 0:
+        return True
+    if len(fragments) &gt; 1:
+        return False
+    return synthesize(fragments[0]).oneline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynGroup.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L148-L166" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+    tab = indent * self.tab
+    fragments = self.ast.fragments
+    if not indented:
+        out.write(tab)
+    out.write(&#39;(&#39;)
+    if self.oneline():
+        synthesize(fragments[0]).pretty(out, indent, True)
+    else:
+        for seq in fragments:
+            out.write(&#39;\n&#39;)
+            synthesize(seq).pretty(out, indent + 1, False)
+        out.write(&#39;\n&#39;)
+        out.write(tab)
+    out.write(&#39;)&#39;)
+    for rd in self.ast.redirects.values():
+        out.write(K.SP)
+        out.write(str(rd))
+    return True</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynPipeline"><code class="flex name class">
+<span>class <span class="ident">SynPipeline</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L169-L185" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynPipeline(SynNodeBase[AstPipeline]):
+    def oneline(self) -&gt; bool:
+        return all(
+            synthesize(part).oneline() for part in self.ast.parts
+        )
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        tab = indent * self.tab
+        if not indented:
+            indented = True
+            out.write(tab)
+        for k, part in enumerate(self.ast.parts):
+            if k &gt; 0:
+                out.write(&#39;|&#39;)
+                out.write(K.SP)
+            indented = synthesize(part).pretty(out, indent, indented)
+        return indented</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynPipeline.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L170-L173" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    return all(
+        synthesize(part).oneline() for part in self.ast.parts
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynPipeline.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L175-L185" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+    tab = indent * self.tab
+    if not indented:
+        indented = True
+        out.write(tab)
+    for k, part in enumerate(self.ast.parts):
+        if k &gt; 0:
+            out.write(&#39;|&#39;)
+            out.write(K.SP)
+        indented = synthesize(part).pretty(out, indent, indented)
+    return indented</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynLabel"><code class="flex name class">
+<span>class <span class="ident">SynLabel</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L188-L194" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynLabel(SynNode[AstLabel]):
+    def oneline(self) -&gt; bool:
+        return True
+
+    def __str__(self):
+        prefix = &#39;::&#39; if self.ast.comment else &#39;:&#39;
+        return F&#39;{prefix}{self.ast.label}&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNode" href="#refinery.lib.batch.synth.SynNode">SynNode</a></li>
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynLabel.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L189-L190" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    return True</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynFor"><code class="flex name class">
+<span>class <span class="ident">SynFor</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L197-L239" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynFor(SynNodeBase[AstFor]):
+    def oneline(self) -&gt; bool:
+        return synthesize(self.ast.body).oneline()
+
+    def options(self, opt: AstForOptions) -&gt; str:
+        options = []
+        if opt.usebackq:
+            options.append(&#39;usebackq&#39;)
+        if (ast := opt.asterisk) or opt.tokens != (0,):
+            tokens = &#39;,&#39;.join(str(t) for t in opt.tokens)
+            if ast:
+                tokens = F&#39;{tokens}*&#39;
+            options.append(F&#39;tokens={tokens}&#39;)
+        if c := opt.comment:
+            options.append(F&#39;eol={c}&#39;)
+        if s := opt.skip:
+            options.append(F&#39;skip={s}&#39;)
+        if (d := opt.delims) != &#39;\x20\t&#39;:
+            options.append(F&#39;delims={d}&#39;)
+        if not options:
+            return &#39;&#39;
+        options = &#39; &#39;.join(options)
+        return F&#39; &#34;{options}&#34;&#39;
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        if not indented:
+            out.write(self.tab * indent)
+        if flag := (ast := self.ast).variant:
+            out.write(F&#39;{K.FOR} /&#39;)
+            out.write(flag.value)
+            if flag == AstForVariant.FileParsing:
+                out.write(self.options(ast.options))
+            elif flag == AstForVariant.DescendRecursively and (path := ast.path):
+                out.write(K.SP)
+                out.write(path)
+        else:
+            out.write(K.FOR)
+        out.write(&#39; %&#39;)
+        out.write(ast.variable)
+        out.write(F&#39; {K.IN} (&#39;)
+        out.write(ast.spec_string)
+        out.write(F&#39;) {K.DO} &#39;)
+        return synthesize(ast.body).pretty(out, indent, True)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynFor.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L198-L199" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    return synthesize(self.ast.body).oneline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynFor.options"><code class="name flex">
+<span>def <span class="ident">options</span></span>(<span>self, opt)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L201-L219" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def options(self, opt: AstForOptions) -&gt; str:
+    options = []
+    if opt.usebackq:
+        options.append(&#39;usebackq&#39;)
+    if (ast := opt.asterisk) or opt.tokens != (0,):
+        tokens = &#39;,&#39;.join(str(t) for t in opt.tokens)
+        if ast:
+            tokens = F&#39;{tokens}*&#39;
+        options.append(F&#39;tokens={tokens}&#39;)
+    if c := opt.comment:
+        options.append(F&#39;eol={c}&#39;)
+    if s := opt.skip:
+        options.append(F&#39;skip={s}&#39;)
+    if (d := opt.delims) != &#39;\x20\t&#39;:
+        options.append(F&#39;delims={d}&#39;)
+    if not options:
+        return &#39;&#39;
+    options = &#39; &#39;.join(options)
+    return F&#39; &#34;{options}&#34;&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynFor.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L221-L239" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+    if not indented:
+        out.write(self.tab * indent)
+    if flag := (ast := self.ast).variant:
+        out.write(F&#39;{K.FOR} /&#39;)
+        out.write(flag.value)
+        if flag == AstForVariant.FileParsing:
+            out.write(self.options(ast.options))
+        elif flag == AstForVariant.DescendRecursively and (path := ast.path):
+            out.write(K.SP)
+            out.write(path)
+    else:
+        out.write(K.FOR)
+    out.write(&#39; %&#39;)
+    out.write(ast.variable)
+    out.write(F&#39; {K.IN} (&#39;)
+    out.write(ast.spec_string)
+    out.write(F&#39;) {K.DO} &#39;)
+    return synthesize(ast.body).pretty(out, indent, True)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynIf"><code class="flex name class">
+<span>class <span class="ident">SynIf</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L242-L278" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynIf(SynNodeBase[AstIf]):
+    def oneline(self) -&gt; bool:
+        ast = self.ast
+        if not synthesize(ast.then_do).oneline():
+            return False
+        elif (else_do := ast.else_do):
+            return synthesize(else_do).oneline()
+        else:
+            return True
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        ast = self.ast
+        if not indented:
+            out.write(indent * self.tab)
+        out.write(K.IF)
+        if ast.casefold:
+            out.write(&#39; /I&#39;)
+        if ast.negated:
+            out.write(K.SP)
+            out.write(K.NOT)
+        if var := ast.variant:
+            out.write(K.SP)
+            out.write(var.value)
+            out.write(K.SP)
+            out.write(str(ast.lhs))
+        else:
+            cmp = ast.cmp
+            assert cmp is not None
+            out.write(F&#39; {ast.lhs!s} {cmp.value} {ast.rhs!s}&#39;)
+        out.write(K.SP)
+        indented = synthesize(ast.then_do).pretty(out, indent, True)
+        if else_do := ast.else_do:
+            out.write(K.SP)
+            out.write(K.ELSE)
+            out.write(K.SP)
+            indented = synthesize(else_do).pretty(out, indent, indented)
+        return indented</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynIf.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L243-L250" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    ast = self.ast
+    if not synthesize(ast.then_do).oneline():
+        return False
+    elif (else_do := ast.else_do):
+        return synthesize(else_do).oneline()
+    else:
+        return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynIf.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L252-L278" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+    ast = self.ast
+    if not indented:
+        out.write(indent * self.tab)
+    out.write(K.IF)
+    if ast.casefold:
+        out.write(&#39; /I&#39;)
+    if ast.negated:
+        out.write(K.SP)
+        out.write(K.NOT)
+    if var := ast.variant:
+        out.write(K.SP)
+        out.write(var.value)
+        out.write(K.SP)
+        out.write(str(ast.lhs))
+    else:
+        cmp = ast.cmp
+        assert cmp is not None
+        out.write(F&#39; {ast.lhs!s} {cmp.value} {ast.rhs!s}&#39;)
+    out.write(K.SP)
+    indented = synthesize(ast.then_do).pretty(out, indent, True)
+    if else_do := ast.else_do:
+        out.write(K.SP)
+        out.write(K.ELSE)
+        out.write(K.SP)
+        indented = synthesize(else_do).pretty(out, indent, indented)
+    return indented</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.synth.SynSequence"><code class="flex name class">
+<span>class <span class="ident">SynSequence</span></span>
+<span>(</span><span>ast)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Abstract base class for generic types.</p>
+<p>On Python 3.12 and newer, generic classes implicitly inherit from
+Generic when they declare a parameter list after the class's name::</p>
+<pre><code>class Mapping[KT, VT]:
+    def __getitem__(self, key: KT) -&gt; VT:
+        ...
+    # Etc.
+</code></pre>
+<p>On older versions of Python, however, generic classes have to
+explicitly inherit from Generic.</p>
+<p>After a class has been declared to be generic, it can then be used as
+follows::</p>
+<pre><code>def lookup_name[KT, VT](mapping: Mapping[KT, VT], key: KT, default: VT) -&gt; VT:
+    try:
+        return mapping[key]
+    except KeyError:
+        return default
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L281-L295" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SynSequence(SynNodeBase[AstSequence]):
+    def oneline(self) -&gt; bool:
+        ast = self.ast
+        if not synthesize(ast.head).oneline():
+            return False
+        return all(synthesize(cmd.statement).oneline() for cmd in ast.tail)
+
+    def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+        ast = self.ast
+        indented = synthesize(ast.head).pretty(out, indent, indented)
+        for cmd in ast.tail:
+            out.write(cmd.condition)
+            out.write(K.SP)
+            indented = synthesize(cmd.statement).pretty(out, indent, indented)
+        return indented</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></li>
+<li>typing.Generic</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.synth.SynSequence.oneline"><code class="name flex">
+<span>def <span class="ident">oneline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L282-L286" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def oneline(self) -&gt; bool:
+    ast = self.ast
+    if not synthesize(ast.head).oneline():
+        return False
+    return all(synthesize(cmd.statement).oneline() for cmd in ast.tail)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.synth.SynSequence.pretty"><code class="name flex">
+<span>def <span class="ident">pretty</span></span>(<span>self, out, indent=0, indented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/synth.py#L288-L295" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pretty(self, out: io.StringIO, indent: int = 0, indented: bool = False):
+    ast = self.ast
+    indented = synthesize(ast.head).pretty(out, indent, indented)
+    for cmd in ast.tail:
+        out.write(cmd.condition)
+        out.write(K.SP)
+        indented = synthesize(cmd.statement).pretty(out, indent, indented)
+    return indented</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.synthesize" href="#refinery.lib.batch.synth.synthesize">synthesize</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.K" href="#refinery.lib.batch.synth.K">K</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynNodeBase" href="#refinery.lib.batch.synth.SynNodeBase">SynNodeBase</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynNodeBase.pretty" href="#refinery.lib.batch.synth.SynNodeBase.pretty">pretty</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynNodeBase.oneline" href="#refinery.lib.batch.synth.SynNodeBase.oneline">oneline</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynNode" href="#refinery.lib.batch.synth.SynNode">SynNode</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynNode.pretty" href="#refinery.lib.batch.synth.SynNode.pretty">pretty</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynCommand" href="#refinery.lib.batch.synth.SynCommand">SynCommand</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynCommand.oneline" href="#refinery.lib.batch.synth.SynCommand.oneline">oneline</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynGroup" href="#refinery.lib.batch.synth.SynGroup">SynGroup</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynGroup.oneline" href="#refinery.lib.batch.synth.SynGroup.oneline">oneline</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynGroup.pretty" href="#refinery.lib.batch.synth.SynGroup.pretty">pretty</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynPipeline" href="#refinery.lib.batch.synth.SynPipeline">SynPipeline</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynPipeline.oneline" href="#refinery.lib.batch.synth.SynPipeline.oneline">oneline</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynPipeline.pretty" href="#refinery.lib.batch.synth.SynPipeline.pretty">pretty</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynLabel" href="#refinery.lib.batch.synth.SynLabel">SynLabel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynLabel.oneline" href="#refinery.lib.batch.synth.SynLabel.oneline">oneline</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynFor" href="#refinery.lib.batch.synth.SynFor">SynFor</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynFor.oneline" href="#refinery.lib.batch.synth.SynFor.oneline">oneline</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynFor.options" href="#refinery.lib.batch.synth.SynFor.options">options</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynFor.pretty" href="#refinery.lib.batch.synth.SynFor.pretty">pretty</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynIf" href="#refinery.lib.batch.synth.SynIf">SynIf</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynIf.oneline" href="#refinery.lib.batch.synth.SynIf.oneline">oneline</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynIf.pretty" href="#refinery.lib.batch.synth.SynIf.pretty">pretty</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.synth.SynSequence" href="#refinery.lib.batch.synth.SynSequence">SynSequence</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.synth.SynSequence.oneline" href="#refinery.lib.batch.synth.SynSequence.oneline">oneline</a></code></li>
+<li><code><a title="refinery.lib.batch.synth.SynSequence.pretty" href="#refinery.lib.batch.synth.SynSequence.pretty">pretty</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

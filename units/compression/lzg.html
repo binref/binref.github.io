@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.compression.lzg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.compression.lzg</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L1-L195" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import re
+
+from refinery.lib.structures import MemoryFile, Struct, StructReader
+from refinery.units import RefineryPartialResult, Unit
+
+
+class LZGMethod(enum.IntEnum):
+    COPY = 0
+    LZG1 = 1
+
+
+class LZGCheckSum:
+    def __init__(self, data: bytearray | memoryview, size: int = 0):
+        reader = StructReader(data)
+        self.reader = reader
+        self._a = 1
+        self._b = 0
+        if size:
+            self.process(size)
+
+    def __int__(self):
+        return ((self._b &lt;&lt; 0x10) | self._a)
+
+    def process(self, size: int) -&gt; None:
+        a = self._a
+        b = self._b
+        for c in self.reader.read_exactly(size):
+            a = (a + c) &amp; 0xFFFF
+            b = (b + a) &amp; 0xFFFF
+        self._a = a
+        self._b = b
+
+
+class LZGStream(Struct):
+    _LENGTH_DECODE = list(range(2, 30))
+    _LENGTH_DECODE.extend((35, 48, 72, 128))
+
+    def __init__(self, reader: StructReader[memoryview]):
+        self._body = reader
+        magic = reader.peek(3)
+        if magic == B&#39;LZG&#39;:
+            self.has_magic = True
+            reader.seekrel(3)
+        else:
+            self.has_magic = False
+        with reader.be:
+            dec = reader.u32()
+            enc = reader.u32()
+            if enc &gt; dec and not self.has_magic:
+                enc, dec = dec, enc
+            self.encoded_size = enc
+            self.decoded_size = dec
+            self.checksum = reader.u32()
+
+        if reader.remaining_bytes &lt; self.encoded_size:
+            raise EOFError(F&#39;Header announces buffer size of {self.encoded_size}, but only {reader.remaining_bytes} remain in buffer&#39;)
+
+        if reader.remaining_bytes == self.encoded_size:
+            if self._checks():
+                self.method = None
+                return
+            raise ValueError(&#39;Invalid checksum or truncated buffer.&#39;)
+
+        method = reader.u8()
+
+        try:
+            self.method = LZGMethod(method)
+        except ValueError:
+            self.method = None
+            if self._checks():
+                raise ValueError(F&#39;Invalid method code {method}.&#39;)
+            reader.seekrel(-1)
+            self.encoded_size -= 1
+
+        if self.method is LZGMethod.COPY and self.encoded_size != self.decoded_size:
+            raise ValueError(&#39;Header indicates method COPY but encoded and decoded size are different.&#39;)
+        if self._checks():
+            return
+
+        self._handle_invalid_checksum()
+
+    def _checks(self):
+        if (body := self._body) is None:
+            raise RuntimeError
+        checker = LZGCheckSum(body.peek())
+        checker.process(self.encoded_size)
+        for tolerance in range(8):
+            if int(checker) == self.checksum:
+                self.encoded_size += tolerance
+                return True
+            checker.process(1)
+        else:
+            return False
+
+    def _find_checksum(self, data: bytearray | memoryview) -&gt; int:
+        a = 1
+        b = 0
+        t = self.checksum
+        for k, c in enumerate(data):
+            a = (a + c) &amp; 0xFFFF
+            b = (b + a) &amp; 0xFFFF
+            s = ((b &lt;&lt; 0x10) | a)
+            if s == t:
+                return k
+        return -1
+
+    def _handle_invalid_checksum(self):
+        if (body := self._body) is None:
+            raise RuntimeError
+        offsets = {}
+        for k in range(16):
+            offset = self._find_checksum(body.peek())
+            if offset &gt;= 0:
+                offsets[offset] = k + 1
+            body.seekrel(1)
+        if not offsets:
+            raise ValueError(&#39;Invalid checksum and no working offsets could be found.&#39;)
+        else:
+            closest = min(offsets, key=lambda k: abs(self.encoded_size - k))
+            skip = offsets[closest]
+            raise ValueError(
+                F&#39;Checksum failed; a valid checksum can be obtained by skipping {skip} bytes and then reading {closest}. &#39;
+                F&#39;According to the header, the size of the encoded data is {self.encoded_size}.&#39;)
+
+    def decompress(self) -&gt; bytearray | memoryview:
+        if self._body is None:
+            raise RuntimeError(&#39;The decompress method can only be called once.&#39;)
+        reader = self._body
+        self._body = None
+
+        if self.method is LZGMethod.COPY:
+            return reader.read(self.encoded_size)
+
+        end = reader.tell() + self.encoded_size
+        out = MemoryFile(bytearray())
+
+        markers = reader.read(4)
+        pattern = re.compile(B&#39;[%s]&#39; % re.escape(markers), flags=re.DOTALL)
+        pos = reader.tell()
+
+        while reader.tell() &lt; end:
+            pos = reader.tell()
+            hop = pattern.search(reader.getvalue(), pos)
+            if hop is None:
+                out.write(reader.read(end - pos))
+                break
+            hop = hop.start()
+            out.write(reader.read(hop - pos))
+            code = reader.u8()
+            arg1 = reader.u8()
+            if not arg1:
+                out.write_byte(code)
+                continue
+            elif code == markers[0]:
+                length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+                b2 = reader.u8()
+                offset = ((arg1 &amp; 0xE0) &lt;&lt; 11) | (b2 &lt;&lt; 8) | reader.u8()
+                offset += 2056
+            elif code == markers[1]:
+                length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+                b2 = reader.u8()
+                offset = ((arg1 &amp; 0xE0) &lt;&lt; 3) | b2
+                offset += 8
+            elif code == markers[2]:
+                length = (arg1 &gt;&gt; 6) + 3
+                offset = (arg1 &amp; 0x3F) + 8
+            elif code == markers[3]:
+                length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+                offset = (arg1 &gt;&gt; 5) + 1
+            else:
+                raise RuntimeError
+            out.replay(offset, length)
+
+        return out.getvalue()
+
+
+class lzg(Unit):
+    &#34;&#34;&#34;
+    LZG decompression.
+    &#34;&#34;&#34;
+    def process(self, data: bytearray):
+        stream = LZGStream.Parse(data)
+        out = stream.decompress()
+        if len(out) != stream.decoded_size:
+            msg = F&#39;LZG header announced {stream.decoded_size} bytes, but decompressed buffer had size {len(out)}.&#39;
+            raise RefineryPartialResult(msg, out)
+        return out
+
+    @classmethod
+    def handles(cls, data):
+        if data[:3] == B&#39;LZG&#39;:
+            return True</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.compression.lzg.LZGMethod"><code class="flex name class">
+<span>class <span class="ident">LZGMethod</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L10-L12" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LZGMethod(enum.IntEnum):
+    COPY = 0
+    LZG1 = 1</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzg.LZGMethod.COPY"><code class="name">var <span class="ident">COPY</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.lzg.LZGMethod.LZG1"><code class="name">var <span class="ident">LZG1</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzg.LZGCheckSum"><code class="flex name class">
+<span>class <span class="ident">LZGCheckSum</span></span>
+<span>(</span><span>data, size=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L15-L34" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LZGCheckSum:
+    def __init__(self, data: bytearray | memoryview, size: int = 0):
+        reader = StructReader(data)
+        self.reader = reader
+        self._a = 1
+        self._b = 0
+        if size:
+            self.process(size)
+
+    def __int__(self):
+        return ((self._b &lt;&lt; 0x10) | self._a)
+
+    def process(self, size: int) -&gt; None:
+        a = self._a
+        b = self._b
+        for c in self.reader.read_exactly(size):
+            a = (a + c) &amp; 0xFFFF
+            b = (b + a) &amp; 0xFFFF
+        self._a = a
+        self._b = b</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzg.LZGCheckSum.process"><code class="name flex">
+<span>def <span class="ident">process</span></span>(<span>self, size)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L27-L34" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def process(self, size: int) -&gt; None:
+    a = self._a
+    b = self._b
+    for c in self.reader.read_exactly(size):
+        a = (a + c) &amp; 0xFFFF
+        b = (b + a) &amp; 0xFFFF
+    self._a = a
+    self._b = b</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzg.LZGStream"><code class="flex name class">
+<span>class <span class="ident">LZGStream</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L37-L177" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LZGStream(Struct):
+    _LENGTH_DECODE = list(range(2, 30))
+    _LENGTH_DECODE.extend((35, 48, 72, 128))
+
+    def __init__(self, reader: StructReader[memoryview]):
+        self._body = reader
+        magic = reader.peek(3)
+        if magic == B&#39;LZG&#39;:
+            self.has_magic = True
+            reader.seekrel(3)
+        else:
+            self.has_magic = False
+        with reader.be:
+            dec = reader.u32()
+            enc = reader.u32()
+            if enc &gt; dec and not self.has_magic:
+                enc, dec = dec, enc
+            self.encoded_size = enc
+            self.decoded_size = dec
+            self.checksum = reader.u32()
+
+        if reader.remaining_bytes &lt; self.encoded_size:
+            raise EOFError(F&#39;Header announces buffer size of {self.encoded_size}, but only {reader.remaining_bytes} remain in buffer&#39;)
+
+        if reader.remaining_bytes == self.encoded_size:
+            if self._checks():
+                self.method = None
+                return
+            raise ValueError(&#39;Invalid checksum or truncated buffer.&#39;)
+
+        method = reader.u8()
+
+        try:
+            self.method = LZGMethod(method)
+        except ValueError:
+            self.method = None
+            if self._checks():
+                raise ValueError(F&#39;Invalid method code {method}.&#39;)
+            reader.seekrel(-1)
+            self.encoded_size -= 1
+
+        if self.method is LZGMethod.COPY and self.encoded_size != self.decoded_size:
+            raise ValueError(&#39;Header indicates method COPY but encoded and decoded size are different.&#39;)
+        if self._checks():
+            return
+
+        self._handle_invalid_checksum()
+
+    def _checks(self):
+        if (body := self._body) is None:
+            raise RuntimeError
+        checker = LZGCheckSum(body.peek())
+        checker.process(self.encoded_size)
+        for tolerance in range(8):
+            if int(checker) == self.checksum:
+                self.encoded_size += tolerance
+                return True
+            checker.process(1)
+        else:
+            return False
+
+    def _find_checksum(self, data: bytearray | memoryview) -&gt; int:
+        a = 1
+        b = 0
+        t = self.checksum
+        for k, c in enumerate(data):
+            a = (a + c) &amp; 0xFFFF
+            b = (b + a) &amp; 0xFFFF
+            s = ((b &lt;&lt; 0x10) | a)
+            if s == t:
+                return k
+        return -1
+
+    def _handle_invalid_checksum(self):
+        if (body := self._body) is None:
+            raise RuntimeError
+        offsets = {}
+        for k in range(16):
+            offset = self._find_checksum(body.peek())
+            if offset &gt;= 0:
+                offsets[offset] = k + 1
+            body.seekrel(1)
+        if not offsets:
+            raise ValueError(&#39;Invalid checksum and no working offsets could be found.&#39;)
+        else:
+            closest = min(offsets, key=lambda k: abs(self.encoded_size - k))
+            skip = offsets[closest]
+            raise ValueError(
+                F&#39;Checksum failed; a valid checksum can be obtained by skipping {skip} bytes and then reading {closest}. &#39;
+                F&#39;According to the header, the size of the encoded data is {self.encoded_size}.&#39;)
+
+    def decompress(self) -&gt; bytearray | memoryview:
+        if self._body is None:
+            raise RuntimeError(&#39;The decompress method can only be called once.&#39;)
+        reader = self._body
+        self._body = None
+
+        if self.method is LZGMethod.COPY:
+            return reader.read(self.encoded_size)
+
+        end = reader.tell() + self.encoded_size
+        out = MemoryFile(bytearray())
+
+        markers = reader.read(4)
+        pattern = re.compile(B&#39;[%s]&#39; % re.escape(markers), flags=re.DOTALL)
+        pos = reader.tell()
+
+        while reader.tell() &lt; end:
+            pos = reader.tell()
+            hop = pattern.search(reader.getvalue(), pos)
+            if hop is None:
+                out.write(reader.read(end - pos))
+                break
+            hop = hop.start()
+            out.write(reader.read(hop - pos))
+            code = reader.u8()
+            arg1 = reader.u8()
+            if not arg1:
+                out.write_byte(code)
+                continue
+            elif code == markers[0]:
+                length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+                b2 = reader.u8()
+                offset = ((arg1 &amp; 0xE0) &lt;&lt; 11) | (b2 &lt;&lt; 8) | reader.u8()
+                offset += 2056
+            elif code == markers[1]:
+                length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+                b2 = reader.u8()
+                offset = ((arg1 &amp; 0xE0) &lt;&lt; 3) | b2
+                offset += 8
+            elif code == markers[2]:
+                length = (arg1 &gt;&gt; 6) + 3
+                offset = (arg1 &amp; 0x3F) + 8
+            elif code == markers[3]:
+                length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+                offset = (arg1 &gt;&gt; 5) + 1
+            else:
+                raise RuntimeError
+            out.replay(offset, length)
+
+        return out.getvalue()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzg.LZGStream.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.compression.lzg.LZGStream.decompress"><code class="name flex">
+<span>def <span class="ident">decompress</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L128-L177" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decompress(self) -&gt; bytearray | memoryview:
+    if self._body is None:
+        raise RuntimeError(&#39;The decompress method can only be called once.&#39;)
+    reader = self._body
+    self._body = None
+
+    if self.method is LZGMethod.COPY:
+        return reader.read(self.encoded_size)
+
+    end = reader.tell() + self.encoded_size
+    out = MemoryFile(bytearray())
+
+    markers = reader.read(4)
+    pattern = re.compile(B&#39;[%s]&#39; % re.escape(markers), flags=re.DOTALL)
+    pos = reader.tell()
+
+    while reader.tell() &lt; end:
+        pos = reader.tell()
+        hop = pattern.search(reader.getvalue(), pos)
+        if hop is None:
+            out.write(reader.read(end - pos))
+            break
+        hop = hop.start()
+        out.write(reader.read(hop - pos))
+        code = reader.u8()
+        arg1 = reader.u8()
+        if not arg1:
+            out.write_byte(code)
+            continue
+        elif code == markers[0]:
+            length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+            b2 = reader.u8()
+            offset = ((arg1 &amp; 0xE0) &lt;&lt; 11) | (b2 &lt;&lt; 8) | reader.u8()
+            offset += 2056
+        elif code == markers[1]:
+            length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+            b2 = reader.u8()
+            offset = ((arg1 &amp; 0xE0) &lt;&lt; 3) | b2
+            offset += 8
+        elif code == markers[2]:
+            length = (arg1 &gt;&gt; 6) + 3
+            offset = (arg1 &amp; 0x3F) + 8
+        elif code == markers[3]:
+            length = self._LENGTH_DECODE[arg1 &amp; 0x1F]
+            offset = (arg1 &gt;&gt; 5) + 1
+        else:
+            raise RuntimeError
+        out.replay(offset, length)
+
+    return out.getvalue()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.lzg.lzg"><code class="flex name class">
+<span>class <span class="ident">lzg</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>LZG decompression.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/lzg.py#L180-L195" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class lzg(Unit):
+    &#34;&#34;&#34;
+    LZG decompression.
+    &#34;&#34;&#34;
+    def process(self, data: bytearray):
+        stream = LZGStream.Parse(data)
+        out = stream.decompress()
+        if len(out) != stream.decoded_size:
+            msg = F&#39;LZG header announced {stream.decoded_size} bytes, but decompressed buffer had size {len(out)}.&#39;
+            raise RefineryPartialResult(msg, out)
+        return out
+
+    @classmethod
+    def handles(cls, data):
+        if data[:3] == B&#39;LZG&#39;:
+            return True</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.compression.lzg.lzg" href="#refinery.units.compression.lzg.lzg">lzg</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.lzg.lzg.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.compression" href="index.html">refinery.units.compression</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.compression.lzg.LZGMethod" href="#refinery.units.compression.lzg.LZGMethod">LZGMethod</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzg.LZGCheckSum" href="#refinery.units.compression.lzg.LZGCheckSum">LZGCheckSum</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzg.LZGCheckSum.process" href="#refinery.units.compression.lzg.LZGCheckSum.process">process</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzg.LZGStream" href="#refinery.units.compression.lzg.LZGStream">LZGStream</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.compression.lzg.LZGStream.Parse" href="#refinery.units.compression.lzg.LZGStream.Parse">Parse</a></code></li>
+<li><code><a title="refinery.units.compression.lzg.LZGStream.decompress" href="#refinery.units.compression.lzg.LZGStream.decompress">decompress</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.lzg.lzg" href="#refinery.units.compression.lzg.lzg">lzg</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.asn1.compiler documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.asn1.compiler</code></h1>
+</header>
+<section id="section-intro">
+<p>ASN.1 Module Definition Compiler</p>
+<p>Parses standard ASN.1 module definition syntax and produces the Python DSL
+objects used by the refinery ASN.1 reader. Supports the subset of ASN.1
+notation used in cryptographic RFCs (X.509, CMS, PKCS, TSP, etc.).</p>
+<p>Usage::</p>
+<pre><code>from refinery.lib.asn1.compiler import compile_asn1
+
+schemas = compile_asn1('''
+    X509 DEFINITIONS EXPLICIT TAGS ::= BEGIN
+        Certificate ::= SEQUENCE {
+            tbsCertificate      TBSCertificate,
+            signatureAlgorithm  AlgorithmIdentifier,
+            signatureValue      BIT STRING
+        }
+    END
+''')
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/asn1/compiler.py#L1-L687" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+ASN.1 Module Definition Compiler
+
+Parses standard ASN.1 module definition syntax and produces the Python DSL
+objects used by the refinery ASN.1 reader. Supports the subset of ASN.1
+notation used in cryptographic RFCs (X.509, CMS, PKCS, TSP, etc.).
+
+Usage::
+
+    from refinery.lib.asn1.compiler import compile_asn1
+
+    schemas = compile_asn1(&#39;&#39;&#39;
+        X509 DEFINITIONS EXPLICIT TAGS ::= BEGIN
+            Certificate ::= SEQUENCE {
+                tbsCertificate      TBSCertificate,
+                signatureAlgorithm  AlgorithmIdentifier,
+                signatureValue      BIT STRING
+            }
+        END
+    &#39;&#39;&#39;)
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import re
+from enum import Enum, auto
+
+from refinery.lib.asn1.schema import (
+    CLASS_APPLICATION,
+    CLASS_CONTEXT,
+    ANY,
+    BIT_STRING,
+    BOOLEAN,
+    ENUMERATED,
+    GEN_TIME,
+    IA5_STRING,
+    INTEGER,
+    NULL,
+    OCTET_STRING,
+    OID,
+    PRINTABLE_STRING,
+    UTF8_STRING,
+    UTC_TIME,
+    Choice,
+    F,
+    SchemaType,
+    Seq,
+    SeqOf,
+    SetOf,
+)
+
+
+class _TT(Enum):
+    IDENT = auto()
+    NUMBER = auto()
+    LBRACE = auto()
+    RBRACE = auto()
+    LPAREN = auto()
+    RPAREN = auto()
+    LBRACKET = auto()
+    RBRACKET = auto()
+    COMMA = auto()
+    ASSIGN = auto()
+    DOTDOT = auto()
+    SEMICOLON = auto()
+    PIPE = auto()
+    EOF = auto()
+
+
+_TOKEN_PATTERN = re.compile(r&#39;&#39;&#39;
+    (?P&lt;comment&gt;--[^\n]*)
+  | (?P&lt;assign&gt;::=)
+  | (?P&lt;dotdot&gt;\.\.\.?)
+  | (?P&lt;number&gt;-?[0-9]+)
+  | (?P&lt;ident&gt;[A-Za-z][A-Za-z0-9-]*)
+  | (?P&lt;lbrace&gt;\{)
+  | (?P&lt;rbrace&gt;\})
+  | (?P&lt;lparen&gt;\()
+  | (?P&lt;rparen&gt;\))
+  | (?P&lt;lbracket&gt;\[)
+  | (?P&lt;rbracket&gt;\])
+  | (?P&lt;comma&gt;,)
+  | (?P&lt;semicolon&gt;;)
+  | (?P&lt;pipe&gt;\|)
+  | (?P&lt;ws&gt;\s+)
+&#39;&#39;&#39;, re.VERBOSE)
+
+
+class _Token:
+    __slots__ = (&#39;type&#39;, &#39;value&#39;, &#39;pos&#39;)
+
+    def __init__(self, type: _TT, value: str, pos: int):
+        self.type = type
+        self.value = value
+        self.pos = pos
+
+    def __repr__(self) -&gt; str:
+        return f&#39;Token({self.type.name}, {self.value!r})&#39;
+
+
+def _tokenize(text: str) -&gt; list[_Token]:
+    tokens: list[_Token] = []
+    pos = 0
+    while pos &lt; len(text):
+        m = _TOKEN_PATTERN.match(text, pos)
+        if m is None:
+            raise SyntaxError(f&#39;unexpected character at position {pos}: {text[pos]!r}&#39;)
+        pos = m.end()
+        if m.lastgroup in (&#39;comment&#39;, &#39;ws&#39;):
+            continue
+        if m.lastgroup == &#39;assign&#39;:
+            tokens.append(_Token(_TT.ASSIGN, &#39;::=&#39;, m.start()))
+        elif m.lastgroup == &#39;dotdot&#39;:
+            tokens.append(_Token(_TT.DOTDOT, &#39;..&#39;, m.start()))
+        elif m.lastgroup == &#39;number&#39;:
+            tokens.append(_Token(_TT.NUMBER, m.group(), m.start()))
+        elif m.lastgroup == &#39;ident&#39;:
+            tokens.append(_Token(_TT.IDENT, m.group(), m.start()))
+        elif m.lastgroup == &#39;lbrace&#39;:
+            tokens.append(_Token(_TT.LBRACE, &#39;{&#39;, m.start()))
+        elif m.lastgroup == &#39;rbrace&#39;:
+            tokens.append(_Token(_TT.RBRACE, &#39;}&#39;, m.start()))
+        elif m.lastgroup == &#39;lparen&#39;:
+            tokens.append(_Token(_TT.LPAREN, &#39;(&#39;, m.start()))
+        elif m.lastgroup == &#39;rparen&#39;:
+            tokens.append(_Token(_TT.RPAREN, &#39;)&#39;, m.start()))
+        elif m.lastgroup == &#39;lbracket&#39;:
+            tokens.append(_Token(_TT.LBRACKET, &#39;[&#39;, m.start()))
+        elif m.lastgroup == &#39;rbracket&#39;:
+            tokens.append(_Token(_TT.RBRACKET, &#39;]&#39;, m.start()))
+        elif m.lastgroup == &#39;comma&#39;:
+            tokens.append(_Token(_TT.COMMA, &#39;,&#39;, m.start()))
+        elif m.lastgroup == &#39;semicolon&#39;:
+            tokens.append(_Token(_TT.SEMICOLON, &#39;;&#39;, m.start()))
+        elif m.lastgroup == &#39;pipe&#39;:
+            tokens.append(_Token(_TT.PIPE, &#39;|&#39;, m.start()))
+    tokens.append(_Token(_TT.EOF, &#39;&#39;, len(text)))
+    return tokens
+
+
+_BUILTIN_TYPE_MAP: dict[str, int] = {
+    &#39;BOOLEAN&#39;: BOOLEAN,
+    &#39;INTEGER&#39;: INTEGER,
+    &#39;NULL&#39;: NULL,
+    &#39;ENUMERATED&#39;: ENUMERATED,
+    &#39;UTCTime&#39;: UTC_TIME,
+    &#39;GeneralizedTime&#39;: GEN_TIME,
+    &#39;UTF8String&#39;: UTF8_STRING,
+    &#39;PrintableString&#39;: PRINTABLE_STRING,
+    &#39;IA5String&#39;: IA5_STRING,
+    &#39;T61String&#39;: 20,
+    &#39;TeletexString&#39;: 20,
+    &#39;BMPString&#39;: 30,
+    &#39;VisibleString&#39;: 26,
+    &#39;GeneralString&#39;: 27,
+    &#39;NumericString&#39;: 18,
+    &#39;UniversalString&#39;: 28,
+}
+
+
+class _Parser:
+    def __init__(self, tokens: list[_Token], externals: dict[str, SchemaType] | None = None):
+        self._tokens = tokens
+        self._pos = 0
+        self._assignments: dict[str, object] = {}
+        self._tag_default: str = &#39;EXPLICIT&#39;
+        self._externals = externals or {}
+
+    def _peek(self) -&gt; _Token:
+        return self._tokens[self._pos]
+
+    def _advance(self) -&gt; _Token:
+        tok = self._tokens[self._pos]
+        self._pos += 1
+        return tok
+
+    def _expect_type(self, tt: _TT) -&gt; _Token:
+        tok = self._advance()
+        if tok.type != tt:
+            raise SyntaxError(
+                f&#39;expected {tt.name}, got {tok.type.name} ({tok.value!r}) at position {tok.pos}&#39;)
+        return tok
+
+    def _expect_ident(self, value: str | None = None) -&gt; _Token:
+        tok = self._expect_type(_TT.IDENT)
+        if value is not None and tok.value != value:
+            raise SyntaxError(
+                f&#39;expected {value!r}, got {tok.value!r} at position {tok.pos}&#39;)
+        return tok
+
+    def _check_ident(self, value: str) -&gt; bool:
+        tok = self._peek()
+        return tok.type == _TT.IDENT and tok.value == value
+
+    def _check_type(self, tt: _TT) -&gt; bool:
+        return self._peek().type == tt
+
+    def _try_consume_ident(self, value: str) -&gt; bool:
+        if self._check_ident(value):
+            self._advance()
+            return True
+        return False
+
+    def parse_module(self) -&gt; dict[str, SchemaType]:
+        # module_name
+        self._expect_type(_TT.IDENT)
+        self._expect_ident(&#39;DEFINITIONS&#39;)
+
+        # optional tag default
+        if self._check_ident(&#39;IMPLICIT&#39;):
+            self._advance()
+            self._expect_ident(&#39;TAGS&#39;)
+            self._tag_default = &#39;IMPLICIT&#39;
+        elif self._check_ident(&#39;EXPLICIT&#39;):
+            self._advance()
+            self._expect_ident(&#39;TAGS&#39;)
+            self._tag_default = &#39;EXPLICIT&#39;
+
+        # optional EXTENSIBILITY IMPLIED
+        self._try_consume_ident(&#39;EXTENSIBILITY&#39;)
+        self._try_consume_ident(&#39;IMPLIED&#39;)
+
+        self._expect_type(_TT.ASSIGN)
+        self._expect_ident(&#39;BEGIN&#39;)
+
+        # optional EXPORTS
+        if self._check_ident(&#39;EXPORTS&#39;):
+            self._advance()
+            while not self._check_type(_TT.SEMICOLON):
+                self._advance()
+            self._advance()  # consume semicolon
+
+        # optional IMPORTS
+        if self._check_ident(&#39;IMPORTS&#39;):
+            self._parse_imports()
+
+        # assignments until END
+        while not self._check_ident(&#39;END&#39;):
+            if self._check_type(_TT.EOF):
+                break
+            self._parse_assignment()
+
+        return self._resolve()
+
+    def _parse_imports(self) -&gt; None:
+        self._expect_ident(&#39;IMPORTS&#39;)
+        while not self._check_type(_TT.SEMICOLON):
+            # ident_list FROM module_name
+            names: list[str] = []
+            while True:
+                names.append(self._expect_type(_TT.IDENT).value)
+                if self._check_type(_TT.COMMA):
+                    self._advance()
+                else:
+                    break
+            self._expect_ident(&#39;FROM&#39;)
+            self._expect_type(_TT.IDENT)
+            # optional OID value after module name
+            if self._check_type(_TT.LBRACE):
+                self._skip_braces()
+        self._expect_type(_TT.SEMICOLON)
+
+    def _parse_assignment(self) -&gt; None:
+        name_tok = self._expect_type(_TT.IDENT)
+        name = name_tok.value
+        self._expect_type(_TT.ASSIGN)
+        schema = self._parse_type()
+        self._assignments[name] = schema
+
+    def _parse_type(self) -&gt; object:
+        # tagged type: [N] IMPLICIT/EXPLICIT Type
+        if self._check_type(_TT.LBRACKET):
+            return self._parse_tagged_type()
+
+        tok = self._peek()
+
+        if tok.type == _TT.IDENT:
+            val = tok.value
+
+            if val == &#39;SEQUENCE&#39;:
+                self._advance()
+                if self._check_type(_TT.LBRACE):
+                    return self._parse_sequence()
+                elif self._check_ident(&#39;OF&#39;):
+                    self._advance()
+                    element = self._parse_type()
+                    return (&#39;SeqOf&#39;, element)
+                elif self._check_type(_TT.LPAREN):
+                    self._skip_constraint()
+                    if self._check_ident(&#39;OF&#39;):
+                        self._advance()
+                        element = self._parse_type()
+                        return (&#39;SeqOf&#39;, element)
+                    return SEQUENCE
+                return SEQUENCE
+
+            if val == &#39;SET&#39;:
+                self._advance()
+                if self._check_type(_TT.LBRACE):
+                    return self._parse_set_body()
+                elif self._check_ident(&#39;OF&#39;):
+                    self._advance()
+                    element = self._parse_type()
+                    return (&#39;SetOf&#39;, element)
+                elif self._check_type(_TT.LPAREN):
+                    self._skip_constraint()
+                    if self._check_ident(&#39;OF&#39;):
+                        self._advance()
+                        element = self._parse_type()
+                        return (&#39;SetOf&#39;, element)
+                    return SET
+                return SET
+
+            if val == &#39;CHOICE&#39;:
+                self._advance()
+                return self._parse_choice()
+
+            if val == &#39;ENUMERATED&#39;:
+                self._advance()
+                if self._check_type(_TT.LBRACE):
+                    self._skip_braces()
+                return ENUMERATED
+
+            if val == &#39;BIT&#39;:
+                self._advance()
+                self._expect_ident(&#39;STRING&#39;)
+                if self._check_type(_TT.LPAREN):
+                    self._skip_constraint()
+                if self._check_type(_TT.LBRACE):
+                    self._skip_braces()
+                return BIT_STRING
+
+            if val == &#39;OCTET&#39;:
+                self._advance()
+                self._expect_ident(&#39;STRING&#39;)
+                if self._check_type(_TT.LPAREN):
+                    self._skip_constraint()
+                return OCTET_STRING
+
+            if val == &#39;OBJECT&#39;:
+                self._advance()
+                self._expect_ident(&#39;IDENTIFIER&#39;)
+                return OID
+
+            if val == &#39;ANY&#39;:
+                self._advance()
+                if self._check_ident(&#39;DEFINED&#39;):
+                    self._advance()
+                    self._expect_ident(&#39;BY&#39;)
+                    self._expect_type(_TT.IDENT)
+                return ANY
+
+            if val == &#39;BOOLEAN&#39;:
+                self._advance()
+                return BOOLEAN
+
+            if val == &#39;INTEGER&#39;:
+                self._advance()
+                if self._check_type(_TT.LPAREN):
+                    self._skip_constraint()
+                if self._check_type(_TT.LBRACE):
+                    self._skip_braces()
+                return INTEGER
+
+            if val == &#39;NULL&#39;:
+                self._advance()
+                return NULL
+
+            if val in _BUILTIN_TYPE_MAP:
+                self._advance()
+                if self._check_type(_TT.LPAREN):
+                    self._skip_constraint()
+                return _BUILTIN_TYPE_MAP[val]
+
+            # type reference
+            self._advance()
+            if self._check_type(_TT.LPAREN):
+                self._skip_constraint()
+            return (&#39;TypeRef&#39;, val)
+
+        raise SyntaxError(
+            f&#39;unexpected token {tok.type.name} ({tok.value!r}) at position {tok.pos} while parsing type&#39;)
+
+    def _parse_tagged_type(self) -&gt; object:
+        self._expect_type(_TT.LBRACKET)
+
+        tag_class_val = CLASS_CONTEXT
+        if self._check_ident(&#39;APPLICATION&#39;):
+            self._advance()
+            tag_class_val = CLASS_APPLICATION
+
+        tag_num = int(self._expect_type(_TT.NUMBER).value)
+        self._expect_type(_TT.RBRACKET)
+
+        tagging: str | None = None
+        if self._check_ident(&#39;IMPLICIT&#39;):
+            self._advance()
+            tagging = &#39;IMPLICIT&#39;
+        elif self._check_ident(&#39;EXPLICIT&#39;):
+            self._advance()
+            tagging = &#39;EXPLICIT&#39;
+
+        if tagging is None:
+            tagging = self._tag_default
+
+        inner = self._parse_type()
+        return (&#39;Tagged&#39;, tag_num, tagging, inner, tag_class_val)
+
+    def _parse_sequence(self) -&gt; object:
+        self._expect_type(_TT.LBRACE)
+        fields: list[object] = []
+
+        while not self._check_type(_TT.RBRACE):
+            # extension marker
+            if self._check_type(_TT.DOTDOT):
+                self._advance()
+                if self._check_type(_TT.DOTDOT):
+                    self._advance()
+                if self._check_type(_TT.COMMA):
+                    self._advance()
+                continue
+
+            field = self._parse_field()
+            fields.append(field)
+
+            if self._check_type(_TT.COMMA):
+                self._advance()
+
+        self._expect_type(_TT.RBRACE)
+        return (&#39;Seq&#39;, fields)
+
+    def _parse_set_body(self) -&gt; object:
+        self._expect_type(_TT.LBRACE)
+        fields: list[object] = []
+
+        while not self._check_type(_TT.RBRACE):
+            if self._check_type(_TT.DOTDOT):
+                self._advance()
+                if self._check_type(_TT.DOTDOT):
+                    self._advance()
+                if self._check_type(_TT.COMMA):
+                    self._advance()
+                continue
+
+            field = self._parse_field()
+            fields.append(field)
+
+            if self._check_type(_TT.COMMA):
+                self._advance()
+
+        self._expect_type(_TT.RBRACE)
+        return (&#39;Set&#39;, fields)
+
+    def _parse_field(self) -&gt; object:
+        name = self._expect_type(_TT.IDENT).value
+        ftype = self._parse_type()
+
+        optional = False
+        default = None
+        has_default = False
+
+        if self._check_ident(&#39;OPTIONAL&#39;):
+            self._advance()
+            optional = True
+        elif self._check_ident(&#39;DEFAULT&#39;):
+            self._advance()
+            has_default = True
+            default = self._parse_default_value()
+
+        return (&#39;Field&#39;, name, ftype, optional, has_default, default)
+
+    def _parse_default_value(self) -&gt; object:
+        tok = self._peek()
+        if tok.type == _TT.NUMBER:
+            self._advance()
+            return int(tok.value)
+        if tok.type == _TT.IDENT:
+            if tok.value == &#39;TRUE&#39;:
+                self._advance()
+                return True
+            if tok.value == &#39;FALSE&#39;:
+                self._advance()
+                return False
+            if tok.value == &#39;NULL&#39;:
+                self._advance()
+                return None
+            # named value or enumerated value - consume it
+            self._advance()
+            # could be a named number from INTEGER { ... }
+            return tok.value
+        # fallback: skip until COMMA/RBRACE
+        self._advance()
+        return None
+
+    def _parse_choice(self) -&gt; object:
+        self._expect_type(_TT.LBRACE)
+        alts: list[object] = []
+
+        while not self._check_type(_TT.RBRACE):
+            if self._check_type(_TT.DOTDOT):
+                self._advance()
+                if self._check_type(_TT.DOTDOT):
+                    self._advance()
+                if self._check_type(_TT.COMMA):
+                    self._advance()
+                continue
+
+            name = self._expect_type(_TT.IDENT).value
+            atype = self._parse_type()
+            alts.append((&#39;Alt&#39;, name, atype))
+
+            if self._check_type(_TT.COMMA):
+                self._advance()
+
+        self._expect_type(_TT.RBRACE)
+        return (&#39;Choice&#39;, alts)
+
+    def _skip_constraint(self) -&gt; None:
+        self._expect_type(_TT.LPAREN)
+        depth = 1
+        while depth &gt; 0:
+            tok = self._advance()
+            if tok.type == _TT.LPAREN:
+                depth += 1
+            elif tok.type == _TT.RPAREN:
+                depth -= 1
+            elif tok.type == _TT.EOF:
+                raise SyntaxError(&#39;unexpected EOF in constraint&#39;)
+
+    def _skip_braces(self) -&gt; None:
+        self._expect_type(_TT.LBRACE)
+        depth = 1
+        while depth &gt; 0:
+            tok = self._advance()
+            if tok.type == _TT.LBRACE:
+                depth += 1
+            elif tok.type == _TT.RBRACE:
+                depth -= 1
+            elif tok.type == _TT.EOF:
+                raise SyntaxError(&#39;unexpected EOF in braces&#39;)
+
+    def _resolve(self) -&gt; dict[str, SchemaType]:
+        resolved: dict[str, SchemaType] = {}
+        resolved.update(self._externals)
+
+        def resolve_type(t: object) -&gt; SchemaType:
+            if isinstance(t, int) or t is ANY:
+                return t
+
+            if isinstance(t, tuple):
+                tag = t[0]
+
+                if tag == &#39;TypeRef&#39;:
+                    name = t[1]
+                    if name in resolved:
+                        return resolved[name]
+                    if name in self._assignments:
+                        resolved[name] = _resolve_assignment(name)
+                        return resolved[name]
+                    if name in _BUILTIN_TYPE_MAP:
+                        return _BUILTIN_TYPE_MAP[name]
+                    return ANY
+
+                if tag == &#39;Seq&#39;:
+                    fields = t[1]
+                    return Seq(*[_resolve_field(f) for f in fields])
+
+                if tag == &#39;Set&#39;:
+                    fields = t[1]
+                    return Seq(*[_resolve_field(f) for f in fields])
+
+                if tag == &#39;SeqOf&#39;:
+                    return SeqOf(resolve_type(t[1]))
+
+                if tag == &#39;SetOf&#39;:
+                    return SetOf(resolve_type(t[1]))
+
+                if tag == &#39;Choice&#39;:
+                    alts = t[1]
+                    return Choice(*[_resolve_alt(a) for a in alts])
+
+                if tag == &#39;Tagged&#39;:
+                    # This is handled at the field level, shouldn&#39;t appear standalone
+                    # at top level except in assignment like:
+                    #   Foo ::= [0] IMPLICIT Bar
+                    # In that case, just resolve the inner type
+                    return resolve_type(t[3])
+
+            return ANY
+
+        def _resolve_field(f: object) -&gt; F:
+            assert isinstance(f, tuple) and f[0] == &#39;Field&#39;
+            _, name, ftype, optional, has_default, default = f
+
+            implicit: int | None = None
+            explicit: int | None = None
+            tag_class_val: int = CLASS_CONTEXT
+
+            # unwrap tagged type
+            actual_type = ftype
+            if isinstance(ftype, tuple) and ftype[0] == &#39;Tagged&#39;:
+                tag_num, tagging, inner, tag_class_val = ftype[1], ftype[2], ftype[3], ftype[4]
+                actual_type = inner
+                if tagging == &#39;IMPLICIT&#39;:
+                    implicit = tag_num
+                else:
+                    explicit = tag_num
+
+            resolved_type = resolve_type(actual_type)
+
+            kwargs: dict[str, object] = {}
+            if implicit is not None:
+                kwargs[&#39;implicit&#39;] = implicit
+            if explicit is not None:
+                kwargs[&#39;explicit&#39;] = explicit
+            if tag_class_val != CLASS_CONTEXT:
+                kwargs[&#39;tag_class&#39;] = tag_class_val
+            if has_default:
+                kwargs[&#39;default&#39;] = default
+            elif optional:
+                kwargs[&#39;optional&#39;] = True
+
+            return F(name, resolved_type, **kwargs)  # type: ignore
+
+        def _resolve_alt(a: object) -&gt; F:
+            assert isinstance(a, tuple) and a[0] == &#39;Alt&#39;
+            _, name, atype = a
+
+            implicit: int | None = None
+            explicit: int | None = None
+            tag_class_val: int = CLASS_CONTEXT
+
+            actual_type = atype
+            if isinstance(atype, tuple) and atype[0] == &#39;Tagged&#39;:
+                tag_num, tagging, inner, tag_class_val = atype[1], atype[2], atype[3], atype[4]
+                actual_type = inner
+                if tagging == &#39;IMPLICIT&#39;:
+                    implicit = tag_num
+                else:
+                    explicit = tag_num
+
+            resolved_type = resolve_type(actual_type)
+
+            kwargs: dict[str, object] = {}
+            if implicit is not None:
+                kwargs[&#39;implicit&#39;] = implicit
+            if explicit is not None:
+                kwargs[&#39;explicit&#39;] = explicit
+            if tag_class_val != CLASS_CONTEXT:
+                kwargs[&#39;tag_class&#39;] = tag_class_val
+
+            return F(name, resolved_type, **kwargs)  # type: ignore
+
+        def _resolve_assignment(name: str) -&gt; SchemaType:
+            if name in resolved:
+                return resolved[name]
+            raw = self._assignments[name]
+            # place a sentinel to detect cycles
+            resolved[name] = ANY
+            result = resolve_type(raw)
+            resolved[name] = result
+            return result
+
+        for name in self._assignments:
+            if name not in resolved:
+                _resolve_assignment(name)
+
+        return resolved
+
+
+def compile_asn1(
+    text: str,
+    externals: dict[str, SchemaType] | None = None,
+) -&gt; dict[str, SchemaType]:
+    &#34;&#34;&#34;
+    Parse ASN.1 module definition text and return a dictionary mapping
+    type names to DSL schema objects.
+
+    Args:
+        text: ASN.1 module text with ``DEFINITIONS ::= BEGIN ... END`` envelope.
+        externals: Pre-resolved type names to inject (e.g. from other modules).
+
+    Returns:
+        Dictionary mapping type names to schema objects (Seq, SeqOf, etc.).
+    &#34;&#34;&#34;
+    tokens = _tokenize(text)
+    parser = _Parser(tokens, externals)
+    return parser.parse_module()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.asn1.compiler.compile_asn1"><code class="name flex">
+<span>def <span class="ident">compile_asn1</span></span>(<span>text, externals=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Parse ASN.1 module definition text and return a dictionary mapping
+type names to DSL schema objects.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text</code></strong></dt>
+<dd>ASN.1 module text with <code>DEFINITIONS ::= BEGIN ... END</code> envelope.</dd>
+<dt><strong><code>externals</code></strong></dt>
+<dd>Pre-resolved type names to inject (e.g. from other modules).</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary mapping type names to schema objects (Seq, SeqOf, etc.).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/asn1/compiler.py#L670-L687" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def compile_asn1(
+    text: str,
+    externals: dict[str, SchemaType] | None = None,
+) -&gt; dict[str, SchemaType]:
+    &#34;&#34;&#34;
+    Parse ASN.1 module definition text and return a dictionary mapping
+    type names to DSL schema objects.
+
+    Args:
+        text: ASN.1 module text with ``DEFINITIONS ::= BEGIN ... END`` envelope.
+        externals: Pre-resolved type names to inject (e.g. from other modules).
+
+    Returns:
+        Dictionary mapping type names to schema objects (Seq, SeqOf, etc.).
+    &#34;&#34;&#34;
+    tokens = _tokenize(text)
+    parser = _Parser(tokens, externals)
+    return parser.parse_module()</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.asn1" href="index.html">refinery.lib.asn1</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.asn1.compiler.compile_asn1" href="#refinery.lib.asn1.compiler.compile_asn1">compile_asn1</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

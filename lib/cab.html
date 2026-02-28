@@ -1,0 +1,1741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.cab documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.cab</code></h1>
+</header>
+<section id="section-intro">
+<p>Parsing of CAB archives.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L1-L422" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Parsing of CAB archives.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import zlib
+
+from datetime import date, datetime, time
+from enum import IntEnum, IntFlag
+from typing import Iterable, NamedTuple
+
+from refinery.lib import chunks
+from refinery.lib.seven.lzx import LzxDecoder
+from refinery.lib.structures import Struct, StructReader
+
+
+class CabVolumeMissing(LookupError):
+    def __init__(self, idx: int = -1, ref: CabRef | None = None):
+        self.idx = idx
+        self.ref = ref
+
+    def __str__(self):
+        if self.ref is not None:
+            name = str(self.ref)
+        else:
+            name = F&#39;Disk {self.idx}&#39;
+        return F&#39;Missing CAB volume: {name}&#39;
+
+
+class CabSequenceMismatch(ValueError):
+    def __init__(self, index: int, prev: CabRef | None, next: CabRef | None):
+        self.index = index
+        self.prev = prev
+        self.next = next
+
+    def __str__(self):
+        k = self.index
+        return (
+            F&#39;CAB disk sequence mismatch at {k}. Disk {k - 1} expected {self.next!s} as the next &#39;
+            F&#39;one, but disk {k + 1} expected {self.prev!s} as its predecessor.&#39;)
+
+
+class CabVolumeCorrupt(ValueError):
+    pass
+
+
+def cab_data_checksum(content: memoryview, checksum: int = 0) -&gt; int:
+    for chunk in chunks.unpack(content, 4):
+        checksum ^= chunk
+    if k := len(content) % 4:
+        checksum ^= int.from_bytes(content[-k:], &#39;big&#39;)
+    return checksum
+
+
+class CabFlags(IntFlag):
+    HasPrev = 1
+    HasNext = 2
+    Reserve = 4
+
+
+class CabMethod(IntEnum):
+    Nothing = 0
+    Deflate = 1
+    Quantum = 2
+    LZX = 3
+
+
+class CabAttr(IntFlag):
+    ReadOnly = 0x01
+    Hidden = 0x02
+    System = 0x04
+    Arch = 0x20
+    Exec = 0x40
+    NameUTF8 = 0x80
+
+
+class NFolderIndex(IntFlag):
+    HasPrev = 0xFFFD
+    HasNext = 0xFFFE
+    HasBoth = 0xFFFF
+
+
+class CabFolder(Struct):
+
+    def __init__(self, reader: StructReader[memoryview], parent: CabDisk, compute_checksums: bool, no_magic: bool):
+        start = reader.u32()
+        count = reader.u16()
+        if no_magic:
+            start -= 4
+        self.method = (reader.u8(), reader.u8())
+        self.compression = CabMethod(self.method[0] &amp; 0xF)
+        reader.seekrel(parent.skip_per_fldr)
+        with reader.detour(start):
+            self.blocks = [CabCompressedBlock(reader, parent, compute_checksums) for _ in range(count)]
+        self.decompressed = None
+
+    def __repr__(self):
+        return F&#39;&lt;fldr:{self.compression.name}({self.method[1]}):{len(self.blocks)}&gt;&#39;
+
+    def iter_block_data(self):
+        it = iter(self.blocks)
+        for block in it:
+            if size := block.decompressed_size:
+                yield size, block.data
+                continue
+            merged = bytearray(block.data)
+            while not size:
+                try:
+                    tail = next(it)
+                except StopIteration as E:
+                    raise EOFError from E
+                merged.extend(tail.data)
+                size = tail.decompressed_size
+            yield size, memoryview(merged)
+
+    def decompress(self):
+        if self.decompressed is not None:
+            return memoryview(self.decompressed)
+
+        dst = bytearray()
+        cm = self.compression
+
+        if cm == CabMethod.Nothing:
+            for block in self.blocks:
+                dst.extend(block.data)
+        elif cm == CabMethod.Deflate:
+            zdict = B&#39;&#39;
+            for _, data in self.iter_block_data():
+                if data[:2] != B&#39;CK&#39;:
+                    raise ValueError(&#39;Corrupted MSZip block with invalid header.&#39;)
+                try:
+                    inflate = zlib.decompressobj(-zlib.MAX_WBITS, zdict)
+                    zdict = inflate.decompress(data[2:]) + inflate.flush()
+                except zlib.error:
+                    raise RuntimeError(&#39;Failed to inflate CAB data block.&#39;)
+                else:
+                    dst.extend(zdict)
+        elif cm == CabMethod.LZX:
+            lzx = LzxDecoder(False)
+            lzx.set_params_and_alloc(self.method[1])
+            for size, data in self.iter_block_data():
+                dst.extend(lzx.decompress(data, size))
+                lzx.keep_history = True
+        elif cm == CabMethod.Quantum:
+            raise NotImplementedError(&#39;Quantum decompression is not yet implemented.&#39;)
+        else:
+            raise ValueError(F&#39;Unknown decompression method: {cm!r}&#39;)
+        self.decompressed = dst
+        return memoryview(dst)
+
+
+class CabFile(Struct):
+
+    folder: CabFolder | None
+
+    def __init__(self, reader: StructReader[memoryview]):
+        self.size = reader.u32()
+        self.offset = reader.u32()
+        self._index = reader.u16()
+        self.folder = None
+        self.end = self.offset + self.size
+        d = reader.u16()
+        t = reader.u16()
+        s = (t &amp; 0x1F) &lt;&lt; 1
+
+        try:
+            self.date = d = date(
+                ((d &amp; 0xFE00) &gt;&gt; 0x9) + 1980,
+                ((d &amp; 0x01E0) &gt;&gt; 0x5),
+                ((d &amp; 0x001F) &gt;&gt; 0x0),
+            )
+        except Exception:
+            self.date = d = None
+
+        try:
+            self.time = t = time(
+                ((t &amp; 0xF800) &gt;&gt; 0xB),
+                ((t &amp; 0x07E0) &gt;&gt; 0x5),
+                59 if s == 60 else s,
+            )
+        except Exception:
+            self.time = t = None
+
+        self.timestamp = datetime.combine(d, t) if d and t else None
+        self.attributes = CabAttr(reader.u16())
+        self.name = reader.read_c_string(self.codec)
+
+    def __repr__(self):
+        index = {
+            NFolderIndex.HasPrev.value: &#39;PP&#39;,
+            NFolderIndex.HasNext.value: &#39;NN&#39;,
+            NFolderIndex.HasBoth.value: &#39;PN&#39;,
+        }.get(self._index, F&#39;{self._index:02d}&#39;)
+        d = d.isoformat() if (d := self.date) else &#39;????-??-??&#39;
+        t = t.isoformat(&#39;seconds&#39;) if (t := self.time) else &#39;??:??:??&#39;
+        return F&#39;&lt;file:{index}:{d}T{t}:{self.name}&gt;&#39;
+
+    def decompress(self):
+        folder = self.folder
+        if folder is None:
+            raise RuntimeError(F&#39;CAB file entry is missing a link to its folder: {self!r}&#39;)
+        folder_data = folder.decompress()
+        data = folder_data[self.offset:self.end]
+        if len(data) != self.size:
+            raise RuntimeError(F&#39;The extracted file does not have the correct size: {self!r}&#39;)
+        return data
+
+    @property
+    def codec(self):
+        return &#39;utf8&#39; if self.attributes &amp; CabAttr.NameUTF8 else &#39;latin1&#39;
+
+    def has_prev(self):
+        return self._index in (NFolderIndex.HasPrev, NFolderIndex.HasBoth)
+
+    def has_next(self):
+        return self._index in (NFolderIndex.HasNext, NFolderIndex.HasBoth)
+
+    @property
+    def index(self):
+        if self.has_prev():
+            return +0
+        if self.has_next():
+            return ~0
+        else:
+            return self._index
+
+
+class CabCompressedBlock(Struct):
+
+    def __init__(self, reader: StructReader[memoryview], parent: CabDisk, compute_checksums: bool):
+        self.provided_checksum = reader.u32()
+        seed = reader.u32(peek=True)
+        size = reader.u16()
+        self.decompressed_size = reader.u16()
+        reader.seekrel(parent.skip_per_data)
+        self.data = data = reader.read_exactly(size)
+        self.computed_checksum = cab_data_checksum(data, seed) if compute_checksums else None
+
+    def __repr__(self):
+        if self.computed_checksum == self.provided_checksum:
+            checksum = &#39;OK&#39;
+        elif self.computed_checksum is None:
+            checksum = &#39;??&#39;
+        else:
+            checksum = &#39;!!&#39;
+        return F&#39;&lt;block:{len(self.data):04X}-&gt;{self.decompressed_size:04X}:{checksum}&gt;&#39;
+
+
+class CabRef(NamedTuple):
+    name: str
+    disk: str
+
+    def __str__(self):
+        return F&#39;{self.disk} ({self.name})&#39;
+
+
+class CabDisk(Struct):
+    MAGIC = B&#39;MSCF&#39;
+
+    def __init__(self, reader: StructReader[memoryview], compute_checksums: bool, no_magic: bool):
+        if no_magic:
+            self.signature = self.MAGIC
+        else:
+            self.signature = reader.read(4)
+
+        self._reserved = []
+        self._reserved.append(reader.u32())
+        self.size = reader.u32()
+        self._reserved.append(reader.u32())
+        self.file_offset = reader.u32()
+        if no_magic:
+            self.file_offset -= 4
+        self._reserved.append(reader.u32())
+
+        self.version = (reader.u8(), reader.u8())
+        self.nr_of_folders = reader.u16()
+        self.nr_of_files = reader.u16()
+        self.flags = CabFlags(reader.u16())
+        self.id = reader.u16()
+        self.index = reader.u16()
+
+        (
+            self.skip_per_disk,
+            self.skip_per_fldr,
+            self.skip_per_data,
+        ) = (reader.u16(), reader.u8(), reader.u8()) if (
+            self.flags &amp; CabFlags.Reserve
+        ) else (0, 0, 0)
+
+        reader.seekrel(self.skip_per_disk)
+
+        self.prev = CabRef(
+            reader.read_c_string(&#39;ascii&#39;),
+            reader.read_c_string(&#39;ascii&#39;),
+        ) if self.flags &amp; CabFlags.HasPrev else None
+
+        self.next = CabRef(
+            reader.read_c_string(&#39;ascii&#39;),
+            reader.read_c_string(&#39;ascii&#39;),
+        ) if self.flags &amp; CabFlags.HasNext else None
+
+        self.folders = [
+            CabFolder(reader, self, compute_checksums, no_magic) for _ in range(self.nr_of_folders)]
+
+        reader.seekset(self.file_offset)
+        self.files = [CabFile(reader) for _ in range(self.nr_of_files)]
+
+        self._reader = reader
+        self._arcpos = reader.tell()
+
+    def check(self):
+        if self.signature != self.MAGIC:
+            raise ValueError(F&#39;Invalid signature: {self.signature.hex()}&#39;)
+        if self.flags.value &gt; 7:
+            raise ValueError(F&#39;Invalid flags: {self.flags.value}.&#39;)
+        if any(self._reserved):
+            raise ValueError(&#39;Reserved field was nonzero.&#39;)
+        if self.size &lt; 36:
+            raise ValueError(F&#39;Archive header specifies invalid size of {self.size} bytes.&#39;)
+        return self
+
+
+class Cabinet:
+    files: dict[int, list[CabFile]]
+    disks: dict[int, list[CabDisk]]
+
+    def __init__(self, *disks: memoryview, compute_checksums: bool = True, no_magic: bool = False):
+        self.disks = {}
+        self.files = {}
+        self.compute_checksums = compute_checksums
+        self.no_magic = no_magic
+        self.extend(disks)
+
+    def get_files(self, id: int | None = None):
+        if id is None:
+            if len(self.files) != 1:
+                raise LookupError
+            return next(iter(self.files.values()))
+        else:
+            return self.files[id]
+
+    def __bool__(self):
+        return bool(self.disks)
+
+    def __len__(self):
+        return sum(len(disks) for disks in self.disks.values())
+
+    def extend(self, disks: Iterable[memoryview]):
+        for d in disks:
+            disk = CabDisk.Parse(memoryview(d), self.compute_checksums, self.no_magic)
+            byid = self.disks.setdefault(disk.id, [])
+            byid.append(disk)
+        for byid in self.disks.values():
+            byid.sort(key=lambda c: c.index)
+
+    def append(self, *disks: memoryview):
+        self.extend(disks)
+
+    def process(self):
+        for id, disks in self.disks.items():
+            files = self.files[id] = []
+            partial: CabFolder | None = None
+            folders: list[CabFolder] = []
+            for disk in disks:
+                folders.clear()
+                for folder in disk.folders:
+                    if partial is None:
+                        folders.append(folder)
+                        continue
+                    if partial.method != folder.method:
+                        raise ValueError(&#39;Mismatching methods for continued folder.&#39;)
+                    if folder.blocks:
+                        partial.blocks.extend(folder.blocks)
+                        folder.blocks.clear()
+                    folders.append(partial)
+                    partial = None
+                for file in disk.files:
+                    file.folder = folders[file.index]
+                    if file.has_next():
+                        partial = file.folder
+                    else:
+                        files.append(file)
+        return self
+
+    def needs_more_disks(self):
+        if not self.disks:
+            return True
+        try:
+            self.check(checksums=False)
+        except CabVolumeMissing:
+            return True
+        else:
+            return False
+
+    def check(self, checksums: bool = True):
+        for disks in self.disks.values():
+            for k, disk in enumerate(disks):
+                if disk.index != k:
+                    raise CabVolumeMissing(idx=k)
+            prev_list = [disk.prev for disk in disks]
+            next_list = [disk.next for disk in disks]
+            if prev := prev_list[+0]:
+                raise CabVolumeMissing(ref=prev)
+            if next := next_list[~0]:
+                raise CabVolumeMissing(ref=next)
+            for k, (prev, next) in enumerate(zip(prev_list[2:], next_list[:-2]), 2):
+                if prev != next:
+                    raise CabSequenceMismatch(k, prev, next)
+            if not checksums:
+                continue
+            for disk in disks:
+                for f, folder in enumerate(disk.folders):
+                    for b, block in enumerate(folder.blocks):
+                        if block.computed_checksum is None:
+                            continue
+                        p = block.provided_checksum
+                        c = block.computed_checksum
+                        if p == c:
+                            continue
+                        raise CabVolumeCorrupt(
+                            F&#39;Incorrect checksum in Disk {disk.index}, folder {f}, block {b}; &#39;
+                            F&#39;provided value was {p:08X}, computed value {c:08X}.&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.cab.cab_data_checksum"><code class="name flex">
+<span>def <span class="ident">cab_data_checksum</span></span>(<span>content, checksum=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L47-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def cab_data_checksum(content: memoryview, checksum: int = 0) -&gt; int:
+    for chunk in chunks.unpack(content, 4):
+        checksum ^= chunk
+    if k := len(content) % 4:
+        checksum ^= int.from_bytes(content[-k:], &#39;big&#39;)
+    return checksum</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.cab.CabVolumeMissing"><code class="flex name class">
+<span>class <span class="ident">CabVolumeMissing</span></span>
+<span>(</span><span>idx=-1, ref=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Base class for lookup errors.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L17-L27" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabVolumeMissing(LookupError):
+    def __init__(self, idx: int = -1, ref: CabRef | None = None):
+        self.idx = idx
+        self.ref = ref
+
+    def __str__(self):
+        if self.ref is not None:
+            name = str(self.ref)
+        else:
+            name = F&#39;Disk {self.idx}&#39;
+        return F&#39;Missing CAB volume: {name}&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.LookupError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.cab.CabSequenceMismatch"><code class="flex name class">
+<span>class <span class="ident">CabSequenceMismatch</span></span>
+<span>(</span><span>index, prev, next)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Inappropriate argument value (of correct type).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L30-L40" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabSequenceMismatch(ValueError):
+    def __init__(self, index: int, prev: CabRef | None, next: CabRef | None):
+        self.index = index
+        self.prev = prev
+        self.next = next
+
+    def __str__(self):
+        k = self.index
+        return (
+            F&#39;CAB disk sequence mismatch at {k}. Disk {k - 1} expected {self.next!s} as the next &#39;
+            F&#39;one, but disk {k + 1} expected {self.prev!s} as its predecessor.&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.cab.CabVolumeCorrupt"><code class="flex name class">
+<span>class <span class="ident">CabVolumeCorrupt</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Inappropriate argument value (of correct type).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L43-L44" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabVolumeCorrupt(ValueError):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.cab.CabFlags"><code class="flex name class">
+<span>class <span class="ident">CabFlags</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Support for integer-based Flags</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L55-L58" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabFlags(IntFlag):
+    HasPrev = 1
+    HasNext = 2
+    Reserve = 4</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntFlag</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Flag</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFlags.HasPrev"><code class="name">var <span class="ident">HasPrev</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabFlags.HasNext"><code class="name">var <span class="ident">HasNext</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabFlags.Reserve"><code class="name">var <span class="ident">Reserve</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabMethod"><code class="flex name class">
+<span>class <span class="ident">CabMethod</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L61-L65" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabMethod(IntEnum):
+    Nothing = 0
+    Deflate = 1
+    Quantum = 2
+    LZX = 3</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabMethod.Nothing"><code class="name">var <span class="ident">Nothing</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabMethod.Deflate"><code class="name">var <span class="ident">Deflate</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabMethod.Quantum"><code class="name">var <span class="ident">Quantum</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabMethod.LZX"><code class="name">var <span class="ident">LZX</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabAttr"><code class="flex name class">
+<span>class <span class="ident">CabAttr</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Support for integer-based Flags</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L68-L74" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabAttr(IntFlag):
+    ReadOnly = 0x01
+    Hidden = 0x02
+    System = 0x04
+    Arch = 0x20
+    Exec = 0x40
+    NameUTF8 = 0x80</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntFlag</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Flag</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabAttr.ReadOnly"><code class="name">var <span class="ident">ReadOnly</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabAttr.Hidden"><code class="name">var <span class="ident">Hidden</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabAttr.System"><code class="name">var <span class="ident">System</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabAttr.Arch"><code class="name">var <span class="ident">Arch</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabAttr.Exec"><code class="name">var <span class="ident">Exec</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.CabAttr.NameUTF8"><code class="name">var <span class="ident">NameUTF8</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.NFolderIndex"><code class="flex name class">
+<span>class <span class="ident">NFolderIndex</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Support for integer-based Flags</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L77-L80" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class NFolderIndex(IntFlag):
+    HasPrev = 0xFFFD
+    HasNext = 0xFFFE
+    HasBoth = 0xFFFF</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntFlag</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Flag</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.NFolderIndex.HasPrev"><code class="name">var <span class="ident">HasPrev</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.NFolderIndex.HasNext"><code class="name">var <span class="ident">HasNext</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.NFolderIndex.HasBoth"><code class="name">var <span class="ident">HasBoth</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabFolder"><code class="flex name class">
+<span>class <span class="ident">CabFolder</span></span>
+<span>(</span><span>reader, parent, compute_checksums, no_magic)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L83-L149" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabFolder(Struct):
+
+    def __init__(self, reader: StructReader[memoryview], parent: CabDisk, compute_checksums: bool, no_magic: bool):
+        start = reader.u32()
+        count = reader.u16()
+        if no_magic:
+            start -= 4
+        self.method = (reader.u8(), reader.u8())
+        self.compression = CabMethod(self.method[0] &amp; 0xF)
+        reader.seekrel(parent.skip_per_fldr)
+        with reader.detour(start):
+            self.blocks = [CabCompressedBlock(reader, parent, compute_checksums) for _ in range(count)]
+        self.decompressed = None
+
+    def __repr__(self):
+        return F&#39;&lt;fldr:{self.compression.name}({self.method[1]}):{len(self.blocks)}&gt;&#39;
+
+    def iter_block_data(self):
+        it = iter(self.blocks)
+        for block in it:
+            if size := block.decompressed_size:
+                yield size, block.data
+                continue
+            merged = bytearray(block.data)
+            while not size:
+                try:
+                    tail = next(it)
+                except StopIteration as E:
+                    raise EOFError from E
+                merged.extend(tail.data)
+                size = tail.decompressed_size
+            yield size, memoryview(merged)
+
+    def decompress(self):
+        if self.decompressed is not None:
+            return memoryview(self.decompressed)
+
+        dst = bytearray()
+        cm = self.compression
+
+        if cm == CabMethod.Nothing:
+            for block in self.blocks:
+                dst.extend(block.data)
+        elif cm == CabMethod.Deflate:
+            zdict = B&#39;&#39;
+            for _, data in self.iter_block_data():
+                if data[:2] != B&#39;CK&#39;:
+                    raise ValueError(&#39;Corrupted MSZip block with invalid header.&#39;)
+                try:
+                    inflate = zlib.decompressobj(-zlib.MAX_WBITS, zdict)
+                    zdict = inflate.decompress(data[2:]) + inflate.flush()
+                except zlib.error:
+                    raise RuntimeError(&#39;Failed to inflate CAB data block.&#39;)
+                else:
+                    dst.extend(zdict)
+        elif cm == CabMethod.LZX:
+            lzx = LzxDecoder(False)
+            lzx.set_params_and_alloc(self.method[1])
+            for size, data in self.iter_block_data():
+                dst.extend(lzx.decompress(data, size))
+                lzx.keep_history = True
+        elif cm == CabMethod.Quantum:
+            raise NotImplementedError(&#39;Quantum decompression is not yet implemented.&#39;)
+        else:
+            raise ValueError(F&#39;Unknown decompression method: {cm!r}&#39;)
+        self.decompressed = dst
+        return memoryview(dst)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFolder.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFolder.iter_block_data"><code class="name flex">
+<span>def <span class="ident">iter_block_data</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L100-L114" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def iter_block_data(self):
+    it = iter(self.blocks)
+    for block in it:
+        if size := block.decompressed_size:
+            yield size, block.data
+            continue
+        merged = bytearray(block.data)
+        while not size:
+            try:
+                tail = next(it)
+            except StopIteration as E:
+                raise EOFError from E
+            merged.extend(tail.data)
+            size = tail.decompressed_size
+        yield size, memoryview(merged)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.CabFolder.decompress"><code class="name flex">
+<span>def <span class="ident">decompress</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L116-L149" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decompress(self):
+    if self.decompressed is not None:
+        return memoryview(self.decompressed)
+
+    dst = bytearray()
+    cm = self.compression
+
+    if cm == CabMethod.Nothing:
+        for block in self.blocks:
+            dst.extend(block.data)
+    elif cm == CabMethod.Deflate:
+        zdict = B&#39;&#39;
+        for _, data in self.iter_block_data():
+            if data[:2] != B&#39;CK&#39;:
+                raise ValueError(&#39;Corrupted MSZip block with invalid header.&#39;)
+            try:
+                inflate = zlib.decompressobj(-zlib.MAX_WBITS, zdict)
+                zdict = inflate.decompress(data[2:]) + inflate.flush()
+            except zlib.error:
+                raise RuntimeError(&#39;Failed to inflate CAB data block.&#39;)
+            else:
+                dst.extend(zdict)
+    elif cm == CabMethod.LZX:
+        lzx = LzxDecoder(False)
+        lzx.set_params_and_alloc(self.method[1])
+        for size, data in self.iter_block_data():
+            dst.extend(lzx.decompress(data, size))
+            lzx.keep_history = True
+    elif cm == CabMethod.Quantum:
+        raise NotImplementedError(&#39;Quantum decompression is not yet implemented.&#39;)
+    else:
+        raise ValueError(F&#39;Unknown decompression method: {cm!r}&#39;)
+    self.decompressed = dst
+    return memoryview(dst)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabFile"><code class="flex name class">
+<span>class <span class="ident">CabFile</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L152-L225" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabFile(Struct):
+
+    folder: CabFolder | None
+
+    def __init__(self, reader: StructReader[memoryview]):
+        self.size = reader.u32()
+        self.offset = reader.u32()
+        self._index = reader.u16()
+        self.folder = None
+        self.end = self.offset + self.size
+        d = reader.u16()
+        t = reader.u16()
+        s = (t &amp; 0x1F) &lt;&lt; 1
+
+        try:
+            self.date = d = date(
+                ((d &amp; 0xFE00) &gt;&gt; 0x9) + 1980,
+                ((d &amp; 0x01E0) &gt;&gt; 0x5),
+                ((d &amp; 0x001F) &gt;&gt; 0x0),
+            )
+        except Exception:
+            self.date = d = None
+
+        try:
+            self.time = t = time(
+                ((t &amp; 0xF800) &gt;&gt; 0xB),
+                ((t &amp; 0x07E0) &gt;&gt; 0x5),
+                59 if s == 60 else s,
+            )
+        except Exception:
+            self.time = t = None
+
+        self.timestamp = datetime.combine(d, t) if d and t else None
+        self.attributes = CabAttr(reader.u16())
+        self.name = reader.read_c_string(self.codec)
+
+    def __repr__(self):
+        index = {
+            NFolderIndex.HasPrev.value: &#39;PP&#39;,
+            NFolderIndex.HasNext.value: &#39;NN&#39;,
+            NFolderIndex.HasBoth.value: &#39;PN&#39;,
+        }.get(self._index, F&#39;{self._index:02d}&#39;)
+        d = d.isoformat() if (d := self.date) else &#39;????-??-??&#39;
+        t = t.isoformat(&#39;seconds&#39;) if (t := self.time) else &#39;??:??:??&#39;
+        return F&#39;&lt;file:{index}:{d}T{t}:{self.name}&gt;&#39;
+
+    def decompress(self):
+        folder = self.folder
+        if folder is None:
+            raise RuntimeError(F&#39;CAB file entry is missing a link to its folder: {self!r}&#39;)
+        folder_data = folder.decompress()
+        data = folder_data[self.offset:self.end]
+        if len(data) != self.size:
+            raise RuntimeError(F&#39;The extracted file does not have the correct size: {self!r}&#39;)
+        return data
+
+    @property
+    def codec(self):
+        return &#39;utf8&#39; if self.attributes &amp; CabAttr.NameUTF8 else &#39;latin1&#39;
+
+    def has_prev(self):
+        return self._index in (NFolderIndex.HasPrev, NFolderIndex.HasBoth)
+
+    def has_next(self):
+        return self._index in (NFolderIndex.HasNext, NFolderIndex.HasBoth)
+
+    @property
+    def index(self):
+        if self.has_prev():
+            return +0
+        if self.has_next():
+            return ~0
+        else:
+            return self._index</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFile.folder"><code class="name">var <span class="ident">folder</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFile.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFile.codec"><code class="name">var <span class="ident">codec</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L208-L210" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def codec(self):
+    return &#39;utf8&#39; if self.attributes &amp; CabAttr.NameUTF8 else &#39;latin1&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.CabFile.index"><code class="name">var <span class="ident">index</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L218-L225" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def index(self):
+    if self.has_prev():
+        return +0
+    if self.has_next():
+        return ~0
+    else:
+        return self._index</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabFile.decompress"><code class="name flex">
+<span>def <span class="ident">decompress</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L198-L206" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decompress(self):
+    folder = self.folder
+    if folder is None:
+        raise RuntimeError(F&#39;CAB file entry is missing a link to its folder: {self!r}&#39;)
+    folder_data = folder.decompress()
+    data = folder_data[self.offset:self.end]
+    if len(data) != self.size:
+        raise RuntimeError(F&#39;The extracted file does not have the correct size: {self!r}&#39;)
+    return data</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.CabFile.has_prev"><code class="name flex">
+<span>def <span class="ident">has_prev</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L212-L213" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def has_prev(self):
+    return self._index in (NFolderIndex.HasPrev, NFolderIndex.HasBoth)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.CabFile.has_next"><code class="name flex">
+<span>def <span class="ident">has_next</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L215-L216" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def has_next(self):
+    return self._index in (NFolderIndex.HasNext, NFolderIndex.HasBoth)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabCompressedBlock"><code class="flex name class">
+<span>class <span class="ident">CabCompressedBlock</span></span>
+<span>(</span><span>reader, parent, compute_checksums)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L228-L246" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabCompressedBlock(Struct):
+
+    def __init__(self, reader: StructReader[memoryview], parent: CabDisk, compute_checksums: bool):
+        self.provided_checksum = reader.u32()
+        seed = reader.u32(peek=True)
+        size = reader.u16()
+        self.decompressed_size = reader.u16()
+        reader.seekrel(parent.skip_per_data)
+        self.data = data = reader.read_exactly(size)
+        self.computed_checksum = cab_data_checksum(data, seed) if compute_checksums else None
+
+    def __repr__(self):
+        if self.computed_checksum == self.provided_checksum:
+            checksum = &#39;OK&#39;
+        elif self.computed_checksum is None:
+            checksum = &#39;??&#39;
+        else:
+            checksum = &#39;!!&#39;
+        return F&#39;&lt;block:{len(self.data):04X}-&gt;{self.decompressed_size:04X}:{checksum}&gt;&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabCompressedBlock.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabRef"><code class="flex name class">
+<span>class <span class="ident">CabRef</span></span>
+<span>(</span><span>name, disk)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>CabRef(name, disk)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L249-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabRef(NamedTuple):
+    name: str
+    disk: str
+
+    def __str__(self):
+        return F&#39;{self.disk} ({self.name})&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabRef.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L249-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabRef(NamedTuple):
+    name: str
+    disk: str
+
+    def __str__(self):
+        return F&#39;{self.disk} ({self.name})&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.CabRef.disk"><code class="name">var <span class="ident">disk</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L249-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabRef(NamedTuple):
+    name: str
+    disk: str
+
+    def __str__(self):
+        return F&#39;{self.disk} ({self.name})&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.CabDisk"><code class="flex name class">
+<span>class <span class="ident">CabDisk</span></span>
+<span>(</span><span>reader, compute_checksums, no_magic)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L257-L320" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CabDisk(Struct):
+    MAGIC = B&#39;MSCF&#39;
+
+    def __init__(self, reader: StructReader[memoryview], compute_checksums: bool, no_magic: bool):
+        if no_magic:
+            self.signature = self.MAGIC
+        else:
+            self.signature = reader.read(4)
+
+        self._reserved = []
+        self._reserved.append(reader.u32())
+        self.size = reader.u32()
+        self._reserved.append(reader.u32())
+        self.file_offset = reader.u32()
+        if no_magic:
+            self.file_offset -= 4
+        self._reserved.append(reader.u32())
+
+        self.version = (reader.u8(), reader.u8())
+        self.nr_of_folders = reader.u16()
+        self.nr_of_files = reader.u16()
+        self.flags = CabFlags(reader.u16())
+        self.id = reader.u16()
+        self.index = reader.u16()
+
+        (
+            self.skip_per_disk,
+            self.skip_per_fldr,
+            self.skip_per_data,
+        ) = (reader.u16(), reader.u8(), reader.u8()) if (
+            self.flags &amp; CabFlags.Reserve
+        ) else (0, 0, 0)
+
+        reader.seekrel(self.skip_per_disk)
+
+        self.prev = CabRef(
+            reader.read_c_string(&#39;ascii&#39;),
+            reader.read_c_string(&#39;ascii&#39;),
+        ) if self.flags &amp; CabFlags.HasPrev else None
+
+        self.next = CabRef(
+            reader.read_c_string(&#39;ascii&#39;),
+            reader.read_c_string(&#39;ascii&#39;),
+        ) if self.flags &amp; CabFlags.HasNext else None
+
+        self.folders = [
+            CabFolder(reader, self, compute_checksums, no_magic) for _ in range(self.nr_of_folders)]
+
+        reader.seekset(self.file_offset)
+        self.files = [CabFile(reader) for _ in range(self.nr_of_files)]
+
+        self._reader = reader
+        self._arcpos = reader.tell()
+
+    def check(self):
+        if self.signature != self.MAGIC:
+            raise ValueError(F&#39;Invalid signature: {self.signature.hex()}&#39;)
+        if self.flags.value &gt; 7:
+            raise ValueError(F&#39;Invalid flags: {self.flags.value}.&#39;)
+        if any(self._reserved):
+            raise ValueError(&#39;Reserved field was nonzero.&#39;)
+        if self.size &lt; 36:
+            raise ValueError(F&#39;Archive header specifies invalid size of {self.size} bytes.&#39;)
+        return self</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.CabDisk.MAGIC"><code class="name">var <span class="ident">MAGIC</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabDisk.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.cab.CabDisk.check"><code class="name flex">
+<span>def <span class="ident">check</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L311-L320" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check(self):
+    if self.signature != self.MAGIC:
+        raise ValueError(F&#39;Invalid signature: {self.signature.hex()}&#39;)
+    if self.flags.value &gt; 7:
+        raise ValueError(F&#39;Invalid flags: {self.flags.value}.&#39;)
+    if any(self._reserved):
+        raise ValueError(&#39;Reserved field was nonzero.&#39;)
+    if self.size &lt; 36:
+        raise ValueError(F&#39;Archive header specifies invalid size of {self.size} bytes.&#39;)
+    return self</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.cab.Cabinet"><code class="flex name class">
+<span>class <span class="ident">Cabinet</span></span>
+<span>(</span><span>*disks, compute_checksums=True, no_magic=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L323-L422" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Cabinet:
+    files: dict[int, list[CabFile]]
+    disks: dict[int, list[CabDisk]]
+
+    def __init__(self, *disks: memoryview, compute_checksums: bool = True, no_magic: bool = False):
+        self.disks = {}
+        self.files = {}
+        self.compute_checksums = compute_checksums
+        self.no_magic = no_magic
+        self.extend(disks)
+
+    def get_files(self, id: int | None = None):
+        if id is None:
+            if len(self.files) != 1:
+                raise LookupError
+            return next(iter(self.files.values()))
+        else:
+            return self.files[id]
+
+    def __bool__(self):
+        return bool(self.disks)
+
+    def __len__(self):
+        return sum(len(disks) for disks in self.disks.values())
+
+    def extend(self, disks: Iterable[memoryview]):
+        for d in disks:
+            disk = CabDisk.Parse(memoryview(d), self.compute_checksums, self.no_magic)
+            byid = self.disks.setdefault(disk.id, [])
+            byid.append(disk)
+        for byid in self.disks.values():
+            byid.sort(key=lambda c: c.index)
+
+    def append(self, *disks: memoryview):
+        self.extend(disks)
+
+    def process(self):
+        for id, disks in self.disks.items():
+            files = self.files[id] = []
+            partial: CabFolder | None = None
+            folders: list[CabFolder] = []
+            for disk in disks:
+                folders.clear()
+                for folder in disk.folders:
+                    if partial is None:
+                        folders.append(folder)
+                        continue
+                    if partial.method != folder.method:
+                        raise ValueError(&#39;Mismatching methods for continued folder.&#39;)
+                    if folder.blocks:
+                        partial.blocks.extend(folder.blocks)
+                        folder.blocks.clear()
+                    folders.append(partial)
+                    partial = None
+                for file in disk.files:
+                    file.folder = folders[file.index]
+                    if file.has_next():
+                        partial = file.folder
+                    else:
+                        files.append(file)
+        return self
+
+    def needs_more_disks(self):
+        if not self.disks:
+            return True
+        try:
+            self.check(checksums=False)
+        except CabVolumeMissing:
+            return True
+        else:
+            return False
+
+    def check(self, checksums: bool = True):
+        for disks in self.disks.values():
+            for k, disk in enumerate(disks):
+                if disk.index != k:
+                    raise CabVolumeMissing(idx=k)
+            prev_list = [disk.prev for disk in disks]
+            next_list = [disk.next for disk in disks]
+            if prev := prev_list[+0]:
+                raise CabVolumeMissing(ref=prev)
+            if next := next_list[~0]:
+                raise CabVolumeMissing(ref=next)
+            for k, (prev, next) in enumerate(zip(prev_list[2:], next_list[:-2]), 2):
+                if prev != next:
+                    raise CabSequenceMismatch(k, prev, next)
+            if not checksums:
+                continue
+            for disk in disks:
+                for f, folder in enumerate(disk.folders):
+                    for b, block in enumerate(folder.blocks):
+                        if block.computed_checksum is None:
+                            continue
+                        p = block.provided_checksum
+                        c = block.computed_checksum
+                        if p == c:
+                            continue
+                        raise CabVolumeCorrupt(
+                            F&#39;Incorrect checksum in Disk {disk.index}, folder {f}, block {b}; &#39;
+                            F&#39;provided value was {p:08X}, computed value {c:08X}.&#39;)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.cab.Cabinet.files"><code class="name">var <span class="ident">files</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.cab.Cabinet.disks"><code class="name">var <span class="ident">disks</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.cab.Cabinet.get_files"><code class="name flex">
+<span>def <span class="ident">get_files</span></span>(<span>self, id=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L334-L340" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def get_files(self, id: int | None = None):
+    if id is None:
+        if len(self.files) != 1:
+            raise LookupError
+        return next(iter(self.files.values()))
+    else:
+        return self.files[id]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.Cabinet.extend"><code class="name flex">
+<span>def <span class="ident">extend</span></span>(<span>self, disks)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L348-L354" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def extend(self, disks: Iterable[memoryview]):
+    for d in disks:
+        disk = CabDisk.Parse(memoryview(d), self.compute_checksums, self.no_magic)
+        byid = self.disks.setdefault(disk.id, [])
+        byid.append(disk)
+    for byid in self.disks.values():
+        byid.sort(key=lambda c: c.index)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.Cabinet.append"><code class="name flex">
+<span>def <span class="ident">append</span></span>(<span>self, *disks)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L356-L357" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def append(self, *disks: memoryview):
+    self.extend(disks)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.Cabinet.process"><code class="name flex">
+<span>def <span class="ident">process</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L359-L383" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def process(self):
+    for id, disks in self.disks.items():
+        files = self.files[id] = []
+        partial: CabFolder | None = None
+        folders: list[CabFolder] = []
+        for disk in disks:
+            folders.clear()
+            for folder in disk.folders:
+                if partial is None:
+                    folders.append(folder)
+                    continue
+                if partial.method != folder.method:
+                    raise ValueError(&#39;Mismatching methods for continued folder.&#39;)
+                if folder.blocks:
+                    partial.blocks.extend(folder.blocks)
+                    folder.blocks.clear()
+                folders.append(partial)
+                partial = None
+            for file in disk.files:
+                file.folder = folders[file.index]
+                if file.has_next():
+                    partial = file.folder
+                else:
+                    files.append(file)
+    return self</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.Cabinet.needs_more_disks"><code class="name flex">
+<span>def <span class="ident">needs_more_disks</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L385-L393" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def needs_more_disks(self):
+    if not self.disks:
+        return True
+    try:
+        self.check(checksums=False)
+    except CabVolumeMissing:
+        return True
+    else:
+        return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.cab.Cabinet.check"><code class="name flex">
+<span>def <span class="ident">check</span></span>(<span>self, checksums=True)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/cab.py#L395-L422" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check(self, checksums: bool = True):
+    for disks in self.disks.values():
+        for k, disk in enumerate(disks):
+            if disk.index != k:
+                raise CabVolumeMissing(idx=k)
+        prev_list = [disk.prev for disk in disks]
+        next_list = [disk.next for disk in disks]
+        if prev := prev_list[+0]:
+            raise CabVolumeMissing(ref=prev)
+        if next := next_list[~0]:
+            raise CabVolumeMissing(ref=next)
+        for k, (prev, next) in enumerate(zip(prev_list[2:], next_list[:-2]), 2):
+            if prev != next:
+                raise CabSequenceMismatch(k, prev, next)
+        if not checksums:
+            continue
+        for disk in disks:
+            for f, folder in enumerate(disk.folders):
+                for b, block in enumerate(folder.blocks):
+                    if block.computed_checksum is None:
+                        continue
+                    p = block.provided_checksum
+                    c = block.computed_checksum
+                    if p == c:
+                        continue
+                    raise CabVolumeCorrupt(
+                        F&#39;Incorrect checksum in Disk {disk.index}, folder {f}, block {b}; &#39;
+                        F&#39;provided value was {p:08X}, computed value {c:08X}.&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.cab.cab_data_checksum" href="#refinery.lib.cab.cab_data_checksum">cab_data_checksum</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.cab.CabVolumeMissing" href="#refinery.lib.cab.CabVolumeMissing">CabVolumeMissing</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabSequenceMismatch" href="#refinery.lib.cab.CabSequenceMismatch">CabSequenceMismatch</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabVolumeCorrupt" href="#refinery.lib.cab.CabVolumeCorrupt">CabVolumeCorrupt</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabFlags" href="#refinery.lib.cab.CabFlags">CabFlags</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabMethod" href="#refinery.lib.cab.CabMethod">CabMethod</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabAttr" href="#refinery.lib.cab.CabAttr">CabAttr</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.NFolderIndex" href="#refinery.lib.cab.NFolderIndex">NFolderIndex</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabFolder" href="#refinery.lib.cab.CabFolder">CabFolder</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.cab.CabFolder.Parse" href="#refinery.lib.cab.CabFolder.Parse">Parse</a></code></li>
+<li><code><a title="refinery.lib.cab.CabFolder.iter_block_data" href="#refinery.lib.cab.CabFolder.iter_block_data">iter_block_data</a></code></li>
+<li><code><a title="refinery.lib.cab.CabFolder.decompress" href="#refinery.lib.cab.CabFolder.decompress">decompress</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabFile" href="#refinery.lib.cab.CabFile">CabFile</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.cab.CabFile.Parse" href="#refinery.lib.cab.CabFile.Parse">Parse</a></code></li>
+<li><code><a title="refinery.lib.cab.CabFile.decompress" href="#refinery.lib.cab.CabFile.decompress">decompress</a></code></li>
+<li><code><a title="refinery.lib.cab.CabFile.has_prev" href="#refinery.lib.cab.CabFile.has_prev">has_prev</a></code></li>
+<li><code><a title="refinery.lib.cab.CabFile.has_next" href="#refinery.lib.cab.CabFile.has_next">has_next</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabCompressedBlock" href="#refinery.lib.cab.CabCompressedBlock">CabCompressedBlock</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.cab.CabCompressedBlock.Parse" href="#refinery.lib.cab.CabCompressedBlock.Parse">Parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabRef" href="#refinery.lib.cab.CabRef">CabRef</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.CabDisk" href="#refinery.lib.cab.CabDisk">CabDisk</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.cab.CabDisk.Parse" href="#refinery.lib.cab.CabDisk.Parse">Parse</a></code></li>
+<li><code><a title="refinery.lib.cab.CabDisk.check" href="#refinery.lib.cab.CabDisk.check">check</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.cab.Cabinet" href="#refinery.lib.cab.Cabinet">Cabinet</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.cab.Cabinet.get_files" href="#refinery.lib.cab.Cabinet.get_files">get_files</a></code></li>
+<li><code><a title="refinery.lib.cab.Cabinet.extend" href="#refinery.lib.cab.Cabinet.extend">extend</a></code></li>
+<li><code><a title="refinery.lib.cab.Cabinet.append" href="#refinery.lib.cab.Cabinet.append">append</a></code></li>
+<li><code><a title="refinery.lib.cab.Cabinet.process" href="#refinery.lib.cab.Cabinet.process">process</a></code></li>
+<li><code><a title="refinery.lib.cab.Cabinet.needs_more_disks" href="#refinery.lib.cab.Cabinet.needs_more_disks">needs_more_disks</a></code></li>
+<li><code><a title="refinery.lib.cab.Cabinet.check" href="#refinery.lib.cab.Cabinet.check">check</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

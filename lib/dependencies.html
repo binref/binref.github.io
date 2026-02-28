@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.dependencies documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.dependencies</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L1-L156" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from typing import TYPE_CHECKING, Callable, Collection, Generic, TypeVar, cast
+
+from refinery.lib.exceptions import RefineryImportError, RefineryImportMissing
+
+if TYPE_CHECKING:
+    from refinery.units import Unit
+
+Mod = TypeVar(&#39;Mod&#39;)
+
+
+class MissingModule:
+    &#34;&#34;&#34;
+    This class can wrap a module import that is currently missing. If any attribute of the missing
+    module is accessed, it raises `refinery.units.RefineryImportMissing`.
+    &#34;&#34;&#34;
+    def __init__(self, name, install=None, info=None, error=None):
+        self.name = name
+        self.install = install or [name]
+        self.info = info
+        self.error = error
+
+    def __getattr__(self, key: str):
+        if key.startswith(&#39;__&#39;) and key.endswith(&#39;__&#39;):
+            raise AttributeError(key)
+        if (error := self.error) and isinstance(error, RefineryImportError):
+            raise error
+        raise RefineryImportMissing(self.name, self.install, info=self.info)
+
+
+class LazyDependency(Generic[Mod]):
+    &#34;&#34;&#34;
+    A lazily evaluated dependency. Functions decorated with `refinery.lib.dependencies.dependency`
+    are converted into this type. Calling the object returns either the return value of that
+    function, which should be an imported module, or a `refinery.lib.dependencies.MissingModule`
+    wrapper which will raise a `refinery.lib.exceptions.RefineryImportMissing` exception as soon
+    as any of its members is accessed.
+    &#34;&#34;&#34;
+    _mod: Mod | None
+    _imp: Callable[[], Mod]
+    name: str
+    dist: Collection[str]
+    info: str | None
+
+    __slots__ = (
+        &#39;_mod&#39;,
+        &#39;_imp&#39;,
+        &#39;_who&#39;,
+        &#39;name&#39;,
+        &#39;dist&#39;,
+        &#39;info&#39;,
+    )
+
+    def __init__(self, imp: Callable[[], Mod], name: str, dist: Collection[str], info: str | None):
+        self.name = name
+        self.dist = dist
+        self.info = info
+        self._imp = imp
+        self._mod = None
+        self._who: set[type[Unit]] = set()
+
+    def register(self, unit: type[Unit] | None):
+        if unit is None:
+            return None
+        if unit in (units := self._who):
+            return unit
+        if dist := self.dist:
+            optmap = unit.optional_dependencies
+            if optmap is None:
+                unit.optional_dependencies = optmap = {}
+            buckets = [optmap.setdefault(name, set()) for name in dist]
+        else:
+            bucket = unit.required_dependencies
+            if bucket is None:
+                unit.required_dependencies = bucket = set()
+            buckets = [bucket]
+        for bucket in buckets:
+            bucket.add(self.name)
+        units.add(unit)
+        return unit
+
+    def __call__(self) -&gt; Mod:
+        if (mod := self._mod) is None:
+            try:
+                mod = self._imp()
+            except ImportError as error:
+                install = {self.name}
+                for unit in self._who:
+                    if deps := unit.optional_dependencies:
+                        for v in deps.values():
+                            install.update(v)
+                mod = cast(Mod, MissingModule(
+                    self.name, install=install, info=self.info, error=error))
+            self._mod = mod
+        return mod
+
+
+class DependencyAccessor(Generic[Mod]):
+    &#34;&#34;&#34;
+    Methods decorated with `refinery.lib.dependencies.dependency_accessor` turn into objects of
+    this type. See the description of this decorator for more details.
+    &#34;&#34;&#34;
+    def __init__(self, dependency: LazyDependency[Mod]):
+        self.dependency = dependency
+        self.parent = None
+        self.module = None
+
+    def __get__(self, _: Unit | None, unit: type[Unit] | None = None):
+        if (mod := self.module) is None:
+            if unit is None:
+                unit = self.parent
+            dependency = self.dependency
+            dependency.register(unit)
+            self.module = mod = dependency()
+        return mod
+
+    def __set_name__(self, unit: type[Unit], name: str):
+        self.parent = unit
+        self.dependency.register(unit)
+
+
+def dependency(name: str, dist: Collection[str] = (), info: str | None = None, local: bool = False):
+    &#34;&#34;&#34;
+    A decorator to mark up an optional dependency. The decorated function can import the module
+    and return the module object. The `name` argument of the decorator specifies the name of the
+    dependency, while `dist` specifies a sequence of extra buckets at which this dependency will
+    automatically be installed by the refinery setup. Functions that are decorated with this
+    method will turn into a `refinery.lib.dependencies.LazyDependency`.
+    &#34;&#34;&#34;
+    def decorator(imp: Callable[[], Mod]):
+        return LazyDependency(imp, name, dist, info)
+    return decorator
+
+
+def dependency_accessor(name: str, dist: Collection[str] = (), info: str | None = None):
+    &#34;&#34;&#34;
+    The same description as for `refinery.lib.dependencies.dependency` applies here, except that
+    this decorator is used to decorate static class methods which then turn into a property-like
+    accessor of type `refinery.lib.dependencies.DependencyAccessor`. Consider, for example, a code
+    excerpt from `refinery.units.compression.brotli.brotli`:
+
+        class brotli(Unit):
+            @Unit.Requires(&#39;brotlipy&#39;, [&#39;all&#39;])
+            def _brotli():
+                import brotli
+                return brotli
+
+            def process(self, data):
+                return self._brotli.decompress(bytes(data))
+
+    The `brotli` dependency is installed only when refinery is installed with the `all` extra.
+    &#34;&#34;&#34;
+    def decorator(imp: Callable[[], Mod]):
+        return DependencyAccessor(LazyDependency(imp, name, dist, info))
+    return decorator</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.dependencies.dependency"><code class="name flex">
+<span>def <span class="ident">dependency</span></span>(<span>name, dist=(), info=None, local=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A decorator to mark up an optional dependency. The decorated function can import the module
+and return the module object. The <code>name</code> argument of the decorator specifies the name of the
+dependency, while <code>dist</code> specifies a sequence of extra buckets at which this dependency will
+automatically be installed by the refinery setup. Functions that are decorated with this
+method will turn into a <code><a title="refinery.lib.dependencies.LazyDependency" href="#refinery.lib.dependencies.LazyDependency">LazyDependency</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L123-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dependency(name: str, dist: Collection[str] = (), info: str | None = None, local: bool = False):
+    &#34;&#34;&#34;
+    A decorator to mark up an optional dependency. The decorated function can import the module
+    and return the module object. The `name` argument of the decorator specifies the name of the
+    dependency, while `dist` specifies a sequence of extra buckets at which this dependency will
+    automatically be installed by the refinery setup. Functions that are decorated with this
+    method will turn into a `refinery.lib.dependencies.LazyDependency`.
+    &#34;&#34;&#34;
+    def decorator(imp: Callable[[], Mod]):
+        return LazyDependency(imp, name, dist, info)
+    return decorator</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.dependencies.dependency_accessor"><code class="name flex">
+<span>def <span class="ident">dependency_accessor</span></span>(<span>name, dist=(), info=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The same description as for <code><a title="refinery.lib.dependencies.dependency" href="#refinery.lib.dependencies.dependency">dependency()</a></code> applies here, except that
+this decorator is used to decorate static class methods which then turn into a property-like
+accessor of type <code><a title="refinery.lib.dependencies.DependencyAccessor" href="#refinery.lib.dependencies.DependencyAccessor">DependencyAccessor</a></code>. Consider, for example, a code
+excerpt from <code><a title="refinery.units.compression.brotli.brotli" href="../units/compression/brotli.html#refinery.units.compression.brotli.brotli">brotli</a></code>:</p>
+<pre><code>class brotli(Unit):
+    @Unit.Requires('brotlipy', ['all'])
+    def _brotli():
+        import brotli
+        return brotli
+
+    def process(self, data):
+        return self._brotli.decompress(bytes(data))
+</code></pre>
+<p>The <code>brotli</code> dependency is installed only when refinery is installed with the <code>all</code> extra.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L136-L156" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dependency_accessor(name: str, dist: Collection[str] = (), info: str | None = None):
+    &#34;&#34;&#34;
+    The same description as for `refinery.lib.dependencies.dependency` applies here, except that
+    this decorator is used to decorate static class methods which then turn into a property-like
+    accessor of type `refinery.lib.dependencies.DependencyAccessor`. Consider, for example, a code
+    excerpt from `refinery.units.compression.brotli.brotli`:
+
+        class brotli(Unit):
+            @Unit.Requires(&#39;brotlipy&#39;, [&#39;all&#39;])
+            def _brotli():
+                import brotli
+                return brotli
+
+            def process(self, data):
+                return self._brotli.decompress(bytes(data))
+
+    The `brotli` dependency is installed only when refinery is installed with the `all` extra.
+    &#34;&#34;&#34;
+    def decorator(imp: Callable[[], Mod]):
+        return DependencyAccessor(LazyDependency(imp, name, dist, info))
+    return decorator</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.dependencies.MissingModule"><code class="flex name class">
+<span>class <span class="ident">MissingModule</span></span>
+<span>(</span><span>name, install=None, info=None, error=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>This class can wrap a module import that is currently missing. If any attribute of the missing
+module is accessed, it raises <code>refinery.units.RefineryImportMissing</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L13-L29" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MissingModule:
+    &#34;&#34;&#34;
+    This class can wrap a module import that is currently missing. If any attribute of the missing
+    module is accessed, it raises `refinery.units.RefineryImportMissing`.
+    &#34;&#34;&#34;
+    def __init__(self, name, install=None, info=None, error=None):
+        self.name = name
+        self.install = install or [name]
+        self.info = info
+        self.error = error
+
+    def __getattr__(self, key: str):
+        if key.startswith(&#39;__&#39;) and key.endswith(&#39;__&#39;):
+            raise AttributeError(key)
+        if (error := self.error) and isinstance(error, RefineryImportError):
+            raise error
+        raise RefineryImportMissing(self.name, self.install, info=self.info)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.dependencies.LazyDependency"><code class="flex name class">
+<span>class <span class="ident">LazyDependency</span></span>
+<span>(</span><span>imp, name, dist, info)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A lazily evaluated dependency. Functions decorated with <code><a title="refinery.lib.dependencies.dependency" href="#refinery.lib.dependencies.dependency">dependency()</a></code>
+are converted into this type. Calling the object returns either the return value of that
+function, which should be an imported module, or a <code><a title="refinery.lib.dependencies.MissingModule" href="#refinery.lib.dependencies.MissingModule">MissingModule</a></code>
+wrapper which will raise a <code><a title="refinery.lib.exceptions.RefineryImportMissing" href="exceptions.html#refinery.lib.exceptions.RefineryImportMissing">RefineryImportMissing</a></code> exception as soon
+as any of its members is accessed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L32-L96" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LazyDependency(Generic[Mod]):
+    &#34;&#34;&#34;
+    A lazily evaluated dependency. Functions decorated with `refinery.lib.dependencies.dependency`
+    are converted into this type. Calling the object returns either the return value of that
+    function, which should be an imported module, or a `refinery.lib.dependencies.MissingModule`
+    wrapper which will raise a `refinery.lib.exceptions.RefineryImportMissing` exception as soon
+    as any of its members is accessed.
+    &#34;&#34;&#34;
+    _mod: Mod | None
+    _imp: Callable[[], Mod]
+    name: str
+    dist: Collection[str]
+    info: str | None
+
+    __slots__ = (
+        &#39;_mod&#39;,
+        &#39;_imp&#39;,
+        &#39;_who&#39;,
+        &#39;name&#39;,
+        &#39;dist&#39;,
+        &#39;info&#39;,
+    )
+
+    def __init__(self, imp: Callable[[], Mod], name: str, dist: Collection[str], info: str | None):
+        self.name = name
+        self.dist = dist
+        self.info = info
+        self._imp = imp
+        self._mod = None
+        self._who: set[type[Unit]] = set()
+
+    def register(self, unit: type[Unit] | None):
+        if unit is None:
+            return None
+        if unit in (units := self._who):
+            return unit
+        if dist := self.dist:
+            optmap = unit.optional_dependencies
+            if optmap is None:
+                unit.optional_dependencies = optmap = {}
+            buckets = [optmap.setdefault(name, set()) for name in dist]
+        else:
+            bucket = unit.required_dependencies
+            if bucket is None:
+                unit.required_dependencies = bucket = set()
+            buckets = [bucket]
+        for bucket in buckets:
+            bucket.add(self.name)
+        units.add(unit)
+        return unit
+
+    def __call__(self) -&gt; Mod:
+        if (mod := self._mod) is None:
+            try:
+                mod = self._imp()
+            except ImportError as error:
+                install = {self.name}
+                for unit in self._who:
+                    if deps := unit.optional_dependencies:
+                        for v in deps.values():
+                            install.update(v)
+                mod = cast(Mod, MissingModule(
+                    self.name, install=install, info=self.info, error=error))
+            self._mod = mod
+        return mod</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Generic</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.dependencies.LazyDependency.dist"><code class="name">var <span class="ident">dist</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L32-L96" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LazyDependency(Generic[Mod]):
+    &#34;&#34;&#34;
+    A lazily evaluated dependency. Functions decorated with `refinery.lib.dependencies.dependency`
+    are converted into this type. Calling the object returns either the return value of that
+    function, which should be an imported module, or a `refinery.lib.dependencies.MissingModule`
+    wrapper which will raise a `refinery.lib.exceptions.RefineryImportMissing` exception as soon
+    as any of its members is accessed.
+    &#34;&#34;&#34;
+    _mod: Mod | None
+    _imp: Callable[[], Mod]
+    name: str
+    dist: Collection[str]
+    info: str | None
+
+    __slots__ = (
+        &#39;_mod&#39;,
+        &#39;_imp&#39;,
+        &#39;_who&#39;,
+        &#39;name&#39;,
+        &#39;dist&#39;,
+        &#39;info&#39;,
+    )
+
+    def __init__(self, imp: Callable[[], Mod], name: str, dist: Collection[str], info: str | None):
+        self.name = name
+        self.dist = dist
+        self.info = info
+        self._imp = imp
+        self._mod = None
+        self._who: set[type[Unit]] = set()
+
+    def register(self, unit: type[Unit] | None):
+        if unit is None:
+            return None
+        if unit in (units := self._who):
+            return unit
+        if dist := self.dist:
+            optmap = unit.optional_dependencies
+            if optmap is None:
+                unit.optional_dependencies = optmap = {}
+            buckets = [optmap.setdefault(name, set()) for name in dist]
+        else:
+            bucket = unit.required_dependencies
+            if bucket is None:
+                unit.required_dependencies = bucket = set()
+            buckets = [bucket]
+        for bucket in buckets:
+            bucket.add(self.name)
+        units.add(unit)
+        return unit
+
+    def __call__(self) -&gt; Mod:
+        if (mod := self._mod) is None:
+            try:
+                mod = self._imp()
+            except ImportError as error:
+                install = {self.name}
+                for unit in self._who:
+                    if deps := unit.optional_dependencies:
+                        for v in deps.values():
+                            install.update(v)
+                mod = cast(Mod, MissingModule(
+                    self.name, install=install, info=self.info, error=error))
+            self._mod = mod
+        return mod</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.dependencies.LazyDependency.info"><code class="name">var <span class="ident">info</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L32-L96" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LazyDependency(Generic[Mod]):
+    &#34;&#34;&#34;
+    A lazily evaluated dependency. Functions decorated with `refinery.lib.dependencies.dependency`
+    are converted into this type. Calling the object returns either the return value of that
+    function, which should be an imported module, or a `refinery.lib.dependencies.MissingModule`
+    wrapper which will raise a `refinery.lib.exceptions.RefineryImportMissing` exception as soon
+    as any of its members is accessed.
+    &#34;&#34;&#34;
+    _mod: Mod | None
+    _imp: Callable[[], Mod]
+    name: str
+    dist: Collection[str]
+    info: str | None
+
+    __slots__ = (
+        &#39;_mod&#39;,
+        &#39;_imp&#39;,
+        &#39;_who&#39;,
+        &#39;name&#39;,
+        &#39;dist&#39;,
+        &#39;info&#39;,
+    )
+
+    def __init__(self, imp: Callable[[], Mod], name: str, dist: Collection[str], info: str | None):
+        self.name = name
+        self.dist = dist
+        self.info = info
+        self._imp = imp
+        self._mod = None
+        self._who: set[type[Unit]] = set()
+
+    def register(self, unit: type[Unit] | None):
+        if unit is None:
+            return None
+        if unit in (units := self._who):
+            return unit
+        if dist := self.dist:
+            optmap = unit.optional_dependencies
+            if optmap is None:
+                unit.optional_dependencies = optmap = {}
+            buckets = [optmap.setdefault(name, set()) for name in dist]
+        else:
+            bucket = unit.required_dependencies
+            if bucket is None:
+                unit.required_dependencies = bucket = set()
+            buckets = [bucket]
+        for bucket in buckets:
+            bucket.add(self.name)
+        units.add(unit)
+        return unit
+
+    def __call__(self) -&gt; Mod:
+        if (mod := self._mod) is None:
+            try:
+                mod = self._imp()
+            except ImportError as error:
+                install = {self.name}
+                for unit in self._who:
+                    if deps := unit.optional_dependencies:
+                        for v in deps.values():
+                            install.update(v)
+                mod = cast(Mod, MissingModule(
+                    self.name, install=install, info=self.info, error=error))
+            self._mod = mod
+        return mod</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.dependencies.LazyDependency.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L32-L96" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LazyDependency(Generic[Mod]):
+    &#34;&#34;&#34;
+    A lazily evaluated dependency. Functions decorated with `refinery.lib.dependencies.dependency`
+    are converted into this type. Calling the object returns either the return value of that
+    function, which should be an imported module, or a `refinery.lib.dependencies.MissingModule`
+    wrapper which will raise a `refinery.lib.exceptions.RefineryImportMissing` exception as soon
+    as any of its members is accessed.
+    &#34;&#34;&#34;
+    _mod: Mod | None
+    _imp: Callable[[], Mod]
+    name: str
+    dist: Collection[str]
+    info: str | None
+
+    __slots__ = (
+        &#39;_mod&#39;,
+        &#39;_imp&#39;,
+        &#39;_who&#39;,
+        &#39;name&#39;,
+        &#39;dist&#39;,
+        &#39;info&#39;,
+    )
+
+    def __init__(self, imp: Callable[[], Mod], name: str, dist: Collection[str], info: str | None):
+        self.name = name
+        self.dist = dist
+        self.info = info
+        self._imp = imp
+        self._mod = None
+        self._who: set[type[Unit]] = set()
+
+    def register(self, unit: type[Unit] | None):
+        if unit is None:
+            return None
+        if unit in (units := self._who):
+            return unit
+        if dist := self.dist:
+            optmap = unit.optional_dependencies
+            if optmap is None:
+                unit.optional_dependencies = optmap = {}
+            buckets = [optmap.setdefault(name, set()) for name in dist]
+        else:
+            bucket = unit.required_dependencies
+            if bucket is None:
+                unit.required_dependencies = bucket = set()
+            buckets = [bucket]
+        for bucket in buckets:
+            bucket.add(self.name)
+        units.add(unit)
+        return unit
+
+    def __call__(self) -&gt; Mod:
+        if (mod := self._mod) is None:
+            try:
+                mod = self._imp()
+            except ImportError as error:
+                install = {self.name}
+                for unit in self._who:
+                    if deps := unit.optional_dependencies:
+                        for v in deps.values():
+                            install.update(v)
+                mod = cast(Mod, MissingModule(
+                    self.name, install=install, info=self.info, error=error))
+            self._mod = mod
+        return mod</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.dependencies.LazyDependency.register"><code class="name flex">
+<span>def <span class="ident">register</span></span>(<span>self, unit)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L63-L81" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def register(self, unit: type[Unit] | None):
+    if unit is None:
+        return None
+    if unit in (units := self._who):
+        return unit
+    if dist := self.dist:
+        optmap = unit.optional_dependencies
+        if optmap is None:
+            unit.optional_dependencies = optmap = {}
+        buckets = [optmap.setdefault(name, set()) for name in dist]
+    else:
+        bucket = unit.required_dependencies
+        if bucket is None:
+            unit.required_dependencies = bucket = set()
+        buckets = [bucket]
+    for bucket in buckets:
+        bucket.add(self.name)
+    units.add(unit)
+    return unit</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.dependencies.DependencyAccessor"><code class="flex name class">
+<span>class <span class="ident">DependencyAccessor</span></span>
+<span>(</span><span>dependency)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Methods decorated with <code><a title="refinery.lib.dependencies.dependency_accessor" href="#refinery.lib.dependencies.dependency_accessor">dependency_accessor()</a></code> turn into objects of
+this type. See the description of this decorator for more details.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/dependencies.py#L109-L116" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def __get__(self, _: Unit | None, unit: type[Unit] | None = None):
+    if (mod := self.module) is None:
+        if unit is None:
+            unit = self.parent
+        dependency = self.dependency
+        dependency.register(unit)
+        self.module = mod = dependency()
+    return mod</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Generic</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.dependencies.dependency" href="#refinery.lib.dependencies.dependency">dependency</a></code></li>
+<li><code><a title="refinery.lib.dependencies.dependency_accessor" href="#refinery.lib.dependencies.dependency_accessor">dependency_accessor</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.dependencies.MissingModule" href="#refinery.lib.dependencies.MissingModule">MissingModule</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dependencies.LazyDependency" href="#refinery.lib.dependencies.LazyDependency">LazyDependency</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.dependencies.LazyDependency.register" href="#refinery.lib.dependencies.LazyDependency.register">register</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.dependencies.DependencyAccessor" href="#refinery.lib.dependencies.DependencyAccessor">DependencyAccessor</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

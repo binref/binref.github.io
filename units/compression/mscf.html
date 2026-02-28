@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.compression.mscf documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.compression.mscf</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/mscf.py#L1-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import zlib
+
+from typing import Callable
+
+from refinery.lib.decompression import (
+    BitBufferedReader,
+    make_huffman_decode_table,
+    read_huffman_symbol,
+)
+from refinery.lib.structures import MemoryFile, StructReader, StructReaderBits
+from refinery.lib.types import Param
+from refinery.units import Arg, Unit
+
+XPRESS_NUM_CHARS        = 256    # noqa
+XPRESS_NUM_SYMBOLS      = 512    # noqa   
+XPRESS_MAX_CODEWORD_LEN = 15     # noqa
+XPRESS_MIN_OFFSET       = 1      # noqa
+XPRESS_MAX_OFFSET       = 65535  # noqa
+XPRESS_MIN_MATCH_LEN    = 3      # noqa
+XPRESS_MAX_MATCH_LEN    = 65538  # noqa
+XPRESS_TABLEBITS        = 11     # noqa
+
+COMPRESS_MAX_CHUNK = 0x4000000
+
+
+class MODE(enum.IntEnum):
+    MSZIP       = 2  # noqa
+    XPRESS      = 3  # noqa
+    XPRESS_HUFF = 4  # noqa
+    LZMS        = 5  # noqa
+
+
+class mscf(Unit):
+    &#34;&#34;&#34;
+    The Microsoft Compression Format unit implements the format and algorithms used by the Microsoft
+    Compression API. The implementation for LZMS is currently missing, but MSZIP and XPRESS (both
+    with and without Huffman table) are supported. This pure Python implementation is very slow when
+    compared to native code, so decompressing very large inputs can take several minutes.
+    &#34;&#34;&#34;
+
+    _SIGNATURE = B&#39;\x0A\x51\xE5\xC0&#39;
+
+    def __init__(
+        self,
+        mode: Param[str | None, Arg.Option(choices=MODE, help=(
+            &#39;Manually select decompression mode ({choices}); by default the unit attempts to derive the &#39;
+            &#39;mode from the header, but this will fail for raw streams. However, even if a header is &#39;
+            &#39;found, a manually specified mode will take precedence.&#39;))] = None,
+    ):
+        super().__init__(mode=Arg.AsOption(mode, MODE))
+
+    def process(self, data):
+        mode: MODE = self.args.mode
+        with StructReader(memoryview(data)) as reader, MemoryFile() as writer:
+            reader: StructReader[memoryview]
+            check = zlib.crc32(reader.peek(6))
+            magic = reader.read(4)
+            if magic != self._SIGNATURE:
+                if mode is None:
+                    self.log_warn(
+                        F&#39;data starts with {magic.hex().upper()} rather than the expected sequence &#39;
+                        F&#39;{self._SIGNATURE.hex().upper()}; this could be a raw stream.&#39;)
+                else:
+                    reader.seek(0)
+                    handler = self._get_handler(mode)
+                    handler(reader, writer, None)
+                    return writer.getvalue()
+
+            header_size = reader.u16()
+            if header_size != 24:
+                self.log_warn(F&#39;the header size {header_size} was not equal to 24&#39;)
+
+            crc32byte = reader.u8()
+            check = zlib.crc32(reader.peek(0x11), check) &amp; 0xFF
+            if check != crc32byte:
+                self.log_warn(F&#39;the CRC32 check byte was {crc32byte}, computed value was {check}&#39;)
+
+            _mode_code = reader.u8()
+
+            try:
+                _mode = MODE(_mode_code)
+            except ValueError:
+                msg = F&#39;header contains unknown compression type code {_mode_code}&#39;
+                if mode is None:
+                    raise ValueError(msg)
+                else:
+                    self.log_warn(msg)
+            else:
+                if mode is not None and mode != _mode:
+                    logger = self.log_warn
+                else:
+                    logger = self.log_info
+                    mode = _mode
+                logger(F&#39;header specifies algorithm {_mode.name}&#39;)
+
+            self.log_info(F&#39;using algorithm {mode.name}&#39;)
+            decompress = self._get_handler(mode)
+
+            final_size = reader.u32()
+            _unknown_1 = reader.u32()
+            chunk_size = reader.u32()
+            _unknown_2 = reader.u32()
+
+            if _unknown_1 != 0:
+                self.log_warn(F&#39;unknown value 1 was unexpectedly nonzero: 0x{_unknown_1:08X}&#39;)
+            if _unknown_2 != 0:
+                self.log_warn(F&#39;unknown value 2 was unexpectedly nonzero: 0x{_unknown_2:08X}&#39;)
+
+            self.log_debug(F&#39;final size: 0x{final_size:08X}&#39;)
+            self.log_debug(F&#39;chunk size: 0x{chunk_size:08X}&#39;)
+
+            if chunk_size &gt; COMPRESS_MAX_CHUNK:
+                raise ValueError(&#39;the header chunk size is greater than the maximum value&#39;)
+
+            while len(writer) &lt; final_size:
+                src_size = reader.u32()
+                src_data = reader.read(src_size)
+                if len(src_data) != src_size:
+                    raise IndexError(F&#39;Attempted to read {src_size} bytes, but got only {len(src_data)}.&#39;)
+                if src_size + len(writer) == final_size:
+                    self.log_debug(F&#39;final chunk is uncompressed, appending {src_size} raw bytes to output&#39;)
+                    writer.write(src_data)
+                    break
+                self.log_debug(F&#39;reading chunk of size {src_size}&#39;)
+                start = writer.tell()
+                chunk = StructReader(src_data)
+                target = min(chunk_size, final_size - len(writer))
+                decompress(chunk, writer, target)
+                writer.flush()
+                written = writer.tell() - start
+                if written != target:
+                    raise RuntimeError(F&#39;decompressed output had unexpected size {written} instead of {chunk_size}&#39;)
+
+            if not reader.eof:
+                self.log_info(F&#39;compression complete with {reader.remaining_bytes} bytes remaining in input&#39;)
+            return writer.getvalue()
+
+    def _get_handler(self, mode: MODE) -&gt; Callable[[StructReader, MemoryFile, int | None], None]:
+        decompress = {
+            mode.MSZIP       : self._decompress_mszip,
+            mode.XPRESS_HUFF : self._decompress_xpress_huffman,
+            mode.XPRESS      : self._decompress_xpress,
+        }.get(mode, None)
+        if decompress is None:
+            raise NotImplementedError(F&#39;algorithm {mode.name} is not yet implemented&#39;)
+        return decompress
+
+    def _decompress_mszip(self, reader: StructReader, writer: MemoryFile, target: int | None = None):
+        header = bytes(reader.read(2))
+        if header != B&#39;CK&#39;:
+            raise ValueError(F&#39;chunk did not begin with CK header, got {header!r} instead&#39;)
+        decompress = zlib.decompressobj(-zlib.MAX_WBITS, zdict=writer.getvalue())
+        writer.write(decompress.decompress(reader.read()))
+        writer.write(decompress.flush())
+
+    def _decompress_xpress_huffman(
+        self,
+        reader: StructReader,
+        writer: MemoryFile,
+        target: int | None = None,
+        max_chunk_size: int = 0x10000
+    ) -&gt; None:
+        limit = writer.tell()
+        reader = StructReaderBits(reader)
+        if target is not None:
+            target += limit
+
+        while not reader.eof:
+
+            if reader.remaining_bytes &lt; XPRESS_NUM_SYMBOLS // 2:
+                raise IndexError(
+                    F&#39;There are only {reader.remaining_bytes} bytes reamining in the input buffer,&#39;
+                    F&#39; but at least {XPRESS_NUM_SYMBOLS // 2} are required to read a Huffman table.&#39;)
+
+            table = bytearray(reader.read_integer(4) for _ in range(XPRESS_NUM_SYMBOLS))
+            table = make_huffman_decode_table(table, XPRESS_TABLEBITS, XPRESS_MAX_CODEWORD_LEN)
+            limit = limit + max_chunk_size
+            flags = BitBufferedReader(reader, 16)
+
+            while True:
+                position = writer.tell()
+                if position == target:
+                    if reader.remaining_bytes:
+                        self.log_info(F&#39;chunk decompressed with {reader.remaining_bytes} bytes remaining in input buffer&#39;)
+                    return
+                if position &gt;= limit:
+                    if position &gt; limit:
+                        limit = position
+                        self.log_info(F&#39;decompression of one chunk generated more than the limit of {max_chunk_size} bytes&#39;)
+                    flags.collect()
+                    break
+                try:
+                    sym = read_huffman_symbol(flags, table, XPRESS_TABLEBITS, XPRESS_MAX_CODEWORD_LEN)
+                except EOFError:
+                    self.log_debug(&#39;end of file while reading huffman symbol&#39;)
+                    break
+                if sym &lt; XPRESS_NUM_CHARS:
+                    writer.write_byte(sym)
+                    continue
+                length = sym &amp; 0xF
+                offsetlog = (sym &gt;&gt; 4) &amp; 0xF
+                flags.collect()
+                if reader.eof:
+                    break
+                offset = (1 &lt;&lt; offsetlog) | flags.read(offsetlog)
+                if length == 0xF:
+                    nudge = reader.read_byte()
+                    if nudge &lt; 0xFF:
+                        length += nudge
+                    else:
+                        length = reader.u16() or reader.u32()
+                length += XPRESS_MIN_MATCH_LEN
+                writer.replay(offset, length)
+
+    def _decompress_xpress(self, reader: StructReader, writer: MemoryFile, target: int | None = None) -&gt; None:
+        if target is not None:
+            target += writer.tell()
+        flags = BitBufferedReader(reader)
+        nibble_cache = None
+        while not reader.eof:
+            if target is not None and writer.tell() &gt;= target:
+                return
+            if not flags.next():
+                writer.write(reader.read(1))
+                continue
+            offset, length = divmod(reader.u16(), 8)
+            offset += 1
+            if length == 7:
+                length = nibble_cache
+                if length is None:
+                    length_pair = reader.u8()
+                    nibble_cache = length_pair &gt;&gt; 4
+                    length = length_pair &amp; 0xF
+                else:
+                    nibble_cache = None
+                if length == 15:
+                    length = reader.u8()
+                    if length == 0xFF:
+                        length = reader.u16() or reader.u32()
+                        length -= 22
+                        if length &lt; 0:
+                            raise RuntimeError(F&#39;Invalid match length of {length} for long delta sequence&#39;)
+                    length += 15
+                length += 7
+            length += 3
+            writer.replay(offset, length)
+
+    @classmethod
+    def handles(cls, data) -&gt; bool | None:
+        if data[:len(cls._SIGNATURE)] == cls._SIGNATURE:
+            return True</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.compression.mscf.MODE"><code class="flex name class">
+<span>class <span class="ident">MODE</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/mscf.py#L29-L33" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MODE(enum.IntEnum):
+    MSZIP       = 2  # noqa
+    XPRESS      = 3  # noqa
+    XPRESS_HUFF = 4  # noqa
+    LZMS        = 5  # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.mscf.MODE.MSZIP"><code class="name">var <span class="ident">MSZIP</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.mscf.MODE.XPRESS"><code class="name">var <span class="ident">XPRESS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.mscf.MODE.XPRESS_HUFF"><code class="name">var <span class="ident">XPRESS_HUFF</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.compression.mscf.MODE.LZMS"><code class="name">var <span class="ident">LZMS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.compression.mscf.mscf"><code class="flex name class">
+<span>class <span class="ident">mscf</span></span>
+<span>(</span><span>mode=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The Microsoft Compression Format unit implements the format and algorithms used by the Microsoft
+Compression API. The implementation for LZMS is currently missing, but MSZIP and XPRESS (both
+with and without Huffman table) are supported. This pure Python implementation is very slow when
+compared to native code, so decompressing very large inputs can take several minutes.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/compression/mscf.py#L36-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class mscf(Unit):
+    &#34;&#34;&#34;
+    The Microsoft Compression Format unit implements the format and algorithms used by the Microsoft
+    Compression API. The implementation for LZMS is currently missing, but MSZIP and XPRESS (both
+    with and without Huffman table) are supported. This pure Python implementation is very slow when
+    compared to native code, so decompressing very large inputs can take several minutes.
+    &#34;&#34;&#34;
+
+    _SIGNATURE = B&#39;\x0A\x51\xE5\xC0&#39;
+
+    def __init__(
+        self,
+        mode: Param[str | None, Arg.Option(choices=MODE, help=(
+            &#39;Manually select decompression mode ({choices}); by default the unit attempts to derive the &#39;
+            &#39;mode from the header, but this will fail for raw streams. However, even if a header is &#39;
+            &#39;found, a manually specified mode will take precedence.&#39;))] = None,
+    ):
+        super().__init__(mode=Arg.AsOption(mode, MODE))
+
+    def process(self, data):
+        mode: MODE = self.args.mode
+        with StructReader(memoryview(data)) as reader, MemoryFile() as writer:
+            reader: StructReader[memoryview]
+            check = zlib.crc32(reader.peek(6))
+            magic = reader.read(4)
+            if magic != self._SIGNATURE:
+                if mode is None:
+                    self.log_warn(
+                        F&#39;data starts with {magic.hex().upper()} rather than the expected sequence &#39;
+                        F&#39;{self._SIGNATURE.hex().upper()}; this could be a raw stream.&#39;)
+                else:
+                    reader.seek(0)
+                    handler = self._get_handler(mode)
+                    handler(reader, writer, None)
+                    return writer.getvalue()
+
+            header_size = reader.u16()
+            if header_size != 24:
+                self.log_warn(F&#39;the header size {header_size} was not equal to 24&#39;)
+
+            crc32byte = reader.u8()
+            check = zlib.crc32(reader.peek(0x11), check) &amp; 0xFF
+            if check != crc32byte:
+                self.log_warn(F&#39;the CRC32 check byte was {crc32byte}, computed value was {check}&#39;)
+
+            _mode_code = reader.u8()
+
+            try:
+                _mode = MODE(_mode_code)
+            except ValueError:
+                msg = F&#39;header contains unknown compression type code {_mode_code}&#39;
+                if mode is None:
+                    raise ValueError(msg)
+                else:
+                    self.log_warn(msg)
+            else:
+                if mode is not None and mode != _mode:
+                    logger = self.log_warn
+                else:
+                    logger = self.log_info
+                    mode = _mode
+                logger(F&#39;header specifies algorithm {_mode.name}&#39;)
+
+            self.log_info(F&#39;using algorithm {mode.name}&#39;)
+            decompress = self._get_handler(mode)
+
+            final_size = reader.u32()
+            _unknown_1 = reader.u32()
+            chunk_size = reader.u32()
+            _unknown_2 = reader.u32()
+
+            if _unknown_1 != 0:
+                self.log_warn(F&#39;unknown value 1 was unexpectedly nonzero: 0x{_unknown_1:08X}&#39;)
+            if _unknown_2 != 0:
+                self.log_warn(F&#39;unknown value 2 was unexpectedly nonzero: 0x{_unknown_2:08X}&#39;)
+
+            self.log_debug(F&#39;final size: 0x{final_size:08X}&#39;)
+            self.log_debug(F&#39;chunk size: 0x{chunk_size:08X}&#39;)
+
+            if chunk_size &gt; COMPRESS_MAX_CHUNK:
+                raise ValueError(&#39;the header chunk size is greater than the maximum value&#39;)
+
+            while len(writer) &lt; final_size:
+                src_size = reader.u32()
+                src_data = reader.read(src_size)
+                if len(src_data) != src_size:
+                    raise IndexError(F&#39;Attempted to read {src_size} bytes, but got only {len(src_data)}.&#39;)
+                if src_size + len(writer) == final_size:
+                    self.log_debug(F&#39;final chunk is uncompressed, appending {src_size} raw bytes to output&#39;)
+                    writer.write(src_data)
+                    break
+                self.log_debug(F&#39;reading chunk of size {src_size}&#39;)
+                start = writer.tell()
+                chunk = StructReader(src_data)
+                target = min(chunk_size, final_size - len(writer))
+                decompress(chunk, writer, target)
+                writer.flush()
+                written = writer.tell() - start
+                if written != target:
+                    raise RuntimeError(F&#39;decompressed output had unexpected size {written} instead of {chunk_size}&#39;)
+
+            if not reader.eof:
+                self.log_info(F&#39;compression complete with {reader.remaining_bytes} bytes remaining in input&#39;)
+            return writer.getvalue()
+
+    def _get_handler(self, mode: MODE) -&gt; Callable[[StructReader, MemoryFile, int | None], None]:
+        decompress = {
+            mode.MSZIP       : self._decompress_mszip,
+            mode.XPRESS_HUFF : self._decompress_xpress_huffman,
+            mode.XPRESS      : self._decompress_xpress,
+        }.get(mode, None)
+        if decompress is None:
+            raise NotImplementedError(F&#39;algorithm {mode.name} is not yet implemented&#39;)
+        return decompress
+
+    def _decompress_mszip(self, reader: StructReader, writer: MemoryFile, target: int | None = None):
+        header = bytes(reader.read(2))
+        if header != B&#39;CK&#39;:
+            raise ValueError(F&#39;chunk did not begin with CK header, got {header!r} instead&#39;)
+        decompress = zlib.decompressobj(-zlib.MAX_WBITS, zdict=writer.getvalue())
+        writer.write(decompress.decompress(reader.read()))
+        writer.write(decompress.flush())
+
+    def _decompress_xpress_huffman(
+        self,
+        reader: StructReader,
+        writer: MemoryFile,
+        target: int | None = None,
+        max_chunk_size: int = 0x10000
+    ) -&gt; None:
+        limit = writer.tell()
+        reader = StructReaderBits(reader)
+        if target is not None:
+            target += limit
+
+        while not reader.eof:
+
+            if reader.remaining_bytes &lt; XPRESS_NUM_SYMBOLS // 2:
+                raise IndexError(
+                    F&#39;There are only {reader.remaining_bytes} bytes reamining in the input buffer,&#39;
+                    F&#39; but at least {XPRESS_NUM_SYMBOLS // 2} are required to read a Huffman table.&#39;)
+
+            table = bytearray(reader.read_integer(4) for _ in range(XPRESS_NUM_SYMBOLS))
+            table = make_huffman_decode_table(table, XPRESS_TABLEBITS, XPRESS_MAX_CODEWORD_LEN)
+            limit = limit + max_chunk_size
+            flags = BitBufferedReader(reader, 16)
+
+            while True:
+                position = writer.tell()
+                if position == target:
+                    if reader.remaining_bytes:
+                        self.log_info(F&#39;chunk decompressed with {reader.remaining_bytes} bytes remaining in input buffer&#39;)
+                    return
+                if position &gt;= limit:
+                    if position &gt; limit:
+                        limit = position
+                        self.log_info(F&#39;decompression of one chunk generated more than the limit of {max_chunk_size} bytes&#39;)
+                    flags.collect()
+                    break
+                try:
+                    sym = read_huffman_symbol(flags, table, XPRESS_TABLEBITS, XPRESS_MAX_CODEWORD_LEN)
+                except EOFError:
+                    self.log_debug(&#39;end of file while reading huffman symbol&#39;)
+                    break
+                if sym &lt; XPRESS_NUM_CHARS:
+                    writer.write_byte(sym)
+                    continue
+                length = sym &amp; 0xF
+                offsetlog = (sym &gt;&gt; 4) &amp; 0xF
+                flags.collect()
+                if reader.eof:
+                    break
+                offset = (1 &lt;&lt; offsetlog) | flags.read(offsetlog)
+                if length == 0xF:
+                    nudge = reader.read_byte()
+                    if nudge &lt; 0xFF:
+                        length += nudge
+                    else:
+                        length = reader.u16() or reader.u32()
+                length += XPRESS_MIN_MATCH_LEN
+                writer.replay(offset, length)
+
+    def _decompress_xpress(self, reader: StructReader, writer: MemoryFile, target: int | None = None) -&gt; None:
+        if target is not None:
+            target += writer.tell()
+        flags = BitBufferedReader(reader)
+        nibble_cache = None
+        while not reader.eof:
+            if target is not None and writer.tell() &gt;= target:
+                return
+            if not flags.next():
+                writer.write(reader.read(1))
+                continue
+            offset, length = divmod(reader.u16(), 8)
+            offset += 1
+            if length == 7:
+                length = nibble_cache
+                if length is None:
+                    length_pair = reader.u8()
+                    nibble_cache = length_pair &gt;&gt; 4
+                    length = length_pair &amp; 0xF
+                else:
+                    nibble_cache = None
+                if length == 15:
+                    length = reader.u8()
+                    if length == 0xFF:
+                        length = reader.u16() or reader.u32()
+                        length -= 22
+                        if length &lt; 0:
+                            raise RuntimeError(F&#39;Invalid match length of {length} for long delta sequence&#39;)
+                    length += 15
+                length += 7
+            length += 3
+            writer.replay(offset, length)
+
+    @classmethod
+    def handles(cls, data) -&gt; bool | None:
+        if data[:len(cls._SIGNATURE)] == cls._SIGNATURE:
+            return True</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.compression.mscf.mscf" href="#refinery.units.compression.mscf.mscf">mscf</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.compression.mscf.mscf.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.compression" href="index.html">refinery.units.compression</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.compression.mscf.MODE" href="#refinery.units.compression.mscf.MODE">MODE</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.compression.mscf.mscf" href="#refinery.units.compression.mscf.mscf">mscf</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

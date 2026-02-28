@@ -1,0 +1,2141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.parser documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.parser</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L1-L621" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import io
+import re
+
+from collections import deque
+
+from refinery.lib.batch.lexer import BatchLexer
+from refinery.lib.batch.model import (
+    AstCommand,
+    AstCondition,
+    AstConditionalStatement,
+    AstError,
+    AstFor,
+    AstForOptions,
+    AstForParserMode,
+    AstForVariant,
+    AstGroup,
+    AstIf,
+    AstIfCmp,
+    AstIfVariant,
+    AstLabel,
+    AstNode,
+    AstPipeline,
+    AstSequence,
+    Ctrl,
+    EmulatorException,
+    RedirectIO,
+    Token,
+    UnexpectedToken,
+    Word,
+)
+from refinery.lib.batch.state import BatchState
+from refinery.lib.batch.util import batchint, batchrange, unquote
+from refinery.lib.types import buf
+
+
+class LookAhead:
+    preview: deque[Token]
+    offsets: deque[int]
+
+    def __init__(self, lexer: BatchLexer, offset: int, scope: int = 1):
+        self.lexer = lexer
+        self.tokens = lexer.tokens(offset)
+        self.preview = deque()
+        self.offsets = deque()
+        self.done = False
+        self.scope = scope
+        self._collect()
+
+    def offset(self):
+        try:
+            return self.offsets[0]
+        except IndexError:
+            return len(self.lexer.code)
+
+    def pop(self, *value):
+        if not (preview := self.preview):
+            return Ctrl.EndOfFile in value
+        if value and preview[0] not in value:
+            return False
+        next(self)
+        return True
+
+    def pop_nonspace(self):
+        if not (preview := self.preview):
+            return None
+        if (peek := preview[0]).isspace():
+            return None
+        if isinstance(peek, RedirectIO):
+            return None
+        assert self.__next__() == peek
+        return peek
+
+    def pop_string(self, key: str):
+        if not (preview := self.preview):
+            return False
+        if preview[0].upper() != key:
+            return False
+        self.__next__()
+        return True
+
+    def skip_space(self):
+        spaces = []
+        while (t := self.peek()) != Ctrl.NewLine and t.isspace():
+            spaces.append(next(self))
+        if not spaces:
+            return None
+        return &#39;&#39;.join(spaces)
+
+    def consume_nonspace_words(self):
+        self.skip_space()
+        with io.StringIO() as fused:
+            while tok := self.pop_nonspace():
+                fused.write(tok)
+            return fused.getvalue()
+
+    def word(self, upper=False) -&gt; Word | Ctrl:
+        self.skip_space()
+        if isinstance((token := next(self)), RedirectIO):
+            raise UnexpectedToken(self.offset(), str(token))
+        if upper:
+            token = token.upper()
+        return token
+
+    def peek(self, index: int = 0) -&gt; Token:
+        try:
+            return self.preview[index]
+        except IndexError:
+            return Ctrl.EndOfFile
+
+    def drop_and_peek(self):
+        self.__next__()
+        return self.peek()
+
+    def _collect(self):
+        offsets = self.offsets
+        preview = self.preview
+        while len(preview) &lt; self.scope:
+            try:
+                token = next(self.tokens)
+            except StopIteration:
+                break
+            preview.append(token)
+            offsets.append(self.lexer.cursor.offset)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.done:
+            raise StopIteration
+        try:
+            self.offsets.popleft()
+            token = self.preview.popleft()
+        except IndexError:
+            self.done = True
+            raise StopIteration
+        else:
+            self._collect()
+            return token
+
+
+class BatchParser:
+
+    def __init__(self, data: str | buf | BatchParser, state: BatchState | None = None):
+        if isinstance(data, BatchParser):
+            if state is not None:
+                raise NotImplementedError
+            src = data.lexer
+        else:
+            src = data
+        self.lexer = BatchLexer(src, state)
+
+    @property
+    def state(self):
+        return self.lexer.state
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    def skip_prefix(self, tokens: LookAhead) -&gt; tuple[int, list[Token]]:
+        token = tokens.peek()
+        prefix = []
+        skip = {
+            Ctrl.At,
+            Ctrl.Semicolon,
+            Ctrl.Comma,
+            Ctrl.Equals,
+        }
+        at = 0
+        while True:
+            if isinstance(token, Word):
+                if not token.isspace():
+                    break
+                prefix.append(token)
+            elif token not in skip:
+                break
+            else:
+                prefix.append(token)
+                if token == Ctrl.At:
+                    at += 1
+                else:
+                    at = 0
+            token = tokens.drop_and_peek()
+        return at, prefix
+
+    def command(
+        self,
+        parent: AstNode,
+        tokens: LookAhead,
+        redirects: dict[int, RedirectIO],
+        in_group: bool,
+        silenced: bool,
+    ) -&gt; AstCommand | None:
+        ast = AstCommand(tokens.offset(), parent, silenced, redirects)
+        tok = tokens.peek()
+        cmd = ast.fragments
+
+        eat_token = False
+        add_space = False
+        nsp_merge = True
+
+        nonspace = io.StringIO()
+
+        if not ast.redirects:
+            assert not isinstance(tok, RedirectIO)
+            tok_upper = tok.upper()
+            if tok_upper.startswith(&#39;ECHO&#39;):
+                if len(tok_upper) &gt; 4 and tok_upper[4] == &#39;.&#39;:
+                    cmd.append(tok[:4])
+                    cmd.append(&#39; &#39;)
+                    tok = tok[5:]
+                    add_space = False
+                else:
+                    add_space = True
+                    eat_token = True
+            elif tok_upper == &#39;SET&#39;:
+                self.lexer.parse_set()
+                nsp_merge = False
+            elif tok_upper == &#39;GOTO&#39;:
+                nsp_merge = False
+            if add_space or not nsp_merge:
+                cmd.append(tok)
+            else:
+                nonspace.write(tok)
+            tok = tokens.drop_and_peek()
+
+        while tok not in (
+            Ctrl.Ampersand,
+            Ctrl.Pipe,
+            Ctrl.NewLine,
+            Ctrl.EndOfFile,
+        ) or not isinstance(tok, Ctrl):
+            if in_group and tok == Ctrl.EndGroup:
+                break
+            if isinstance(tok, RedirectIO):
+                ast.redirects[tok.source] = tok
+            elif add_space:
+                add_space = False
+                if not tok.isspace():
+                    cmd.append(&#39; &#39;)
+                    if eat_token:
+                        tok = tok[1:]
+                if tok:
+                    cmd.append(tok)
+            elif not nsp_merge:
+                cmd.append(tok)
+            elif tok.isspace() or tok.startswith(&#39;/&#39;):
+                if nsp := nonspace.getvalue():
+                    nonspace.seek(0)
+                    nonspace.truncate(0)
+                    cmd.append(nsp)
+                cmd.append(tok)
+            else:
+                nonspace.write(tok)
+            tok = tokens.drop_and_peek()
+        if nsp := nonspace.getvalue():
+            cmd.append(nsp)
+        if ast:
+            return ast
+
+    def redirects(self, tokens: LookAhead):
+        redirects = {}
+        while isinstance((t := tokens.peek()), RedirectIO):
+            redirects[t.source] = t
+            tokens.pop()
+            tokens.skip_space()
+        return redirects
+
+    def pipeline(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstPipeline | None:
+        ast = AstPipeline(tokens.offset(), parent, silenced)
+        while True:
+            redirects = self.redirects(tokens)
+            if not (cmd := self.group(ast, tokens, redirects, silenced)):
+                if not (cmd := self.command(ast, tokens, redirects, in_group, silenced)):
+                    break
+            ast.parts.append(cmd)
+            if not tokens.pop(Ctrl.Pipe) or tokens.peek() == Ctrl.Pipe:
+                break
+            at, _ = self.skip_prefix(tokens)
+            silenced = at &gt; 0
+        if ast.parts:
+            return ast
+
+    def ifthen(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstIf | None:
+        offset = tokens.offset()
+
+        if not tokens.pop_string(&#39;IF&#39;):
+            return None
+
+        casefold = False
+        negated = False
+        lhs = None
+        rhs = None
+
+        token = tokens.word()
+
+        if token.upper() == &#39;/I&#39;:
+            casefold = True
+            token = tokens.word()
+        if token.upper() == &#39;NOT&#39;:
+            negated = True
+            token = tokens.word()
+        try:
+            variant = AstIfVariant(token.upper())
+        except Exception:
+            tokens.skip_space()
+            variant = None
+            lhs = token
+            cmp = next(tokens)
+
+            if cmp == Ctrl.Equals:
+                if tokens.pop(Ctrl.Equals):
+                    cmp = AstIfCmp(&#39;==&#39;)
+                else:
+                    raise UnexpectedToken(offset, tokens.peek())
+            else:
+                try:
+                    cmp = AstIfCmp(cmp.upper())
+                except Exception:
+                    raise UnexpectedToken(offset, cmp)
+                if cmp != AstIfCmp.STR and self.state.extensions_version &lt; 1:
+                    raise UnexpectedToken(offset, cmp)
+
+            rhs = tokens.consume_nonspace_words()
+
+            try:
+                ilh = batchint(lhs)
+                irh = batchint(rhs)
+            except ValueError:
+                pass
+            else:
+                lhs = ilh
+                rhs = irh
+        else:
+            lhs = unquote(tokens.consume_nonspace_words())
+            rhs = None
+            cmp = None
+            try:
+                lhs = batchint(lhs)
+            except ValueError:
+                pass
+
+        then_do = self.sequence(None, tokens, in_group)
+
+        if then_do is None:
+            raise UnexpectedToken(offset, tokens.peek())
+
+        tokens.skip_space()
+
+        ast = AstIf(
+            offset,
+            parent,
+            silenced,
+            then_do,
+            None,
+            variant,
+            casefold,
+            negated,
+            cmp,
+            lhs, rhs # type:ignore
+        )
+        then_do.parent = ast
+
+        if tokens.peek().upper() == &#39;ELSE&#39;:
+            tokens.pop()
+            ast.else_do = self.sequence(ast, tokens, in_group)
+
+        return ast
+
+    def forloop_options(self, options: str) -&gt; AstForOptions:
+        result = AstForOptions()
+
+        if not options:
+            return result
+        elif (quote := re.search(&#39;&#34;(.*?)&#34;&#39;, options)):
+            options = quote[1]
+
+        parts = options.strip().split()
+        count = len(parts)
+
+        for k, part in enumerate(parts, 1):
+            key, eq, value = part.partition(&#39;=&#39;)
+            key = key.lower()
+            if key == &#39;usebackq&#39;:
+                if eq or value:
+                    raise ValueError
+                result.usebackq = True
+            elif not eq:
+                raise ValueError
+            elif key == &#39;eol&#39;:
+                if len(value) != 1:
+                    raise ValueError
+                result.comment = value
+            elif key == &#39;skip&#39;:
+                try:
+                    result.skip = batchint(value)
+                except Exception:
+                    raise ValueError
+            elif key == &#39;delims&#39;:
+                if k == count:
+                    _, _, value = options.partition(&#39;delims=&#39;)
+                result.delims = value
+            elif key == &#39;tokens&#39;:
+                tokens: set[int] = set()
+                if value.endswith(&#39;*&#39;):
+                    result.asterisk = True
+                    value = value[:-1]
+                    if not value:
+                        result.tokens = ()
+                        continue
+                for x in value.split(&#39;,&#39;):
+                    x, _, y = x.partition(&#39;-&#39;)
+                    x = batchint(x) - 1
+                    if x &lt; 0:
+                        raise ValueError
+                    y = batchint(y) if y else x + 1
+                    for t in range(x, y):
+                        tokens.add(t)
+                result.tokens = tuple(sorted(tokens))
+            else:
+                raise ValueError
+
+        return result
+
+    def forloop(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstFor | None:
+        offset = tokens.offset()
+
+        if not tokens.pop_string(&#39;FOR&#39;):
+            return None
+
+        def isvar(token: str):
+            return len(token) == 2 and token.startswith(&#39;%&#39;)
+
+        path = None
+        mode = AstForParserMode.FileSet
+        spec = []
+        options = &#39;&#39;
+
+        if isvar(variable := tokens.word()):
+            variant = AstForVariant.Default
+        elif len(variable) != 2 or not variable.startswith(&#39;/&#39;):
+            raise UnexpectedToken(offset, variable)
+        else:
+            try:
+                variant = AstForVariant(variable[1].upper())
+            except ValueError:
+                raise UnexpectedToken(offset, variable)
+            variable = tokens.word()
+            if not isvar(variable):
+                if variant == AstForVariant.FileParsing:
+                    options = variable
+                elif variant == AstForVariant.DescendRecursively:
+                    path = unquote(variable)
+                else:
+                    raise UnexpectedToken(offset, variable)
+                variable = tokens.word()
+                if not isvar(variable):
+                    raise UnexpectedToken(offset, variable)
+
+        if (t := tokens.word()).upper() != &#39;IN&#39;:
+            raise UnexpectedToken(offset, t)
+
+        tokens.skip_space()
+
+        if not tokens.pop(Ctrl.NewGroup):
+            raise UnexpectedToken(offset, tokens.peek())
+
+        with io.StringIO() as _spec:
+            while not tokens.pop(Ctrl.EndGroup):
+                if isinstance((t := next(tokens)), RedirectIO):
+                    raise UnexpectedToken(offset, t)
+                _spec.write(t)
+            spec_string = _spec.getvalue().strip()
+
+        tokens.skip_space()
+
+        if not tokens.pop_string(&#39;DO&#39;):
+            raise UnexpectedToken(offset, tokens.peek())
+
+        if not (body := self.sequence(None, tokens, in_group)):
+            raise UnexpectedToken(offset, tokens.peek())
+
+        options = self.forloop_options(options)
+
+        if variant == AstForVariant.FileParsing:
+            quote_literal = &#34;&#39;&#34; if options.usebackq else &#39;&#34;&#39;
+            quote_command = &#39;`&#39; if options.usebackq else &#34;&#39;&#34;
+            for q, m in (
+                (quote_literal, AstForParserMode.Literal),
+                (quote_command, AstForParserMode.Command),
+            ):
+                if spec_string.startswith(q):
+                    if not spec_string.endswith(q):
+                        raise UnexpectedToken(offset, spec_string)
+                    mode = m
+                    spec = [spec_string[1:-1]]
+                    break
+
+        if not spec:
+            spec = re.split(&#39;[\\s,;]+&#39;, spec_string)
+
+        if variant == AstForVariant.NumericLoop:
+            init = [0, 0, 0]
+            for k, v in enumerate(spec):
+                init[k] = batchint(v, 0)
+            spec = batchrange(*init)
+
+        ast = AstFor(
+            offset,
+            parent,
+            silenced,
+            variant,
+            variable[1],
+            options,
+            body,
+            spec,
+            spec_string,
+            path,
+            mode,
+        )
+        ast.body.parent = ast
+        return ast
+
+    def block(self, parent: AstNode | None, tokens: LookAhead, in_group: bool):
+        while True:
+            while tokens.pop(Ctrl.NewLine):
+                continue
+            if in_group and tokens.pop(Ctrl.EndGroup):
+                break
+            if tokens.pop(Ctrl.EndOfFile):
+                break
+            if sequence := self.sequence(parent, tokens, in_group):
+                yield sequence
+            else:
+                break
+
+    def group(
+        self,
+        parent: AstNode | None,
+        tokens: LookAhead,
+        redirects: dict[int, RedirectIO],
+        silenced: bool,
+    ) -&gt; AstGroup | None:
+        offset = tokens.offset()
+        if tokens.peek() == Ctrl.NewGroup:
+            self.lexer.parse_group()
+            tokens.pop()
+            group = AstGroup(offset, parent, silenced, redirects)
+            group.fragments.extend(self.block(group, tokens, True))
+            tokens.skip_space()
+            group.redirects.update(self.redirects(tokens))
+            return group
+
+    def label(self, tokens: LookAhead, silenced: bool) -&gt; AstLabel | None:
+        comment = False
+        if (t := tokens.peek()) == Ctrl.Comment:
+            comment = True
+        elif t != Ctrl.Label:
+            return None
+        offset = tokens.offset()
+        lexer = self.lexer
+        lexer.parse_label()
+        tokens.pop()
+        line = tokens.word()
+        if comment:
+            label = line
+        else:
+            label = lexer.label(line, uppercase=False)
+            if (x := lexer.labels[label.upper()]) != offset - 1:
+                raise RuntimeError(F&#39;Expected offset for label {label} to be {offset}, got {x} instead.&#39;)
+        return AstLabel(offset, None, silenced, line, label, comment)
+
+    def statement(self, parent: AstNode | None, tokens: LookAhead, in_group: bool):
+        at, _ = self.skip_prefix(tokens)
+        silenced = at &gt; 0
+        if at &lt;= 1 and (s := self.label(tokens, silenced)):
+            return s
+        if s := self.ifthen(parent, tokens, in_group, silenced):
+            return s
+        if s := self.forloop(parent, tokens, in_group, silenced):
+            return s
+        return self.pipeline(parent, tokens, in_group, silenced)
+
+    def sequence(self, parent: AstNode | None, tokens: LookAhead, in_group: bool) -&gt; AstSequence | None:
+        tokens.skip_space()
+        head = self.statement(parent, tokens, in_group)
+        if head is None:
+            return None
+        node = AstSequence(head.offset, parent, head)
+        head.parent = node
+        tokens.skip_space()
+        while True:
+            if tokens.pop(Ctrl.Ampersand):
+                if tokens.pop(Ctrl.Ampersand):
+                    condition = AstCondition.Success
+                else:
+                    condition = AstCondition.NoCheck
+            elif tokens.pop(Ctrl.Pipe):
+                condition = AstCondition.Failure
+            else:
+                break
+            tokens.skip_space()
+            if not (statement := self.statement(node, tokens, in_group)):
+                raise EmulatorException(&#39;Failed to parse conditional statement.&#39;)
+            node.tail.append(
+                AstConditionalStatement(statement.offset, node, condition, statement))
+            tokens.skip_space()
+        return node
+
+    def parse(self, offset: int):
+        tokens = LookAhead(self.lexer, offset)
+        while True:
+            try:
+                yield from self.block(None, tokens, False)
+            except UnexpectedToken as ut:
+                yield AstError(ut.offset, None, ut.token, ut.error)
+            else:
+                break</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.parser.LookAhead"><code class="flex name class">
+<span>class <span class="ident">LookAhead</span></span>
+<span>(</span><span>lexer, offset, scope=1)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L38-L141" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LookAhead:
+    preview: deque[Token]
+    offsets: deque[int]
+
+    def __init__(self, lexer: BatchLexer, offset: int, scope: int = 1):
+        self.lexer = lexer
+        self.tokens = lexer.tokens(offset)
+        self.preview = deque()
+        self.offsets = deque()
+        self.done = False
+        self.scope = scope
+        self._collect()
+
+    def offset(self):
+        try:
+            return self.offsets[0]
+        except IndexError:
+            return len(self.lexer.code)
+
+    def pop(self, *value):
+        if not (preview := self.preview):
+            return Ctrl.EndOfFile in value
+        if value and preview[0] not in value:
+            return False
+        next(self)
+        return True
+
+    def pop_nonspace(self):
+        if not (preview := self.preview):
+            return None
+        if (peek := preview[0]).isspace():
+            return None
+        if isinstance(peek, RedirectIO):
+            return None
+        assert self.__next__() == peek
+        return peek
+
+    def pop_string(self, key: str):
+        if not (preview := self.preview):
+            return False
+        if preview[0].upper() != key:
+            return False
+        self.__next__()
+        return True
+
+    def skip_space(self):
+        spaces = []
+        while (t := self.peek()) != Ctrl.NewLine and t.isspace():
+            spaces.append(next(self))
+        if not spaces:
+            return None
+        return &#39;&#39;.join(spaces)
+
+    def consume_nonspace_words(self):
+        self.skip_space()
+        with io.StringIO() as fused:
+            while tok := self.pop_nonspace():
+                fused.write(tok)
+            return fused.getvalue()
+
+    def word(self, upper=False) -&gt; Word | Ctrl:
+        self.skip_space()
+        if isinstance((token := next(self)), RedirectIO):
+            raise UnexpectedToken(self.offset(), str(token))
+        if upper:
+            token = token.upper()
+        return token
+
+    def peek(self, index: int = 0) -&gt; Token:
+        try:
+            return self.preview[index]
+        except IndexError:
+            return Ctrl.EndOfFile
+
+    def drop_and_peek(self):
+        self.__next__()
+        return self.peek()
+
+    def _collect(self):
+        offsets = self.offsets
+        preview = self.preview
+        while len(preview) &lt; self.scope:
+            try:
+                token = next(self.tokens)
+            except StopIteration:
+                break
+            preview.append(token)
+            offsets.append(self.lexer.cursor.offset)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.done:
+            raise StopIteration
+        try:
+            self.offsets.popleft()
+            token = self.preview.popleft()
+        except IndexError:
+            self.done = True
+            raise StopIteration
+        else:
+            self._collect()
+            return token</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.batch.parser.LookAhead.preview"><code class="name">var <span class="ident">preview</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.offsets"><code class="name">var <span class="ident">offsets</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.parser.LookAhead.offset"><code class="name flex">
+<span>def <span class="ident">offset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L51-L55" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def offset(self):
+    try:
+        return self.offsets[0]
+    except IndexError:
+        return len(self.lexer.code)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.pop"><code class="name flex">
+<span>def <span class="ident">pop</span></span>(<span>self, *value)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L57-L63" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pop(self, *value):
+    if not (preview := self.preview):
+        return Ctrl.EndOfFile in value
+    if value and preview[0] not in value:
+        return False
+    next(self)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.pop_nonspace"><code class="name flex">
+<span>def <span class="ident">pop_nonspace</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L65-L73" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pop_nonspace(self):
+    if not (preview := self.preview):
+        return None
+    if (peek := preview[0]).isspace():
+        return None
+    if isinstance(peek, RedirectIO):
+        return None
+    assert self.__next__() == peek
+    return peek</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.pop_string"><code class="name flex">
+<span>def <span class="ident">pop_string</span></span>(<span>self, key)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L75-L81" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pop_string(self, key: str):
+    if not (preview := self.preview):
+        return False
+    if preview[0].upper() != key:
+        return False
+    self.__next__()
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.skip_space"><code class="name flex">
+<span>def <span class="ident">skip_space</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L83-L89" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def skip_space(self):
+    spaces = []
+    while (t := self.peek()) != Ctrl.NewLine and t.isspace():
+        spaces.append(next(self))
+    if not spaces:
+        return None
+    return &#39;&#39;.join(spaces)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.consume_nonspace_words"><code class="name flex">
+<span>def <span class="ident">consume_nonspace_words</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L91-L96" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def consume_nonspace_words(self):
+    self.skip_space()
+    with io.StringIO() as fused:
+        while tok := self.pop_nonspace():
+            fused.write(tok)
+        return fused.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.word"><code class="name flex">
+<span>def <span class="ident">word</span></span>(<span>self, upper=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L98-L104" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def word(self, upper=False) -&gt; Word | Ctrl:
+    self.skip_space()
+    if isinstance((token := next(self)), RedirectIO):
+        raise UnexpectedToken(self.offset(), str(token))
+    if upper:
+        token = token.upper()
+    return token</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.peek"><code class="name flex">
+<span>def <span class="ident">peek</span></span>(<span>self, index=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L106-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def peek(self, index: int = 0) -&gt; Token:
+    try:
+        return self.preview[index]
+    except IndexError:
+        return Ctrl.EndOfFile</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.LookAhead.drop_and_peek"><code class="name flex">
+<span>def <span class="ident">drop_and_peek</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L112-L114" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def drop_and_peek(self):
+    self.__next__()
+    return self.peek()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser"><code class="flex name class">
+<span>class <span class="ident">BatchParser</span></span>
+<span>(</span><span>data, state=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L144-L621" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BatchParser:
+
+    def __init__(self, data: str | buf | BatchParser, state: BatchState | None = None):
+        if isinstance(data, BatchParser):
+            if state is not None:
+                raise NotImplementedError
+            src = data.lexer
+        else:
+            src = data
+        self.lexer = BatchLexer(src, state)
+
+    @property
+    def state(self):
+        return self.lexer.state
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    def skip_prefix(self, tokens: LookAhead) -&gt; tuple[int, list[Token]]:
+        token = tokens.peek()
+        prefix = []
+        skip = {
+            Ctrl.At,
+            Ctrl.Semicolon,
+            Ctrl.Comma,
+            Ctrl.Equals,
+        }
+        at = 0
+        while True:
+            if isinstance(token, Word):
+                if not token.isspace():
+                    break
+                prefix.append(token)
+            elif token not in skip:
+                break
+            else:
+                prefix.append(token)
+                if token == Ctrl.At:
+                    at += 1
+                else:
+                    at = 0
+            token = tokens.drop_and_peek()
+        return at, prefix
+
+    def command(
+        self,
+        parent: AstNode,
+        tokens: LookAhead,
+        redirects: dict[int, RedirectIO],
+        in_group: bool,
+        silenced: bool,
+    ) -&gt; AstCommand | None:
+        ast = AstCommand(tokens.offset(), parent, silenced, redirects)
+        tok = tokens.peek()
+        cmd = ast.fragments
+
+        eat_token = False
+        add_space = False
+        nsp_merge = True
+
+        nonspace = io.StringIO()
+
+        if not ast.redirects:
+            assert not isinstance(tok, RedirectIO)
+            tok_upper = tok.upper()
+            if tok_upper.startswith(&#39;ECHO&#39;):
+                if len(tok_upper) &gt; 4 and tok_upper[4] == &#39;.&#39;:
+                    cmd.append(tok[:4])
+                    cmd.append(&#39; &#39;)
+                    tok = tok[5:]
+                    add_space = False
+                else:
+                    add_space = True
+                    eat_token = True
+            elif tok_upper == &#39;SET&#39;:
+                self.lexer.parse_set()
+                nsp_merge = False
+            elif tok_upper == &#39;GOTO&#39;:
+                nsp_merge = False
+            if add_space or not nsp_merge:
+                cmd.append(tok)
+            else:
+                nonspace.write(tok)
+            tok = tokens.drop_and_peek()
+
+        while tok not in (
+            Ctrl.Ampersand,
+            Ctrl.Pipe,
+            Ctrl.NewLine,
+            Ctrl.EndOfFile,
+        ) or not isinstance(tok, Ctrl):
+            if in_group and tok == Ctrl.EndGroup:
+                break
+            if isinstance(tok, RedirectIO):
+                ast.redirects[tok.source] = tok
+            elif add_space:
+                add_space = False
+                if not tok.isspace():
+                    cmd.append(&#39; &#39;)
+                    if eat_token:
+                        tok = tok[1:]
+                if tok:
+                    cmd.append(tok)
+            elif not nsp_merge:
+                cmd.append(tok)
+            elif tok.isspace() or tok.startswith(&#39;/&#39;):
+                if nsp := nonspace.getvalue():
+                    nonspace.seek(0)
+                    nonspace.truncate(0)
+                    cmd.append(nsp)
+                cmd.append(tok)
+            else:
+                nonspace.write(tok)
+            tok = tokens.drop_and_peek()
+        if nsp := nonspace.getvalue():
+            cmd.append(nsp)
+        if ast:
+            return ast
+
+    def redirects(self, tokens: LookAhead):
+        redirects = {}
+        while isinstance((t := tokens.peek()), RedirectIO):
+            redirects[t.source] = t
+            tokens.pop()
+            tokens.skip_space()
+        return redirects
+
+    def pipeline(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstPipeline | None:
+        ast = AstPipeline(tokens.offset(), parent, silenced)
+        while True:
+            redirects = self.redirects(tokens)
+            if not (cmd := self.group(ast, tokens, redirects, silenced)):
+                if not (cmd := self.command(ast, tokens, redirects, in_group, silenced)):
+                    break
+            ast.parts.append(cmd)
+            if not tokens.pop(Ctrl.Pipe) or tokens.peek() == Ctrl.Pipe:
+                break
+            at, _ = self.skip_prefix(tokens)
+            silenced = at &gt; 0
+        if ast.parts:
+            return ast
+
+    def ifthen(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstIf | None:
+        offset = tokens.offset()
+
+        if not tokens.pop_string(&#39;IF&#39;):
+            return None
+
+        casefold = False
+        negated = False
+        lhs = None
+        rhs = None
+
+        token = tokens.word()
+
+        if token.upper() == &#39;/I&#39;:
+            casefold = True
+            token = tokens.word()
+        if token.upper() == &#39;NOT&#39;:
+            negated = True
+            token = tokens.word()
+        try:
+            variant = AstIfVariant(token.upper())
+        except Exception:
+            tokens.skip_space()
+            variant = None
+            lhs = token
+            cmp = next(tokens)
+
+            if cmp == Ctrl.Equals:
+                if tokens.pop(Ctrl.Equals):
+                    cmp = AstIfCmp(&#39;==&#39;)
+                else:
+                    raise UnexpectedToken(offset, tokens.peek())
+            else:
+                try:
+                    cmp = AstIfCmp(cmp.upper())
+                except Exception:
+                    raise UnexpectedToken(offset, cmp)
+                if cmp != AstIfCmp.STR and self.state.extensions_version &lt; 1:
+                    raise UnexpectedToken(offset, cmp)
+
+            rhs = tokens.consume_nonspace_words()
+
+            try:
+                ilh = batchint(lhs)
+                irh = batchint(rhs)
+            except ValueError:
+                pass
+            else:
+                lhs = ilh
+                rhs = irh
+        else:
+            lhs = unquote(tokens.consume_nonspace_words())
+            rhs = None
+            cmp = None
+            try:
+                lhs = batchint(lhs)
+            except ValueError:
+                pass
+
+        then_do = self.sequence(None, tokens, in_group)
+
+        if then_do is None:
+            raise UnexpectedToken(offset, tokens.peek())
+
+        tokens.skip_space()
+
+        ast = AstIf(
+            offset,
+            parent,
+            silenced,
+            then_do,
+            None,
+            variant,
+            casefold,
+            negated,
+            cmp,
+            lhs, rhs # type:ignore
+        )
+        then_do.parent = ast
+
+        if tokens.peek().upper() == &#39;ELSE&#39;:
+            tokens.pop()
+            ast.else_do = self.sequence(ast, tokens, in_group)
+
+        return ast
+
+    def forloop_options(self, options: str) -&gt; AstForOptions:
+        result = AstForOptions()
+
+        if not options:
+            return result
+        elif (quote := re.search(&#39;&#34;(.*?)&#34;&#39;, options)):
+            options = quote[1]
+
+        parts = options.strip().split()
+        count = len(parts)
+
+        for k, part in enumerate(parts, 1):
+            key, eq, value = part.partition(&#39;=&#39;)
+            key = key.lower()
+            if key == &#39;usebackq&#39;:
+                if eq or value:
+                    raise ValueError
+                result.usebackq = True
+            elif not eq:
+                raise ValueError
+            elif key == &#39;eol&#39;:
+                if len(value) != 1:
+                    raise ValueError
+                result.comment = value
+            elif key == &#39;skip&#39;:
+                try:
+                    result.skip = batchint(value)
+                except Exception:
+                    raise ValueError
+            elif key == &#39;delims&#39;:
+                if k == count:
+                    _, _, value = options.partition(&#39;delims=&#39;)
+                result.delims = value
+            elif key == &#39;tokens&#39;:
+                tokens: set[int] = set()
+                if value.endswith(&#39;*&#39;):
+                    result.asterisk = True
+                    value = value[:-1]
+                    if not value:
+                        result.tokens = ()
+                        continue
+                for x in value.split(&#39;,&#39;):
+                    x, _, y = x.partition(&#39;-&#39;)
+                    x = batchint(x) - 1
+                    if x &lt; 0:
+                        raise ValueError
+                    y = batchint(y) if y else x + 1
+                    for t in range(x, y):
+                        tokens.add(t)
+                result.tokens = tuple(sorted(tokens))
+            else:
+                raise ValueError
+
+        return result
+
+    def forloop(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstFor | None:
+        offset = tokens.offset()
+
+        if not tokens.pop_string(&#39;FOR&#39;):
+            return None
+
+        def isvar(token: str):
+            return len(token) == 2 and token.startswith(&#39;%&#39;)
+
+        path = None
+        mode = AstForParserMode.FileSet
+        spec = []
+        options = &#39;&#39;
+
+        if isvar(variable := tokens.word()):
+            variant = AstForVariant.Default
+        elif len(variable) != 2 or not variable.startswith(&#39;/&#39;):
+            raise UnexpectedToken(offset, variable)
+        else:
+            try:
+                variant = AstForVariant(variable[1].upper())
+            except ValueError:
+                raise UnexpectedToken(offset, variable)
+            variable = tokens.word()
+            if not isvar(variable):
+                if variant == AstForVariant.FileParsing:
+                    options = variable
+                elif variant == AstForVariant.DescendRecursively:
+                    path = unquote(variable)
+                else:
+                    raise UnexpectedToken(offset, variable)
+                variable = tokens.word()
+                if not isvar(variable):
+                    raise UnexpectedToken(offset, variable)
+
+        if (t := tokens.word()).upper() != &#39;IN&#39;:
+            raise UnexpectedToken(offset, t)
+
+        tokens.skip_space()
+
+        if not tokens.pop(Ctrl.NewGroup):
+            raise UnexpectedToken(offset, tokens.peek())
+
+        with io.StringIO() as _spec:
+            while not tokens.pop(Ctrl.EndGroup):
+                if isinstance((t := next(tokens)), RedirectIO):
+                    raise UnexpectedToken(offset, t)
+                _spec.write(t)
+            spec_string = _spec.getvalue().strip()
+
+        tokens.skip_space()
+
+        if not tokens.pop_string(&#39;DO&#39;):
+            raise UnexpectedToken(offset, tokens.peek())
+
+        if not (body := self.sequence(None, tokens, in_group)):
+            raise UnexpectedToken(offset, tokens.peek())
+
+        options = self.forloop_options(options)
+
+        if variant == AstForVariant.FileParsing:
+            quote_literal = &#34;&#39;&#34; if options.usebackq else &#39;&#34;&#39;
+            quote_command = &#39;`&#39; if options.usebackq else &#34;&#39;&#34;
+            for q, m in (
+                (quote_literal, AstForParserMode.Literal),
+                (quote_command, AstForParserMode.Command),
+            ):
+                if spec_string.startswith(q):
+                    if not spec_string.endswith(q):
+                        raise UnexpectedToken(offset, spec_string)
+                    mode = m
+                    spec = [spec_string[1:-1]]
+                    break
+
+        if not spec:
+            spec = re.split(&#39;[\\s,;]+&#39;, spec_string)
+
+        if variant == AstForVariant.NumericLoop:
+            init = [0, 0, 0]
+            for k, v in enumerate(spec):
+                init[k] = batchint(v, 0)
+            spec = batchrange(*init)
+
+        ast = AstFor(
+            offset,
+            parent,
+            silenced,
+            variant,
+            variable[1],
+            options,
+            body,
+            spec,
+            spec_string,
+            path,
+            mode,
+        )
+        ast.body.parent = ast
+        return ast
+
+    def block(self, parent: AstNode | None, tokens: LookAhead, in_group: bool):
+        while True:
+            while tokens.pop(Ctrl.NewLine):
+                continue
+            if in_group and tokens.pop(Ctrl.EndGroup):
+                break
+            if tokens.pop(Ctrl.EndOfFile):
+                break
+            if sequence := self.sequence(parent, tokens, in_group):
+                yield sequence
+            else:
+                break
+
+    def group(
+        self,
+        parent: AstNode | None,
+        tokens: LookAhead,
+        redirects: dict[int, RedirectIO],
+        silenced: bool,
+    ) -&gt; AstGroup | None:
+        offset = tokens.offset()
+        if tokens.peek() == Ctrl.NewGroup:
+            self.lexer.parse_group()
+            tokens.pop()
+            group = AstGroup(offset, parent, silenced, redirects)
+            group.fragments.extend(self.block(group, tokens, True))
+            tokens.skip_space()
+            group.redirects.update(self.redirects(tokens))
+            return group
+
+    def label(self, tokens: LookAhead, silenced: bool) -&gt; AstLabel | None:
+        comment = False
+        if (t := tokens.peek()) == Ctrl.Comment:
+            comment = True
+        elif t != Ctrl.Label:
+            return None
+        offset = tokens.offset()
+        lexer = self.lexer
+        lexer.parse_label()
+        tokens.pop()
+        line = tokens.word()
+        if comment:
+            label = line
+        else:
+            label = lexer.label(line, uppercase=False)
+            if (x := lexer.labels[label.upper()]) != offset - 1:
+                raise RuntimeError(F&#39;Expected offset for label {label} to be {offset}, got {x} instead.&#39;)
+        return AstLabel(offset, None, silenced, line, label, comment)
+
+    def statement(self, parent: AstNode | None, tokens: LookAhead, in_group: bool):
+        at, _ = self.skip_prefix(tokens)
+        silenced = at &gt; 0
+        if at &lt;= 1 and (s := self.label(tokens, silenced)):
+            return s
+        if s := self.ifthen(parent, tokens, in_group, silenced):
+            return s
+        if s := self.forloop(parent, tokens, in_group, silenced):
+            return s
+        return self.pipeline(parent, tokens, in_group, silenced)
+
+    def sequence(self, parent: AstNode | None, tokens: LookAhead, in_group: bool) -&gt; AstSequence | None:
+        tokens.skip_space()
+        head = self.statement(parent, tokens, in_group)
+        if head is None:
+            return None
+        node = AstSequence(head.offset, parent, head)
+        head.parent = node
+        tokens.skip_space()
+        while True:
+            if tokens.pop(Ctrl.Ampersand):
+                if tokens.pop(Ctrl.Ampersand):
+                    condition = AstCondition.Success
+                else:
+                    condition = AstCondition.NoCheck
+            elif tokens.pop(Ctrl.Pipe):
+                condition = AstCondition.Failure
+            else:
+                break
+            tokens.skip_space()
+            if not (statement := self.statement(node, tokens, in_group)):
+                raise EmulatorException(&#39;Failed to parse conditional statement.&#39;)
+            node.tail.append(
+                AstConditionalStatement(statement.offset, node, condition, statement))
+            tokens.skip_space()
+        return node
+
+    def parse(self, offset: int):
+        tokens = LookAhead(self.lexer, offset)
+        while True:
+            try:
+                yield from self.block(None, tokens, False)
+            except UnexpectedToken as ut:
+                yield AstError(ut.offset, None, ut.token, ut.error)
+            else:
+                break</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.parser.BatchParser.state"><code class="name">var <span class="ident">state</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L155-L157" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def state(self):
+    return self.lexer.state</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.environment"><code class="name">var <span class="ident">environment</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L159-L161" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def environment(self):
+    return self.state.environment</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.parser.BatchParser.skip_prefix"><code class="name flex">
+<span>def <span class="ident">skip_prefix</span></span>(<span>self, tokens)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L163-L187" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def skip_prefix(self, tokens: LookAhead) -&gt; tuple[int, list[Token]]:
+    token = tokens.peek()
+    prefix = []
+    skip = {
+        Ctrl.At,
+        Ctrl.Semicolon,
+        Ctrl.Comma,
+        Ctrl.Equals,
+    }
+    at = 0
+    while True:
+        if isinstance(token, Word):
+            if not token.isspace():
+                break
+            prefix.append(token)
+        elif token not in skip:
+            break
+        else:
+            prefix.append(token)
+            if token == Ctrl.At:
+                at += 1
+            else:
+                at = 0
+        token = tokens.drop_and_peek()
+    return at, prefix</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.command"><code class="name flex">
+<span>def <span class="ident">command</span></span>(<span>self, parent, tokens, redirects, in_group, silenced)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L189-L262" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def command(
+    self,
+    parent: AstNode,
+    tokens: LookAhead,
+    redirects: dict[int, RedirectIO],
+    in_group: bool,
+    silenced: bool,
+) -&gt; AstCommand | None:
+    ast = AstCommand(tokens.offset(), parent, silenced, redirects)
+    tok = tokens.peek()
+    cmd = ast.fragments
+
+    eat_token = False
+    add_space = False
+    nsp_merge = True
+
+    nonspace = io.StringIO()
+
+    if not ast.redirects:
+        assert not isinstance(tok, RedirectIO)
+        tok_upper = tok.upper()
+        if tok_upper.startswith(&#39;ECHO&#39;):
+            if len(tok_upper) &gt; 4 and tok_upper[4] == &#39;.&#39;:
+                cmd.append(tok[:4])
+                cmd.append(&#39; &#39;)
+                tok = tok[5:]
+                add_space = False
+            else:
+                add_space = True
+                eat_token = True
+        elif tok_upper == &#39;SET&#39;:
+            self.lexer.parse_set()
+            nsp_merge = False
+        elif tok_upper == &#39;GOTO&#39;:
+            nsp_merge = False
+        if add_space or not nsp_merge:
+            cmd.append(tok)
+        else:
+            nonspace.write(tok)
+        tok = tokens.drop_and_peek()
+
+    while tok not in (
+        Ctrl.Ampersand,
+        Ctrl.Pipe,
+        Ctrl.NewLine,
+        Ctrl.EndOfFile,
+    ) or not isinstance(tok, Ctrl):
+        if in_group and tok == Ctrl.EndGroup:
+            break
+        if isinstance(tok, RedirectIO):
+            ast.redirects[tok.source] = tok
+        elif add_space:
+            add_space = False
+            if not tok.isspace():
+                cmd.append(&#39; &#39;)
+                if eat_token:
+                    tok = tok[1:]
+            if tok:
+                cmd.append(tok)
+        elif not nsp_merge:
+            cmd.append(tok)
+        elif tok.isspace() or tok.startswith(&#39;/&#39;):
+            if nsp := nonspace.getvalue():
+                nonspace.seek(0)
+                nonspace.truncate(0)
+                cmd.append(nsp)
+            cmd.append(tok)
+        else:
+            nonspace.write(tok)
+        tok = tokens.drop_and_peek()
+    if nsp := nonspace.getvalue():
+        cmd.append(nsp)
+    if ast:
+        return ast</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.redirects"><code class="name flex">
+<span>def <span class="ident">redirects</span></span>(<span>self, tokens)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L264-L270" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def redirects(self, tokens: LookAhead):
+    redirects = {}
+    while isinstance((t := tokens.peek()), RedirectIO):
+        redirects[t.source] = t
+        tokens.pop()
+        tokens.skip_space()
+    return redirects</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.pipeline"><code class="name flex">
+<span>def <span class="ident">pipeline</span></span>(<span>self, parent, tokens, in_group, silenced)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L272-L285" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pipeline(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstPipeline | None:
+    ast = AstPipeline(tokens.offset(), parent, silenced)
+    while True:
+        redirects = self.redirects(tokens)
+        if not (cmd := self.group(ast, tokens, redirects, silenced)):
+            if not (cmd := self.command(ast, tokens, redirects, in_group, silenced)):
+                break
+        ast.parts.append(cmd)
+        if not tokens.pop(Ctrl.Pipe) or tokens.peek() == Ctrl.Pipe:
+            break
+        at, _ = self.skip_prefix(tokens)
+        silenced = at &gt; 0
+    if ast.parts:
+        return ast</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.ifthen"><code class="name flex">
+<span>def <span class="ident">ifthen</span></span>(<span>self, parent, tokens, in_group, silenced)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L287-L371" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def ifthen(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstIf | None:
+    offset = tokens.offset()
+
+    if not tokens.pop_string(&#39;IF&#39;):
+        return None
+
+    casefold = False
+    negated = False
+    lhs = None
+    rhs = None
+
+    token = tokens.word()
+
+    if token.upper() == &#39;/I&#39;:
+        casefold = True
+        token = tokens.word()
+    if token.upper() == &#39;NOT&#39;:
+        negated = True
+        token = tokens.word()
+    try:
+        variant = AstIfVariant(token.upper())
+    except Exception:
+        tokens.skip_space()
+        variant = None
+        lhs = token
+        cmp = next(tokens)
+
+        if cmp == Ctrl.Equals:
+            if tokens.pop(Ctrl.Equals):
+                cmp = AstIfCmp(&#39;==&#39;)
+            else:
+                raise UnexpectedToken(offset, tokens.peek())
+        else:
+            try:
+                cmp = AstIfCmp(cmp.upper())
+            except Exception:
+                raise UnexpectedToken(offset, cmp)
+            if cmp != AstIfCmp.STR and self.state.extensions_version &lt; 1:
+                raise UnexpectedToken(offset, cmp)
+
+        rhs = tokens.consume_nonspace_words()
+
+        try:
+            ilh = batchint(lhs)
+            irh = batchint(rhs)
+        except ValueError:
+            pass
+        else:
+            lhs = ilh
+            rhs = irh
+    else:
+        lhs = unquote(tokens.consume_nonspace_words())
+        rhs = None
+        cmp = None
+        try:
+            lhs = batchint(lhs)
+        except ValueError:
+            pass
+
+    then_do = self.sequence(None, tokens, in_group)
+
+    if then_do is None:
+        raise UnexpectedToken(offset, tokens.peek())
+
+    tokens.skip_space()
+
+    ast = AstIf(
+        offset,
+        parent,
+        silenced,
+        then_do,
+        None,
+        variant,
+        casefold,
+        negated,
+        cmp,
+        lhs, rhs # type:ignore
+    )
+    then_do.parent = ast
+
+    if tokens.peek().upper() == &#39;ELSE&#39;:
+        tokens.pop()
+        ast.else_do = self.sequence(ast, tokens, in_group)
+
+    return ast</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.forloop_options"><code class="name flex">
+<span>def <span class="ident">forloop_options</span></span>(<span>self, options)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L373-L426" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def forloop_options(self, options: str) -&gt; AstForOptions:
+    result = AstForOptions()
+
+    if not options:
+        return result
+    elif (quote := re.search(&#39;&#34;(.*?)&#34;&#39;, options)):
+        options = quote[1]
+
+    parts = options.strip().split()
+    count = len(parts)
+
+    for k, part in enumerate(parts, 1):
+        key, eq, value = part.partition(&#39;=&#39;)
+        key = key.lower()
+        if key == &#39;usebackq&#39;:
+            if eq or value:
+                raise ValueError
+            result.usebackq = True
+        elif not eq:
+            raise ValueError
+        elif key == &#39;eol&#39;:
+            if len(value) != 1:
+                raise ValueError
+            result.comment = value
+        elif key == &#39;skip&#39;:
+            try:
+                result.skip = batchint(value)
+            except Exception:
+                raise ValueError
+        elif key == &#39;delims&#39;:
+            if k == count:
+                _, _, value = options.partition(&#39;delims=&#39;)
+            result.delims = value
+        elif key == &#39;tokens&#39;:
+            tokens: set[int] = set()
+            if value.endswith(&#39;*&#39;):
+                result.asterisk = True
+                value = value[:-1]
+                if not value:
+                    result.tokens = ()
+                    continue
+            for x in value.split(&#39;,&#39;):
+                x, _, y = x.partition(&#39;-&#39;)
+                x = batchint(x) - 1
+                if x &lt; 0:
+                    raise ValueError
+                y = batchint(y) if y else x + 1
+                for t in range(x, y):
+                    tokens.add(t)
+            result.tokens = tuple(sorted(tokens))
+        else:
+            raise ValueError
+
+    return result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.forloop"><code class="name flex">
+<span>def <span class="ident">forloop</span></span>(<span>self, parent, tokens, in_group, silenced)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L428-L525" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def forloop(self, parent: AstNode | None, tokens: LookAhead, in_group: bool, silenced: bool) -&gt; AstFor | None:
+    offset = tokens.offset()
+
+    if not tokens.pop_string(&#39;FOR&#39;):
+        return None
+
+    def isvar(token: str):
+        return len(token) == 2 and token.startswith(&#39;%&#39;)
+
+    path = None
+    mode = AstForParserMode.FileSet
+    spec = []
+    options = &#39;&#39;
+
+    if isvar(variable := tokens.word()):
+        variant = AstForVariant.Default
+    elif len(variable) != 2 or not variable.startswith(&#39;/&#39;):
+        raise UnexpectedToken(offset, variable)
+    else:
+        try:
+            variant = AstForVariant(variable[1].upper())
+        except ValueError:
+            raise UnexpectedToken(offset, variable)
+        variable = tokens.word()
+        if not isvar(variable):
+            if variant == AstForVariant.FileParsing:
+                options = variable
+            elif variant == AstForVariant.DescendRecursively:
+                path = unquote(variable)
+            else:
+                raise UnexpectedToken(offset, variable)
+            variable = tokens.word()
+            if not isvar(variable):
+                raise UnexpectedToken(offset, variable)
+
+    if (t := tokens.word()).upper() != &#39;IN&#39;:
+        raise UnexpectedToken(offset, t)
+
+    tokens.skip_space()
+
+    if not tokens.pop(Ctrl.NewGroup):
+        raise UnexpectedToken(offset, tokens.peek())
+
+    with io.StringIO() as _spec:
+        while not tokens.pop(Ctrl.EndGroup):
+            if isinstance((t := next(tokens)), RedirectIO):
+                raise UnexpectedToken(offset, t)
+            _spec.write(t)
+        spec_string = _spec.getvalue().strip()
+
+    tokens.skip_space()
+
+    if not tokens.pop_string(&#39;DO&#39;):
+        raise UnexpectedToken(offset, tokens.peek())
+
+    if not (body := self.sequence(None, tokens, in_group)):
+        raise UnexpectedToken(offset, tokens.peek())
+
+    options = self.forloop_options(options)
+
+    if variant == AstForVariant.FileParsing:
+        quote_literal = &#34;&#39;&#34; if options.usebackq else &#39;&#34;&#39;
+        quote_command = &#39;`&#39; if options.usebackq else &#34;&#39;&#34;
+        for q, m in (
+            (quote_literal, AstForParserMode.Literal),
+            (quote_command, AstForParserMode.Command),
+        ):
+            if spec_string.startswith(q):
+                if not spec_string.endswith(q):
+                    raise UnexpectedToken(offset, spec_string)
+                mode = m
+                spec = [spec_string[1:-1]]
+                break
+
+    if not spec:
+        spec = re.split(&#39;[\\s,;]+&#39;, spec_string)
+
+    if variant == AstForVariant.NumericLoop:
+        init = [0, 0, 0]
+        for k, v in enumerate(spec):
+            init[k] = batchint(v, 0)
+        spec = batchrange(*init)
+
+    ast = AstFor(
+        offset,
+        parent,
+        silenced,
+        variant,
+        variable[1],
+        options,
+        body,
+        spec,
+        spec_string,
+        path,
+        mode,
+    )
+    ast.body.parent = ast
+    return ast</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.block"><code class="name flex">
+<span>def <span class="ident">block</span></span>(<span>self, parent, tokens, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L527-L538" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def block(self, parent: AstNode | None, tokens: LookAhead, in_group: bool):
+    while True:
+        while tokens.pop(Ctrl.NewLine):
+            continue
+        if in_group and tokens.pop(Ctrl.EndGroup):
+            break
+        if tokens.pop(Ctrl.EndOfFile):
+            break
+        if sequence := self.sequence(parent, tokens, in_group):
+            yield sequence
+        else:
+            break</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.group"><code class="name flex">
+<span>def <span class="ident">group</span></span>(<span>self, parent, tokens, redirects, silenced)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L540-L555" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def group(
+    self,
+    parent: AstNode | None,
+    tokens: LookAhead,
+    redirects: dict[int, RedirectIO],
+    silenced: bool,
+) -&gt; AstGroup | None:
+    offset = tokens.offset()
+    if tokens.peek() == Ctrl.NewGroup:
+        self.lexer.parse_group()
+        tokens.pop()
+        group = AstGroup(offset, parent, silenced, redirects)
+        group.fragments.extend(self.block(group, tokens, True))
+        tokens.skip_space()
+        group.redirects.update(self.redirects(tokens))
+        return group</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.label"><code class="name flex">
+<span>def <span class="ident">label</span></span>(<span>self, tokens, silenced)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L557-L574" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def label(self, tokens: LookAhead, silenced: bool) -&gt; AstLabel | None:
+    comment = False
+    if (t := tokens.peek()) == Ctrl.Comment:
+        comment = True
+    elif t != Ctrl.Label:
+        return None
+    offset = tokens.offset()
+    lexer = self.lexer
+    lexer.parse_label()
+    tokens.pop()
+    line = tokens.word()
+    if comment:
+        label = line
+    else:
+        label = lexer.label(line, uppercase=False)
+        if (x := lexer.labels[label.upper()]) != offset - 1:
+            raise RuntimeError(F&#39;Expected offset for label {label} to be {offset}, got {x} instead.&#39;)
+    return AstLabel(offset, None, silenced, line, label, comment)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.statement"><code class="name flex">
+<span>def <span class="ident">statement</span></span>(<span>self, parent, tokens, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L576-L585" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def statement(self, parent: AstNode | None, tokens: LookAhead, in_group: bool):
+    at, _ = self.skip_prefix(tokens)
+    silenced = at &gt; 0
+    if at &lt;= 1 and (s := self.label(tokens, silenced)):
+        return s
+    if s := self.ifthen(parent, tokens, in_group, silenced):
+        return s
+    if s := self.forloop(parent, tokens, in_group, silenced):
+        return s
+    return self.pipeline(parent, tokens, in_group, silenced)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.sequence"><code class="name flex">
+<span>def <span class="ident">sequence</span></span>(<span>self, parent, tokens, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L587-L611" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def sequence(self, parent: AstNode | None, tokens: LookAhead, in_group: bool) -&gt; AstSequence | None:
+    tokens.skip_space()
+    head = self.statement(parent, tokens, in_group)
+    if head is None:
+        return None
+    node = AstSequence(head.offset, parent, head)
+    head.parent = node
+    tokens.skip_space()
+    while True:
+        if tokens.pop(Ctrl.Ampersand):
+            if tokens.pop(Ctrl.Ampersand):
+                condition = AstCondition.Success
+            else:
+                condition = AstCondition.NoCheck
+        elif tokens.pop(Ctrl.Pipe):
+            condition = AstCondition.Failure
+        else:
+            break
+        tokens.skip_space()
+        if not (statement := self.statement(node, tokens, in_group)):
+            raise EmulatorException(&#39;Failed to parse conditional statement.&#39;)
+        node.tail.append(
+            AstConditionalStatement(statement.offset, node, condition, statement))
+        tokens.skip_space()
+    return node</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.parser.BatchParser.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>self, offset)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/parser.py#L613-L621" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse(self, offset: int):
+    tokens = LookAhead(self.lexer, offset)
+    while True:
+        try:
+            yield from self.block(None, tokens, False)
+        except UnexpectedToken as ut:
+            yield AstError(ut.offset, None, ut.token, ut.error)
+        else:
+            break</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.parser.LookAhead" href="#refinery.lib.batch.parser.LookAhead">LookAhead</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.parser.LookAhead.offset" href="#refinery.lib.batch.parser.LookAhead.offset">offset</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.pop" href="#refinery.lib.batch.parser.LookAhead.pop">pop</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.pop_nonspace" href="#refinery.lib.batch.parser.LookAhead.pop_nonspace">pop_nonspace</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.pop_string" href="#refinery.lib.batch.parser.LookAhead.pop_string">pop_string</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.skip_space" href="#refinery.lib.batch.parser.LookAhead.skip_space">skip_space</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.consume_nonspace_words" href="#refinery.lib.batch.parser.LookAhead.consume_nonspace_words">consume_nonspace_words</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.word" href="#refinery.lib.batch.parser.LookAhead.word">word</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.peek" href="#refinery.lib.batch.parser.LookAhead.peek">peek</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.LookAhead.drop_and_peek" href="#refinery.lib.batch.parser.LookAhead.drop_and_peek">drop_and_peek</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.parser.BatchParser" href="#refinery.lib.batch.parser.BatchParser">BatchParser</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.batch.parser.BatchParser.skip_prefix" href="#refinery.lib.batch.parser.BatchParser.skip_prefix">skip_prefix</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.command" href="#refinery.lib.batch.parser.BatchParser.command">command</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.redirects" href="#refinery.lib.batch.parser.BatchParser.redirects">redirects</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.pipeline" href="#refinery.lib.batch.parser.BatchParser.pipeline">pipeline</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.ifthen" href="#refinery.lib.batch.parser.BatchParser.ifthen">ifthen</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.forloop_options" href="#refinery.lib.batch.parser.BatchParser.forloop_options">forloop_options</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.forloop" href="#refinery.lib.batch.parser.BatchParser.forloop">forloop</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.block" href="#refinery.lib.batch.parser.BatchParser.block">block</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.group" href="#refinery.lib.batch.parser.BatchParser.group">group</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.label" href="#refinery.lib.batch.parser.BatchParser.label">label</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.statement" href="#refinery.lib.batch.parser.BatchParser.statement">statement</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.sequence" href="#refinery.lib.batch.parser.BatchParser.sequence">sequence</a></code></li>
+<li><code><a title="refinery.lib.batch.parser.BatchParser.parse" href="#refinery.lib.batch.parser.BatchParser.parse">parse</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

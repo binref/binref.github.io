@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.pattern.struct_parser documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.pattern.struct_parser</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/pattern/struct_parser.py#L1-L273" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import itertools
+import re
+import string
+
+from refinery.lib.argformats import ParserError, PythonExpression, numseq
+from refinery.lib.meta import SizeInt, check_variable_name, metavars
+from refinery.lib.structures import StreamDetour, StructReader
+from refinery.lib.types import Param
+from refinery.units import Arg, Chunk, Unit
+
+
+def identity(x):
+    return x
+
+
+_REST_MARKER = &#39;#&#39;
+
+
+class struct(Unit):
+    &#34;&#34;&#34;
+    Read structured data from the beginning of a chunk and store the extracted fields in chunk meta
+    variables. The structure format is specified in extended Python struct format, and all
+    remaining arguments to this unit are the names of the variables that receive the values from
+    this struct. The extended struct format supports all field types supported by Python, as well
+    as the following:
+
+    - `a` for null-terminated ASCII strings,
+    - `u` to read encoded, null-terminated UTF16 strings,
+    - `w` to read decoded, null-terminated UTF16 strings,
+    - `g` to read Microsoft GUID values,
+    - `E` to read 7-bit encoded integers.
+
+    For example, the string `LLxxHaa` will read two unsigned 32bit integers, then skip two bytes,
+    then read one unsigned 16bit integer, then two null-terminated ASCII strings. The unit defaults
+    to using native byte order with no alignment. The `spec` parameter may additionally contain
+    format expressions of the following form:
+
+        {name[!alignment]:format}
+
+    The `alignment` parameter is optional. It must be an expression that evaluates to an integer
+    value. The current data pointer is aligned to a multiple of this value before reading the field.
+    The `format` can either be an integer expression specifying a number of bytes to read, or any
+    format string. If `name` is specified for an extracted field, its value is made available as a
+    meta variable under the given name. For example, the expression `LLxxH{foo:a}{bar:a}` would be
+    parsed in the same way as the previous example, but the two ASCII strings would also be stored
+    in meta variables under the names `foo` and `bar`, respectively. The `format` string of a named
+    field is itself parsed as a foramt string expression, where all the previously parsed fields
+    are already available. For example, `I{:{}}` reads a single 32-bit integer length prefix and
+    then reads as many bytes as that prefix specifies.
+
+    A second format string expression is used to specify the output format. For example, the format
+    string `LLxxH{foo:a}{bar:a}` together with the output format `{foo}/{bar}` would parse data as
+    before, but the output body would be the concatnation of the field `foo`, a forward slash, and
+    the field `bar`. Variables used in the output expression are not included as meta variables. As
+    format fields in the output expression, one can also use `{1}`, `{2}` or `{-1}` to access
+    extracted fields by index. The value `{0}` represents the entire chunk of structured data. By
+    default, the output format `{%s}` is used, which represents either the last byte string field
+    that was extracted, or the entire chunk of structured data if none of the fields were extracted.
+
+    Reverse `refinery.lib.argformats.multibin` expressions can be used to post-process the fields
+    included in any output format. For example, `{F:b64:zl}` will be the base64-decoded and inflate-
+    decompressed contents of the data that was read as field `F`.
+
+    Finally, it is possible to specify a byte alignment by using the syntax `{field!T:a:b:c}` where
+    the letter `T` is either a single digit specifying the alignment, or a single letter variable
+    that holds the byte alignment value in the current metadata. It is also possible to specify the
+    alignment as `0` which instructs the parser to only peek the contents of this field, i.e. the
+    read pointer is not advanced after reading it.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        spec: Param[str, Arg.String(help=&#39;Structure format as explained above.&#39;)],
+        *outputs: Param[str, Arg.String(metavar=&#39;output&#39;, help=&#39;Output format as explained above.&#39;)],
+        multi: Param[bool, Arg.Switch(&#39;-m&#39;, help=(
+            &#39;Read as many pieces of structured data as possible intead of just one.&#39;))] = False,
+        count: Param[int, Arg.Number(&#39;-c&#39;, help=(
+            &#39;A limit on the number of chunks to read in multi mode; there is no limit by default.&#39;))] = 0,
+        until: Param[str, Arg.String(&#39;-u&#39;, metavar=&#39;E&#39;, help=(
+            &#39;An expression evaluated on each chunk in multi mode. New chunks will be parsed &#39;
+            &#39;only if the result is nonzero.&#39;))] = &#39;&#39;,
+        format: Param[str, Arg.String(&#39;-f&#39;, metavar=&#39;F&#39;, help=(
+            &#39;Optionally specify a format string expression to auto-name extracted fields without a &#39;
+            &#39;given name. The format string accepts the field {{c}} for the type code and {{n}} for &#39;
+            &#39;the variable index.&#39;))] = &#39;&#39;,
+        name: Param[str, Arg.String(&#39;-n&#39;, metavar=&#39;VAR&#39;, group=&#39;FIELDS&#39;, help=(
+            &#39;Equivalent to --format=VAR{{n}}.&#39;))] = &#39;&#39;,
+        more: Param[bool, Arg.Switch(&#39;-M&#39;, help=(
+            &#39;After parsing the struct, emit one chunk that contains the data that was left &#39;
+            &#39;over in the buffer. If no data was left over, this chunk will be empty.&#39;))] = False
+    ):
+        if name:
+            format = format or F&#39;{name}{{n}}&#39;
+        outputs = outputs or (F&#39;{{{_REST_MARKER}}}&#39;,)
+        super().__init__(spec=spec, outputs=outputs, until=until, format=format, count=count, multi=multi, more=more)
+
+    def process(self, data: Chunk):
+        formatter = string.Formatter()
+        field_format: str = self.args.format
+        until = self.args.until
+        until = until and PythonExpression(until, all_variables_allowed=True)
+        reader = StructReader(memoryview(data))
+        checkpoint = 0
+        mainspec = self.args.spec
+        byteorder = mainspec[:1]
+        count = self.args.count
+
+        if byteorder in &#39;&lt;@=!&gt;&#39;:
+            mainspec = mainspec[1:]
+        else:
+            byteorder = &#39;=&#39;
+
+        def fixorder(spec):
+            if spec[0] not in &#39;&lt;@=!&gt;&#39;:
+                spec = byteorder + spec
+            return spec
+
+        previously_existing_variables = set(metavars(data).variable_names())
+
+        it = itertools.count() if self.args.multi else (0,)
+        for index in it:
+
+            field_counter = 0
+            checkpoint = reader.tell()
+
+            if reader.eof:
+                break
+            if 0 &lt; count &lt;= index:
+                break
+
+            meta = metavars(data)
+            meta.ghost = True
+            meta.index = index
+
+            args = []
+            last = None
+            self.log_debug(F&#39;starting new read at: 0x{checkpoint:08X}&#39;)
+
+            try:
+                for prefix, name, spec, conversion in formatter.parse(mainspec):
+                    if prefix:
+                        fields = reader.read_struct(fixorder(prefix))
+                        if field_format:
+                            codes = re.findall(&#39;[?cbBhHiIlLqQnNefdspPauwgk]&#39;, prefix)
+                            if len(codes) != len(fields):
+                                codes = &#39;v&#39; * len(fields)
+                            for code, field in zip(codes, fields):
+                                code = &#39;b&#39; if code == &#39;?&#39; else code.lower()
+                                v = field_format.format_map({&#39;c&#39;: code, &#39;n&#39;: field_counter})
+                                meta[v] = field
+                                field_counter += 1
+                        args.extend(fields)
+
+                    if name is None:
+                        continue
+                    if spec is None:
+                        spec = &#39;&#39;
+
+                    assert isinstance(spec, str)
+                    assert isinstance(name, str)
+
+                    field_counter += 1
+
+                    if name and not name.isdecimal():
+                        check_variable_name(name)
+
+                    if not conversion:
+                        peek = False
+                    else:
+                        alignment = PythonExpression.Evaluate(conversion, meta)
+                        if alignment == 0:
+                            peek = True
+                        else:
+                            _aa = reader.tell()
+                            reader.byte_align(alignment)
+                            _ab = reader.tell()
+                            if _aa != _ab:
+                                self.log_info(F&#39;aligned from 0x{_aa:X} to 0x{_ab:X}&#39;)
+
+                    spec, _, pipeline = spec.partition(&#39;:&#39;)
+
+                    if spec:
+                        spec = meta.format_str(spec, self.codec, args)
+
+                    if spec:
+                        try:
+                            _exp = PythonExpression.Evaluate(spec, meta)
+                        except ParserError:
+                            pass
+                        else:
+                            spec = _exp
+
+                    if spec == &#39;&#39;:
+                        last = value = reader.read(peek=peek)
+                    elif isinstance(spec, int):
+                        if spec &lt; 0:
+                            spec += reader.remaining_bytes
+                        if spec &lt; 0:
+                            raise ValueError(F&#39;The specified negative read offset is {-spec} beyond the cursor.&#39;)
+                        last = value = reader.read_bytes(spec, peek=peek)
+                    else:
+                        value = reader.read_struct(fixorder(spec), peek=peek)
+                        if not value:
+                            self.log_debug(F&#39;field {name} was empty, ignoring.&#39;)
+                            continue
+                        if len(value) &gt; 1:
+                            self.log_info(F&#39;parsing field {name} produced {len(value)} items reading a tuple&#39;)
+                        else:
+                            value = value[0]
+
+                    if pipeline:
+                        value = numseq(pipeline, reverse=True, seed=value)
+                    args.append(value)
+
+                    if name == _REST_MARKER:
+                        raise ValueError(F&#39;Extracting a field with name {_REST_MARKER} is forbidden.&#39;)
+                    elif name.isdecimal():
+                        index = int(name)
+                        limit = len(args) - 1
+                        if index &gt; limit:
+                            self.log_warn(F&#39;cannot assign index field {name}, the highest index is {limit}&#39;)
+                        else:
+                            args[index] = value
+                        continue
+                    elif name:
+                        meta[name] = value
+
+                if until and until(meta):
+                    self.log_info(F&#39;the expression ({until}) evaluated to true; aborting.&#39;)
+                    break
+
+                with StreamDetour(reader, checkpoint) as detour:
+                    full = reader.read(detour.cursor - checkpoint)
+                if last is None:
+                    last = full
+
+                outputs = []
+                symbols = dict(meta)
+                symbols[_REST_MARKER] = last
+
+                for template in self.args.outputs:
+                    used = set()
+                    outputs.append(meta.format(template, self.codec, [full, *args], symbols, True, used=used))
+                    for key in used:
+                        if key in previously_existing_variables:
+                            continue
+                        meta.discard(key)
+
+                for output in outputs:
+                    chunk = Chunk(output)
+                    chunk.meta.update(meta)
+                    chunk.set_next_batch(index)
+                    yield chunk
+
+            except EOFError:
+                break
+
+        leftover = len(reader) - checkpoint
+
+        if not leftover:
+            return
+        elif self.args.more:
+            reader.seekset(checkpoint)
+            yield reader.read()
+        else:
+            leftover = repr(SizeInt(leftover)).strip()
+            self.log_info(F&#39;discarding {leftover} left in buffer&#39;)
+
+
+if __d := struct.__doc__:
+    struct.__doc__ = __d % _REST_MARKER</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.units.pattern.struct_parser.identity"><code class="name flex">
+<span>def <span class="ident">identity</span></span>(<span>x)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/pattern/struct_parser.py#L14-L15" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def identity(x):
+    return x</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.pattern.struct_parser.struct"><code class="flex name class">
+<span>class <span class="ident">struct</span></span>
+<span>(</span><span>spec, *outputs, multi=False, count=0, until='', format='', name='', more=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read structured data from the beginning of a chunk and store the extracted fields in chunk meta
+variables. The structure format is specified in extended Python struct format, and all
+remaining arguments to this unit are the names of the variables that receive the values from
+this struct. The extended struct format supports all field types supported by Python, as well
+as the following:</p>
+<ul>
+<li><code>a</code> for null-terminated ASCII strings,</li>
+<li><code>u</code> to read encoded, null-terminated UTF16 strings,</li>
+<li><code>w</code> to read decoded, null-terminated UTF16 strings,</li>
+<li><code>g</code> to read Microsoft GUID values,</li>
+<li><code>E</code> to read 7-bit encoded integers.</li>
+</ul>
+<p>For example, the string <code>LLxxHaa</code> will read two unsigned 32bit integers, then skip two bytes,
+then read one unsigned 16bit integer, then two null-terminated ASCII strings. The unit defaults
+to using native byte order with no alignment. The <code>spec</code> parameter may additionally contain
+format expressions of the following form:</p>
+<pre><code>{name[!alignment]:format}
+</code></pre>
+<p>The <code>alignment</code> parameter is optional. It must be an expression that evaluates to an integer
+value. The current data pointer is aligned to a multiple of this value before reading the field.
+The <code>format</code> can either be an integer expression specifying a number of bytes to read, or any
+format string. If <code>name</code> is specified for an extracted field, its value is made available as a
+meta variable under the given name. For example, the expression <code>LLxxH{foo:a}{bar:a}</code> would be
+parsed in the same way as the previous example, but the two ASCII strings would also be stored
+in meta variables under the names <code>foo</code> and <code>bar</code>, respectively. The <code>format</code> string of a named
+field is itself parsed as a foramt string expression, where all the previously parsed fields
+are already available. For example, <code>I{:{}}</code> reads a single 32-bit integer length prefix and
+then reads as many bytes as that prefix specifies.</p>
+<p>A second format string expression is used to specify the output format. For example, the format
+string <code>LLxxH{foo:a}{bar:a}</code> together with the output format <code>{foo}/{bar}</code> would parse data as
+before, but the output body would be the concatnation of the field <code>foo</code>, a forward slash, and
+the field <code>bar</code>. Variables used in the output expression are not included as meta variables. As
+format fields in the output expression, one can also use <code>{1}</code>, <code>{2}</code> or <code>{-1}</code> to access
+extracted fields by index. The value <code>{0}</code> represents the entire chunk of structured data. By
+default, the output format <code>{#}</code> is used, which represents either the last byte string field
+that was extracted, or the entire chunk of structured data if none of the fields were extracted.</p>
+<p>Reverse <code><a title="refinery.lib.argformats.multibin" href="../../lib/argformats.html#refinery.lib.argformats.multibin">multibin()</a></code> expressions can be used to post-process the fields
+included in any output format. For example, <code>{F:b64:zl}</code> will be the base64-decoded and inflate-
+decompressed contents of the data that was read as field <code>F</code>.</p>
+<p>Finally, it is possible to specify a byte alignment by using the syntax <code>{field!T:a:b:c}</code> where
+the letter <code>T</code> is either a single digit specifying the alignment, or a single letter variable
+that holds the byte alignment value in the current metadata. It is also possible to specify the
+alignment as <code>0</code> which instructs the parser to only peek the contents of this field, i.e. the
+read pointer is not advanced after reading it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/pattern/struct_parser.py#L21-L269" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class struct(Unit):
+    &#34;&#34;&#34;
+    Read structured data from the beginning of a chunk and store the extracted fields in chunk meta
+    variables. The structure format is specified in extended Python struct format, and all
+    remaining arguments to this unit are the names of the variables that receive the values from
+    this struct. The extended struct format supports all field types supported by Python, as well
+    as the following:
+
+    - `a` for null-terminated ASCII strings,
+    - `u` to read encoded, null-terminated UTF16 strings,
+    - `w` to read decoded, null-terminated UTF16 strings,
+    - `g` to read Microsoft GUID values,
+    - `E` to read 7-bit encoded integers.
+
+    For example, the string `LLxxHaa` will read two unsigned 32bit integers, then skip two bytes,
+    then read one unsigned 16bit integer, then two null-terminated ASCII strings. The unit defaults
+    to using native byte order with no alignment. The `spec` parameter may additionally contain
+    format expressions of the following form:
+
+        {name[!alignment]:format}
+
+    The `alignment` parameter is optional. It must be an expression that evaluates to an integer
+    value. The current data pointer is aligned to a multiple of this value before reading the field.
+    The `format` can either be an integer expression specifying a number of bytes to read, or any
+    format string. If `name` is specified for an extracted field, its value is made available as a
+    meta variable under the given name. For example, the expression `LLxxH{foo:a}{bar:a}` would be
+    parsed in the same way as the previous example, but the two ASCII strings would also be stored
+    in meta variables under the names `foo` and `bar`, respectively. The `format` string of a named
+    field is itself parsed as a foramt string expression, where all the previously parsed fields
+    are already available. For example, `I{:{}}` reads a single 32-bit integer length prefix and
+    then reads as many bytes as that prefix specifies.
+
+    A second format string expression is used to specify the output format. For example, the format
+    string `LLxxH{foo:a}{bar:a}` together with the output format `{foo}/{bar}` would parse data as
+    before, but the output body would be the concatnation of the field `foo`, a forward slash, and
+    the field `bar`. Variables used in the output expression are not included as meta variables. As
+    format fields in the output expression, one can also use `{1}`, `{2}` or `{-1}` to access
+    extracted fields by index. The value `{0}` represents the entire chunk of structured data. By
+    default, the output format `{%s}` is used, which represents either the last byte string field
+    that was extracted, or the entire chunk of structured data if none of the fields were extracted.
+
+    Reverse `refinery.lib.argformats.multibin` expressions can be used to post-process the fields
+    included in any output format. For example, `{F:b64:zl}` will be the base64-decoded and inflate-
+    decompressed contents of the data that was read as field `F`.
+
+    Finally, it is possible to specify a byte alignment by using the syntax `{field!T:a:b:c}` where
+    the letter `T` is either a single digit specifying the alignment, or a single letter variable
+    that holds the byte alignment value in the current metadata. It is also possible to specify the
+    alignment as `0` which instructs the parser to only peek the contents of this field, i.e. the
+    read pointer is not advanced after reading it.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        spec: Param[str, Arg.String(help=&#39;Structure format as explained above.&#39;)],
+        *outputs: Param[str, Arg.String(metavar=&#39;output&#39;, help=&#39;Output format as explained above.&#39;)],
+        multi: Param[bool, Arg.Switch(&#39;-m&#39;, help=(
+            &#39;Read as many pieces of structured data as possible intead of just one.&#39;))] = False,
+        count: Param[int, Arg.Number(&#39;-c&#39;, help=(
+            &#39;A limit on the number of chunks to read in multi mode; there is no limit by default.&#39;))] = 0,
+        until: Param[str, Arg.String(&#39;-u&#39;, metavar=&#39;E&#39;, help=(
+            &#39;An expression evaluated on each chunk in multi mode. New chunks will be parsed &#39;
+            &#39;only if the result is nonzero.&#39;))] = &#39;&#39;,
+        format: Param[str, Arg.String(&#39;-f&#39;, metavar=&#39;F&#39;, help=(
+            &#39;Optionally specify a format string expression to auto-name extracted fields without a &#39;
+            &#39;given name. The format string accepts the field {{c}} for the type code and {{n}} for &#39;
+            &#39;the variable index.&#39;))] = &#39;&#39;,
+        name: Param[str, Arg.String(&#39;-n&#39;, metavar=&#39;VAR&#39;, group=&#39;FIELDS&#39;, help=(
+            &#39;Equivalent to --format=VAR{{n}}.&#39;))] = &#39;&#39;,
+        more: Param[bool, Arg.Switch(&#39;-M&#39;, help=(
+            &#39;After parsing the struct, emit one chunk that contains the data that was left &#39;
+            &#39;over in the buffer. If no data was left over, this chunk will be empty.&#39;))] = False
+    ):
+        if name:
+            format = format or F&#39;{name}{{n}}&#39;
+        outputs = outputs or (F&#39;{{{_REST_MARKER}}}&#39;,)
+        super().__init__(spec=spec, outputs=outputs, until=until, format=format, count=count, multi=multi, more=more)
+
+    def process(self, data: Chunk):
+        formatter = string.Formatter()
+        field_format: str = self.args.format
+        until = self.args.until
+        until = until and PythonExpression(until, all_variables_allowed=True)
+        reader = StructReader(memoryview(data))
+        checkpoint = 0
+        mainspec = self.args.spec
+        byteorder = mainspec[:1]
+        count = self.args.count
+
+        if byteorder in &#39;&lt;@=!&gt;&#39;:
+            mainspec = mainspec[1:]
+        else:
+            byteorder = &#39;=&#39;
+
+        def fixorder(spec):
+            if spec[0] not in &#39;&lt;@=!&gt;&#39;:
+                spec = byteorder + spec
+            return spec
+
+        previously_existing_variables = set(metavars(data).variable_names())
+
+        it = itertools.count() if self.args.multi else (0,)
+        for index in it:
+
+            field_counter = 0
+            checkpoint = reader.tell()
+
+            if reader.eof:
+                break
+            if 0 &lt; count &lt;= index:
+                break
+
+            meta = metavars(data)
+            meta.ghost = True
+            meta.index = index
+
+            args = []
+            last = None
+            self.log_debug(F&#39;starting new read at: 0x{checkpoint:08X}&#39;)
+
+            try:
+                for prefix, name, spec, conversion in formatter.parse(mainspec):
+                    if prefix:
+                        fields = reader.read_struct(fixorder(prefix))
+                        if field_format:
+                            codes = re.findall(&#39;[?cbBhHiIlLqQnNefdspPauwgk]&#39;, prefix)
+                            if len(codes) != len(fields):
+                                codes = &#39;v&#39; * len(fields)
+                            for code, field in zip(codes, fields):
+                                code = &#39;b&#39; if code == &#39;?&#39; else code.lower()
+                                v = field_format.format_map({&#39;c&#39;: code, &#39;n&#39;: field_counter})
+                                meta[v] = field
+                                field_counter += 1
+                        args.extend(fields)
+
+                    if name is None:
+                        continue
+                    if spec is None:
+                        spec = &#39;&#39;
+
+                    assert isinstance(spec, str)
+                    assert isinstance(name, str)
+
+                    field_counter += 1
+
+                    if name and not name.isdecimal():
+                        check_variable_name(name)
+
+                    if not conversion:
+                        peek = False
+                    else:
+                        alignment = PythonExpression.Evaluate(conversion, meta)
+                        if alignment == 0:
+                            peek = True
+                        else:
+                            _aa = reader.tell()
+                            reader.byte_align(alignment)
+                            _ab = reader.tell()
+                            if _aa != _ab:
+                                self.log_info(F&#39;aligned from 0x{_aa:X} to 0x{_ab:X}&#39;)
+
+                    spec, _, pipeline = spec.partition(&#39;:&#39;)
+
+                    if spec:
+                        spec = meta.format_str(spec, self.codec, args)
+
+                    if spec:
+                        try:
+                            _exp = PythonExpression.Evaluate(spec, meta)
+                        except ParserError:
+                            pass
+                        else:
+                            spec = _exp
+
+                    if spec == &#39;&#39;:
+                        last = value = reader.read(peek=peek)
+                    elif isinstance(spec, int):
+                        if spec &lt; 0:
+                            spec += reader.remaining_bytes
+                        if spec &lt; 0:
+                            raise ValueError(F&#39;The specified negative read offset is {-spec} beyond the cursor.&#39;)
+                        last = value = reader.read_bytes(spec, peek=peek)
+                    else:
+                        value = reader.read_struct(fixorder(spec), peek=peek)
+                        if not value:
+                            self.log_debug(F&#39;field {name} was empty, ignoring.&#39;)
+                            continue
+                        if len(value) &gt; 1:
+                            self.log_info(F&#39;parsing field {name} produced {len(value)} items reading a tuple&#39;)
+                        else:
+                            value = value[0]
+
+                    if pipeline:
+                        value = numseq(pipeline, reverse=True, seed=value)
+                    args.append(value)
+
+                    if name == _REST_MARKER:
+                        raise ValueError(F&#39;Extracting a field with name {_REST_MARKER} is forbidden.&#39;)
+                    elif name.isdecimal():
+                        index = int(name)
+                        limit = len(args) - 1
+                        if index &gt; limit:
+                            self.log_warn(F&#39;cannot assign index field {name}, the highest index is {limit}&#39;)
+                        else:
+                            args[index] = value
+                        continue
+                    elif name:
+                        meta[name] = value
+
+                if until and until(meta):
+                    self.log_info(F&#39;the expression ({until}) evaluated to true; aborting.&#39;)
+                    break
+
+                with StreamDetour(reader, checkpoint) as detour:
+                    full = reader.read(detour.cursor - checkpoint)
+                if last is None:
+                    last = full
+
+                outputs = []
+                symbols = dict(meta)
+                symbols[_REST_MARKER] = last
+
+                for template in self.args.outputs:
+                    used = set()
+                    outputs.append(meta.format(template, self.codec, [full, *args], symbols, True, used=used))
+                    for key in used:
+                        if key in previously_existing_variables:
+                            continue
+                        meta.discard(key)
+
+                for output in outputs:
+                    chunk = Chunk(output)
+                    chunk.meta.update(meta)
+                    chunk.set_next_batch(index)
+                    yield chunk
+
+            except EOFError:
+                break
+
+        leftover = len(reader) - checkpoint
+
+        if not leftover:
+            return
+        elif self.args.more:
+            reader.seekset(checkpoint)
+            yield reader.read()
+        else:
+            leftover = repr(SizeInt(leftover)).strip()
+            self.log_info(F&#39;discarding {leftover} left in buffer&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.pattern.struct_parser.struct" href="#refinery.units.pattern.struct_parser.struct">struct</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.pattern.struct_parser.struct.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.pattern" href="index.html">refinery.units.pattern</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.units.pattern.struct_parser.identity" href="#refinery.units.pattern.struct_parser.identity">identity</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.pattern.struct_parser.struct" href="#refinery.units.pattern.struct_parser.struct">struct</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

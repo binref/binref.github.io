@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.formats.pdf documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.formats.pdf</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/pdf.py#L1-L241" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import re
+
+from itertools import islice
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from pikepdf import Object
+    from pymupdf import Page
+    from pypdf.generic import EncodedStreamObject
+
+from refinery.lib import json
+from refinery.lib.mime import get_cached_file_magic_info
+from refinery.lib.structures import MemoryFile
+from refinery.lib.tools import NoLogging
+from refinery.units.formats.archive import ArchiveUnit, UnpackResult
+
+
+def isdict(object):
+    return isinstance(object, dict) or all(hasattr(object, method) for method in [&#39;items&#39;, &#39;values&#39;, &#39;keys&#39;])
+
+
+class xtpdf(ArchiveUnit):
+    &#34;&#34;&#34;
+    Extract objects from PDF documents.
+    &#34;&#34;&#34;
+    # @ArchiveUnit.Requires(&#39;pypdf&gt;=3.1.0&#39;)
+    # def _pypdf2():
+    #     import pypdf
+    #     import pypdf.generic
+    #     return pypdf
+
+    @ArchiveUnit.Requires(&#39;pikepdf&lt;=9.5&#39;, [&#39;formats&#39;, &#39;default&#39;, &#39;extended&#39;])
+    def _pikepdf():
+        import pikepdf
+        return pikepdf
+
+    @ArchiveUnit.Requires(&#39;pymupdf&#39;, [&#39;formats&#39;, &#39;default&#39;, &#39;extended&#39;])
+    def _mupdf():
+        import os
+        for setting in (&#39;PYMUPDF_MESSAGE&#39;, &#39;PYMUPDF_LOG&#39;):
+            os.environ[setting] = F&#39;path:{os.devnull}&#39;
+        import pymupdf
+        return pymupdf
+
+    def _walk_pypdf2(self, blob, memo: set[int] | None = None, *path):
+        lib = self._pypdf2
+
+        while isinstance(blob, lib.generic.IndirectObject):
+            try:
+                blob = blob.get_object()
+            except Exception:
+                break
+        if memo is None:
+            memo = {id(blob)}
+        elif id(blob) in memo:
+            return
+        else:
+            memo.add(id(blob))
+        try:
+            name = blob[&#39;/F&#39;]
+            blob = blob[&#39;/EF&#39;][&#39;/F&#39;]
+        except Exception:
+            pass
+        else:
+            def unhex(match):
+                return bytes.fromhex(match[1]).decode(&#39;latin1&#39;)
+            name = re.sub(&#39;#([0-9a-fA-F]{2})&#39;, unhex, name)
+            path = *path[:-1], F&#39;/{name}&#39;
+        try:
+            def extract():
+                with NoLogging():
+                    return get_data()
+            if TYPE_CHECKING:
+                blob = cast(EncodedStreamObject, blob)
+            get_data = blob.get_data
+        except AttributeError:
+            pass
+        else:
+            yield UnpackResult(&#39;&#39;.join(path), extract, kind=&#39;object&#39;)
+            return
+
+        if isinstance(blob, lib.generic.ByteStringObject):
+            yield UnpackResult(&#39;&#39;.join(path), blob, kind=&#39;bytes&#39;)
+            return
+        if isinstance(blob, lib.generic.TextStringObject):
+            yield UnpackResult(&#39;&#39;.join(path), blob.encode(self.codec), kind=&#39;string&#39;)
+            return
+
+        if isinstance(blob, (
+            lib.generic.BooleanObject,
+            lib.generic.ByteStringObject,
+            lib.generic.FloatObject,
+            lib.generic.NameObject,
+            lib.generic.NullObject,
+            lib.generic.NumberObject,
+            lib.generic.RectangleObject,
+        )):
+            # unhandled PDF objects
+            return
+
+        if isinstance(blob, lib.generic.TreeObject):
+            blob = list(blob)
+
+        pdf = lib.generic.PdfObject
+
+        if isinstance(blob, list):
+            if (
+                len(blob) % 2 == 0
+                and all(isinstance(key, str) for key in islice(iter(blob), 0, None, 2))
+                and all(isinstance(key, pdf) for key in islice(iter(blob), 1, None, 2))
+            ):
+                blob = dict(zip(*([iter(blob)] * 2)))
+            else:
+                for key, value in enumerate(blob):
+                    yield from self._walk_pypdf2(value, memo, *path, F&#39;/{key}&#39;)
+                return
+
+        if not isdict(blob):
+            return
+
+        assert isinstance(blob, dict)
+
+        for key, value in blob.items():
+            if not isinstance(key, str):
+                continue
+            if not key.startswith(&#39;/&#39;):
+                key = F&#39;/{key}&#39;
+            yield from self._walk_pypdf2(value, memo, *path, key)
+
+    def _walk_pike(self, blob: Object, memo: list[Object] | None = None, *keys):
+        if memo is None:
+            memo = [blob]
+        elif blob in memo:
+            return
+        else:
+            memo.append(blob)
+
+        try:
+            name = blob[&#39;/F&#39;]
+            blob = blob[&#39;/EF&#39;][&#39;/F&#39;]
+        except Exception:
+            pass
+        else:
+            def unhex(match):
+                return bytes.fromhex(match[1]).decode(&#39;latin1&#39;)
+            name = re.sub(&#39;#([0-9a-fA-F]{2})&#39;, unhex, str(name))
+            keys = *keys, F&#39;/{name}&#39;
+
+        pike = self._pikepdf
+        meta = {}
+        path = &#39;&#39;.join(keys)
+        done = set()
+
+        if isinstance(blob, pike.Dictionary):
+            nested = {}
+            for key, value in blob.items():
+                if isinstance(value, pike.Name):
+                    value = str(value)
+                if isinstance(value, (int, float, str, bool)):
+                    key = key.lstrip(&#39;/&#39;)
+                    meta[key] = value
+                    continue
+                nested[key] = value
+                done.add(key)
+            for key, value in nested.items():
+                yield from self._walk_pike(value, memo, *keys, key)
+            if meta:
+                yield UnpackResult(path, blob.to_json(dereference=True))
+                return
+        elif isinstance(blob, pike.Array):
+            for key, value in enumerate(iter(blob)):
+                if isinstance(value, pike.Object):
+                    yield from self._walk_pike(value, memo, *keys, F&#39;/{key}&#39;)
+            return
+
+        try:
+            buffer = blob.get_stream_buffer()
+        except Exception:
+            try:
+                buffer = blob.get_raw_stream_buffer()
+            except Exception:
+                buffer = None
+        if buffer or buffer:
+            yield UnpackResult(path, bytearray(buffer))
+        elif isinstance(blob, pike.String):
+            yield UnpackResult(path, bytes(blob))
+        elif isinstance(blob, pike.Object):
+            yield UnpackResult(path, blob.to_json())
+
+    def unpack(self, data):
+        try:
+            mu = self._mupdf.open(stream=data, filetype=&#39;pdf&#39;)
+        except Exception:
+            mu = password = None
+        else:
+            if password := self.args.pwd or None:
+                if mu.is_encrypted:
+                    mu.authenticate(password)
+                else:
+                    self.log_warn(&#39;This PDF document is not protected; ignoring password argument.&#39;)
+                    password = &#39;&#39;
+            elif mu.is_encrypted:
+                raise ValueError(&#39;This PDF is password protected.&#39;)
+
+        with MemoryFile(data, output=bytes) as stream, NoLogging():
+            try:
+                pdf = self._pikepdf.open(stream, password=(password or &#39;&#39;))
+                yield from self._walk_pike(pdf.trailer, None, &#39;raw&#39;)
+            except Exception:
+                raise
+                pdf = self._pypdf2.PdfReader(stream, password=password)
+                yield from self._walk_pypdf2(pdf.trailer, None, &#39;raw&#39;)
+
+        if mu is None:
+            return
+
+        if (md := mu.metadata) and (md := {k: v for k, v in md.items() if v}):
+            yield UnpackResult(&#39;parsed/meta.json&#39;, lambda m=md: json.dumps(m))
+
+        for k in range(len(mu)):
+            with NoLogging(NoLogging.Mode.ALL):
+                try:
+                    page: Page = mu[k]
+                    text = page.get_textpage()
+                except Exception:
+                    continue
+            yield UnpackResult(F&#39;parsed/page{k}.html&#39;, text.extractHTML().encode(self.codec))
+            yield UnpackResult(F&#39;parsed/page{k}.json&#39;, text.extractJSON().encode(self.codec))
+            yield UnpackResult(F&#39;parsed/page{k}.txt&#39;, text.extractText().encode(self.codec))
+            for j, image in enumerate(page.get_images(), 1):
+                xref = image[0]
+                base = mu.extract_image(xref)
+                data = base[&#39;image&#39;]
+                info = get_cached_file_magic_info(data)
+                yield UnpackResult(F&#39;parsed/page{k}/img{j}.{info.extension}&#39;, data)
+
+    @classmethod
+    def handles(cls, data) -&gt; bool | None:
+        return data[:5] == B&#39;%PDF-&#39;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.units.formats.pdf.isdict"><code class="name flex">
+<span>def <span class="ident">isdict</span></span>(<span>object)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/pdf.py#L20-L21" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def isdict(object):
+    return isinstance(object, dict) or all(hasattr(object, method) for method in [&#39;items&#39;, &#39;values&#39;, &#39;keys&#39;])</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.formats.pdf.xtpdf"><code class="flex name class">
+<span>class <span class="ident">xtpdf</span></span>
+<span>(</span><span>*paths, list=False, join_path=False, drop_path=False, fuzzy=0, exact=False, regex=False, path=b'path', date=b'date', pwd=b'')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Extract objects from PDF documents.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/pdf.py#L24-L241" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class xtpdf(ArchiveUnit):
+    &#34;&#34;&#34;
+    Extract objects from PDF documents.
+    &#34;&#34;&#34;
+    # @ArchiveUnit.Requires(&#39;pypdf&gt;=3.1.0&#39;)
+    # def _pypdf2():
+    #     import pypdf
+    #     import pypdf.generic
+    #     return pypdf
+
+    @ArchiveUnit.Requires(&#39;pikepdf&lt;=9.5&#39;, [&#39;formats&#39;, &#39;default&#39;, &#39;extended&#39;])
+    def _pikepdf():
+        import pikepdf
+        return pikepdf
+
+    @ArchiveUnit.Requires(&#39;pymupdf&#39;, [&#39;formats&#39;, &#39;default&#39;, &#39;extended&#39;])
+    def _mupdf():
+        import os
+        for setting in (&#39;PYMUPDF_MESSAGE&#39;, &#39;PYMUPDF_LOG&#39;):
+            os.environ[setting] = F&#39;path:{os.devnull}&#39;
+        import pymupdf
+        return pymupdf
+
+    def _walk_pypdf2(self, blob, memo: set[int] | None = None, *path):
+        lib = self._pypdf2
+
+        while isinstance(blob, lib.generic.IndirectObject):
+            try:
+                blob = blob.get_object()
+            except Exception:
+                break
+        if memo is None:
+            memo = {id(blob)}
+        elif id(blob) in memo:
+            return
+        else:
+            memo.add(id(blob))
+        try:
+            name = blob[&#39;/F&#39;]
+            blob = blob[&#39;/EF&#39;][&#39;/F&#39;]
+        except Exception:
+            pass
+        else:
+            def unhex(match):
+                return bytes.fromhex(match[1]).decode(&#39;latin1&#39;)
+            name = re.sub(&#39;#([0-9a-fA-F]{2})&#39;, unhex, name)
+            path = *path[:-1], F&#39;/{name}&#39;
+        try:
+            def extract():
+                with NoLogging():
+                    return get_data()
+            if TYPE_CHECKING:
+                blob = cast(EncodedStreamObject, blob)
+            get_data = blob.get_data
+        except AttributeError:
+            pass
+        else:
+            yield UnpackResult(&#39;&#39;.join(path), extract, kind=&#39;object&#39;)
+            return
+
+        if isinstance(blob, lib.generic.ByteStringObject):
+            yield UnpackResult(&#39;&#39;.join(path), blob, kind=&#39;bytes&#39;)
+            return
+        if isinstance(blob, lib.generic.TextStringObject):
+            yield UnpackResult(&#39;&#39;.join(path), blob.encode(self.codec), kind=&#39;string&#39;)
+            return
+
+        if isinstance(blob, (
+            lib.generic.BooleanObject,
+            lib.generic.ByteStringObject,
+            lib.generic.FloatObject,
+            lib.generic.NameObject,
+            lib.generic.NullObject,
+            lib.generic.NumberObject,
+            lib.generic.RectangleObject,
+        )):
+            # unhandled PDF objects
+            return
+
+        if isinstance(blob, lib.generic.TreeObject):
+            blob = list(blob)
+
+        pdf = lib.generic.PdfObject
+
+        if isinstance(blob, list):
+            if (
+                len(blob) % 2 == 0
+                and all(isinstance(key, str) for key in islice(iter(blob), 0, None, 2))
+                and all(isinstance(key, pdf) for key in islice(iter(blob), 1, None, 2))
+            ):
+                blob = dict(zip(*([iter(blob)] * 2)))
+            else:
+                for key, value in enumerate(blob):
+                    yield from self._walk_pypdf2(value, memo, *path, F&#39;/{key}&#39;)
+                return
+
+        if not isdict(blob):
+            return
+
+        assert isinstance(blob, dict)
+
+        for key, value in blob.items():
+            if not isinstance(key, str):
+                continue
+            if not key.startswith(&#39;/&#39;):
+                key = F&#39;/{key}&#39;
+            yield from self._walk_pypdf2(value, memo, *path, key)
+
+    def _walk_pike(self, blob: Object, memo: list[Object] | None = None, *keys):
+        if memo is None:
+            memo = [blob]
+        elif blob in memo:
+            return
+        else:
+            memo.append(blob)
+
+        try:
+            name = blob[&#39;/F&#39;]
+            blob = blob[&#39;/EF&#39;][&#39;/F&#39;]
+        except Exception:
+            pass
+        else:
+            def unhex(match):
+                return bytes.fromhex(match[1]).decode(&#39;latin1&#39;)
+            name = re.sub(&#39;#([0-9a-fA-F]{2})&#39;, unhex, str(name))
+            keys = *keys, F&#39;/{name}&#39;
+
+        pike = self._pikepdf
+        meta = {}
+        path = &#39;&#39;.join(keys)
+        done = set()
+
+        if isinstance(blob, pike.Dictionary):
+            nested = {}
+            for key, value in blob.items():
+                if isinstance(value, pike.Name):
+                    value = str(value)
+                if isinstance(value, (int, float, str, bool)):
+                    key = key.lstrip(&#39;/&#39;)
+                    meta[key] = value
+                    continue
+                nested[key] = value
+                done.add(key)
+            for key, value in nested.items():
+                yield from self._walk_pike(value, memo, *keys, key)
+            if meta:
+                yield UnpackResult(path, blob.to_json(dereference=True))
+                return
+        elif isinstance(blob, pike.Array):
+            for key, value in enumerate(iter(blob)):
+                if isinstance(value, pike.Object):
+                    yield from self._walk_pike(value, memo, *keys, F&#39;/{key}&#39;)
+            return
+
+        try:
+            buffer = blob.get_stream_buffer()
+        except Exception:
+            try:
+                buffer = blob.get_raw_stream_buffer()
+            except Exception:
+                buffer = None
+        if buffer or buffer:
+            yield UnpackResult(path, bytearray(buffer))
+        elif isinstance(blob, pike.String):
+            yield UnpackResult(path, bytes(blob))
+        elif isinstance(blob, pike.Object):
+            yield UnpackResult(path, blob.to_json())
+
+    def unpack(self, data):
+        try:
+            mu = self._mupdf.open(stream=data, filetype=&#39;pdf&#39;)
+        except Exception:
+            mu = password = None
+        else:
+            if password := self.args.pwd or None:
+                if mu.is_encrypted:
+                    mu.authenticate(password)
+                else:
+                    self.log_warn(&#39;This PDF document is not protected; ignoring password argument.&#39;)
+                    password = &#39;&#39;
+            elif mu.is_encrypted:
+                raise ValueError(&#39;This PDF is password protected.&#39;)
+
+        with MemoryFile(data, output=bytes) as stream, NoLogging():
+            try:
+                pdf = self._pikepdf.open(stream, password=(password or &#39;&#39;))
+                yield from self._walk_pike(pdf.trailer, None, &#39;raw&#39;)
+            except Exception:
+                raise
+                pdf = self._pypdf2.PdfReader(stream, password=password)
+                yield from self._walk_pypdf2(pdf.trailer, None, &#39;raw&#39;)
+
+        if mu is None:
+            return
+
+        if (md := mu.metadata) and (md := {k: v for k, v in md.items() if v}):
+            yield UnpackResult(&#39;parsed/meta.json&#39;, lambda m=md: json.dumps(m))
+
+        for k in range(len(mu)):
+            with NoLogging(NoLogging.Mode.ALL):
+                try:
+                    page: Page = mu[k]
+                    text = page.get_textpage()
+                except Exception:
+                    continue
+            yield UnpackResult(F&#39;parsed/page{k}.html&#39;, text.extractHTML().encode(self.codec))
+            yield UnpackResult(F&#39;parsed/page{k}.json&#39;, text.extractJSON().encode(self.codec))
+            yield UnpackResult(F&#39;parsed/page{k}.txt&#39;, text.extractText().encode(self.codec))
+            for j, image in enumerate(page.get_images(), 1):
+                xref = image[0]
+                base = mu.extract_image(xref)
+                data = base[&#39;image&#39;]
+                info = get_cached_file_magic_info(data)
+                yield UnpackResult(F&#39;parsed/page{k}/img{j}.{info.extension}&#39;, data)
+
+    @classmethod
+    def handles(cls, data) -&gt; bool | None:
+        return data[:5] == B&#39;%PDF-&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.archive.ArchiveUnit" href="archive/index.html#refinery.units.formats.archive.ArchiveUnit">ArchiveUnit</a></li>
+<li><a title="refinery.units.formats.PathExtractorUnit" href="index.html#refinery.units.formats.PathExtractorUnit">PathExtractorUnit</a></li>
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.pdf.xtpdf" href="#refinery.units.formats.pdf.xtpdf">xtpdf</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.formats.pdf.xtpdf.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.formats.pdf.xtpdf.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/pdf.py#L192-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, data):
+    try:
+        mu = self._mupdf.open(stream=data, filetype=&#39;pdf&#39;)
+    except Exception:
+        mu = password = None
+    else:
+        if password := self.args.pwd or None:
+            if mu.is_encrypted:
+                mu.authenticate(password)
+            else:
+                self.log_warn(&#39;This PDF document is not protected; ignoring password argument.&#39;)
+                password = &#39;&#39;
+        elif mu.is_encrypted:
+            raise ValueError(&#39;This PDF is password protected.&#39;)
+
+    with MemoryFile(data, output=bytes) as stream, NoLogging():
+        try:
+            pdf = self._pikepdf.open(stream, password=(password or &#39;&#39;))
+            yield from self._walk_pike(pdf.trailer, None, &#39;raw&#39;)
+        except Exception:
+            raise
+            pdf = self._pypdf2.PdfReader(stream, password=password)
+            yield from self._walk_pypdf2(pdf.trailer, None, &#39;raw&#39;)
+
+    if mu is None:
+        return
+
+    if (md := mu.metadata) and (md := {k: v for k, v in md.items() if v}):
+        yield UnpackResult(&#39;parsed/meta.json&#39;, lambda m=md: json.dumps(m))
+
+    for k in range(len(mu)):
+        with NoLogging(NoLogging.Mode.ALL):
+            try:
+                page: Page = mu[k]
+                text = page.get_textpage()
+            except Exception:
+                continue
+        yield UnpackResult(F&#39;parsed/page{k}.html&#39;, text.extractHTML().encode(self.codec))
+        yield UnpackResult(F&#39;parsed/page{k}.json&#39;, text.extractJSON().encode(self.codec))
+        yield UnpackResult(F&#39;parsed/page{k}.txt&#39;, text.extractText().encode(self.codec))
+        for j, image in enumerate(page.get_images(), 1):
+            xref = image[0]
+            base = mu.extract_image(xref)
+            data = base[&#39;image&#39;]
+            info = get_cached_file_magic_info(data)
+            yield UnpackResult(F&#39;parsed/page{k}/img{j}.{info.extension}&#39;, data)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.formats.archive.ArchiveUnit" href="archive/index.html#refinery.units.formats.archive.ArchiveUnit">ArchiveUnit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.CustomJoinBehaviour" href="index.html#refinery.units.formats.PathExtractorUnit.CustomJoinBehaviour">CustomJoinBehaviour</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.CustomPathSeparator" href="index.html#refinery.units.formats.PathExtractorUnit.CustomPathSeparator">CustomPathSeparator</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.formats.archive.ArchiveUnit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.formats" href="index.html">refinery.units.formats</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.units.formats.pdf.isdict" href="#refinery.units.formats.pdf.isdict">isdict</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.formats.pdf.xtpdf" href="#refinery.units.formats.pdf.xtpdf">xtpdf</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.pdf.xtpdf.unpack" href="#refinery.units.formats.pdf.xtpdf.unpack">unpack</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

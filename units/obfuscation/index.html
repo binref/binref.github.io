@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.obfuscation documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.obfuscation</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/obfuscation/__init__.py#L1-L130" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import abc
+import io
+import re
+
+from functools import wraps
+from zlib import crc32
+
+from refinery.lib.decorators import unicoded
+from refinery.lib.types import Callable, Param, buf
+from refinery.units import Arg, Chunk, RefineryPartialResult, Unit
+
+__all__ = [
+    &#39;Deobfuscator&#39;,
+    &#39;IterativeDeobfuscator&#39;,
+    &#39;outside&#39;,
+    &#39;unicoded&#39;,
+]
+
+
+class AutoDeobfuscationTimeout(RefineryPartialResult):
+    def __init__(self, partial):
+        super().__init__(&#39;The deobfuscation timeout was reached before the data stabilized.&#39;, partial=partial)
+
+
+def outside(*exceptions):
+    &#34;&#34;&#34;
+    A decorator which allows to apply the transformation only to areas where
+    a set of given regular expressions does not match. Here, this is mostly
+    used to apply deobfuscations only to code outside of strings.
+    &#34;&#34;&#34;
+
+    exclusion = &#39;|&#39;.join(F&#39;(?:{e})&#39; for e in exceptions)
+
+    def excluded(method):
+        def wrapper(self, data):
+            with io.StringIO() as out:
+                cursor = 0
+                for m in re.finditer(exclusion, data, re.DOTALL):
+                    out.write(method(self, data[cursor:m.start()]))
+                    out.write(m[0])
+                    cursor = m.end()
+                out.write(method(self, data[cursor:]))
+                return out.getvalue()
+        return wrapper
+
+    return excluded
+
+
+class Deobfuscator(Unit, abstract=True):
+
+    def __init__(self):
+        super().__init__()
+
+    @unicoded
+    def process(self, data: str) -&gt; str:
+        return self.deobfuscate(data)
+
+    @abc.abstractmethod
+    def deobfuscate(self, data: str) -&gt; str:
+        return data
+
+
+class IterativeDeobfuscator(Deobfuscator, abstract=True):
+
+    def __init__(self, timeout: Param[int, Arg(&#39;-t&#39;, help=&#39;Maximum number of iterations; the default is 100.&#39;)] = 100):
+        if timeout &lt; 1:
+            raise ValueError(&#39;The timeout must be at least 1.&#39;)
+        super().__init__()
+        self.args.timeout = timeout
+
+    def process(self, data: Chunk) -&gt; buf:
+        previous = crc32(data)
+        for _ in range(self.args.timeout):
+            try:
+                data[:] = super().process(data)
+            except KeyboardInterrupt:
+                raise RefineryPartialResult(&#39;Returning partially deobfuscated data&#39;, partial=data)
+            checksum = crc32(data)
+            if checksum == previous:
+                break
+            previous = checksum
+        else:
+            raise AutoDeobfuscationTimeout(data)
+        return data
+
+
+class StringLiterals:
+
+    def __init__(self, pattern: str, data: str):
+        self.pattern = str(pattern)
+        self.update(data)
+
+    def update(self, data):
+        self.data = data
+        self.ranges = [
+            match.span() for match in re.finditer(self.pattern, data)
+        ]
+
+    def shift(self, by, start=0):
+        for k in range(start, len(self.ranges)):
+            a, b = self.ranges[k]
+            self.ranges[k] = a + by, b + by
+
+    def outside(self, function: Callable[[re.Match], str]) -&gt; Callable[[re.Match], str]:
+        @wraps(function)
+        def wrapper(match: re.Match) -&gt; str:
+            if match.string != self.data:
+                self.update(match.string)
+            a, b = match.span()
+            for x, y in self.ranges:
+                if x &gt; b:
+                    break
+                if (a in range(x, y) or x in range(a, b)) and (x &lt; a or y &gt; b):
+                    return match[0]
+            result = function(match)
+            if result is not None:
+                return result
+            return match[0]
+        return wrapper
+
+    def __contains__(self, index):
+        return any(index in range(*L) for L in self.ranges)
+
+    def get_container(self, offset):
+        for k, L in enumerate(self.ranges):
+            if offset in range(*L):
+                return k
+        return None</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="refinery.units.obfuscation.js" href="js/index.html">refinery.units.obfuscation.js</a></code></dt>
+<dd>
+<section class="desc"><p>Deobfuscation of JavaScript documents.</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.units.obfuscation.ps1" href="ps1/index.html">refinery.units.obfuscation.ps1</a></code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+<dt><code class="name"><a title="refinery.units.obfuscation.vba" href="vba/index.html">refinery.units.obfuscation.vba</a></code></dt>
+<dd>
+<section class="desc"><p>A package containing deobfuscators for Visual Basic for Applications (VBA).</p></section>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.units.obfuscation.outside"><code class="name flex">
+<span>def <span class="ident">outside</span></span>(<span>*exceptions)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A decorator which allows to apply the transformation only to areas where
+a set of given regular expressions does not match. Here, this is mostly
+used to apply deobfuscations only to code outside of strings.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/obfuscation/__init__.py#L27-L48" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def outside(*exceptions):
+    &#34;&#34;&#34;
+    A decorator which allows to apply the transformation only to areas where
+    a set of given regular expressions does not match. Here, this is mostly
+    used to apply deobfuscations only to code outside of strings.
+    &#34;&#34;&#34;
+
+    exclusion = &#39;|&#39;.join(F&#39;(?:{e})&#39; for e in exceptions)
+
+    def excluded(method):
+        def wrapper(self, data):
+            with io.StringIO() as out:
+                cursor = 0
+                for m in re.finditer(exclusion, data, re.DOTALL):
+                    out.write(method(self, data[cursor:m.start()]))
+                    out.write(m[0])
+                    cursor = m.end()
+                out.write(method(self, data[cursor:]))
+                return out.getvalue()
+        return wrapper
+
+    return excluded</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.obfuscation.unicoded"><code class="name flex">
+<span>def <span class="ident">unicoded</span></span>(<span>method)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Can be used to decorate a <code><a title="refinery.units.Unit.process" href="../index.html#refinery.units.UnitBase.process">Unit.process()</a></code> routine that takes a
+string argument and also returns one. The resulting routine takes a binary buffer
+as input and attempts to decode it as unicode text. If certain characters cannot
+be decoded, then these ranges are skipped and the decorated routine is called
+once for each string patch that was successfully decoded.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/decorators.py#L45-L67" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unicoded(method: Callable[[Any, str], str | None]) -&gt; Callable[[Any, Chunk], bytes | None]:
+    &#34;&#34;&#34;
+    Can be used to decorate a `refinery.units.Unit.process` routine that takes a
+    string argument and also returns one. The resulting routine takes a binary buffer
+    as input and attempts to decode it as unicode text. If certain characters cannot
+    be decoded, then these ranges are skipped and the decorated routine is called
+    once for each string patch that was successfully decoded.
+    &#34;&#34;&#34;
+    @wraps_without_annotations(method)
+    def method_wrapper(self: Unit, data: Chunk) -&gt; bytes | None:
+        input_codec = self.codec if any(data[::2]) else &#39;UTF-16LE&#39;
+        partial = re.split(R&#39;([\uDC80-\uDCFF]+)&#39;,  # surrogate escape range
+            codecs.decode(data, input_codec, errors=&#39;surrogateescape&#39;))
+        partial[::2] = (method(self, p) or &#39;&#39; if p else &#39;&#39; for p in itertools.islice(iter(partial), 0, None, 2))
+        nones = sum(1 for p in partial if p is None)
+        if nones == len(partial):
+            return None
+        if nones &gt;= 1:
+            for k, p in enumerate(partial):
+                if p is None:
+                    partial[k] = &#39;&#39;
+        return codecs.encode(&#39;&#39;.join(partial), self.codec, errors=&#39;surrogateescape&#39;)
+    return method_wrapper</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.obfuscation.Deobfuscator"><code class="flex name class">
+<span>class <span class="ident">Deobfuscator</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/obfuscation/__init__.py#L51-L62" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Deobfuscator(Unit, abstract=True):
+
+    def __init__(self):
+        super().__init__()
+
+    @unicoded
+    def process(self, data: str) -&gt; str:
+        return self.deobfuscate(data)
+
+    @abc.abstractmethod
+    def deobfuscate(self, data: str) -&gt; str:
+        return data</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.obfuscation.IterativeDeobfuscator" href="#refinery.units.obfuscation.IterativeDeobfuscator">IterativeDeobfuscator</a></li>
+<li><a title="refinery.units.obfuscation.js.arithmetic.deob_js_arithmetic" href="js/arithmetic.html#refinery.units.obfuscation.js.arithmetic.deob_js_arithmetic">deob_js_arithmetic</a></li>
+<li><a title="refinery.units.obfuscation.js.arrays.deob_js_arrays" href="js/arrays.html#refinery.units.obfuscation.js.arrays.deob_js_arrays">deob_js_arrays</a></li>
+<li><a title="refinery.units.obfuscation.js.comments.deob_js_comments" href="js/comments.html#refinery.units.obfuscation.js.comments.deob_js_comments">deob_js_comments</a></li>
+<li><a title="refinery.units.obfuscation.js.getattr.deob_js_getattr" href="js/getattr.html#refinery.units.obfuscation.js.getattr.deob_js_getattr">deob_js_getattr</a></li>
+<li><a title="refinery.units.obfuscation.js.tuples.deob_js_tuples" href="js/tuples.html#refinery.units.obfuscation.js.tuples.deob_js_tuples">deob_js_tuples</a></li>
+<li><a title="refinery.units.obfuscation.ps1.b64convert.deob_ps1_b64convert" href="ps1/b64convert.html#refinery.units.obfuscation.ps1.b64convert.deob_ps1_b64convert">deob_ps1_b64convert</a></li>
+<li><a title="refinery.units.obfuscation.ps1.brackets.deob_ps1_brackets" href="ps1/brackets.html#refinery.units.obfuscation.ps1.brackets.deob_ps1_brackets">deob_ps1_brackets</a></li>
+<li><a title="refinery.units.obfuscation.ps1.cases.deob_ps1_cases" href="ps1/cases.html#refinery.units.obfuscation.ps1.cases.deob_ps1_cases">deob_ps1_cases</a></li>
+<li><a title="refinery.units.obfuscation.ps1.encodings.deob_ps1_encodings" href="ps1/encodings.html#refinery.units.obfuscation.ps1.encodings.deob_ps1_encodings">deob_ps1_encodings</a></li>
+<li><a title="refinery.units.obfuscation.ps1.escape.deob_ps1_escape" href="ps1/escape.html#refinery.units.obfuscation.ps1.escape.deob_ps1_escape">deob_ps1_escape</a></li>
+<li><a title="refinery.units.obfuscation.ps1.format.deob_ps1_format" href="ps1/format.html#refinery.units.obfuscation.ps1.format.deob_ps1_format">deob_ps1_format</a></li>
+<li><a title="refinery.units.obfuscation.ps1.invoke.deob_ps1_invoke" href="ps1/invoke.html#refinery.units.obfuscation.ps1.invoke.deob_ps1_invoke">deob_ps1_invoke</a></li>
+<li><a title="refinery.units.obfuscation.ps1.securestring.deob_ps1_secstr" href="ps1/securestring.html#refinery.units.obfuscation.ps1.securestring.deob_ps1_secstr">deob_ps1_secstr</a></li>
+<li><a title="refinery.units.obfuscation.ps1.stringreplace.deob_ps1_stringreplace" href="ps1/stringreplace.html#refinery.units.obfuscation.ps1.stringreplace.deob_ps1_stringreplace">deob_ps1_stringreplace</a></li>
+<li><a title="refinery.units.obfuscation.ps1.typecast.deob_ps1_typecast" href="ps1/typecast.html#refinery.units.obfuscation.ps1.typecast.deob_ps1_typecast">deob_ps1_typecast</a></li>
+<li><a title="refinery.units.obfuscation.ps1.uncurly.deob_ps1_uncurly" href="ps1/uncurly.html#refinery.units.obfuscation.ps1.uncurly.deob_ps1_uncurly">deob_ps1_uncurly</a></li>
+<li><a title="refinery.units.obfuscation.vba.arithmetic.deob_vba_arithmetic" href="vba/arithmetic.html#refinery.units.obfuscation.vba.arithmetic.deob_vba_arithmetic">deob_vba_arithmetic</a></li>
+<li><a title="refinery.units.obfuscation.vba.brackets.deob_vba_brackets" href="vba/brackets.html#refinery.units.obfuscation.vba.brackets.deob_vba_brackets">deob_vba_brackets</a></li>
+<li><a title="refinery.units.obfuscation.vba.char.deob_vba_char_function" href="vba/char.html#refinery.units.obfuscation.vba.char.deob_vba_char_function">deob_vba_char_function</a></li>
+<li><a title="refinery.units.obfuscation.vba.comments.deob_vba_comments" href="vba/comments.html#refinery.units.obfuscation.vba.comments.deob_vba_comments">deob_vba_comments</a></li>
+<li><a title="refinery.units.obfuscation.vba.constants.deob_vba_constants" href="vba/constants.html#refinery.units.obfuscation.vba.constants.deob_vba_constants">deob_vba_constants</a></li>
+<li><a title="refinery.units.obfuscation.vba.dummies.deob_vba_dummy_variables" href="vba/dummies.html#refinery.units.obfuscation.vba.dummies.deob_vba_dummy_variables">deob_vba_dummy_variables</a></li>
+<li><a title="refinery.units.obfuscation.vba.stringreplace.deob_vba_stringreplace" href="vba/stringreplace.html#refinery.units.obfuscation.vba.stringreplace.deob_vba_stringreplace">deob_vba_stringreplace</a></li>
+<li><a title="refinery.units.obfuscation.vba.stringreverse.deob_vba_stringreverse" href="vba/stringreverse.html#refinery.units.obfuscation.vba.stringreverse.deob_vba_stringreverse">deob_vba_stringreverse</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.obfuscation.Deobfuscator.deobfuscate"><code class="name flex">
+<span>def <span class="ident">deobfuscate</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/obfuscation/__init__.py#L60-L62" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@abc.abstractmethod
+def deobfuscate(self, data: str) -&gt; str:
+    return data</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.reverse" href="../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.units.obfuscation.IterativeDeobfuscator"><code class="flex name class">
+<span>class <span class="ident">IterativeDeobfuscator</span></span>
+<span>(</span><span>timeout=100)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/obfuscation/__init__.py#L65-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class IterativeDeobfuscator(Deobfuscator, abstract=True):
+
+    def __init__(self, timeout: Param[int, Arg(&#39;-t&#39;, help=&#39;Maximum number of iterations; the default is 100.&#39;)] = 100):
+        if timeout &lt; 1:
+            raise ValueError(&#39;The timeout must be at least 1.&#39;)
+        super().__init__()
+        self.args.timeout = timeout
+
+    def process(self, data: Chunk) -&gt; buf:
+        previous = crc32(data)
+        for _ in range(self.args.timeout):
+            try:
+                data[:] = super().process(data)
+            except KeyboardInterrupt:
+                raise RefineryPartialResult(&#39;Returning partially deobfuscated data&#39;, partial=data)
+            checksum = crc32(data)
+            if checksum == previous:
+                break
+            previous = checksum
+        else:
+            raise AutoDeobfuscationTimeout(data)
+        return data</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.obfuscation.Deobfuscator" href="#refinery.units.obfuscation.Deobfuscator">Deobfuscator</a></li>
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.obfuscation.js.concat.deob_js_concat" href="js/concat.html#refinery.units.obfuscation.js.concat.deob_js_concat">deob_js_concat</a></li>
+<li><a title="refinery.units.obfuscation.ps1.all.deob_ps1" href="ps1/all.html#refinery.units.obfuscation.ps1.all.deob_ps1">deob_ps1</a></li>
+<li><a title="refinery.units.obfuscation.ps1.concat.deob_ps1_concat" href="ps1/concat.html#refinery.units.obfuscation.ps1.concat.deob_ps1_concat">deob_ps1_concat</a></li>
+<li><a title="refinery.units.obfuscation.vba.all.deob_vba" href="vba/all.html#refinery.units.obfuscation.vba.all.deob_vba">deob_vba</a></li>
+<li><a title="refinery.units.obfuscation.vba.concat.deob_vba_concat" href="vba/concat.html#refinery.units.obfuscation.vba.concat.deob_vba_concat">deob_vba_concat</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.obfuscation.Deobfuscator" href="#refinery.units.obfuscation.Deobfuscator">Deobfuscator</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.obfuscation.Deobfuscator" href="#refinery.units.obfuscation.Deobfuscator">Deobfuscator</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.reverse" href="../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units" href="../index.html">refinery.units</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="refinery.units.obfuscation.js" href="js/index.html">refinery.units.obfuscation.js</a></code></li>
+<li><code><a title="refinery.units.obfuscation.ps1" href="ps1/index.html">refinery.units.obfuscation.ps1</a></code></li>
+<li><code><a title="refinery.units.obfuscation.vba" href="vba/index.html">refinery.units.obfuscation.vba</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.units.obfuscation.outside" href="#refinery.units.obfuscation.outside">outside</a></code></li>
+<li><code><a title="refinery.units.obfuscation.unicoded" href="#refinery.units.obfuscation.unicoded">unicoded</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.obfuscation.Deobfuscator" href="#refinery.units.obfuscation.Deobfuscator">Deobfuscator</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.obfuscation.Deobfuscator.deobfuscate" href="#refinery.units.obfuscation.Deobfuscator.deobfuscate">deobfuscate</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.obfuscation.IterativeDeobfuscator" href="#refinery.units.obfuscation.IterativeDeobfuscator">IterativeDeobfuscator</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

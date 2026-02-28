@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.formats.hexload documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.formats.hexload</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L1-L137" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import inspect
+import operator
+import re
+
+from typing import NamedTuple
+
+from refinery.lib.patterns import make_hexline_pattern
+from refinery.lib.tools import lookahead
+from refinery.units import RefineryPartialResult
+from refinery.units.sinks import HexViewer
+
+
+class HexLineCheck(NamedTuple):
+    decoded_length: int
+    preview_length: int
+    matched_binary: bool
+
+
+def regex(cls: type) -&gt; re.Pattern:
+    return re.compile(inspect.getdoc(cls))
+
+
+class hexload(HexViewer):
+    &#34;&#34;&#34;
+    Convert hex dumps back to the original data and vice versa. All options of this unit apply
+    to its reverse operation where binary data is converted to a readable hexdump format.
+    The default mode of the unit expects the input data to contain a readable hexdump and
+    converts it back to binary.
+    &#34;&#34;&#34;
+    @regex
+    class _ENCODED_BYTES:
+        R&#34;&#34;&#34;
+        (?ix)(?:^|(?&lt;=\s))                      # encoded byte patches must be prefixed by white space
+        (?:
+            (?:                                 # separated chunks of hex data
+                [a-f0-9]{2}                     # hexadecimal chunk; single byte (two hexadecimal letters)
+                \s{1,2}                         # encoded byte followed by whitespace
+                (?:                             # at least one more encoded byte
+                    [a-f0-9]{2}                 # followed by more encoded bytes
+                    (?:\s{1,2}[a-f0-9]{2})*     # unless it was just a single byte
+                )?
+            )
+            | (?:[a-f0-9]{4}\s{1,2}             # 2-byte chunks
+              (?:[a-f0-9]{4}
+              (?:\s{1,2}[a-f0-9]{4})*)?)
+            | (?:[a-f0-9]{8}\s{1,2}             # 4-byte chunks
+              (?:[a-f0-9]{8}
+              (?:\s{1,2}[a-f0-9]{8})*)?)
+            | (?:(?:[a-f0-9]{2})+)              # continuous line of hexadecimal characters
+        )(?=\s|$)                               # terminated by a whitespace or line end
+        &#34;&#34;&#34;
+
+    def __init__(self, blocks=1, dense=False, expand=False, narrow=False, width=0):
+        super().__init__(blocks=blocks, dense=dense, expand=expand, narrow=narrow, width=width)
+        self._hexline_pattern = re.compile(F&#39;{make_hexline_pattern(1)}(?:[\r\n]|$)&#39;, flags=re.MULTILINE)
+
+    def process(self, data: bytearray):
+        if not (lines := [
+            line for line in data.decode(self.codec).splitlines(keepends=False)
+            if line.strip()
+        ]):
+            return None
+
+        result = bytearray()
+        encoded_byte_matches: list[dict[int, int]] = []
+
+        for check in lines:
+            matches: dict[int, int] = {}
+            encoded_byte_matches.append(matches)
+            for match in self._ENCODED_BYTES.finditer(check):
+                a, b = match.span()
+                matches[a] = b - a
+
+        it = iter(encoded_byte_matches)
+        offsets = set(next(it).keys())
+        for matches in it:
+            offsets.intersection_update(matches.keys())
+        if not offsets:
+            raise ValueError(&#39;unable to determine the position of the hex bytes in this dump&#39;)
+        lengths: dict[int, list[int]] = {offset: [] for offset in offsets}
+        del offsets
+        for matches in encoded_byte_matches:
+            for offset in lengths:
+                lengths[offset].append(matches[offset])
+        for offset in lengths:
+            lengths[offset].sort()
+        midpoint = len(encoded_byte_matches) // 2
+        offset, length = max(((offset, lengths[offset][midpoint]) for offset in lengths),
+            key=operator.itemgetter(1))
+        end = offset + length
+        del lengths
+
+        line_checks: list[HexLineCheck] = []
+
+        for k, check in enumerate(lines, 1):
+            encoded = check[offset:end]
+            onlyhex = re.search(r&#39;^[\sA-Fa-f0-9]+&#39;, encoded)
+            if not onlyhex:
+                self.log_warn(F&#39;ignoring line without hexadecimal data: {check}&#39;)
+                continue
+            if onlyhex.group(0) != encoded:
+                if k != len(lines):
+                    self.log_warn(F&#39;ignoring line with mismatching hex data length: {check}&#39;)
+                    continue
+                encoded = onlyhex.group(0)
+            self.log_debug(F&#39;decoding: {encoded.strip()}&#39;)
+            decoded = bytes.fromhex(encoded)
+            result.extend(decoded)
+            matched = True
+            if preview := check[end:]:
+                pattern = re.compile(
+                    &#39;.&#39;.join(re.escape(x.decode(&#39;ascii&#39;)) for x in re.split(b&#39;[^!-~]&#39;, decoded)))
+                matched = pattern.search(preview) is not None
+            line_checks.append(HexLineCheck(len(decoded), len(preview), matched))
+
+        decoded_sizes: set[int] = set()
+        for last, hl in lookahead(line_checks):
+            if not last:
+                decoded_sizes.add(hl.decoded_length)
+                if len(decoded_sizes) &gt; 1:
+                    raise RefineryPartialResult(&#39;inconsistent text preview sizes&#39;, result)
+
+        for k, check in enumerate(line_checks, 1):
+            if check.preview_length and not check.matched_binary:
+                self.log_warn(F&#39;preview mismatch in line {k}: {lines[k - 1]}&#39;, result)
+
+        if result:
+            yield result
+
+    def reverse(self, data):
+        metrics = self._get_metrics(len(data))
+        if not self.args.width:
+            metrics.fit_to_width(allow_increase=True)
+        for line in self.hexdump(data, metrics):
+            yield line.encode(self.codec)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.units.formats.hexload.regex"><code class="name flex">
+<span>def <span class="ident">regex</span></span>(<span>cls)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L21-L22" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def regex(cls: type) -&gt; re.Pattern:
+    return re.compile(inspect.getdoc(cls))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.formats.hexload.HexLineCheck"><code class="flex name class">
+<span>class <span class="ident">HexLineCheck</span></span>
+<span>(</span><span>decoded_length, preview_length, matched_binary)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>HexLineCheck(decoded_length, preview_length, matched_binary)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L15-L18" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class HexLineCheck(NamedTuple):
+    decoded_length: int
+    preview_length: int
+    matched_binary: bool</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.units.formats.hexload.HexLineCheck.decoded_length"><code class="name">var <span class="ident">decoded_length</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L15-L18" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class HexLineCheck(NamedTuple):
+    decoded_length: int
+    preview_length: int
+    matched_binary: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.hexload.HexLineCheck.preview_length"><code class="name">var <span class="ident">preview_length</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L15-L18" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class HexLineCheck(NamedTuple):
+    decoded_length: int
+    preview_length: int
+    matched_binary: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.hexload.HexLineCheck.matched_binary"><code class="name">var <span class="ident">matched_binary</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L15-L18" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class HexLineCheck(NamedTuple):
+    decoded_length: int
+    preview_length: int
+    matched_binary: bool</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.hexload.hexload"><code class="flex name class">
+<span>class <span class="ident">hexload</span></span>
+<span>(</span><span>blocks=1, dense=False, expand=False, narrow=False, width=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Convert hex dumps back to the original data and vice versa. All options of this unit apply
+to its reverse operation where binary data is converted to a readable hexdump format.
+The default mode of the unit expects the input data to contain a readable hexdump and
+converts it back to binary.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/hexload.py#L25-L137" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class hexload(HexViewer):
+    &#34;&#34;&#34;
+    Convert hex dumps back to the original data and vice versa. All options of this unit apply
+    to its reverse operation where binary data is converted to a readable hexdump format.
+    The default mode of the unit expects the input data to contain a readable hexdump and
+    converts it back to binary.
+    &#34;&#34;&#34;
+    @regex
+    class _ENCODED_BYTES:
+        R&#34;&#34;&#34;
+        (?ix)(?:^|(?&lt;=\s))                      # encoded byte patches must be prefixed by white space
+        (?:
+            (?:                                 # separated chunks of hex data
+                [a-f0-9]{2}                     # hexadecimal chunk; single byte (two hexadecimal letters)
+                \s{1,2}                         # encoded byte followed by whitespace
+                (?:                             # at least one more encoded byte
+                    [a-f0-9]{2}                 # followed by more encoded bytes
+                    (?:\s{1,2}[a-f0-9]{2})*     # unless it was just a single byte
+                )?
+            )
+            | (?:[a-f0-9]{4}\s{1,2}             # 2-byte chunks
+              (?:[a-f0-9]{4}
+              (?:\s{1,2}[a-f0-9]{4})*)?)
+            | (?:[a-f0-9]{8}\s{1,2}             # 4-byte chunks
+              (?:[a-f0-9]{8}
+              (?:\s{1,2}[a-f0-9]{8})*)?)
+            | (?:(?:[a-f0-9]{2})+)              # continuous line of hexadecimal characters
+        )(?=\s|$)                               # terminated by a whitespace or line end
+        &#34;&#34;&#34;
+
+    def __init__(self, blocks=1, dense=False, expand=False, narrow=False, width=0):
+        super().__init__(blocks=blocks, dense=dense, expand=expand, narrow=narrow, width=width)
+        self._hexline_pattern = re.compile(F&#39;{make_hexline_pattern(1)}(?:[\r\n]|$)&#39;, flags=re.MULTILINE)
+
+    def process(self, data: bytearray):
+        if not (lines := [
+            line for line in data.decode(self.codec).splitlines(keepends=False)
+            if line.strip()
+        ]):
+            return None
+
+        result = bytearray()
+        encoded_byte_matches: list[dict[int, int]] = []
+
+        for check in lines:
+            matches: dict[int, int] = {}
+            encoded_byte_matches.append(matches)
+            for match in self._ENCODED_BYTES.finditer(check):
+                a, b = match.span()
+                matches[a] = b - a
+
+        it = iter(encoded_byte_matches)
+        offsets = set(next(it).keys())
+        for matches in it:
+            offsets.intersection_update(matches.keys())
+        if not offsets:
+            raise ValueError(&#39;unable to determine the position of the hex bytes in this dump&#39;)
+        lengths: dict[int, list[int]] = {offset: [] for offset in offsets}
+        del offsets
+        for matches in encoded_byte_matches:
+            for offset in lengths:
+                lengths[offset].append(matches[offset])
+        for offset in lengths:
+            lengths[offset].sort()
+        midpoint = len(encoded_byte_matches) // 2
+        offset, length = max(((offset, lengths[offset][midpoint]) for offset in lengths),
+            key=operator.itemgetter(1))
+        end = offset + length
+        del lengths
+
+        line_checks: list[HexLineCheck] = []
+
+        for k, check in enumerate(lines, 1):
+            encoded = check[offset:end]
+            onlyhex = re.search(r&#39;^[\sA-Fa-f0-9]+&#39;, encoded)
+            if not onlyhex:
+                self.log_warn(F&#39;ignoring line without hexadecimal data: {check}&#39;)
+                continue
+            if onlyhex.group(0) != encoded:
+                if k != len(lines):
+                    self.log_warn(F&#39;ignoring line with mismatching hex data length: {check}&#39;)
+                    continue
+                encoded = onlyhex.group(0)
+            self.log_debug(F&#39;decoding: {encoded.strip()}&#39;)
+            decoded = bytes.fromhex(encoded)
+            result.extend(decoded)
+            matched = True
+            if preview := check[end:]:
+                pattern = re.compile(
+                    &#39;.&#39;.join(re.escape(x.decode(&#39;ascii&#39;)) for x in re.split(b&#39;[^!-~]&#39;, decoded)))
+                matched = pattern.search(preview) is not None
+            line_checks.append(HexLineCheck(len(decoded), len(preview), matched))
+
+        decoded_sizes: set[int] = set()
+        for last, hl in lookahead(line_checks):
+            if not last:
+                decoded_sizes.add(hl.decoded_length)
+                if len(decoded_sizes) &gt; 1:
+                    raise RefineryPartialResult(&#39;inconsistent text preview sizes&#39;, result)
+
+        for k, check in enumerate(line_checks, 1):
+            if check.preview_length and not check.matched_binary:
+                self.log_warn(F&#39;preview mismatch in line {k}: {lines[k - 1]}&#39;, result)
+
+        if result:
+            yield result
+
+    def reverse(self, data):
+        metrics = self._get_metrics(len(data))
+        if not self.args.width:
+            metrics.fit_to_width(allow_increase=True)
+        for line in self.hexdump(data, metrics):
+            yield line.encode(self.codec)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.sinks.HexViewer" href="../sinks/index.html#refinery.units.sinks.HexViewer">HexViewer</a></li>
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.hexload.hexload" href="#refinery.units.formats.hexload.hexload">hexload</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.sinks.HexViewer" href="../sinks/index.html#refinery.units.sinks.HexViewer">HexViewer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.sinks.HexViewer.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.reverse" href="../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.sinks.HexViewer.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.formats" href="index.html">refinery.units.formats</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.units.formats.hexload.regex" href="#refinery.units.formats.hexload.regex">regex</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.formats.hexload.HexLineCheck" href="#refinery.units.formats.hexload.HexLineCheck">HexLineCheck</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.hexload.hexload" href="#refinery.units.formats.hexload.hexload">hexload</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

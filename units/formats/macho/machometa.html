@@ -1,0 +1,1348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.formats.macho.machometa documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.formats.macho.machometa</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L1-L354" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import itertools
+import plistlib
+
+from enum import IntEnum
+from hashlib import md5
+from typing import Iterable, cast
+
+from refinery.lib import lief
+from refinery.lib.structures import StreamDetour, Struct, StructReader
+from refinery.lib.types import Param
+from refinery.units import Arg
+from refinery.units.formats import JSONTableUnit
+from refinery.units.formats.pe.pemeta import pemeta
+
+CS_ADHOC = 0x0000_0002
+
+
+class BlobType(IntEnum):
+    CODEDIRECTORY                 = 0x00000 # noqa
+    INFOSLOT                      = 0x00001 # noqa
+    REQUIREMENTS                  = 0x00002 # noqa
+    RESOURCEDIR                   = 0x00003 # noqa
+    APPLICATION                   = 0x00004 # noqa
+    XML_ENTITLEMENTS              = 0x00005 # noqa
+    DER_ENTITLEMENTS              = 0x00007 # noqa
+    LAUNCH_CONSTRAINT_SELF        = 0x00008 # noqa
+    LAUNCH_CONSTRAINT_PARENT      = 0x00009 # noqa
+    LAUNCH_CONSTRAINT_RESPONSIBLE = 0x0000A # noqa
+    LIBRARY_CONSTRAINT            = 0x0000B # noqa
+    ALTERNATE_CODEDIRECTORIES     = 0x01000 # noqa
+    CMS_SIGNATURE                 = 0x10000 # noqa
+
+
+class BlobMagic(IntEnum):
+    OneRequirement      = 0xFADE0C00 # noqa
+    Requirements        = 0xFADE0C01 # noqa
+    CodeDirectory       = 0xFADE0C02 # noqa
+    Signature           = 0xFADE0CC0 # noqa
+    DetachedSignature   = 0xFADE0CC1 # noqa
+    BlobWrapper         = 0xFADE0B01 # noqa
+    SignatureOld        = 0xFADE0B02 # noqa
+    EntitlementsXML     = 0xFADE7171 # noqa
+    EntitlementsDER     = 0xFADE7172 # noqa
+    LaunchConstraint    = 0xFADE8181 # noqa
+
+
+class BlobIndex(Struct):
+    def __init__(self, reader: StructReader[memoryview]):
+        self.type = reader.u32()
+        self.offset = reader.u32()
+        with StreamDetour(reader, self.offset):
+            pos = reader.tell()
+            self.magic = reader.u32()
+            length = reader.u32()
+            self.data = reader.read(length - reader.tell() + pos)
+
+
+class SuperBlob(Struct):
+    def __init__(self, reader: StructReader[memoryview]):
+        magic = reader.read(4)
+        if magic == B&#39;\xfa\xde\x0c\xc0&#39;:
+            reader.bigendian = True
+        elif magic != B&#39;\xc0\x0c\xde\xfa&#39;:
+            raise ValueError
+        self.size = reader.u32()
+        count = reader.u32()
+        self.blobs = [BlobIndex(reader) for _ in range(count)]
+
+
+class CodeDirectoryBlob(Struct):
+    def __init__(self, reader: StructReader[memoryview]):
+        reader.bigendian = True
+        self.version = reader.u32()
+        self.flags = reader.u32()
+        self.hashOffset = reader.u32()
+        self.identOffset = reader.u32()
+        self.nSpecialSlots = reader.u32()
+        self.nCodeSlots = reader.u32()
+        self.codeLimit = reader.u32()
+        self.hashSize = reader.u8()
+        self.hashType = reader.u8()
+        self.platform = reader.u8()
+        self.pageSize = reader.u8()
+        self.spare2 = reader.u32()
+
+
+_CPU_SUBTYPES = {
+    lief.MachO.Header.CPU_TYPE.X86.value: {
+        0x03: &#39;ALL&#39;,
+        0x04: &#39;ARCH1&#39;,
+    },
+    lief.MachO.Header.CPU_TYPE.X86_64.value: {
+        0x03: &#39;ALL&#39;,
+        0x08: &#39;H&#39;,
+    },
+    lief.MachO.Header.CPU_TYPE.POWERPC.value: {
+        0x00: &#39;ALL&#39;,
+        0x01: &#39;601&#39;,
+        0x02: &#39;602&#39;,
+        0x03: &#39;603&#39;,
+        0x04: &#39;603e&#39;,
+        0x05: &#39;603ev&#39;,
+        0x06: &#39;604&#39;,
+        0x07: &#39;604e&#39;,
+        0x08: &#39;620&#39;,
+        0x09: &#39;750&#39;,
+        0x0A: &#39;7400&#39;,
+        0x0B: &#39;7450&#39;,
+        0x64: &#39;970&#39;,
+    },
+    lief.MachO.Header.CPU_TYPE.ARM.value: {
+        0x00: &#39;ALL&#39;,
+        0x05: &#39;V4T&#39;,
+        0x06: &#39;V6&#39;,
+        0x07: &#39;V5&#39;,
+        0x08: &#39;XSCALE&#39;,
+        0x09: &#39;V7&#39;,
+        0x0A: &#39;ARM_V7F&#39;,
+        0x0B: &#39;V7S&#39;,
+        0x0C: &#39;V7K&#39;,
+        0x0E: &#39;V6M&#39;,
+        0x0F: &#39;V7M&#39;,
+        0x10: &#39;V7EM&#39;,
+    },
+    lief.MachO.Header.CPU_TYPE.ARM64.value: {
+        0x00: &#39;ALL&#39;,
+        0x02: &#39;ARM64E&#39;,
+    },
+    lief.MachO.Header.CPU_TYPE.SPARC.value: {
+        0x00: &#39;ALL&#39;,
+    },
+}
+
+
+class machometa(JSONTableUnit):
+    &#34;&#34;&#34;
+    Extract metadata from Mach-O files.
+    &#34;&#34;&#34;
+    def __init__(
+        self, all: Param[bool, Arg(&#39;-c&#39;, &#39;--custom&#39;,
+            help=&#39;Unless enabled, all default categories will be extracted.&#39;)] = True,
+        header: Param[bool, Arg(&#39;-H&#39;, help=&#39;Parse basic data from the Mach-O header.&#39;)] = False,
+        linked_images: Param[bool, Arg(&#39;-K&#39;, help=&#39;Parse all library images linked by the Mach-O.&#39;)] = False,
+        signatures: Param[bool, Arg(&#39;-S&#39;, help=&#39;Parse signature and entitlement information.&#39;)] = False,
+        version: Param[bool, Arg(&#39;-V&#39;, help=&#39;Parse version information from the Mach-O load commands.&#39;)] = False,
+        load_commands: Param[bool, Arg(&#39;-D&#39;, help=&#39;Parse load commands from the Mach-O header.&#39;)] = False,
+        exports: Param[bool, Arg(&#39;-E&#39;, help=&#39;List all exported functions.&#39;)] = False,
+        imports: Param[bool, Arg(&#39;-I&#39;, help=&#39;List all imported functions.&#39;)] = False,
+        tabular: Param[bool, Arg(&#39;-t&#39;, help=&#39;Print information in a table rather than as JSON&#39;)] = False,
+    ):
+        super().__init__(
+            header=all or header,
+            linked_images=all or linked_images,
+            version=all or version,
+            signatures=all or signatures,
+            load_commands=load_commands,
+            imports=imports,
+            exports=exports,
+            tabular=tabular,
+        )
+
+    def compute_symhash(self, macho: lief.MachO.Binary):
+        def _symbols(symbols: Iterable[lief.MachO.Symbol]):
+            for sym in symbols:
+                if sym.category != lief.MachO.Symbol.CATEGORY.UNDEFINED:
+                    continue
+                yield lief.string(sym.name)
+        symbols = sorted(set(_symbols(macho.symbols)))
+        return md5(&#39;,&#39;.join(symbols).encode(&#39;utf8&#39;)).hexdigest()
+
+    def parse_macho_header(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+        info = {}
+        if header := macho.header:
+            st = header.cpu_subtype &amp; 0x7FFFFFFF
+            ht = &#39;mach_header_64&#39; if header.magic.value in {
+                lief.MachO.MACHO_TYPES.CIGAM_64.value,
+                lief.MachO.MACHO_TYPES.MAGIC_64.value,
+            } else &#39;mach_header&#39;
+            info[&#39;Type&#39;] = ht
+            info[&#39;Magic&#39;] = header.magic.value
+            info[&#39;CPUType&#39;] = header.cpu_type.__name__.upper()
+            info[&#39;CPUSubType&#39;] = _CPU_SUBTYPES.get(header.cpu_type.value, {}).get(st, st)
+            info[&#39;FileType&#39;] = header.file_type.__name__
+            info[&#39;LoadCount&#39;] = header.nb_cmds
+            info[&#39;LoadSize&#39;] = header.sizeof_cmds
+            info[&#39;Flags&#39;] = sorted(flag.__name__ for flag in header.flags_list)
+            info[&#39;Reserved&#39;] = header.reserved
+        return info
+
+    def parse_linked_images(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+        load_command_images = {}
+        load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+        for load_command in load_commands:
+            if not isinstance(load_command, lief.MachO.DylibCommand):
+                continue
+            images: list[str] = load_command_images.setdefault(load_command.command.__name__, [])
+            images.append(load_command.name)
+        return load_command_images
+
+    def parse_signature(self, macho_image: lief.MachO.Binary, data=None) -&gt; dict:
+
+        if not macho_image.has_code_signature:
+            return {}
+
+        info = {}
+        reader = StructReader(macho_image.code_signature.content)
+        super_blob = SuperBlob(reader)
+
+        for blob in super_blob.blobs:
+
+            if blob.type == BlobType.CODEDIRECTORY:
+                codedirectory_blob = CodeDirectoryBlob.Parse(blob.data)
+                if codedirectory_blob.flags &amp; CS_ADHOC != 0:
+                    info[&#39;AdHocSigned&#39;] = True
+                else:
+                    info[&#39;AdHocSigned&#39;] = False
+                reader.seekset(codedirectory_blob.identOffset + blob.offset)
+                info[&#39;SignatureIdentifier&#39;] = reader.read_c_string(&#39;utf8&#39;)
+                continue
+
+            if blob.type == BlobType.CMS_SIGNATURE:
+                reader.seekset(blob.offset)
+                cms_signature = blob.data
+                if not cms_signature:
+                    continue
+                try:
+                    parsed_cms_signature = pemeta.parse_signature(bytearray(cms_signature))
+                    info[&#39;Signature&#39;] = parsed_cms_signature
+                except ValueError as pkcs7_parse_error:
+                    self.log_warn(F&#39;Could not parse the data in CSSLOT_CMS_SIGNATURE as valid PKCS7 data: {pkcs7_parse_error!s}&#39;)
+                continue
+
+            if blob.type == BlobType.REQUIREMENTS:
+                # TODO: Parse the requirements blob,
+                # which is encoded according to the code signing requirements language:
+                # https://developer.apple.com/library/archive/documentation/Security
+                #        /Conceptual/CodeSigningGuide/RequirementLang/RequirementLang.html
+                info[&#39;Requirements&#39;] = blob.data.hex()
+                continue
+
+            if blob.type == BlobType.XML_ENTITLEMENTS:
+                entitlements = bytes(blob.data)
+                if not entitlements:
+                    continue
+                try:
+                    entitlements = plistlib.loads(entitlements)
+                except Exception as error:
+                    self.log_warn(F&#39;failed to parse entitlements: {error!s}&#39;)
+                else:
+                    info[&#39;Entitlements&#39;] = entitlements
+
+        return info
+
+    def parse_version(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+        info = {}
+        load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+        for load_command in load_commands:
+            if load_command.command == lief.MachO.LoadCommand.TYPE.SOURCE_VERSION:
+                if &#39;SourceVersion&#39; not in info:
+                    sv = cast(&#39;lief.MachO.SourceVersion&#39;, load_command)
+                    info[&#39;SourceVersion&#39;] = sv.version[0]
+                else:
+                    self.log_warn(&#39;More than one load command of type SOURCE_VERSION found; the MachO file is possibly malformed&#39;)
+                continue
+            if load_command.command == lief.MachO.LoadCommand.TYPE.BUILD_VERSION:
+                if &#39;BuildVersion&#39; not in info:
+                    cmd = cast(&#39;lief.MachO.BuildVersion&#39;, load_command)
+                    info[&#39;BuildVersion&#39;] = {}
+                    info[&#39;BuildVersion&#39;][&#39;Platform&#39;] = cmd.platform.__name__
+                    info[&#39;BuildVersion&#39;][&#39;MinOS&#39;] = &#39;.&#39;.join(str(v) for v in cmd.minos)
+                    info[&#39;BuildVersion&#39;][&#39;SDK&#39;] = &#39;.&#39;.join(str(v) for v in cmd.sdk)
+                    info[&#39;BuildVersion&#39;][&#39;Ntools&#39;] = len(cmd.tools)
+                else:
+                    self.log_warn(&#39;More than one load command of type BUILD_VERSION found; the MachO file is possibly malformed&#39;)
+                continue
+        return info
+
+    def parse_load_commands(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+        info = []
+        load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+        for load_command in load_commands:
+            info.append(dict(
+                Type=load_command.command.__name__,
+                Size=load_command.size,
+                Data=load_command.data.hex(),
+            ))
+        return info
+
+    def parse_imports(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+        info = []
+        imports: Iterable[lief.MachO.Symbol] = macho.imported_symbols
+        for imp in imports:
+            info.append(lief.string(imp.name))
+        return info
+
+    def parse_exports(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+        info = []
+        exports: Iterable[lief.MachO.Symbol] = macho.exported_symbols
+        for exp in exports:
+            info.append(lief.string(exp.name))
+        return info
+
+    def json(self, data: bytearray):
+        result = {}
+        slices = []
+        macho = lief.load_macho(data)
+        macho_slices: list[lief.MachO.Binary] = []
+
+        if isinstance(macho, lief.MachO.Binary):
+            macho_slices = [macho]
+        else:
+            for k in itertools.count():
+                if not (ms := macho.at(k)):
+                    break
+                macho_slices.append(ms)
+
+        result[&#39;FileType&#39;] = &#39;FAT&#39; if len(macho_slices) &gt; 1 else &#39;THIN&#39;
+
+        for image in macho_slices:
+            slice_result = {}
+
+            for switch, resolver, name in [
+                (self.args.header,          self.parse_macho_header,  &#39;Header&#39;),       # noqa
+                (self.args.linked_images,   self.parse_linked_images, &#39;LinkedImages&#39;), # noqa
+                (self.args.signatures,      self.parse_signature,     &#39;Signatures&#39;),   # noqa
+                (self.args.version,         self.parse_version,       &#39;Version&#39;),      # noqa
+                (self.args.load_commands,   self.parse_load_commands, &#39;LoadCommands&#39;), # noqa
+                (self.args.imports,         self.parse_imports,       &#39;Imports&#39;),      # noqa
+                (self.args.exports,         self.parse_exports,       &#39;Exports&#39;),      # noqa
+            ]:
+                if not switch:
+                    continue
+                self.log_debug(F&#39;parsing: {name}&#39;)
+                try:
+                    info = resolver(image, data)
+                except Exception as E:
+                    self.log_info(F&#39;failed to obtain {name}: {E!s}&#39;)
+                    continue
+                if info:
+                    slice_result[name] = info
+
+            if image.uuid is not None:
+                uuid = bytes(image.uuid.uuid)
+                slice_result[&#39;UUID&#39;] = uuid.hex()
+            slice_result[&#39;SymHash&#39;] = self.compute_symhash(image)
+            if fileset_name := image.fileset_name:
+                slice_result[&#39;FilesetName&#39;] = fileset_name
+            slices.append(slice_result)
+
+        if slices:
+            result[&#39;Slices&#39;] = slices
+            return result</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.BlobType"><code class="flex name class">
+<span>class <span class="ident">BlobType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L20-L33" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BlobType(IntEnum):
+    CODEDIRECTORY                 = 0x00000 # noqa
+    INFOSLOT                      = 0x00001 # noqa
+    REQUIREMENTS                  = 0x00002 # noqa
+    RESOURCEDIR                   = 0x00003 # noqa
+    APPLICATION                   = 0x00004 # noqa
+    XML_ENTITLEMENTS              = 0x00005 # noqa
+    DER_ENTITLEMENTS              = 0x00007 # noqa
+    LAUNCH_CONSTRAINT_SELF        = 0x00008 # noqa
+    LAUNCH_CONSTRAINT_PARENT      = 0x00009 # noqa
+    LAUNCH_CONSTRAINT_RESPONSIBLE = 0x0000A # noqa
+    LIBRARY_CONSTRAINT            = 0x0000B # noqa
+    ALTERNATE_CODEDIRECTORIES     = 0x01000 # noqa
+    CMS_SIGNATURE                 = 0x10000 # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.BlobType.CODEDIRECTORY"><code class="name">var <span class="ident">CODEDIRECTORY</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.INFOSLOT"><code class="name">var <span class="ident">INFOSLOT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.REQUIREMENTS"><code class="name">var <span class="ident">REQUIREMENTS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.RESOURCEDIR"><code class="name">var <span class="ident">RESOURCEDIR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.APPLICATION"><code class="name">var <span class="ident">APPLICATION</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.XML_ENTITLEMENTS"><code class="name">var <span class="ident">XML_ENTITLEMENTS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.DER_ENTITLEMENTS"><code class="name">var <span class="ident">DER_ENTITLEMENTS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.LAUNCH_CONSTRAINT_SELF"><code class="name">var <span class="ident">LAUNCH_CONSTRAINT_SELF</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.LAUNCH_CONSTRAINT_PARENT"><code class="name">var <span class="ident">LAUNCH_CONSTRAINT_PARENT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.LAUNCH_CONSTRAINT_RESPONSIBLE"><code class="name">var <span class="ident">LAUNCH_CONSTRAINT_RESPONSIBLE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.LIBRARY_CONSTRAINT"><code class="name">var <span class="ident">LIBRARY_CONSTRAINT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.ALTERNATE_CODEDIRECTORIES"><code class="name">var <span class="ident">ALTERNATE_CODEDIRECTORIES</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobType.CMS_SIGNATURE"><code class="name">var <span class="ident">CMS_SIGNATURE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic"><code class="flex name class">
+<span>class <span class="ident">BlobMagic</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L36-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BlobMagic(IntEnum):
+    OneRequirement      = 0xFADE0C00 # noqa
+    Requirements        = 0xFADE0C01 # noqa
+    CodeDirectory       = 0xFADE0C02 # noqa
+    Signature           = 0xFADE0CC0 # noqa
+    DetachedSignature   = 0xFADE0CC1 # noqa
+    BlobWrapper         = 0xFADE0B01 # noqa
+    SignatureOld        = 0xFADE0B02 # noqa
+    EntitlementsXML     = 0xFADE7171 # noqa
+    EntitlementsDER     = 0xFADE7172 # noqa
+    LaunchConstraint    = 0xFADE8181 # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.OneRequirement"><code class="name">var <span class="ident">OneRequirement</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.Requirements"><code class="name">var <span class="ident">Requirements</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.CodeDirectory"><code class="name">var <span class="ident">CodeDirectory</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.Signature"><code class="name">var <span class="ident">Signature</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.DetachedSignature"><code class="name">var <span class="ident">DetachedSignature</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.BlobWrapper"><code class="name">var <span class="ident">BlobWrapper</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.SignatureOld"><code class="name">var <span class="ident">SignatureOld</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.EntitlementsXML"><code class="name">var <span class="ident">EntitlementsXML</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.EntitlementsDER"><code class="name">var <span class="ident">EntitlementsDER</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobMagic.LaunchConstraint"><code class="name">var <span class="ident">LaunchConstraint</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.BlobIndex"><code class="flex name class">
+<span>class <span class="ident">BlobIndex</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="../../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="../../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="../../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L49-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BlobIndex(Struct):
+    def __init__(self, reader: StructReader[memoryview]):
+        self.type = reader.u32()
+        self.offset = reader.u32()
+        with StreamDetour(reader, self.offset):
+            pos = reader.tell()
+            self.magic = reader.u32()
+            length = reader.u32()
+            self.data = reader.read(length - reader.tell() + pos)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="../../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.BlobIndex.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.SuperBlob"><code class="flex name class">
+<span>class <span class="ident">SuperBlob</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="../../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="../../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="../../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L60-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class SuperBlob(Struct):
+    def __init__(self, reader: StructReader[memoryview]):
+        magic = reader.read(4)
+        if magic == B&#39;\xfa\xde\x0c\xc0&#39;:
+            reader.bigendian = True
+        elif magic != B&#39;\xc0\x0c\xde\xfa&#39;:
+            raise ValueError
+        self.size = reader.u32()
+        count = reader.u32()
+        self.blobs = [BlobIndex(reader) for _ in range(count)]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="../../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.SuperBlob.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.CodeDirectoryBlob"><code class="flex name class">
+<span>class <span class="ident">CodeDirectoryBlob</span></span>
+<span>(</span><span>reader)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A class to parse structured data. A <code><a title="refinery.lib.structures.Struct" href="../../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></code> class can be instantiated
+as follows:</p>
+<pre><code>foo = Struct(data, bar=29)
+</code></pre>
+<p>The initialization routine of the structure will be called with a single argument <code>reader</code>. If
+the object <code>data</code> is already a <code><a title="refinery.lib.structures.StructReader" href="../../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>, then it will be passed
+as <code>reader</code>. Otherwise, the argument will be wrapped in a <code><a title="refinery.lib.structures.StructReader" href="../../../lib/structures.html#refinery.lib.structures.StructReader">StructReader</a></code>.
+Additional arguments to the struct are passed through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L72-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CodeDirectoryBlob(Struct):
+    def __init__(self, reader: StructReader[memoryview]):
+        reader.bigendian = True
+        self.version = reader.u32()
+        self.flags = reader.u32()
+        self.hashOffset = reader.u32()
+        self.identOffset = reader.u32()
+        self.nSpecialSlots = reader.u32()
+        self.nCodeSlots = reader.u32()
+        self.codeLimit = reader.u32()
+        self.hashSize = reader.u8()
+        self.hashType = reader.u8()
+        self.platform = reader.u8()
+        self.pageSize = reader.u8()
+        self.spare2 = reader.u32()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.structures.Struct" href="../../../lib/structures.html#refinery.lib.structures.Struct">Struct</a></li>
+<li>typing.Generic</li>
+<li>collections.abc.Buffer</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.CodeDirectoryBlob.Parse"><code class="name flex">
+<span>def <span class="ident">Parse</span></span>(<span>reader, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa"><code class="flex name class">
+<span>class <span class="ident">machometa</span></span>
+<span>(</span><span>all=True, header=False, linked_images=False, signatures=False, version=False, load_commands=False, exports=False, imports=False, tabular=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Extract metadata from Mach-O files.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L137-L354" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class machometa(JSONTableUnit):
+    &#34;&#34;&#34;
+    Extract metadata from Mach-O files.
+    &#34;&#34;&#34;
+    def __init__(
+        self, all: Param[bool, Arg(&#39;-c&#39;, &#39;--custom&#39;,
+            help=&#39;Unless enabled, all default categories will be extracted.&#39;)] = True,
+        header: Param[bool, Arg(&#39;-H&#39;, help=&#39;Parse basic data from the Mach-O header.&#39;)] = False,
+        linked_images: Param[bool, Arg(&#39;-K&#39;, help=&#39;Parse all library images linked by the Mach-O.&#39;)] = False,
+        signatures: Param[bool, Arg(&#39;-S&#39;, help=&#39;Parse signature and entitlement information.&#39;)] = False,
+        version: Param[bool, Arg(&#39;-V&#39;, help=&#39;Parse version information from the Mach-O load commands.&#39;)] = False,
+        load_commands: Param[bool, Arg(&#39;-D&#39;, help=&#39;Parse load commands from the Mach-O header.&#39;)] = False,
+        exports: Param[bool, Arg(&#39;-E&#39;, help=&#39;List all exported functions.&#39;)] = False,
+        imports: Param[bool, Arg(&#39;-I&#39;, help=&#39;List all imported functions.&#39;)] = False,
+        tabular: Param[bool, Arg(&#39;-t&#39;, help=&#39;Print information in a table rather than as JSON&#39;)] = False,
+    ):
+        super().__init__(
+            header=all or header,
+            linked_images=all or linked_images,
+            version=all or version,
+            signatures=all or signatures,
+            load_commands=load_commands,
+            imports=imports,
+            exports=exports,
+            tabular=tabular,
+        )
+
+    def compute_symhash(self, macho: lief.MachO.Binary):
+        def _symbols(symbols: Iterable[lief.MachO.Symbol]):
+            for sym in symbols:
+                if sym.category != lief.MachO.Symbol.CATEGORY.UNDEFINED:
+                    continue
+                yield lief.string(sym.name)
+        symbols = sorted(set(_symbols(macho.symbols)))
+        return md5(&#39;,&#39;.join(symbols).encode(&#39;utf8&#39;)).hexdigest()
+
+    def parse_macho_header(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+        info = {}
+        if header := macho.header:
+            st = header.cpu_subtype &amp; 0x7FFFFFFF
+            ht = &#39;mach_header_64&#39; if header.magic.value in {
+                lief.MachO.MACHO_TYPES.CIGAM_64.value,
+                lief.MachO.MACHO_TYPES.MAGIC_64.value,
+            } else &#39;mach_header&#39;
+            info[&#39;Type&#39;] = ht
+            info[&#39;Magic&#39;] = header.magic.value
+            info[&#39;CPUType&#39;] = header.cpu_type.__name__.upper()
+            info[&#39;CPUSubType&#39;] = _CPU_SUBTYPES.get(header.cpu_type.value, {}).get(st, st)
+            info[&#39;FileType&#39;] = header.file_type.__name__
+            info[&#39;LoadCount&#39;] = header.nb_cmds
+            info[&#39;LoadSize&#39;] = header.sizeof_cmds
+            info[&#39;Flags&#39;] = sorted(flag.__name__ for flag in header.flags_list)
+            info[&#39;Reserved&#39;] = header.reserved
+        return info
+
+    def parse_linked_images(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+        load_command_images = {}
+        load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+        for load_command in load_commands:
+            if not isinstance(load_command, lief.MachO.DylibCommand):
+                continue
+            images: list[str] = load_command_images.setdefault(load_command.command.__name__, [])
+            images.append(load_command.name)
+        return load_command_images
+
+    def parse_signature(self, macho_image: lief.MachO.Binary, data=None) -&gt; dict:
+
+        if not macho_image.has_code_signature:
+            return {}
+
+        info = {}
+        reader = StructReader(macho_image.code_signature.content)
+        super_blob = SuperBlob(reader)
+
+        for blob in super_blob.blobs:
+
+            if blob.type == BlobType.CODEDIRECTORY:
+                codedirectory_blob = CodeDirectoryBlob.Parse(blob.data)
+                if codedirectory_blob.flags &amp; CS_ADHOC != 0:
+                    info[&#39;AdHocSigned&#39;] = True
+                else:
+                    info[&#39;AdHocSigned&#39;] = False
+                reader.seekset(codedirectory_blob.identOffset + blob.offset)
+                info[&#39;SignatureIdentifier&#39;] = reader.read_c_string(&#39;utf8&#39;)
+                continue
+
+            if blob.type == BlobType.CMS_SIGNATURE:
+                reader.seekset(blob.offset)
+                cms_signature = blob.data
+                if not cms_signature:
+                    continue
+                try:
+                    parsed_cms_signature = pemeta.parse_signature(bytearray(cms_signature))
+                    info[&#39;Signature&#39;] = parsed_cms_signature
+                except ValueError as pkcs7_parse_error:
+                    self.log_warn(F&#39;Could not parse the data in CSSLOT_CMS_SIGNATURE as valid PKCS7 data: {pkcs7_parse_error!s}&#39;)
+                continue
+
+            if blob.type == BlobType.REQUIREMENTS:
+                # TODO: Parse the requirements blob,
+                # which is encoded according to the code signing requirements language:
+                # https://developer.apple.com/library/archive/documentation/Security
+                #        /Conceptual/CodeSigningGuide/RequirementLang/RequirementLang.html
+                info[&#39;Requirements&#39;] = blob.data.hex()
+                continue
+
+            if blob.type == BlobType.XML_ENTITLEMENTS:
+                entitlements = bytes(blob.data)
+                if not entitlements:
+                    continue
+                try:
+                    entitlements = plistlib.loads(entitlements)
+                except Exception as error:
+                    self.log_warn(F&#39;failed to parse entitlements: {error!s}&#39;)
+                else:
+                    info[&#39;Entitlements&#39;] = entitlements
+
+        return info
+
+    def parse_version(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+        info = {}
+        load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+        for load_command in load_commands:
+            if load_command.command == lief.MachO.LoadCommand.TYPE.SOURCE_VERSION:
+                if &#39;SourceVersion&#39; not in info:
+                    sv = cast(&#39;lief.MachO.SourceVersion&#39;, load_command)
+                    info[&#39;SourceVersion&#39;] = sv.version[0]
+                else:
+                    self.log_warn(&#39;More than one load command of type SOURCE_VERSION found; the MachO file is possibly malformed&#39;)
+                continue
+            if load_command.command == lief.MachO.LoadCommand.TYPE.BUILD_VERSION:
+                if &#39;BuildVersion&#39; not in info:
+                    cmd = cast(&#39;lief.MachO.BuildVersion&#39;, load_command)
+                    info[&#39;BuildVersion&#39;] = {}
+                    info[&#39;BuildVersion&#39;][&#39;Platform&#39;] = cmd.platform.__name__
+                    info[&#39;BuildVersion&#39;][&#39;MinOS&#39;] = &#39;.&#39;.join(str(v) for v in cmd.minos)
+                    info[&#39;BuildVersion&#39;][&#39;SDK&#39;] = &#39;.&#39;.join(str(v) for v in cmd.sdk)
+                    info[&#39;BuildVersion&#39;][&#39;Ntools&#39;] = len(cmd.tools)
+                else:
+                    self.log_warn(&#39;More than one load command of type BUILD_VERSION found; the MachO file is possibly malformed&#39;)
+                continue
+        return info
+
+    def parse_load_commands(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+        info = []
+        load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+        for load_command in load_commands:
+            info.append(dict(
+                Type=load_command.command.__name__,
+                Size=load_command.size,
+                Data=load_command.data.hex(),
+            ))
+        return info
+
+    def parse_imports(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+        info = []
+        imports: Iterable[lief.MachO.Symbol] = macho.imported_symbols
+        for imp in imports:
+            info.append(lief.string(imp.name))
+        return info
+
+    def parse_exports(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+        info = []
+        exports: Iterable[lief.MachO.Symbol] = macho.exported_symbols
+        for exp in exports:
+            info.append(lief.string(exp.name))
+        return info
+
+    def json(self, data: bytearray):
+        result = {}
+        slices = []
+        macho = lief.load_macho(data)
+        macho_slices: list[lief.MachO.Binary] = []
+
+        if isinstance(macho, lief.MachO.Binary):
+            macho_slices = [macho]
+        else:
+            for k in itertools.count():
+                if not (ms := macho.at(k)):
+                    break
+                macho_slices.append(ms)
+
+        result[&#39;FileType&#39;] = &#39;FAT&#39; if len(macho_slices) &gt; 1 else &#39;THIN&#39;
+
+        for image in macho_slices:
+            slice_result = {}
+
+            for switch, resolver, name in [
+                (self.args.header,          self.parse_macho_header,  &#39;Header&#39;),       # noqa
+                (self.args.linked_images,   self.parse_linked_images, &#39;LinkedImages&#39;), # noqa
+                (self.args.signatures,      self.parse_signature,     &#39;Signatures&#39;),   # noqa
+                (self.args.version,         self.parse_version,       &#39;Version&#39;),      # noqa
+                (self.args.load_commands,   self.parse_load_commands, &#39;LoadCommands&#39;), # noqa
+                (self.args.imports,         self.parse_imports,       &#39;Imports&#39;),      # noqa
+                (self.args.exports,         self.parse_exports,       &#39;Exports&#39;),      # noqa
+            ]:
+                if not switch:
+                    continue
+                self.log_debug(F&#39;parsing: {name}&#39;)
+                try:
+                    info = resolver(image, data)
+                except Exception as E:
+                    self.log_info(F&#39;failed to obtain {name}: {E!s}&#39;)
+                    continue
+                if info:
+                    slice_result[name] = info
+
+            if image.uuid is not None:
+                uuid = bytes(image.uuid.uuid)
+                slice_result[&#39;UUID&#39;] = uuid.hex()
+            slice_result[&#39;SymHash&#39;] = self.compute_symhash(image)
+            if fileset_name := image.fileset_name:
+                slice_result[&#39;FilesetName&#39;] = fileset_name
+            slices.append(slice_result)
+
+        if slices:
+            result[&#39;Slices&#39;] = slices
+            return result</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.JSONTableUnit" href="../index.html#refinery.units.formats.JSONTableUnit">JSONTableUnit</a></li>
+<li><a title="refinery.units.Unit" href="../../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.macho.machometa.machometa" href="#refinery.units.formats.macho.machometa.machometa">machometa</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.machometa.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.formats.macho.machometa.machometa.compute_symhash"><code class="name flex">
+<span>def <span class="ident">compute_symhash</span></span>(<span>self, macho)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L164-L171" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def compute_symhash(self, macho: lief.MachO.Binary):
+    def _symbols(symbols: Iterable[lief.MachO.Symbol]):
+        for sym in symbols:
+            if sym.category != lief.MachO.Symbol.CATEGORY.UNDEFINED:
+                continue
+            yield lief.string(sym.name)
+    symbols = sorted(set(_symbols(macho.symbols)))
+    return md5(&#39;,&#39;.join(symbols).encode(&#39;utf8&#39;)).hexdigest()</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_macho_header"><code class="name flex">
+<span>def <span class="ident">parse_macho_header</span></span>(<span>self, macho, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L173-L190" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_macho_header(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+    info = {}
+    if header := macho.header:
+        st = header.cpu_subtype &amp; 0x7FFFFFFF
+        ht = &#39;mach_header_64&#39; if header.magic.value in {
+            lief.MachO.MACHO_TYPES.CIGAM_64.value,
+            lief.MachO.MACHO_TYPES.MAGIC_64.value,
+        } else &#39;mach_header&#39;
+        info[&#39;Type&#39;] = ht
+        info[&#39;Magic&#39;] = header.magic.value
+        info[&#39;CPUType&#39;] = header.cpu_type.__name__.upper()
+        info[&#39;CPUSubType&#39;] = _CPU_SUBTYPES.get(header.cpu_type.value, {}).get(st, st)
+        info[&#39;FileType&#39;] = header.file_type.__name__
+        info[&#39;LoadCount&#39;] = header.nb_cmds
+        info[&#39;LoadSize&#39;] = header.sizeof_cmds
+        info[&#39;Flags&#39;] = sorted(flag.__name__ for flag in header.flags_list)
+        info[&#39;Reserved&#39;] = header.reserved
+    return info</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_linked_images"><code class="name flex">
+<span>def <span class="ident">parse_linked_images</span></span>(<span>self, macho, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L192-L200" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_linked_images(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+    load_command_images = {}
+    load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+    for load_command in load_commands:
+        if not isinstance(load_command, lief.MachO.DylibCommand):
+            continue
+        images: list[str] = load_command_images.setdefault(load_command.command.__name__, [])
+        images.append(load_command.name)
+    return load_command_images</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_signature"><code class="name flex">
+<span>def <span class="ident">parse_signature</span></span>(<span>self, macho_image, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L202-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_signature(self, macho_image: lief.MachO.Binary, data=None) -&gt; dict:
+
+    if not macho_image.has_code_signature:
+        return {}
+
+    info = {}
+    reader = StructReader(macho_image.code_signature.content)
+    super_blob = SuperBlob(reader)
+
+    for blob in super_blob.blobs:
+
+        if blob.type == BlobType.CODEDIRECTORY:
+            codedirectory_blob = CodeDirectoryBlob.Parse(blob.data)
+            if codedirectory_blob.flags &amp; CS_ADHOC != 0:
+                info[&#39;AdHocSigned&#39;] = True
+            else:
+                info[&#39;AdHocSigned&#39;] = False
+            reader.seekset(codedirectory_blob.identOffset + blob.offset)
+            info[&#39;SignatureIdentifier&#39;] = reader.read_c_string(&#39;utf8&#39;)
+            continue
+
+        if blob.type == BlobType.CMS_SIGNATURE:
+            reader.seekset(blob.offset)
+            cms_signature = blob.data
+            if not cms_signature:
+                continue
+            try:
+                parsed_cms_signature = pemeta.parse_signature(bytearray(cms_signature))
+                info[&#39;Signature&#39;] = parsed_cms_signature
+            except ValueError as pkcs7_parse_error:
+                self.log_warn(F&#39;Could not parse the data in CSSLOT_CMS_SIGNATURE as valid PKCS7 data: {pkcs7_parse_error!s}&#39;)
+            continue
+
+        if blob.type == BlobType.REQUIREMENTS:
+            # TODO: Parse the requirements blob,
+            # which is encoded according to the code signing requirements language:
+            # https://developer.apple.com/library/archive/documentation/Security
+            #        /Conceptual/CodeSigningGuide/RequirementLang/RequirementLang.html
+            info[&#39;Requirements&#39;] = blob.data.hex()
+            continue
+
+        if blob.type == BlobType.XML_ENTITLEMENTS:
+            entitlements = bytes(blob.data)
+            if not entitlements:
+                continue
+            try:
+                entitlements = plistlib.loads(entitlements)
+            except Exception as error:
+                self.log_warn(F&#39;failed to parse entitlements: {error!s}&#39;)
+            else:
+                info[&#39;Entitlements&#39;] = entitlements
+
+    return info</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_version"><code class="name flex">
+<span>def <span class="ident">parse_version</span></span>(<span>self, macho, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L256-L278" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_version(self, macho: lief.MachO.Binary, data=None) -&gt; dict:
+    info = {}
+    load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+    for load_command in load_commands:
+        if load_command.command == lief.MachO.LoadCommand.TYPE.SOURCE_VERSION:
+            if &#39;SourceVersion&#39; not in info:
+                sv = cast(&#39;lief.MachO.SourceVersion&#39;, load_command)
+                info[&#39;SourceVersion&#39;] = sv.version[0]
+            else:
+                self.log_warn(&#39;More than one load command of type SOURCE_VERSION found; the MachO file is possibly malformed&#39;)
+            continue
+        if load_command.command == lief.MachO.LoadCommand.TYPE.BUILD_VERSION:
+            if &#39;BuildVersion&#39; not in info:
+                cmd = cast(&#39;lief.MachO.BuildVersion&#39;, load_command)
+                info[&#39;BuildVersion&#39;] = {}
+                info[&#39;BuildVersion&#39;][&#39;Platform&#39;] = cmd.platform.__name__
+                info[&#39;BuildVersion&#39;][&#39;MinOS&#39;] = &#39;.&#39;.join(str(v) for v in cmd.minos)
+                info[&#39;BuildVersion&#39;][&#39;SDK&#39;] = &#39;.&#39;.join(str(v) for v in cmd.sdk)
+                info[&#39;BuildVersion&#39;][&#39;Ntools&#39;] = len(cmd.tools)
+            else:
+                self.log_warn(&#39;More than one load command of type BUILD_VERSION found; the MachO file is possibly malformed&#39;)
+            continue
+    return info</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_load_commands"><code class="name flex">
+<span>def <span class="ident">parse_load_commands</span></span>(<span>self, macho, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L280-L289" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_load_commands(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+    info = []
+    load_commands: Iterable[lief.MachO.LoadCommand] = macho.commands
+    for load_command in load_commands:
+        info.append(dict(
+            Type=load_command.command.__name__,
+            Size=load_command.size,
+            Data=load_command.data.hex(),
+        ))
+    return info</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_imports"><code class="name flex">
+<span>def <span class="ident">parse_imports</span></span>(<span>self, macho, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L291-L296" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_imports(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+    info = []
+    imports: Iterable[lief.MachO.Symbol] = macho.imported_symbols
+    for imp in imports:
+        info.append(lief.string(imp.name))
+    return info</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.parse_exports"><code class="name flex">
+<span>def <span class="ident">parse_exports</span></span>(<span>self, macho, data=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L298-L303" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_exports(self, macho: lief.MachO.Binary, data=None) -&gt; list:
+    info = []
+    exports: Iterable[lief.MachO.Symbol] = macho.exported_symbols
+    for exp in exports:
+        info.append(lief.string(exp.name))
+    return info</code></pre>
+</details>
+</dd>
+<dt id="refinery.units.formats.macho.machometa.machometa.json"><code class="name flex">
+<span>def <span class="ident">json</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/macho/machometa.py#L305-L354" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def json(self, data: bytearray):
+    result = {}
+    slices = []
+    macho = lief.load_macho(data)
+    macho_slices: list[lief.MachO.Binary] = []
+
+    if isinstance(macho, lief.MachO.Binary):
+        macho_slices = [macho]
+    else:
+        for k in itertools.count():
+            if not (ms := macho.at(k)):
+                break
+            macho_slices.append(ms)
+
+    result[&#39;FileType&#39;] = &#39;FAT&#39; if len(macho_slices) &gt; 1 else &#39;THIN&#39;
+
+    for image in macho_slices:
+        slice_result = {}
+
+        for switch, resolver, name in [
+            (self.args.header,          self.parse_macho_header,  &#39;Header&#39;),       # noqa
+            (self.args.linked_images,   self.parse_linked_images, &#39;LinkedImages&#39;), # noqa
+            (self.args.signatures,      self.parse_signature,     &#39;Signatures&#39;),   # noqa
+            (self.args.version,         self.parse_version,       &#39;Version&#39;),      # noqa
+            (self.args.load_commands,   self.parse_load_commands, &#39;LoadCommands&#39;), # noqa
+            (self.args.imports,         self.parse_imports,       &#39;Imports&#39;),      # noqa
+            (self.args.exports,         self.parse_exports,       &#39;Exports&#39;),      # noqa
+        ]:
+            if not switch:
+                continue
+            self.log_debug(F&#39;parsing: {name}&#39;)
+            try:
+                info = resolver(image, data)
+            except Exception as E:
+                self.log_info(F&#39;failed to obtain {name}: {E!s}&#39;)
+                continue
+            if info:
+                slice_result[name] = info
+
+        if image.uuid is not None:
+            uuid = bytes(image.uuid.uuid)
+            slice_result[&#39;UUID&#39;] = uuid.hex()
+        slice_result[&#39;SymHash&#39;] = self.compute_symhash(image)
+        if fileset_name := image.fileset_name:
+            slice_result[&#39;FilesetName&#39;] = fileset_name
+        slices.append(slice_result)
+
+    if slices:
+        result[&#39;Slices&#39;] = slices
+        return result</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.formats.JSONTableUnit" href="../index.html#refinery.units.formats.JSONTableUnit">JSONTableUnit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.formats.JSONTableUnit.FilterEverything" href="../../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.Requires" href="../../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.act" href="../../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.assemble" href="../../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.codec" href="../../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.console" href="../../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.filter" href="../../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.finish" href="../../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.handles" href="../../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.is_quiet" href="../../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.is_reversible" href="../../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.isatty" href="../../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.labelled" href="../../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.leniency" href="../../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_always" href="../../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_debug" href="../../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_detach" href="../../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_fail" href="../../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_info" href="../../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_level" href="../../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.log_warn" href="../../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.logger" href="../../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.name" href="../../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.nozzle" href="../../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.optional_dependencies" href="../../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.read" href="../../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.read1" href="../../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.required_dependencies" href="../../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.reset" href="../../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.run" href="../../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.source" href="../../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.formats.JSONTableUnit.superinit" href="../../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.formats.macho" href="index.html">refinery.units.formats.macho</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.formats.macho.machometa.BlobType" href="#refinery.units.formats.macho.machometa.BlobType">BlobType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.macho.machometa.BlobMagic" href="#refinery.units.formats.macho.machometa.BlobMagic">BlobMagic</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.macho.machometa.BlobIndex" href="#refinery.units.formats.macho.machometa.BlobIndex">BlobIndex</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.macho.machometa.BlobIndex.Parse" href="#refinery.units.formats.macho.machometa.BlobIndex.Parse">Parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.macho.machometa.SuperBlob" href="#refinery.units.formats.macho.machometa.SuperBlob">SuperBlob</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.macho.machometa.SuperBlob.Parse" href="#refinery.units.formats.macho.machometa.SuperBlob.Parse">Parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.macho.machometa.CodeDirectoryBlob" href="#refinery.units.formats.macho.machometa.CodeDirectoryBlob">CodeDirectoryBlob</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.macho.machometa.CodeDirectoryBlob.Parse" href="#refinery.units.formats.macho.machometa.CodeDirectoryBlob.Parse">Parse</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.macho.machometa.machometa" href="#refinery.units.formats.macho.machometa.machometa">machometa</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.compute_symhash" href="#refinery.units.formats.macho.machometa.machometa.compute_symhash">compute_symhash</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_macho_header" href="#refinery.units.formats.macho.machometa.machometa.parse_macho_header">parse_macho_header</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_linked_images" href="#refinery.units.formats.macho.machometa.machometa.parse_linked_images">parse_linked_images</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_signature" href="#refinery.units.formats.macho.machometa.machometa.parse_signature">parse_signature</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_version" href="#refinery.units.formats.macho.machometa.machometa.parse_version">parse_version</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_load_commands" href="#refinery.units.formats.macho.machometa.machometa.parse_load_commands">parse_load_commands</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_imports" href="#refinery.units.formats.macho.machometa.machometa.parse_imports">parse_imports</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.parse_exports" href="#refinery.units.formats.macho.machometa.machometa.parse_exports">parse_exports</a></code></li>
+<li><code><a title="refinery.units.formats.macho.machometa.machometa.json" href="#refinery.units.formats.macho.machometa.machometa.json">json</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

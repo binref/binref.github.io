@@ -1,0 +1,4577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.batch.emulator documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.batch.emulator</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1-L1330" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import itertools
+import ntpath
+import re
+import uuid
+
+from dataclasses import dataclass, field, fields
+from enum import Enum
+from io import StringIO
+from typing import Callable, ClassVar, Generator, Iterable, TypeVar
+
+from refinery.lib.batch.help import HelpOutput
+from refinery.lib.batch.model import (
+    AbortExecution,
+    ArgVarFlags,
+    AstCondition,
+    AstError,
+    AstFor,
+    AstForParserMode,
+    AstForVariant,
+    AstGroup,
+    AstIf,
+    AstIfCmp,
+    AstIfVariant,
+    AstLabel,
+    AstNode,
+    AstPipeline,
+    AstSequence,
+    AstStatement,
+    Ctrl,
+    EmulatorException,
+    Exit,
+    Goto,
+    InputLocked,
+    InvalidLabel,
+    MissingVariable,
+)
+from refinery.lib.batch.parser import BatchParser
+from refinery.lib.batch.state import BatchState, ErrorZero
+from refinery.lib.batch.synth import SynCommand, SynNodeBase, synthesize
+from refinery.lib.batch.util import batchint, uncaret, unquote
+from refinery.lib.deobfuscation import cautious_parse, names_in_expression
+from refinery.lib.patterns import indicators
+from refinery.lib.types import buf
+
+_T = TypeVar(&#39;_T&#39;)
+
+
+def winfnmatch(pattern: str, path: str, cwd: str):
+    &#34;&#34;&#34;
+    A function similar to the fnmatch module, but using only Windows wildcards. In Batch, the
+    bracket wildcard does not exist.
+    &#34;&#34;&#34;
+    parts = re.split(&#39;([*?])&#39;, pattern)
+    regex = StringIO()
+    it = iter(parts)
+    verbatim = next(it)
+    for wildcard in it:
+        regex.write(re.escape(verbatim))
+        if wildcard == &#39;*&#39;:
+            regex.write(&#39;.*&#39;)
+        if wildcard == &#39;?&#39;:
+            regex.write(&#39;.&#39;)
+        verbatim = next(it)
+    regex.write(re.escape(verbatim))
+    cwd = re.escape(cwd.rstrip(&#39;\\&#39;))
+    pattern = rF&#39;(?s:{cwd}\\{regex.getvalue()})$&#39;
+    return bool(re.match(pattern, path))
+
+
+def _fuse(*iters):
+    with StringIO() as io:
+        for it in iters:
+            if isinstance(it, str):
+                io.write(it)
+                continue
+            for i in it:
+                io.write(i)
+        return io.getvalue()
+
+
+def _onoff(v: str) -&gt; bool:
+    vc = v.upper()
+    if vc == &#39;ON&#39;:
+        return True
+    if vc == &#39;OFF&#39;:
+        return False
+    raise ValueError(v)
+
+
+class DevNull:
+    def getvalue(self):
+        return &#39;&#39;
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        raise StopIteration
+
+    def detach(self):
+        raise NotImplementedError
+
+    def readline(self, size: int = -1, /) -&gt; str:
+        return &#39;&#39;
+
+    def read(self, size: int | None = -1, /) -&gt; str:
+        return &#39;&#39;
+
+    def write(self, s: str, /) -&gt; int:
+        return len(s)
+
+    def seek(self, k: int, whence: int = 0, /):
+        return
+
+    @property
+    def closed(self):
+        return True
+
+
+class Error(str):
+    pass
+
+
+ErrorCannotFindFile = Error(&#39;The system cannot find the file specified.&#39;)
+
+
+@dataclass
+class IO:
+    i: DevNull | StringIO = field(default_factory=StringIO)
+    o: DevNull | StringIO = field(default_factory=StringIO)
+    e: DevNull | StringIO = field(default_factory=StringIO)
+
+    def __iter__(self):
+        yield self.i
+        yield self.o
+        yield self.e
+
+    def __setitem__(self, k, v):
+        if k == 0:
+            self.i = v
+        elif k == 1:
+            self.o = v
+        elif k == 2:
+            self.e = v
+        else:
+            raise IndexError(k)
+
+    def __getitem__(self, k):
+        if k == 0:
+            return self.i
+        elif k == 1:
+            return self.o
+        elif k == 2:
+            return self.e
+        else:
+            raise IndexError(k)
+
+
+@dataclass
+class BatchEmulatorConfig:
+    show_nops: bool = False
+    show_junk: bool = False
+    show_labels: bool = False
+    show_sets: bool = False
+    show_comments: bool = False
+    skip_goto: bool = False
+    skip_call: bool = False
+    skip_exit: bool = False
+
+
+class BatchEmulator:
+
+    class _node:
+        handlers: ClassVar[dict[
+            type[AstNode],
+            Callable[[
+                BatchEmulator,
+                AstNode,
+                IO,
+                bool,
+            ], Generator[SynNodeBase[AstNode] | Error]]
+        ]] = {}
+
+        def __init__(self, key: type[AstNode]):
+            self.key = key
+
+        def __call__(self, handler):
+            self.handlers[self.key] = handler
+            return handler
+
+    class _command:
+        handlers: ClassVar[dict[
+            str,
+            Callable[[
+                BatchEmulator,
+                SynCommand,
+                IO,
+                bool,
+            ], Generator[str, None, int | None] | int | ErrorZero | None]
+        ]] = {}
+
+        def __init__(self, key: str):
+            self.key = key.upper()
+
+        def __call__(self, handler):
+            self.handlers[self.key] = handler
+            return handler
+
+    def __init__(
+        self,
+        data: str | buf | BatchParser,
+        state: BatchState | None = None,
+        cfg: BatchEmulatorConfig | None = None,
+        std: IO | None = None,
+    ):
+        self.stack = []
+        self.parser = BatchParser(data, state)
+        self.std = std or IO()
+        self.cfg = cfg or BatchEmulatorConfig()
+        self.block_labels = set()
+
+    def spawn(self, data: str | buf | BatchParser, state: BatchState | None = None, std: IO | None = None):
+        return BatchEmulator(
+            data,
+            state,
+            self.cfg,
+            std,
+        )
+
+    @property
+    def state(self):
+        return self.parser.state
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    @property
+    def delayexpand(self):
+        return self.state.delayexpand
+
+    def clone_state(
+        self,
+        delayexpand: bool | None = None,
+        cmdextended: bool | None = None,
+        environment: dict | None | ellipsis = ...,
+        filename: str | None = None,
+    ):
+        state = self.state
+        if delayexpand is None:
+            delayexpand = False
+        if cmdextended is None:
+            cmdextended = state.cmdextended
+        if environment is ...:
+            environment = dict(state.environment)
+        return BatchState(
+            delayexpand,
+            cmdextended,
+            environment=environment,
+            file_system=state.file_system,
+            username=state.username,
+            hostname=state.hostname,
+            now=state.now,
+            cwd=state.cwd,
+            filename=filename,
+        )
+
+    def get_for_variable_regex(self, vars: Iterable[str]):
+        return re.compile(RF&#39;%((?:~[fdpnxsatz]*)?)((?:\\$\\w+)?)([{&#34;&#34;.join(vars)}])&#39;)
+
+    def expand_delayed_variables(self, block: str):
+        def expansion(match: re.Match[str]):
+            name = match.group(1)
+            try:
+                return parse(name)
+            except MissingVariable:
+                _, _, rest = name.partition(&#39;:&#39;)
+                return rest
+        parse = self.parser.lexer.parse_env_variable
+        return re.sub(r&#39;!([^!\n]*)!&#39;, expansion, block)
+
+    def expand_forloop_variables(self, block: str, vars: dict[str, str] | None):
+        def expansion(match: re.Match[str]):
+            flags = ArgVarFlags.Empty
+            for flag in match[1]:
+                flags |= ArgVarFlags.FromToken(ord(flag))
+            return _vars[match[3]]
+        if not vars:
+            return block
+        _vars = vars
+        return self.get_for_variable_regex(vars).sub(expansion, block)
+
+    def contains_for_variable(self, ast: AstNode, vars: Iterable[str]):
+        def check(token):
+            if isinstance(token, list):
+                return any(check(v) for v in token)
+            if isinstance(token, dict):
+                return any(check(v) for v in token.values())
+            if isinstance(token, Enum):
+                return False
+            if isinstance(token, str):
+                return bool(checker(token))
+            if isinstance(token, AstNode):
+                for tf in fields(token):
+                    if tf.name == &#39;parent&#39;:
+                        continue
+                    if check(getattr(token, tf.name)):
+                        return True
+            return False
+        checker = self.get_for_variable_regex(vars).search
+        return check(ast) # type:ignore
+
+    def expand_ast_node(self, ast: _T) -&gt; _T:
+        def expand(token):
+            if isinstance(token, list):
+                return [expand(v) for v in token]
+            if isinstance(token, dict):
+                return {k: expand(v) for k, v in token.items()}
+            if isinstance(token, Enum):
+                return token
+            if isinstance(token, str):
+                if delayexpand:
+                    token = self.expand_delayed_variables(token)
+                return self.expand_forloop_variables(token, variables)
+            if isinstance(token, AstNode):
+                new = {}
+                for tf in fields(token):
+                    value = getattr(token, tf.name)
+                    if tf.name != &#39;parent&#39;:
+                        value = expand(value)
+                    new[tf.name] = value
+                return token.__class__(**new)
+            return token
+        delayexpand = self.delayexpand
+        variables = self.state.for_loop_variables
+        if not variables and not delayexpand:
+            return ast
+        return expand(ast) # type:ignore
+
+    def execute_find_or_findstr(self, cmd: SynCommand, std: IO, findstr: bool):
+        needles = []
+        paths: list[str | ellipsis] = [...]
+        flags = {}
+        it = iter(cmd.args)
+        arg = None
+        yield cmd
+
+        for arg in it:
+            if not arg.startswith(&#39;/&#39;):
+                if not findstr and not arg.startswith(&#39;&#34;&#39;):
+                    return 1
+                needles.extend(unquote(arg).split())
+                break
+            name, has_param, value = arg[1:].partition(&#39;:&#39;)
+            name = name.upper()
+            if name in (&#39;OFF&#39;, &#39;OFFLINE&#39;):
+                continue
+            elif len(name) &gt; 1:
+                return 1
+            elif name == &#39;C&#39;:
+                needles.append(unquote(value))
+            elif name == &#39;F&#39; and findstr:
+                if (p := self.state.ingest_file(value)) is None:
+                    return 1
+                paths.extend(p.splitlines(False))
+            elif name == &#39;G&#39; and findstr:
+                if (n := self.state.ingest_file(value)) is None:
+                    return 1
+                needles.extend(n.splitlines(False))
+            elif has_param:
+                flags[name] = value
+            else:
+                flags[name] = True
+
+        valid_flags = &#39;VNI&#39;
+        if findstr:
+            valid_flags += &#39;BELRSXMOPADQ&#39;
+
+        for v in flags:
+            if v not in valid_flags:
+                return 1
+
+        prefix_filename = False
+        state = self.state
+
+        for arg in it:
+            pattern = unquote(arg)
+            if &#39;*&#39; in pattern or &#39;?&#39; in pattern:
+                prefix_filename = True
+                for path in state.file_system:
+                    if winfnmatch(path, pattern, state.cwd):
+                        paths.append(path)
+            else:
+                paths.append(pattern)
+
+        if len(paths) &gt; 1:
+            prefix_filename = True
+
+        for n, needle in enumerate(needles):
+            if not findstr or &#39;L&#39; in flags:
+                needle = re.escape(needle)
+            if &#39;X&#39; in flags:
+                needle = F&#39;^{needle}$&#39;
+            elif &#39;B&#39; in flags:
+                needle = F&#39;^{needle}&#39;
+            elif &#39;E&#39; in flags:
+                needle = F&#39;{needle}$&#39;
+            needles[n] = needle
+
+        _V = &#39;V&#39; in flags # noqa; Prints only lines that do not contain a match.
+        _P = &#39;P&#39; in flags # noqa; Skip files with non-printable characters.
+        _O = &#39;O&#39; in flags # noqa; Prints character offset before each matching line.
+        _N = &#39;N&#39; in flags # noqa; Prints the line number before each line that matches.
+        _M = &#39;M&#39; in flags # noqa; Prints only the filename if a file contains a match.
+
+        nothing_found = True
+        offset = 0
+
+        for path in paths:
+            if path is (...):
+                data = std.i.read()
+            else:
+                data = state.ingest_file(path)
+            if data is None:
+                return 1
+            if _P and not re.fullmatch(&#39;[\\s!-~]+&#39;, data):
+                continue
+            for n, line in enumerate(data.splitlines(True), 1):
+                for needle in needles:
+                    hit = re.search(needle, line)
+                    if _V == bool(hit):
+                        continue
+                    nothing_found = False
+                    if not _M:
+                        if _O:
+                            o = offset + (hit.start() if hit else 0)
+                            line = F&#39;{o}:{line}&#39;
+                        if _N:
+                            line = F&#39;{n}:{line}&#39;
+                        if prefix_filename:
+                            line = F&#39;{path}:{line}&#39;
+                        std.o.write(line)
+                    elif path is not (...):
+                        std.o.write(path)
+                        break
+                offset += len(line)
+
+        return int(nothing_found)
+
+    @_command(&#39;TYPE&#39;)
+    def execute_type(self, cmd: SynCommand, std: IO, *_):
+        path = cmd.argument_string.strip()
+        data = self.state.ingest_file(path)
+        if data is None:
+            yield ErrorCannotFindFile
+            return 1
+        else:
+            std.o.write(data)
+            return 0
+
+    @_command(&#39;FIND&#39;)
+    def execute_find(self, cmd: SynCommand, std: IO, *_):
+        return self.execute_find_or_findstr(cmd, std, findstr=False)
+
+    @_command(&#39;FINDSTR&#39;)
+    def execute_findstr(self, cmd: SynCommand, std: IO, *_):
+        return self.execute_find_or_findstr(cmd, std, findstr=True)
+
+    @_command(&#39;SET&#39;)
+    def execute_set(self, cmd: SynCommand, std: IO, *_):
+        if not (args := cmd.args):
+            raise EmulatorException(&#39;Empty SET instruction&#39;)
+
+        if cmd.verb.upper() != &#39;SET&#39;:
+            raise RuntimeError
+
+        # Since variables can be used in GOTO, a SET can be used to change the behavior of a GOTO.
+        self.block_labels.clear()
+
+        arithmetic = False
+        quote_mode = False
+        prompt = None
+
+        it = iter(args)
+        tk = next(it)
+
+        if tk.upper() == &#39;/P&#39;:
+            if std.i.closed:
+                prompt = &#39;&#39;
+            elif not (prompt := std.i.readline()).endswith(&#39;\n&#39;):
+                raise InputLocked
+            else:
+                prompt = prompt.rstrip(&#39;\r\n&#39;)
+            tk = next(it)
+        else:
+            cmd.junk = not self.cfg.show_sets
+
+        yield cmd
+
+        if tk.upper() == &#39;/A&#39;:
+            arithmetic = True
+            try:
+                tk = next(it)
+            except StopIteration:
+                tk = &#39;&#39;
+
+        args = [tk, *it, *cmd.trailing_spaces]
+
+        if arithmetic:
+            def defang(s: str):
+                def r(m: re.Match[str]):
+                    return F&#39;_{prefix}{ord(m[0]):X}_&#39;
+                return re.sub(r&#39;[^-\s()!~*/%+&gt;&lt;&amp;^|_\w]&#39;, r, s)
+            def refang(s: str): # noqa
+                def r(m: re.Match[str]):
+                    return chr(int(m[1], 16))
+                return re.sub(rf&#39;_{prefix}([A-F0-9]+)_&#39;, r, s)
+            prefix = F&#39;{uuid.uuid4().time_mid:X}&#39;
+            namespace = {}
+            translate = {}
+            value = None
+            if not (program := &#39;&#39;.join(args)):
+                std.e.write(&#39;The syntax of the command is incorrect.\r\n&#39;)
+                return ErrorZero.Val
+            for assignment in program.split(&#39;,&#39;):
+                assignment = assignment.strip()
+                if not assignment:
+                    std.e.write(&#39;Missing operand.\r\n&#39;)
+                    return ErrorZero.Val
+                name, operator, definition = re.split(r&#39;([*+^|/%-&amp;]|&lt;&lt;|&gt;&gt;|)=&#39;, assignment, maxsplit=1)
+                name = name.upper()
+                definition = re.sub(r&#39;\b0([0-7]+)\b&#39;, r&#39;0o\1&#39;, definition)
+                if operator:
+                    definition = F&#39;{name}{operator}({definition})&#39;
+                definition = defang(definition)
+                expression = cautious_parse(definition)
+                names = names_in_expression(expression)
+                if names.stored or names.others:
+                    raise EmulatorException(&#39;Arithmetic SET had unexpected variable access.&#39;)
+                for var in names.loaded:
+                    original = refang(name).upper()
+                    translate[original] = var
+                    if var in namespace:
+                        continue
+                    try:
+                        namespace[var] = batchint(self.environment[original])
+                    except (KeyError, ValueError):
+                        namespace[var] = 0
+                code = compile(expression, filename=&#39;[ast]&#39;, mode=&#39;eval&#39;)
+                value = eval(code, namespace, {})
+                self.environment[name] = str(value)
+                namespace[defang(name)] = value
+            if value is None:
+                std.e.write(&#39;The syntax of the command is incorrect.&#39;)
+                return
+            else:
+                std.o.write(F&#39;{value!s}\r\n&#39;)
+        else:
+            try:
+                eq = args.index(Ctrl.Equals)
+            except ValueError:
+                assignment = cmd.argument_string
+                if assignment.startswith(&#39;&#34;&#39;):
+                    quote_mode = True
+                    assignment, _, unquoted = assignment[1:].rpartition(&#39;&#34;&#39;)
+                    assignment = assignment or unquoted
+                else:
+                    assignment = &#39;&#39;.join(args)
+                name, _, content = assignment.partition(&#39;=&#39;)
+            else:
+                with StringIO() as io:
+                    for k in range(eq + 1, len(args)):
+                        io.write(args[k])
+                    content = io.getvalue()
+                    name = cmd.args[eq - 1] if eq else &#39;&#39;
+            name = name.upper()
+            trailing_caret, content = uncaret(content, quote_mode)
+            if trailing_caret:
+                content = content[:-1]
+            if prompt is not None:
+                if (qc := content.strip()).startswith(&#39;&#34;&#39;):
+                    _, _, qc = qc. partition(&#39;&#34;&#39;) # noqa
+                    qc, _, r = qc.rpartition(&#39;&#34;&#39;) # noqa
+                    content = qc or r
+                std.o.write(content)
+                content = prompt
+            if name:
+                if content:
+                    self.environment[name] = content
+                else:
+                    self.environment.pop(name, None)
+
+    @_command(&#39;CALL&#39;)
+    def execute_call(self, cmd: SynCommand, std: IO, *_):
+        cmdl = cmd.argument_string
+        empty, colon, label = cmdl.partition(&#39;:&#39;)
+        if colon and not empty:
+            try:
+                offset = self.parser.lexer.labels[label.upper()]
+            except KeyError as KE:
+                raise InvalidLabel(label) from KE
+            emu = self.spawn(self.parser, std=std)
+        else:
+            offset = 0
+            path = cmdl.strip()
+            code = self.state.ingest_file(path)
+            if code is None:
+                yield cmd
+                return
+            state = self.clone_state(environment=self.state.environment, filename=path)
+            emu = self.spawn(code, std=std, state=state)
+        if self.cfg.skip_call:
+            emu.execute(called=True)
+        else:
+            yield from emu.trace(offset, called=True)
+
+    @_command(&#39;SETLOCAL&#39;)
+    def execute_setlocal(self, cmd: SynCommand, *_):
+        yield cmd
+        setting = cmd.argument_string.strip().upper()
+        delay = {
+            &#39;DISABLEDELAYEDEXPANSION&#39;: False,
+            &#39;ENABLEDELAYEDEXPANSION&#39; : True,
+        }.get(setting, self.state.delayexpand)
+        cmdxt = {
+            &#39;DISABLEEXTENSIONS&#39;: False,
+            &#39;ENABLEEXTENSIONS&#39; : True,
+        }.get(setting, self.state.cmdextended)
+        self.state.delayexpand_stack.append(delay)
+        self.state.cmdextended_stack.append(cmdxt)
+        self.state.environment_stack.append(dict(self.environment))
+
+    @_command(&#39;ENDLOCAL&#39;)
+    def execute_endlocal(self, cmd: SynCommand, *_):
+        yield cmd
+        if len(self.state.environment_stack) &gt; 1:
+            self.state.environment_stack.pop()
+            self.state.delayexpand_stack.pop()
+
+    @_command(&#39;GOTO&#39;)
+    def execute_goto(self, cmd: SynCommand, std: IO, *_):
+        if self.cfg.skip_goto:
+            yield cmd
+            return
+        it = iter(cmd.args)
+        mark = False
+        for label in it:
+            if not isinstance(label, Ctrl):
+                break
+            if label == Ctrl.Label:
+                mark = True
+                for label in it:
+                    break
+                else:
+                    label = &#39;&#39;
+                break
+        else:
+            std.e.write(&#39;No batch label specified to GOTO command.\r\n&#39;)
+            raise AbortExecution
+        label, *_ = label.split(maxsplit=1)
+        key = label.upper()
+        if mark and key == &#39;EOF&#39;:
+            raise Exit(int(self.state.ec), False)
+        if key not in self.block_labels:
+            raise Goto(label)
+        else:
+            yield Error(F&#39;Infinite Loop detected for label {key}&#39;)
+
+    @_command(&#39;EXIT&#39;)
+    def execute_exit(self, cmd: SynCommand, *_):
+        it = iter(cmd.args)
+        exit = True
+        token = 0
+        for arg in it:
+            if arg.upper() == &#39;/B&#39;:
+                exit = False
+                continue
+            token = arg
+            break
+        try:
+            code = int(token)
+        except ValueError:
+            code = 0
+        yield cmd
+        if self.cfg.skip_exit:
+            return
+        raise Exit(code, exit)
+
+    @_command(&#39;CHDIR&#39;)
+    @_command(&#39;CD&#39;)
+    def execute_chdir(self, cmd: SynCommand, *_):
+        yield cmd
+        self.state.cwd = cmd.argument_string.strip()
+
+    @_command(&#39;PUSHD&#39;)
+    def execute_pushd(self, cmd: SynCommand, *_):
+        yield cmd
+        self.state.dirstack.append(self.state.cwd)
+        self.execute_chdir(cmd)
+
+    @_command(&#39;POPD&#39;)
+    def execute_popd(self, cmd: SynCommand, *_):
+        yield cmd
+        try:
+            self.state.cwd = self.state.dirstack.pop()
+        except IndexError:
+            pass
+
+    @_command(&#39;ECHO&#39;)
+    def execute_echo(self, cmd: SynCommand, std: IO, in_group: bool):
+        cmdl = cmd.argument_string
+        mode = cmdl.strip().lower()
+        current_state = self.state.echo
+        if mode == &#39;on&#39;:
+            if self.cfg.show_nops or current_state is False:
+                yield cmd
+            self.state.echo = True
+            return
+        if mode == &#39;off&#39;:
+            if self.cfg.show_nops or current_state is True:
+                yield cmd
+            self.state.echo = False
+            return
+        yield cmd
+        if mode:
+            if in_group and not cmdl.endswith(&#39; &#39;):
+                cmdl += &#39; &#39;
+            std.o.write(F&#39;{cmdl}\r\n&#39;)
+        else:
+            mode = &#39;on&#39; if self.state.echo else &#39;off&#39;
+            std.o.write(F&#39;ECHO is {mode}.\r\n&#39;)
+
+    @_command(&#39;CLS&#39;)
+    def execute_cls(self, cmd: SynCommand, *_):
+        yield cmd
+
+    @_command(&#39;ERASE&#39;)
+    @_command(&#39;DEL&#39;)
+    def execute_del(self, cmd: SynCommand, std: IO, *_):
+        if not cmd.args:
+            yield Error(&#39;The syntax of the command is incorrect&#39;)
+            return 1
+        else:
+            yield cmd
+        flags = {}
+        it = iter(cmd.args)
+        while (arg := next(it)).startswith(&#39;/&#39;) and 1 &lt; len(arg):
+            flag = arg.upper()
+            if flag[:3] == &#39;/A:&#39;:
+                flags[&#39;A&#39;] = flag[3:]
+                continue
+            flags[flag[1]] = True
+        _P = &#39;P&#39; in flags # Prompts for confirmation before deleting each file.
+        _F = &#39;F&#39; in flags # Force deleting of read-only files.
+        _S = &#39;S&#39; in flags # Delete specified files from all subdirectories.
+        _Q = &#39;Q&#39; in flags # Quiet mode, do not ask if ok to delete on global wildcard
+        paths = [arg, *it]
+        state = self.state
+        cwd = state.cwd
+        for pattern in paths:
+            for path in list(state.file_system):
+                if not winfnmatch(pattern, path, cwd):
+                    continue
+                if _F:
+                    pass
+                if _S:
+                    pass
+                if _Q:
+                    pass
+                if _P and state.exists_file(pattern):
+                    std.o.write(F&#39;{pattern}, Delete (Y/N)? &#39;)
+                    decision = None
+                    while decision not in (&#39;y&#39;, &#39;n&#39;):
+                        confirmation = std.i.readline()
+                        if not confirmation.endswith(&#39;\n&#39;):
+                            raise InputLocked
+                        decision = confirmation[:1].lower()
+                    if decision == &#39;n&#39;:
+                        continue
+                state.remove_file(path)
+        return 0
+
+    @_command(&#39;START&#39;)
+    def execute_start(self, cmd: SynCommand, std: IO, *_):
+        yield cmd
+        it = iter(cmd.ast.fragments)
+        it = itertools.islice(it, cmd.argument_offset, None)
+        title = None
+        start = None
+        cwd = self.state.cwd
+        env = ...
+        for arg in it:
+            if title is None:
+                if &#39;&#34;&#39; not in arg:
+                    title = &#39;&#39;
+                else:
+                    title = unquote(arg)
+                    continue
+            if arg.isspace():
+                continue
+            if not arg.startswith(&#39;/&#39;):
+                start = unquote(arg)
+                break
+            if (flag := arg.upper()) in (&#39;/NODE&#39;, &#39;/AFFINITY&#39;, &#39;/MACHINE&#39;):
+                next(it)
+            elif flag == &#39;/D&#39;:
+                cwd = next(it)
+            elif flag == &#39;/I&#39;:
+                env = None
+        if start and (batch := self.state.ingest_file(start)):
+            state = self.clone_state(environment=env)
+            state.cwd = cwd
+            state.command_line = _fuse(it).strip()
+            shell = self.spawn(batch, state, std)
+            yield from shell.trace()
+
+    @_command(&#39;CMD&#39;)
+    def execute_cmd(self, cmd: SynCommand, std: IO, *_):
+        yield cmd
+        it = iter(cmd.ast.fragments)
+        command = None
+        quiet = False
+        strip = False
+        codec = &#39;cp1252&#39;
+        delayexpand = None
+        cmdextended = None
+
+        for arg in it:
+            if arg.isspace() or not arg.startswith(&#39;/&#39;):
+                continue
+            name, _, flag = arg[1:].partition(&#39;:&#39;)
+            flag = flag.upper()
+            name = name.upper()
+            if name in &#39;CKR&#39;:
+                command = _fuse(it)
+                break
+            elif name == &#39;Q&#39;:
+                quiet = True
+            elif name == &#39;S&#39;:
+                strip = True
+            elif name == &#39;U&#39;:
+                codec = &#39;utf-16le&#39;
+            elif name == &#39;E&#39;:
+                cmdextended = _onoff(flag)
+            elif name == &#39;V&#39;:
+                delayexpand = _onoff(flag)
+        else:
+            return 0
+
+        if (stripped := re.search(&#39;^\\s*&#34;(.*)&#34;&#39;, command)) and (strip
+            or command.count(&#39;&#34;&#39;) != 2
+            or re.search(&#39;[&amp;&lt;&gt;()@^|]&#39;, stripped[1])
+            or re.search(&#39;\\s&#39;, stripped[1]) is None
+        ):
+            command = stripped[1]
+
+        state = self.clone_state(delayexpand=delayexpand, cmdextended=cmdextended)
+        state.codec = codec
+        state.echo = not quiet
+        shell = self.spawn(command, state, std)
+        yield from shell.trace()
+
+    @_command(&#39;ARP&#39;)
+    @_command(&#39;AT&#39;)
+    @_command(&#39;ATBROKER&#39;)
+    @_command(&#39;BGINFO&#39;)
+    @_command(&#39;BITSADMIN&#39;)
+    @_command(&#39;CERTUTIL&#39;)
+    @_command(&#39;CLIP&#39;)
+    @_command(&#39;CMSTP&#39;)
+    @_command(&#39;COMPACT&#39;)
+    @_command(&#39;CONTROL&#39;)
+    @_command(&#39;CSCRIPT&#39;)
+    @_command(&#39;CURL&#39;)
+    @_command(&#39;DEFRAG&#39;)
+    @_command(&#39;DISKSHADOW&#39;)
+    @_command(&#39;ESENTUTL&#39;)
+    @_command(&#39;EXPAND&#39;)
+    @_command(&#39;EXPLORER&#39;)
+    @_command(&#39;EXTRAC32&#39;)
+    @_command(&#39;FODHELPER&#39;)
+    @_command(&#39;FORFILES&#39;)
+    @_command(&#39;FTP&#39;)
+    @_command(&#39;HOSTNAME&#39;)
+    @_command(&#39;HOSTNAME&#39;)
+    @_command(&#39;INSTALLUTIL&#39;)
+    @_command(&#39;IPCONFIG&#39;)
+    @_command(&#39;LOGOFF&#39;)
+    @_command(&#39;MAKECAB&#39;)
+    @_command(&#39;MAVINJECT&#39;)
+    @_command(&#39;MOUNTVOL&#39;)
+    @_command(&#39;MSBUILD&#39;)
+    @_command(&#39;MSHTA&#39;)
+    @_command(&#39;MSIEXEC&#39;)
+    @_command(&#39;MSTSC&#39;)
+    @_command(&#39;NET&#39;)
+    @_command(&#39;NET1&#39;)
+    @_command(&#39;NETSH&#39;)
+    @_command(&#39;NSLOOKUP&#39;)
+    @_command(&#39;ODBCCONF&#39;)
+    @_command(&#39;PATHPING&#39;)
+    @_command(&#39;PING&#39;)
+    @_command(&#39;POWERSHELL&#39;)
+    @_command(&#39;PRESENTATIONHOST&#39;)
+    @_command(&#39;PWSH&#39;)
+    @_command(&#39;REG&#39;)
+    @_command(&#39;REGSVR32&#39;)
+    @_command(&#39;ROUTE&#39;)
+    @_command(&#39;RUNDLL32&#39;)
+    @_command(&#39;SCP&#39;)
+    @_command(&#39;SDCLT&#39;)
+    @_command(&#39;SETX&#39;)
+    @_command(&#39;SFTP&#39;)
+    @_command(&#39;SHUTDOWN&#39;)
+    @_command(&#39;SSH&#39;)
+    @_command(&#39;SUBST&#39;)
+    @_command(&#39;SYNCAPPVPUBLISHINGSERVER&#39;)
+    @_command(&#39;SYSTEMINFO&#39;)
+    @_command(&#39;TAR&#39;)
+    @_command(&#39;TELNET&#39;)
+    @_command(&#39;TFTP&#39;)
+    @_command(&#39;TIMEOUT&#39;)
+    @_command(&#39;TRACERT&#39;)
+    @_command(&#39;VSSADMIN&#39;)
+    @_command(&#39;WBADMIN&#39;)
+    @_command(&#39;WHERE&#39;)
+    @_command(&#39;WHOAMI&#39;)
+    @_command(&#39;WINRM&#39;)
+    @_command(&#39;WINRS&#39;)
+    @_command(&#39;WSCRIPT&#39;)
+    def execute_unimplemented_program(self, cmd: SynCommand, *_):
+        yield cmd
+        return 0
+
+    @_command(&#39;CLS&#39;)
+    def execute_unimplemented_command_unmodified_ec(self, cmd: SynCommand, *_):
+        yield cmd
+
+    @_command(&#39;ASSOC&#39;)
+    @_command(&#39;ATTRIB&#39;)
+    @_command(&#39;BCDEDIT&#39;)
+    @_command(&#39;BREAK&#39;)
+    @_command(&#39;CACLS&#39;)
+    @_command(&#39;CHCP&#39;)
+    @_command(&#39;CHKDSK&#39;)
+    @_command(&#39;CHKNTFS&#39;)
+    @_command(&#39;COLOR&#39;)
+    @_command(&#39;COMP&#39;)
+    @_command(&#39;COMPACT&#39;)
+    @_command(&#39;CONVERT&#39;)
+    @_command(&#39;COPY&#39;)
+    @_command(&#39;DATE&#39;)
+    @_command(&#39;DIR&#39;)
+    @_command(&#39;DISKPART&#39;)
+    @_command(&#39;DOSKEY&#39;)
+    @_command(&#39;DRIVERQUERY&#39;)
+    @_command(&#39;FC&#39;)
+    @_command(&#39;FORMAT&#39;)
+    @_command(&#39;FSUTIL&#39;)
+    @_command(&#39;FTYPE&#39;)
+    @_command(&#39;GPRESULT&#39;)
+    @_command(&#39;ICACLS&#39;)
+    @_command(&#39;LABEL&#39;)
+    @_command(&#39;MD&#39;)
+    @_command(&#39;MKDIR&#39;)
+    @_command(&#39;MKLINK&#39;)
+    @_command(&#39;MODE&#39;)
+    @_command(&#39;MORE&#39;)
+    @_command(&#39;MOVE&#39;)
+    @_command(&#39;OPENFILES&#39;)
+    @_command(&#39;PATH&#39;)
+    @_command(&#39;PAUSE&#39;)
+    @_command(&#39;PRINT&#39;)
+    @_command(&#39;PROMPT&#39;)
+    @_command(&#39;RD&#39;)
+    @_command(&#39;RECOVER&#39;)
+    @_command(&#39;REN&#39;)
+    @_command(&#39;RENAME&#39;)
+    @_command(&#39;REPLACE&#39;)
+    @_command(&#39;RMDIR&#39;)
+    @_command(&#39;ROBOCOPY&#39;)
+    @_command(&#39;SC&#39;)
+    @_command(&#39;SCHTASKS&#39;)
+    @_command(&#39;SHIFT&#39;)
+    @_command(&#39;SHUTDOWN&#39;)
+    @_command(&#39;SORT&#39;)
+    @_command(&#39;SUBST&#39;)
+    @_command(&#39;SYSTEMINFO&#39;)
+    @_command(&#39;TASKKILL&#39;)
+    @_command(&#39;TASKLIST&#39;)
+    @_command(&#39;TIME&#39;)
+    @_command(&#39;TITLE&#39;)
+    @_command(&#39;TREE&#39;)
+    @_command(&#39;TYPE&#39;)
+    @_command(&#39;VER&#39;)
+    @_command(&#39;VERIFY&#39;)
+    @_command(&#39;VOL&#39;)
+    @_command(&#39;WMIC&#39;)
+    @_command(&#39;XCOPY&#39;)
+    def execute_unimplemented_command(self, cmd: SynCommand, *_):
+        yield cmd
+        return 0
+
+    @_command(&#39;REM&#39;)
+    def execute_rem(self, cmd: SynCommand, *_):
+        if self.cfg.show_comments:
+            yield cmd
+
+    @_command(&#39;HELP&#39;)
+    def execute_help(self, cmd: SynCommand, std: IO, *_):
+        yield cmd
+        std.o.write(HelpOutput[&#39;HELP&#39;])
+        return 0
+
+    def execute_command(self, cmd: SynCommand, std: IO, in_group: bool):
+        verb = cmd.verb.upper().strip()
+        handler = self._command.handlers.get(verb)
+
+        if handler is None:
+            base, ext = ntpath.splitext(verb)
+            handler = None
+            if any(ext == pe.upper() for pe in self.state.envar(&#39;PATHEXT&#39;, &#39;&#39;).split(&#39;;&#39;)):
+                handler = self._command.handlers.get(base)
+
+        if handler is None:
+            if self.state.exists_file(verb):
+                self.state.ec = 0
+            elif not indicators.winfpath.value.fullmatch(verb):
+                if &#39;\uFFFD&#39; in verb or not verb.isprintable():
+                    self.state.ec = 9009
+                    cmd.junk = True
+                else:
+                    cmd.junk = not self.cfg.show_junk
+            yield cmd
+            return
+
+        paths: dict[int, str] = {}
+
+        for src, r in cmd.ast.redirects.items():
+            if not 0 &lt;= src &lt;= 2 or (src == 0) != r.is_input:
+                continue
+            if isinstance((target := r.target), str):
+                if target.upper() == &#39;NUL&#39;:
+                    std[src] = DevNull()
+                else:
+                    data = self.state.ingest_file(target)
+                    if src == 0:
+                        if data is None:
+                            yield ErrorCannotFindFile
+                            return
+                        std.i = StringIO(data)
+                    else:
+                        if r.is_out_append:
+                            buffer = StringIO(data)
+                            buffer.seek(0, 2)
+                        else:
+                            buffer = StringIO()
+                        std[src] = buffer
+                        paths[src] = target
+            elif src == 1 and target == 2:
+                std.o = std.e
+            elif src == 2 and target == 1:
+                std.e = std.o
+
+        if &#39;/?&#39; in cmd.args:
+            std.o.write(HelpOutput[verb])
+            self.state.ec = 0
+            return
+
+        if (result := handler(self, cmd, std, in_group)) is None:
+            pass
+        elif not isinstance(result, (int, ErrorZero)):
+            result = (yield from result)
+
+        for k, path in paths.items():
+            self.state.create_file(path, std[k].getvalue())
+
+        if result is not None:
+            self.state.ec = result
+
+    @_node(AstPipeline)
+    def trace_pipeline(self, pipeline: AstPipeline, std: IO, in_group: bool):
+        length = len(pipeline.parts)
+        streams = IO(*std)
+        if length &gt; 1:
+            yield synthesize(pipeline)
+        for k, part in enumerate(pipeline.parts, 1):
+            if k != 1:
+                streams.i = streams.o
+                streams.i.seek(0)
+            if k == length:
+                streams.o = std.o
+            else:
+                streams.o = StringIO()
+            if isinstance(part, AstGroup):
+                it = self.trace_group(part, streams, in_group)
+            else:
+                ast = self.expand_ast_node(part)
+                cmd = synthesize(ast)
+                it = self.execute_command(cmd, streams, in_group)
+            yield from it
+
+    @_node(AstSequence)
+    def trace_sequence(self, sequence: AstSequence, std: IO, in_group: bool):
+        yield from self.trace_statement(sequence.head, std, in_group)
+        for cs in sequence.tail:
+            if cs.condition == AstCondition.Failure:
+                if bool(self.state.ec) is False:
+                    continue
+            if cs.condition == AstCondition.Success:
+                if bool(self.state.ec) is True:
+                    continue
+            yield from self.trace_statement(cs.statement, std, in_group)
+
+    @_node(AstIf)
+    def trace_if(self, _if: AstIf, std: IO, in_group: bool):
+        yield synthesize(_if)
+        _if = self.expand_ast_node(_if)
+        self.block_labels.clear()
+
+        if _if.variant == AstIfVariant.ErrorLevel:
+            condition = _if.var_int &lt;= self.state.ec
+        elif _if.variant == AstIfVariant.CmdExtVersion:
+            condition = _if.var_int &lt;= self.state.extensions_version
+        elif _if.variant == AstIfVariant.Exist:
+            condition = self.state.exists_file(_if.var_str)
+        elif _if.variant == AstIfVariant.Defined:
+            condition = _if.var_str.upper() in self.state.environment
+        else:
+            lhs = _if.lhs
+            rhs = _if.rhs
+            cmp = _if.cmp
+            assert lhs is not None
+            assert rhs is not None
+            if cmp == AstIfCmp.STR:
+                if _if.casefold:
+                    if isinstance(lhs, str):
+                        lhs = lhs.casefold()
+                    if isinstance(rhs, str):
+                        rhs = rhs.casefold()
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.GTR:
+                condition = lhs &gt; rhs
+            elif cmp == AstIfCmp.GEQ:
+                condition = lhs &gt;= rhs
+            elif cmp == AstIfCmp.NEQ:
+                condition = lhs != rhs
+            elif cmp == AstIfCmp.EQU:
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.LSS:
+                condition = lhs &lt; rhs
+            elif cmp == AstIfCmp.LEQ:
+                condition = lhs &lt;= rhs
+            else:
+                raise RuntimeError(cmp)
+        if _if.negated:
+            condition = not condition
+
+        if condition:
+            yield from self.trace_sequence(_if.then_do, std, in_group)
+        elif (_else := _if.else_do):
+            yield from self.trace_sequence(_else, std, in_group)
+
+    @_node(AstFor)
+    def trace_for(self, _for: AstFor, std: IO, in_group: bool):
+        state = self.state
+        cwd = state.cwd
+        vars = state.new_forloop()
+        body = _for.body
+        name = _for.variable
+        vars[name] = &#39;&#39;
+
+        if (
+            self.contains_for_variable(body, vars)
+                or _for.variant != AstForVariant.NumericLoop
+                or len(_for.spec) != 1
+        ):
+            yield synthesize(_for)
+
+        if _for.variant == AstForVariant.FileParsing:
+            if _for.mode == AstForParserMode.Command:
+                emulator = self.spawn(_for.specline, self.clone_state(filename=state.name))
+                yield from emulator.trace()
+                lines = emulator.std.o.getvalue().splitlines()
+            elif _for.mode == AstForParserMode.Literal:
+                lines = _for.spec
+            else:
+                def lines_from_files():
+                    fs = state.file_system
+                    for name in _for.spec:
+                        for path, content in fs.items():
+                            if not winfnmatch(path, name, cwd):
+                                continue
+                            yield from content.splitlines(False)
+                lines = lines_from_files()
+            opt = _for.options
+            tokens = sorted(opt.tokens)
+            split = re.compile(&#39;[{}]+&#39;.format(re.escape(opt.delims)))
+            count = tokens[-1] + 1 if tokens else 0
+            first_variable = ord(name)
+            if opt.asterisk:
+                tokens.append(count)
+            for n, line in enumerate(lines):
+                if n &lt; opt.skip:
+                    continue
+                if opt.comment and line.startswith(opt.comment):
+                    continue
+                if count:
+                    tokenized = split.split(line, maxsplit=count)
+                else:
+                    tokenized = (line,)
+                for k, tok in enumerate(tokens):
+                    name = chr(first_variable + k)
+                    if not name.isalpha():
+                        raise EmulatorException(&#39;Ran out of variables in FOR-Loop.&#39;)
+                    try:
+                        vars[name] = tokenized[tok]
+                    except IndexError:
+                        vars[name] = &#39;&#39;
+                yield from self.trace_sequence(body, std, in_group)
+        else:
+            for entry in _for.spec:
+                vars[name] = entry
+                yield from self.trace_sequence(body, std, in_group)
+        state.end_forloop()
+
+    @_node(AstGroup)
+    def trace_group(self, group: AstGroup, std: IO, in_group: bool):
+        for sequence in group.fragments:
+            yield from self.trace_sequence(sequence, std, True)
+        yield synthesize(group)
+
+    @_node(AstLabel)
+    def trace_label(self, label: AstLabel, *_):
+        if label.comment:
+            if self.cfg.show_comments:
+                yield synthesize(label)
+        else:
+            if self.cfg.show_labels:
+                yield synthesize(label)
+            self.block_labels.add(label.label.upper())
+
+    def trace_statement(self, statement: AstStatement, std: IO, in_group: bool):
+        try:
+            handler = self._node.handlers[statement.__class__]
+        except KeyError:
+            raise RuntimeError(statement)
+        yield from handler(self, statement, std, in_group)
+
+    def emulate_commands(self, allow_junk=False):
+        for syn in self.trace():
+            if not isinstance(syn, SynCommand):
+                continue
+            if not allow_junk and syn.junk:
+                continue
+            yield str(syn)
+
+    def emulate_to_depth(self, depth: int = 0):
+        for syn in self.trace():
+            if not isinstance(syn, SynNodeBase):
+                continue
+            if syn.ast.depth &lt;= depth:
+                yield str(syn)
+
+    def emulate(self, offset: int = 0):
+        last: AstNode | None = None
+        junk: AstNode | None = None
+        for syn in self.trace(offset):
+            if not isinstance(syn, SynNodeBase):
+                continue
+            ast = syn.ast
+            if isinstance(syn, SynCommand) and syn.junk:
+                junk = ast
+                continue
+            if junk is not None:
+                if junk.is_descendant_of(ast):
+                    if not last or not last.is_descendant_of(ast):
+                        continue
+            if last is not None:
+                if ast.is_descendant_of(last):
+                    # we already synthesized a parent construct, like a FOR loop or IF block
+                    continue
+                if last.is_descendant_of(ast):
+                    # we synthesized a command and no longer need to synthesize an AST node that
+                    # wraps it, like a group
+                    continue
+            if isinstance(ast, AstPipeline):
+                if len(ast.parts) == 1:
+                    continue
+            if last is ast:
+                raise RuntimeError(&#39;Emulator attempted to synthesize the same command twice.&#39;)
+            last = ast
+            yield str(syn)
+
+    def execute(self, offset: int = 0, called: bool = False):
+        for _ in self.trace(offset, called=called):
+            pass
+
+    def trace(self, offset: int = 0, called: bool = False):
+        if (name := self.state.name):
+            self.state.create_file(name, self.parser.lexer.text)
+        length = len(self.parser.lexer.code)
+        labels = self.parser.lexer.labels
+
+        while offset &lt; length:
+            try:
+                for sequence in self.parser.parse(offset):
+                    if isinstance(sequence, AstError):
+                        yield Error(sequence.error)
+                        continue
+                    yield from self.trace_sequence(sequence, self.std, False)
+            except Goto as goto:
+                try:
+                    offset = labels[goto.label.upper()]
+                except KeyError:
+                    raise InvalidLabel(goto.label) from goto
+                continue
+            except Exit as exit:
+                self.state.ec = exit.code
+                if exit.exit and called:
+                    raise
+                else:
+                    break
+            except AbortExecution:
+                self.state.ec = 1
+                break
+            else:
+                break</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.batch.emulator.winfnmatch"><code class="name flex">
+<span>def <span class="ident">winfnmatch</span></span>(<span>pattern, path, cwd)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A function similar to the fnmatch module, but using only Windows wildcards. In Batch, the
+bracket wildcard does not exist.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L50-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def winfnmatch(pattern: str, path: str, cwd: str):
+    &#34;&#34;&#34;
+    A function similar to the fnmatch module, but using only Windows wildcards. In Batch, the
+    bracket wildcard does not exist.
+    &#34;&#34;&#34;
+    parts = re.split(&#39;([*?])&#39;, pattern)
+    regex = StringIO()
+    it = iter(parts)
+    verbatim = next(it)
+    for wildcard in it:
+        regex.write(re.escape(verbatim))
+        if wildcard == &#39;*&#39;:
+            regex.write(&#39;.*&#39;)
+        if wildcard == &#39;?&#39;:
+            regex.write(&#39;.&#39;)
+        verbatim = next(it)
+    regex.write(re.escape(verbatim))
+    cwd = re.escape(cwd.rstrip(&#39;\\&#39;))
+    pattern = rF&#39;(?s:{cwd}\\{regex.getvalue()})$&#39;
+    return bool(re.match(pattern, path))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.batch.emulator.DevNull"><code class="flex name class">
+<span>class <span class="ident">DevNull</span></span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L92-L119" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class DevNull:
+    def getvalue(self):
+        return &#39;&#39;
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        raise StopIteration
+
+    def detach(self):
+        raise NotImplementedError
+
+    def readline(self, size: int = -1, /) -&gt; str:
+        return &#39;&#39;
+
+    def read(self, size: int | None = -1, /) -&gt; str:
+        return &#39;&#39;
+
+    def write(self, s: str, /) -&gt; int:
+        return len(s)
+
+    def seek(self, k: int, whence: int = 0, /):
+        return
+
+    @property
+    def closed(self):
+        return True</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.DevNull.closed"><code class="name">var <span class="ident">closed</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L117-L119" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def closed(self):
+    return True</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.DevNull.getvalue"><code class="name flex">
+<span>def <span class="ident">getvalue</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L93-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def getvalue(self):
+    return &#39;&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.DevNull.detach"><code class="name flex">
+<span>def <span class="ident">detach</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L102-L103" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def detach(self):
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.DevNull.readline"><code class="name flex">
+<span>def <span class="ident">readline</span></span>(<span>self, size=-1, /)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L105-L106" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def readline(self, size: int = -1, /) -&gt; str:
+    return &#39;&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.DevNull.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>self, size=-1, /)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L108-L109" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def read(self, size: int | None = -1, /) -&gt; str:
+    return &#39;&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.DevNull.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self, s, /)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L111-L112" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write(self, s: str, /) -&gt; int:
+    return len(s)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.DevNull.seek"><code class="name flex">
+<span>def <span class="ident">seek</span></span>(<span>self, k, whence=0, /)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L114-L115" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def seek(self, k: int, whence: int = 0, /):
+    return</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.emulator.Error"><code class="flex name class">
+<span>class <span class="ident">Error</span></span>
+<span>(</span><span>...)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to 'utf-8'.
+errors defaults to 'strict'.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L122-L123" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Error(str):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+</ul>
+</dd>
+<dt id="refinery.lib.batch.emulator.IO"><code class="flex name class">
+<span>class <span class="ident">IO</span></span>
+<span>(</span><span>i=&lt;factory&gt;, o=&lt;factory&gt;, e=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>IO(i: 'DevNull | StringIO' = <factory>, o: 'DevNull | StringIO' = <factory>, e: 'DevNull | StringIO' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L129-L158" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class IO:
+    i: DevNull | StringIO = field(default_factory=StringIO)
+    o: DevNull | StringIO = field(default_factory=StringIO)
+    e: DevNull | StringIO = field(default_factory=StringIO)
+
+    def __iter__(self):
+        yield self.i
+        yield self.o
+        yield self.e
+
+    def __setitem__(self, k, v):
+        if k == 0:
+            self.i = v
+        elif k == 1:
+            self.o = v
+        elif k == 2:
+            self.e = v
+        else:
+            raise IndexError(k)
+
+    def __getitem__(self, k):
+        if k == 0:
+            return self.i
+        elif k == 1:
+            return self.o
+        elif k == 2:
+            return self.e
+        else:
+            raise IndexError(k)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.IO.i"><code class="name">var <span class="ident">i</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.IO.o"><code class="name">var <span class="ident">o</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.IO.e"><code class="name">var <span class="ident">e</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig"><code class="flex name class">
+<span>class <span class="ident">BatchEmulatorConfig</span></span>
+<span>(</span><span>show_nops=False, show_junk=False, show_labels=False, show_sets=False, show_comments=False, skip_goto=False, skip_call=False, skip_exit=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>BatchEmulatorConfig(show_nops: 'bool' = False, show_junk: 'bool' = False, show_labels: 'bool' = False, show_sets: 'bool' = False, show_comments: 'bool' = False, skip_goto: 'bool' = False, skip_call: 'bool' = False, skip_exit: 'bool' = False)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L161-L170" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class BatchEmulatorConfig:
+    show_nops: bool = False
+    show_junk: bool = False
+    show_labels: bool = False
+    show_sets: bool = False
+    show_comments: bool = False
+    skip_goto: bool = False
+    skip_call: bool = False
+    skip_exit: bool = False</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.show_nops"><code class="name">var <span class="ident">show_nops</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.show_junk"><code class="name">var <span class="ident">show_junk</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.show_labels"><code class="name">var <span class="ident">show_labels</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.show_sets"><code class="name">var <span class="ident">show_sets</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.show_comments"><code class="name">var <span class="ident">show_comments</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.skip_goto"><code class="name">var <span class="ident">skip_goto</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.skip_call"><code class="name">var <span class="ident">skip_call</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulatorConfig.skip_exit"><code class="name">var <span class="ident">skip_exit</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator"><code class="flex name class">
+<span>class <span class="ident">BatchEmulator</span></span>
+<span>(</span><span>data, state=None, cfg=None, std=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L173-L1330" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class BatchEmulator:
+
+    class _node:
+        handlers: ClassVar[dict[
+            type[AstNode],
+            Callable[[
+                BatchEmulator,
+                AstNode,
+                IO,
+                bool,
+            ], Generator[SynNodeBase[AstNode] | Error]]
+        ]] = {}
+
+        def __init__(self, key: type[AstNode]):
+            self.key = key
+
+        def __call__(self, handler):
+            self.handlers[self.key] = handler
+            return handler
+
+    class _command:
+        handlers: ClassVar[dict[
+            str,
+            Callable[[
+                BatchEmulator,
+                SynCommand,
+                IO,
+                bool,
+            ], Generator[str, None, int | None] | int | ErrorZero | None]
+        ]] = {}
+
+        def __init__(self, key: str):
+            self.key = key.upper()
+
+        def __call__(self, handler):
+            self.handlers[self.key] = handler
+            return handler
+
+    def __init__(
+        self,
+        data: str | buf | BatchParser,
+        state: BatchState | None = None,
+        cfg: BatchEmulatorConfig | None = None,
+        std: IO | None = None,
+    ):
+        self.stack = []
+        self.parser = BatchParser(data, state)
+        self.std = std or IO()
+        self.cfg = cfg or BatchEmulatorConfig()
+        self.block_labels = set()
+
+    def spawn(self, data: str | buf | BatchParser, state: BatchState | None = None, std: IO | None = None):
+        return BatchEmulator(
+            data,
+            state,
+            self.cfg,
+            std,
+        )
+
+    @property
+    def state(self):
+        return self.parser.state
+
+    @property
+    def environment(self):
+        return self.state.environment
+
+    @property
+    def delayexpand(self):
+        return self.state.delayexpand
+
+    def clone_state(
+        self,
+        delayexpand: bool | None = None,
+        cmdextended: bool | None = None,
+        environment: dict | None | ellipsis = ...,
+        filename: str | None = None,
+    ):
+        state = self.state
+        if delayexpand is None:
+            delayexpand = False
+        if cmdextended is None:
+            cmdextended = state.cmdextended
+        if environment is ...:
+            environment = dict(state.environment)
+        return BatchState(
+            delayexpand,
+            cmdextended,
+            environment=environment,
+            file_system=state.file_system,
+            username=state.username,
+            hostname=state.hostname,
+            now=state.now,
+            cwd=state.cwd,
+            filename=filename,
+        )
+
+    def get_for_variable_regex(self, vars: Iterable[str]):
+        return re.compile(RF&#39;%((?:~[fdpnxsatz]*)?)((?:\\$\\w+)?)([{&#34;&#34;.join(vars)}])&#39;)
+
+    def expand_delayed_variables(self, block: str):
+        def expansion(match: re.Match[str]):
+            name = match.group(1)
+            try:
+                return parse(name)
+            except MissingVariable:
+                _, _, rest = name.partition(&#39;:&#39;)
+                return rest
+        parse = self.parser.lexer.parse_env_variable
+        return re.sub(r&#39;!([^!\n]*)!&#39;, expansion, block)
+
+    def expand_forloop_variables(self, block: str, vars: dict[str, str] | None):
+        def expansion(match: re.Match[str]):
+            flags = ArgVarFlags.Empty
+            for flag in match[1]:
+                flags |= ArgVarFlags.FromToken(ord(flag))
+            return _vars[match[3]]
+        if not vars:
+            return block
+        _vars = vars
+        return self.get_for_variable_regex(vars).sub(expansion, block)
+
+    def contains_for_variable(self, ast: AstNode, vars: Iterable[str]):
+        def check(token):
+            if isinstance(token, list):
+                return any(check(v) for v in token)
+            if isinstance(token, dict):
+                return any(check(v) for v in token.values())
+            if isinstance(token, Enum):
+                return False
+            if isinstance(token, str):
+                return bool(checker(token))
+            if isinstance(token, AstNode):
+                for tf in fields(token):
+                    if tf.name == &#39;parent&#39;:
+                        continue
+                    if check(getattr(token, tf.name)):
+                        return True
+            return False
+        checker = self.get_for_variable_regex(vars).search
+        return check(ast) # type:ignore
+
+    def expand_ast_node(self, ast: _T) -&gt; _T:
+        def expand(token):
+            if isinstance(token, list):
+                return [expand(v) for v in token]
+            if isinstance(token, dict):
+                return {k: expand(v) for k, v in token.items()}
+            if isinstance(token, Enum):
+                return token
+            if isinstance(token, str):
+                if delayexpand:
+                    token = self.expand_delayed_variables(token)
+                return self.expand_forloop_variables(token, variables)
+            if isinstance(token, AstNode):
+                new = {}
+                for tf in fields(token):
+                    value = getattr(token, tf.name)
+                    if tf.name != &#39;parent&#39;:
+                        value = expand(value)
+                    new[tf.name] = value
+                return token.__class__(**new)
+            return token
+        delayexpand = self.delayexpand
+        variables = self.state.for_loop_variables
+        if not variables and not delayexpand:
+            return ast
+        return expand(ast) # type:ignore
+
+    def execute_find_or_findstr(self, cmd: SynCommand, std: IO, findstr: bool):
+        needles = []
+        paths: list[str | ellipsis] = [...]
+        flags = {}
+        it = iter(cmd.args)
+        arg = None
+        yield cmd
+
+        for arg in it:
+            if not arg.startswith(&#39;/&#39;):
+                if not findstr and not arg.startswith(&#39;&#34;&#39;):
+                    return 1
+                needles.extend(unquote(arg).split())
+                break
+            name, has_param, value = arg[1:].partition(&#39;:&#39;)
+            name = name.upper()
+            if name in (&#39;OFF&#39;, &#39;OFFLINE&#39;):
+                continue
+            elif len(name) &gt; 1:
+                return 1
+            elif name == &#39;C&#39;:
+                needles.append(unquote(value))
+            elif name == &#39;F&#39; and findstr:
+                if (p := self.state.ingest_file(value)) is None:
+                    return 1
+                paths.extend(p.splitlines(False))
+            elif name == &#39;G&#39; and findstr:
+                if (n := self.state.ingest_file(value)) is None:
+                    return 1
+                needles.extend(n.splitlines(False))
+            elif has_param:
+                flags[name] = value
+            else:
+                flags[name] = True
+
+        valid_flags = &#39;VNI&#39;
+        if findstr:
+            valid_flags += &#39;BELRSXMOPADQ&#39;
+
+        for v in flags:
+            if v not in valid_flags:
+                return 1
+
+        prefix_filename = False
+        state = self.state
+
+        for arg in it:
+            pattern = unquote(arg)
+            if &#39;*&#39; in pattern or &#39;?&#39; in pattern:
+                prefix_filename = True
+                for path in state.file_system:
+                    if winfnmatch(path, pattern, state.cwd):
+                        paths.append(path)
+            else:
+                paths.append(pattern)
+
+        if len(paths) &gt; 1:
+            prefix_filename = True
+
+        for n, needle in enumerate(needles):
+            if not findstr or &#39;L&#39; in flags:
+                needle = re.escape(needle)
+            if &#39;X&#39; in flags:
+                needle = F&#39;^{needle}$&#39;
+            elif &#39;B&#39; in flags:
+                needle = F&#39;^{needle}&#39;
+            elif &#39;E&#39; in flags:
+                needle = F&#39;{needle}$&#39;
+            needles[n] = needle
+
+        _V = &#39;V&#39; in flags # noqa; Prints only lines that do not contain a match.
+        _P = &#39;P&#39; in flags # noqa; Skip files with non-printable characters.
+        _O = &#39;O&#39; in flags # noqa; Prints character offset before each matching line.
+        _N = &#39;N&#39; in flags # noqa; Prints the line number before each line that matches.
+        _M = &#39;M&#39; in flags # noqa; Prints only the filename if a file contains a match.
+
+        nothing_found = True
+        offset = 0
+
+        for path in paths:
+            if path is (...):
+                data = std.i.read()
+            else:
+                data = state.ingest_file(path)
+            if data is None:
+                return 1
+            if _P and not re.fullmatch(&#39;[\\s!-~]+&#39;, data):
+                continue
+            for n, line in enumerate(data.splitlines(True), 1):
+                for needle in needles:
+                    hit = re.search(needle, line)
+                    if _V == bool(hit):
+                        continue
+                    nothing_found = False
+                    if not _M:
+                        if _O:
+                            o = offset + (hit.start() if hit else 0)
+                            line = F&#39;{o}:{line}&#39;
+                        if _N:
+                            line = F&#39;{n}:{line}&#39;
+                        if prefix_filename:
+                            line = F&#39;{path}:{line}&#39;
+                        std.o.write(line)
+                    elif path is not (...):
+                        std.o.write(path)
+                        break
+                offset += len(line)
+
+        return int(nothing_found)
+
+    @_command(&#39;TYPE&#39;)
+    def execute_type(self, cmd: SynCommand, std: IO, *_):
+        path = cmd.argument_string.strip()
+        data = self.state.ingest_file(path)
+        if data is None:
+            yield ErrorCannotFindFile
+            return 1
+        else:
+            std.o.write(data)
+            return 0
+
+    @_command(&#39;FIND&#39;)
+    def execute_find(self, cmd: SynCommand, std: IO, *_):
+        return self.execute_find_or_findstr(cmd, std, findstr=False)
+
+    @_command(&#39;FINDSTR&#39;)
+    def execute_findstr(self, cmd: SynCommand, std: IO, *_):
+        return self.execute_find_or_findstr(cmd, std, findstr=True)
+
+    @_command(&#39;SET&#39;)
+    def execute_set(self, cmd: SynCommand, std: IO, *_):
+        if not (args := cmd.args):
+            raise EmulatorException(&#39;Empty SET instruction&#39;)
+
+        if cmd.verb.upper() != &#39;SET&#39;:
+            raise RuntimeError
+
+        # Since variables can be used in GOTO, a SET can be used to change the behavior of a GOTO.
+        self.block_labels.clear()
+
+        arithmetic = False
+        quote_mode = False
+        prompt = None
+
+        it = iter(args)
+        tk = next(it)
+
+        if tk.upper() == &#39;/P&#39;:
+            if std.i.closed:
+                prompt = &#39;&#39;
+            elif not (prompt := std.i.readline()).endswith(&#39;\n&#39;):
+                raise InputLocked
+            else:
+                prompt = prompt.rstrip(&#39;\r\n&#39;)
+            tk = next(it)
+        else:
+            cmd.junk = not self.cfg.show_sets
+
+        yield cmd
+
+        if tk.upper() == &#39;/A&#39;:
+            arithmetic = True
+            try:
+                tk = next(it)
+            except StopIteration:
+                tk = &#39;&#39;
+
+        args = [tk, *it, *cmd.trailing_spaces]
+
+        if arithmetic:
+            def defang(s: str):
+                def r(m: re.Match[str]):
+                    return F&#39;_{prefix}{ord(m[0]):X}_&#39;
+                return re.sub(r&#39;[^-\s()!~*/%+&gt;&lt;&amp;^|_\w]&#39;, r, s)
+            def refang(s: str): # noqa
+                def r(m: re.Match[str]):
+                    return chr(int(m[1], 16))
+                return re.sub(rf&#39;_{prefix}([A-F0-9]+)_&#39;, r, s)
+            prefix = F&#39;{uuid.uuid4().time_mid:X}&#39;
+            namespace = {}
+            translate = {}
+            value = None
+            if not (program := &#39;&#39;.join(args)):
+                std.e.write(&#39;The syntax of the command is incorrect.\r\n&#39;)
+                return ErrorZero.Val
+            for assignment in program.split(&#39;,&#39;):
+                assignment = assignment.strip()
+                if not assignment:
+                    std.e.write(&#39;Missing operand.\r\n&#39;)
+                    return ErrorZero.Val
+                name, operator, definition = re.split(r&#39;([*+^|/%-&amp;]|&lt;&lt;|&gt;&gt;|)=&#39;, assignment, maxsplit=1)
+                name = name.upper()
+                definition = re.sub(r&#39;\b0([0-7]+)\b&#39;, r&#39;0o\1&#39;, definition)
+                if operator:
+                    definition = F&#39;{name}{operator}({definition})&#39;
+                definition = defang(definition)
+                expression = cautious_parse(definition)
+                names = names_in_expression(expression)
+                if names.stored or names.others:
+                    raise EmulatorException(&#39;Arithmetic SET had unexpected variable access.&#39;)
+                for var in names.loaded:
+                    original = refang(name).upper()
+                    translate[original] = var
+                    if var in namespace:
+                        continue
+                    try:
+                        namespace[var] = batchint(self.environment[original])
+                    except (KeyError, ValueError):
+                        namespace[var] = 0
+                code = compile(expression, filename=&#39;[ast]&#39;, mode=&#39;eval&#39;)
+                value = eval(code, namespace, {})
+                self.environment[name] = str(value)
+                namespace[defang(name)] = value
+            if value is None:
+                std.e.write(&#39;The syntax of the command is incorrect.&#39;)
+                return
+            else:
+                std.o.write(F&#39;{value!s}\r\n&#39;)
+        else:
+            try:
+                eq = args.index(Ctrl.Equals)
+            except ValueError:
+                assignment = cmd.argument_string
+                if assignment.startswith(&#39;&#34;&#39;):
+                    quote_mode = True
+                    assignment, _, unquoted = assignment[1:].rpartition(&#39;&#34;&#39;)
+                    assignment = assignment or unquoted
+                else:
+                    assignment = &#39;&#39;.join(args)
+                name, _, content = assignment.partition(&#39;=&#39;)
+            else:
+                with StringIO() as io:
+                    for k in range(eq + 1, len(args)):
+                        io.write(args[k])
+                    content = io.getvalue()
+                    name = cmd.args[eq - 1] if eq else &#39;&#39;
+            name = name.upper()
+            trailing_caret, content = uncaret(content, quote_mode)
+            if trailing_caret:
+                content = content[:-1]
+            if prompt is not None:
+                if (qc := content.strip()).startswith(&#39;&#34;&#39;):
+                    _, _, qc = qc. partition(&#39;&#34;&#39;) # noqa
+                    qc, _, r = qc.rpartition(&#39;&#34;&#39;) # noqa
+                    content = qc or r
+                std.o.write(content)
+                content = prompt
+            if name:
+                if content:
+                    self.environment[name] = content
+                else:
+                    self.environment.pop(name, None)
+
+    @_command(&#39;CALL&#39;)
+    def execute_call(self, cmd: SynCommand, std: IO, *_):
+        cmdl = cmd.argument_string
+        empty, colon, label = cmdl.partition(&#39;:&#39;)
+        if colon and not empty:
+            try:
+                offset = self.parser.lexer.labels[label.upper()]
+            except KeyError as KE:
+                raise InvalidLabel(label) from KE
+            emu = self.spawn(self.parser, std=std)
+        else:
+            offset = 0
+            path = cmdl.strip()
+            code = self.state.ingest_file(path)
+            if code is None:
+                yield cmd
+                return
+            state = self.clone_state(environment=self.state.environment, filename=path)
+            emu = self.spawn(code, std=std, state=state)
+        if self.cfg.skip_call:
+            emu.execute(called=True)
+        else:
+            yield from emu.trace(offset, called=True)
+
+    @_command(&#39;SETLOCAL&#39;)
+    def execute_setlocal(self, cmd: SynCommand, *_):
+        yield cmd
+        setting = cmd.argument_string.strip().upper()
+        delay = {
+            &#39;DISABLEDELAYEDEXPANSION&#39;: False,
+            &#39;ENABLEDELAYEDEXPANSION&#39; : True,
+        }.get(setting, self.state.delayexpand)
+        cmdxt = {
+            &#39;DISABLEEXTENSIONS&#39;: False,
+            &#39;ENABLEEXTENSIONS&#39; : True,
+        }.get(setting, self.state.cmdextended)
+        self.state.delayexpand_stack.append(delay)
+        self.state.cmdextended_stack.append(cmdxt)
+        self.state.environment_stack.append(dict(self.environment))
+
+    @_command(&#39;ENDLOCAL&#39;)
+    def execute_endlocal(self, cmd: SynCommand, *_):
+        yield cmd
+        if len(self.state.environment_stack) &gt; 1:
+            self.state.environment_stack.pop()
+            self.state.delayexpand_stack.pop()
+
+    @_command(&#39;GOTO&#39;)
+    def execute_goto(self, cmd: SynCommand, std: IO, *_):
+        if self.cfg.skip_goto:
+            yield cmd
+            return
+        it = iter(cmd.args)
+        mark = False
+        for label in it:
+            if not isinstance(label, Ctrl):
+                break
+            if label == Ctrl.Label:
+                mark = True
+                for label in it:
+                    break
+                else:
+                    label = &#39;&#39;
+                break
+        else:
+            std.e.write(&#39;No batch label specified to GOTO command.\r\n&#39;)
+            raise AbortExecution
+        label, *_ = label.split(maxsplit=1)
+        key = label.upper()
+        if mark and key == &#39;EOF&#39;:
+            raise Exit(int(self.state.ec), False)
+        if key not in self.block_labels:
+            raise Goto(label)
+        else:
+            yield Error(F&#39;Infinite Loop detected for label {key}&#39;)
+
+    @_command(&#39;EXIT&#39;)
+    def execute_exit(self, cmd: SynCommand, *_):
+        it = iter(cmd.args)
+        exit = True
+        token = 0
+        for arg in it:
+            if arg.upper() == &#39;/B&#39;:
+                exit = False
+                continue
+            token = arg
+            break
+        try:
+            code = int(token)
+        except ValueError:
+            code = 0
+        yield cmd
+        if self.cfg.skip_exit:
+            return
+        raise Exit(code, exit)
+
+    @_command(&#39;CHDIR&#39;)
+    @_command(&#39;CD&#39;)
+    def execute_chdir(self, cmd: SynCommand, *_):
+        yield cmd
+        self.state.cwd = cmd.argument_string.strip()
+
+    @_command(&#39;PUSHD&#39;)
+    def execute_pushd(self, cmd: SynCommand, *_):
+        yield cmd
+        self.state.dirstack.append(self.state.cwd)
+        self.execute_chdir(cmd)
+
+    @_command(&#39;POPD&#39;)
+    def execute_popd(self, cmd: SynCommand, *_):
+        yield cmd
+        try:
+            self.state.cwd = self.state.dirstack.pop()
+        except IndexError:
+            pass
+
+    @_command(&#39;ECHO&#39;)
+    def execute_echo(self, cmd: SynCommand, std: IO, in_group: bool):
+        cmdl = cmd.argument_string
+        mode = cmdl.strip().lower()
+        current_state = self.state.echo
+        if mode == &#39;on&#39;:
+            if self.cfg.show_nops or current_state is False:
+                yield cmd
+            self.state.echo = True
+            return
+        if mode == &#39;off&#39;:
+            if self.cfg.show_nops or current_state is True:
+                yield cmd
+            self.state.echo = False
+            return
+        yield cmd
+        if mode:
+            if in_group and not cmdl.endswith(&#39; &#39;):
+                cmdl += &#39; &#39;
+            std.o.write(F&#39;{cmdl}\r\n&#39;)
+        else:
+            mode = &#39;on&#39; if self.state.echo else &#39;off&#39;
+            std.o.write(F&#39;ECHO is {mode}.\r\n&#39;)
+
+    @_command(&#39;CLS&#39;)
+    def execute_cls(self, cmd: SynCommand, *_):
+        yield cmd
+
+    @_command(&#39;ERASE&#39;)
+    @_command(&#39;DEL&#39;)
+    def execute_del(self, cmd: SynCommand, std: IO, *_):
+        if not cmd.args:
+            yield Error(&#39;The syntax of the command is incorrect&#39;)
+            return 1
+        else:
+            yield cmd
+        flags = {}
+        it = iter(cmd.args)
+        while (arg := next(it)).startswith(&#39;/&#39;) and 1 &lt; len(arg):
+            flag = arg.upper()
+            if flag[:3] == &#39;/A:&#39;:
+                flags[&#39;A&#39;] = flag[3:]
+                continue
+            flags[flag[1]] = True
+        _P = &#39;P&#39; in flags # Prompts for confirmation before deleting each file.
+        _F = &#39;F&#39; in flags # Force deleting of read-only files.
+        _S = &#39;S&#39; in flags # Delete specified files from all subdirectories.
+        _Q = &#39;Q&#39; in flags # Quiet mode, do not ask if ok to delete on global wildcard
+        paths = [arg, *it]
+        state = self.state
+        cwd = state.cwd
+        for pattern in paths:
+            for path in list(state.file_system):
+                if not winfnmatch(pattern, path, cwd):
+                    continue
+                if _F:
+                    pass
+                if _S:
+                    pass
+                if _Q:
+                    pass
+                if _P and state.exists_file(pattern):
+                    std.o.write(F&#39;{pattern}, Delete (Y/N)? &#39;)
+                    decision = None
+                    while decision not in (&#39;y&#39;, &#39;n&#39;):
+                        confirmation = std.i.readline()
+                        if not confirmation.endswith(&#39;\n&#39;):
+                            raise InputLocked
+                        decision = confirmation[:1].lower()
+                    if decision == &#39;n&#39;:
+                        continue
+                state.remove_file(path)
+        return 0
+
+    @_command(&#39;START&#39;)
+    def execute_start(self, cmd: SynCommand, std: IO, *_):
+        yield cmd
+        it = iter(cmd.ast.fragments)
+        it = itertools.islice(it, cmd.argument_offset, None)
+        title = None
+        start = None
+        cwd = self.state.cwd
+        env = ...
+        for arg in it:
+            if title is None:
+                if &#39;&#34;&#39; not in arg:
+                    title = &#39;&#39;
+                else:
+                    title = unquote(arg)
+                    continue
+            if arg.isspace():
+                continue
+            if not arg.startswith(&#39;/&#39;):
+                start = unquote(arg)
+                break
+            if (flag := arg.upper()) in (&#39;/NODE&#39;, &#39;/AFFINITY&#39;, &#39;/MACHINE&#39;):
+                next(it)
+            elif flag == &#39;/D&#39;:
+                cwd = next(it)
+            elif flag == &#39;/I&#39;:
+                env = None
+        if start and (batch := self.state.ingest_file(start)):
+            state = self.clone_state(environment=env)
+            state.cwd = cwd
+            state.command_line = _fuse(it).strip()
+            shell = self.spawn(batch, state, std)
+            yield from shell.trace()
+
+    @_command(&#39;CMD&#39;)
+    def execute_cmd(self, cmd: SynCommand, std: IO, *_):
+        yield cmd
+        it = iter(cmd.ast.fragments)
+        command = None
+        quiet = False
+        strip = False
+        codec = &#39;cp1252&#39;
+        delayexpand = None
+        cmdextended = None
+
+        for arg in it:
+            if arg.isspace() or not arg.startswith(&#39;/&#39;):
+                continue
+            name, _, flag = arg[1:].partition(&#39;:&#39;)
+            flag = flag.upper()
+            name = name.upper()
+            if name in &#39;CKR&#39;:
+                command = _fuse(it)
+                break
+            elif name == &#39;Q&#39;:
+                quiet = True
+            elif name == &#39;S&#39;:
+                strip = True
+            elif name == &#39;U&#39;:
+                codec = &#39;utf-16le&#39;
+            elif name == &#39;E&#39;:
+                cmdextended = _onoff(flag)
+            elif name == &#39;V&#39;:
+                delayexpand = _onoff(flag)
+        else:
+            return 0
+
+        if (stripped := re.search(&#39;^\\s*&#34;(.*)&#34;&#39;, command)) and (strip
+            or command.count(&#39;&#34;&#39;) != 2
+            or re.search(&#39;[&amp;&lt;&gt;()@^|]&#39;, stripped[1])
+            or re.search(&#39;\\s&#39;, stripped[1]) is None
+        ):
+            command = stripped[1]
+
+        state = self.clone_state(delayexpand=delayexpand, cmdextended=cmdextended)
+        state.codec = codec
+        state.echo = not quiet
+        shell = self.spawn(command, state, std)
+        yield from shell.trace()
+
+    @_command(&#39;ARP&#39;)
+    @_command(&#39;AT&#39;)
+    @_command(&#39;ATBROKER&#39;)
+    @_command(&#39;BGINFO&#39;)
+    @_command(&#39;BITSADMIN&#39;)
+    @_command(&#39;CERTUTIL&#39;)
+    @_command(&#39;CLIP&#39;)
+    @_command(&#39;CMSTP&#39;)
+    @_command(&#39;COMPACT&#39;)
+    @_command(&#39;CONTROL&#39;)
+    @_command(&#39;CSCRIPT&#39;)
+    @_command(&#39;CURL&#39;)
+    @_command(&#39;DEFRAG&#39;)
+    @_command(&#39;DISKSHADOW&#39;)
+    @_command(&#39;ESENTUTL&#39;)
+    @_command(&#39;EXPAND&#39;)
+    @_command(&#39;EXPLORER&#39;)
+    @_command(&#39;EXTRAC32&#39;)
+    @_command(&#39;FODHELPER&#39;)
+    @_command(&#39;FORFILES&#39;)
+    @_command(&#39;FTP&#39;)
+    @_command(&#39;HOSTNAME&#39;)
+    @_command(&#39;HOSTNAME&#39;)
+    @_command(&#39;INSTALLUTIL&#39;)
+    @_command(&#39;IPCONFIG&#39;)
+    @_command(&#39;LOGOFF&#39;)
+    @_command(&#39;MAKECAB&#39;)
+    @_command(&#39;MAVINJECT&#39;)
+    @_command(&#39;MOUNTVOL&#39;)
+    @_command(&#39;MSBUILD&#39;)
+    @_command(&#39;MSHTA&#39;)
+    @_command(&#39;MSIEXEC&#39;)
+    @_command(&#39;MSTSC&#39;)
+    @_command(&#39;NET&#39;)
+    @_command(&#39;NET1&#39;)
+    @_command(&#39;NETSH&#39;)
+    @_command(&#39;NSLOOKUP&#39;)
+    @_command(&#39;ODBCCONF&#39;)
+    @_command(&#39;PATHPING&#39;)
+    @_command(&#39;PING&#39;)
+    @_command(&#39;POWERSHELL&#39;)
+    @_command(&#39;PRESENTATIONHOST&#39;)
+    @_command(&#39;PWSH&#39;)
+    @_command(&#39;REG&#39;)
+    @_command(&#39;REGSVR32&#39;)
+    @_command(&#39;ROUTE&#39;)
+    @_command(&#39;RUNDLL32&#39;)
+    @_command(&#39;SCP&#39;)
+    @_command(&#39;SDCLT&#39;)
+    @_command(&#39;SETX&#39;)
+    @_command(&#39;SFTP&#39;)
+    @_command(&#39;SHUTDOWN&#39;)
+    @_command(&#39;SSH&#39;)
+    @_command(&#39;SUBST&#39;)
+    @_command(&#39;SYNCAPPVPUBLISHINGSERVER&#39;)
+    @_command(&#39;SYSTEMINFO&#39;)
+    @_command(&#39;TAR&#39;)
+    @_command(&#39;TELNET&#39;)
+    @_command(&#39;TFTP&#39;)
+    @_command(&#39;TIMEOUT&#39;)
+    @_command(&#39;TRACERT&#39;)
+    @_command(&#39;VSSADMIN&#39;)
+    @_command(&#39;WBADMIN&#39;)
+    @_command(&#39;WHERE&#39;)
+    @_command(&#39;WHOAMI&#39;)
+    @_command(&#39;WINRM&#39;)
+    @_command(&#39;WINRS&#39;)
+    @_command(&#39;WSCRIPT&#39;)
+    def execute_unimplemented_program(self, cmd: SynCommand, *_):
+        yield cmd
+        return 0
+
+    @_command(&#39;CLS&#39;)
+    def execute_unimplemented_command_unmodified_ec(self, cmd: SynCommand, *_):
+        yield cmd
+
+    @_command(&#39;ASSOC&#39;)
+    @_command(&#39;ATTRIB&#39;)
+    @_command(&#39;BCDEDIT&#39;)
+    @_command(&#39;BREAK&#39;)
+    @_command(&#39;CACLS&#39;)
+    @_command(&#39;CHCP&#39;)
+    @_command(&#39;CHKDSK&#39;)
+    @_command(&#39;CHKNTFS&#39;)
+    @_command(&#39;COLOR&#39;)
+    @_command(&#39;COMP&#39;)
+    @_command(&#39;COMPACT&#39;)
+    @_command(&#39;CONVERT&#39;)
+    @_command(&#39;COPY&#39;)
+    @_command(&#39;DATE&#39;)
+    @_command(&#39;DIR&#39;)
+    @_command(&#39;DISKPART&#39;)
+    @_command(&#39;DOSKEY&#39;)
+    @_command(&#39;DRIVERQUERY&#39;)
+    @_command(&#39;FC&#39;)
+    @_command(&#39;FORMAT&#39;)
+    @_command(&#39;FSUTIL&#39;)
+    @_command(&#39;FTYPE&#39;)
+    @_command(&#39;GPRESULT&#39;)
+    @_command(&#39;ICACLS&#39;)
+    @_command(&#39;LABEL&#39;)
+    @_command(&#39;MD&#39;)
+    @_command(&#39;MKDIR&#39;)
+    @_command(&#39;MKLINK&#39;)
+    @_command(&#39;MODE&#39;)
+    @_command(&#39;MORE&#39;)
+    @_command(&#39;MOVE&#39;)
+    @_command(&#39;OPENFILES&#39;)
+    @_command(&#39;PATH&#39;)
+    @_command(&#39;PAUSE&#39;)
+    @_command(&#39;PRINT&#39;)
+    @_command(&#39;PROMPT&#39;)
+    @_command(&#39;RD&#39;)
+    @_command(&#39;RECOVER&#39;)
+    @_command(&#39;REN&#39;)
+    @_command(&#39;RENAME&#39;)
+    @_command(&#39;REPLACE&#39;)
+    @_command(&#39;RMDIR&#39;)
+    @_command(&#39;ROBOCOPY&#39;)
+    @_command(&#39;SC&#39;)
+    @_command(&#39;SCHTASKS&#39;)
+    @_command(&#39;SHIFT&#39;)
+    @_command(&#39;SHUTDOWN&#39;)
+    @_command(&#39;SORT&#39;)
+    @_command(&#39;SUBST&#39;)
+    @_command(&#39;SYSTEMINFO&#39;)
+    @_command(&#39;TASKKILL&#39;)
+    @_command(&#39;TASKLIST&#39;)
+    @_command(&#39;TIME&#39;)
+    @_command(&#39;TITLE&#39;)
+    @_command(&#39;TREE&#39;)
+    @_command(&#39;TYPE&#39;)
+    @_command(&#39;VER&#39;)
+    @_command(&#39;VERIFY&#39;)
+    @_command(&#39;VOL&#39;)
+    @_command(&#39;WMIC&#39;)
+    @_command(&#39;XCOPY&#39;)
+    def execute_unimplemented_command(self, cmd: SynCommand, *_):
+        yield cmd
+        return 0
+
+    @_command(&#39;REM&#39;)
+    def execute_rem(self, cmd: SynCommand, *_):
+        if self.cfg.show_comments:
+            yield cmd
+
+    @_command(&#39;HELP&#39;)
+    def execute_help(self, cmd: SynCommand, std: IO, *_):
+        yield cmd
+        std.o.write(HelpOutput[&#39;HELP&#39;])
+        return 0
+
+    def execute_command(self, cmd: SynCommand, std: IO, in_group: bool):
+        verb = cmd.verb.upper().strip()
+        handler = self._command.handlers.get(verb)
+
+        if handler is None:
+            base, ext = ntpath.splitext(verb)
+            handler = None
+            if any(ext == pe.upper() for pe in self.state.envar(&#39;PATHEXT&#39;, &#39;&#39;).split(&#39;;&#39;)):
+                handler = self._command.handlers.get(base)
+
+        if handler is None:
+            if self.state.exists_file(verb):
+                self.state.ec = 0
+            elif not indicators.winfpath.value.fullmatch(verb):
+                if &#39;\uFFFD&#39; in verb or not verb.isprintable():
+                    self.state.ec = 9009
+                    cmd.junk = True
+                else:
+                    cmd.junk = not self.cfg.show_junk
+            yield cmd
+            return
+
+        paths: dict[int, str] = {}
+
+        for src, r in cmd.ast.redirects.items():
+            if not 0 &lt;= src &lt;= 2 or (src == 0) != r.is_input:
+                continue
+            if isinstance((target := r.target), str):
+                if target.upper() == &#39;NUL&#39;:
+                    std[src] = DevNull()
+                else:
+                    data = self.state.ingest_file(target)
+                    if src == 0:
+                        if data is None:
+                            yield ErrorCannotFindFile
+                            return
+                        std.i = StringIO(data)
+                    else:
+                        if r.is_out_append:
+                            buffer = StringIO(data)
+                            buffer.seek(0, 2)
+                        else:
+                            buffer = StringIO()
+                        std[src] = buffer
+                        paths[src] = target
+            elif src == 1 and target == 2:
+                std.o = std.e
+            elif src == 2 and target == 1:
+                std.e = std.o
+
+        if &#39;/?&#39; in cmd.args:
+            std.o.write(HelpOutput[verb])
+            self.state.ec = 0
+            return
+
+        if (result := handler(self, cmd, std, in_group)) is None:
+            pass
+        elif not isinstance(result, (int, ErrorZero)):
+            result = (yield from result)
+
+        for k, path in paths.items():
+            self.state.create_file(path, std[k].getvalue())
+
+        if result is not None:
+            self.state.ec = result
+
+    @_node(AstPipeline)
+    def trace_pipeline(self, pipeline: AstPipeline, std: IO, in_group: bool):
+        length = len(pipeline.parts)
+        streams = IO(*std)
+        if length &gt; 1:
+            yield synthesize(pipeline)
+        for k, part in enumerate(pipeline.parts, 1):
+            if k != 1:
+                streams.i = streams.o
+                streams.i.seek(0)
+            if k == length:
+                streams.o = std.o
+            else:
+                streams.o = StringIO()
+            if isinstance(part, AstGroup):
+                it = self.trace_group(part, streams, in_group)
+            else:
+                ast = self.expand_ast_node(part)
+                cmd = synthesize(ast)
+                it = self.execute_command(cmd, streams, in_group)
+            yield from it
+
+    @_node(AstSequence)
+    def trace_sequence(self, sequence: AstSequence, std: IO, in_group: bool):
+        yield from self.trace_statement(sequence.head, std, in_group)
+        for cs in sequence.tail:
+            if cs.condition == AstCondition.Failure:
+                if bool(self.state.ec) is False:
+                    continue
+            if cs.condition == AstCondition.Success:
+                if bool(self.state.ec) is True:
+                    continue
+            yield from self.trace_statement(cs.statement, std, in_group)
+
+    @_node(AstIf)
+    def trace_if(self, _if: AstIf, std: IO, in_group: bool):
+        yield synthesize(_if)
+        _if = self.expand_ast_node(_if)
+        self.block_labels.clear()
+
+        if _if.variant == AstIfVariant.ErrorLevel:
+            condition = _if.var_int &lt;= self.state.ec
+        elif _if.variant == AstIfVariant.CmdExtVersion:
+            condition = _if.var_int &lt;= self.state.extensions_version
+        elif _if.variant == AstIfVariant.Exist:
+            condition = self.state.exists_file(_if.var_str)
+        elif _if.variant == AstIfVariant.Defined:
+            condition = _if.var_str.upper() in self.state.environment
+        else:
+            lhs = _if.lhs
+            rhs = _if.rhs
+            cmp = _if.cmp
+            assert lhs is not None
+            assert rhs is not None
+            if cmp == AstIfCmp.STR:
+                if _if.casefold:
+                    if isinstance(lhs, str):
+                        lhs = lhs.casefold()
+                    if isinstance(rhs, str):
+                        rhs = rhs.casefold()
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.GTR:
+                condition = lhs &gt; rhs
+            elif cmp == AstIfCmp.GEQ:
+                condition = lhs &gt;= rhs
+            elif cmp == AstIfCmp.NEQ:
+                condition = lhs != rhs
+            elif cmp == AstIfCmp.EQU:
+                condition = lhs == rhs
+            elif cmp == AstIfCmp.LSS:
+                condition = lhs &lt; rhs
+            elif cmp == AstIfCmp.LEQ:
+                condition = lhs &lt;= rhs
+            else:
+                raise RuntimeError(cmp)
+        if _if.negated:
+            condition = not condition
+
+        if condition:
+            yield from self.trace_sequence(_if.then_do, std, in_group)
+        elif (_else := _if.else_do):
+            yield from self.trace_sequence(_else, std, in_group)
+
+    @_node(AstFor)
+    def trace_for(self, _for: AstFor, std: IO, in_group: bool):
+        state = self.state
+        cwd = state.cwd
+        vars = state.new_forloop()
+        body = _for.body
+        name = _for.variable
+        vars[name] = &#39;&#39;
+
+        if (
+            self.contains_for_variable(body, vars)
+                or _for.variant != AstForVariant.NumericLoop
+                or len(_for.spec) != 1
+        ):
+            yield synthesize(_for)
+
+        if _for.variant == AstForVariant.FileParsing:
+            if _for.mode == AstForParserMode.Command:
+                emulator = self.spawn(_for.specline, self.clone_state(filename=state.name))
+                yield from emulator.trace()
+                lines = emulator.std.o.getvalue().splitlines()
+            elif _for.mode == AstForParserMode.Literal:
+                lines = _for.spec
+            else:
+                def lines_from_files():
+                    fs = state.file_system
+                    for name in _for.spec:
+                        for path, content in fs.items():
+                            if not winfnmatch(path, name, cwd):
+                                continue
+                            yield from content.splitlines(False)
+                lines = lines_from_files()
+            opt = _for.options
+            tokens = sorted(opt.tokens)
+            split = re.compile(&#39;[{}]+&#39;.format(re.escape(opt.delims)))
+            count = tokens[-1] + 1 if tokens else 0
+            first_variable = ord(name)
+            if opt.asterisk:
+                tokens.append(count)
+            for n, line in enumerate(lines):
+                if n &lt; opt.skip:
+                    continue
+                if opt.comment and line.startswith(opt.comment):
+                    continue
+                if count:
+                    tokenized = split.split(line, maxsplit=count)
+                else:
+                    tokenized = (line,)
+                for k, tok in enumerate(tokens):
+                    name = chr(first_variable + k)
+                    if not name.isalpha():
+                        raise EmulatorException(&#39;Ran out of variables in FOR-Loop.&#39;)
+                    try:
+                        vars[name] = tokenized[tok]
+                    except IndexError:
+                        vars[name] = &#39;&#39;
+                yield from self.trace_sequence(body, std, in_group)
+        else:
+            for entry in _for.spec:
+                vars[name] = entry
+                yield from self.trace_sequence(body, std, in_group)
+        state.end_forloop()
+
+    @_node(AstGroup)
+    def trace_group(self, group: AstGroup, std: IO, in_group: bool):
+        for sequence in group.fragments:
+            yield from self.trace_sequence(sequence, std, True)
+        yield synthesize(group)
+
+    @_node(AstLabel)
+    def trace_label(self, label: AstLabel, *_):
+        if label.comment:
+            if self.cfg.show_comments:
+                yield synthesize(label)
+        else:
+            if self.cfg.show_labels:
+                yield synthesize(label)
+            self.block_labels.add(label.label.upper())
+
+    def trace_statement(self, statement: AstStatement, std: IO, in_group: bool):
+        try:
+            handler = self._node.handlers[statement.__class__]
+        except KeyError:
+            raise RuntimeError(statement)
+        yield from handler(self, statement, std, in_group)
+
+    def emulate_commands(self, allow_junk=False):
+        for syn in self.trace():
+            if not isinstance(syn, SynCommand):
+                continue
+            if not allow_junk and syn.junk:
+                continue
+            yield str(syn)
+
+    def emulate_to_depth(self, depth: int = 0):
+        for syn in self.trace():
+            if not isinstance(syn, SynNodeBase):
+                continue
+            if syn.ast.depth &lt;= depth:
+                yield str(syn)
+
+    def emulate(self, offset: int = 0):
+        last: AstNode | None = None
+        junk: AstNode | None = None
+        for syn in self.trace(offset):
+            if not isinstance(syn, SynNodeBase):
+                continue
+            ast = syn.ast
+            if isinstance(syn, SynCommand) and syn.junk:
+                junk = ast
+                continue
+            if junk is not None:
+                if junk.is_descendant_of(ast):
+                    if not last or not last.is_descendant_of(ast):
+                        continue
+            if last is not None:
+                if ast.is_descendant_of(last):
+                    # we already synthesized a parent construct, like a FOR loop or IF block
+                    continue
+                if last.is_descendant_of(ast):
+                    # we synthesized a command and no longer need to synthesize an AST node that
+                    # wraps it, like a group
+                    continue
+            if isinstance(ast, AstPipeline):
+                if len(ast.parts) == 1:
+                    continue
+            if last is ast:
+                raise RuntimeError(&#39;Emulator attempted to synthesize the same command twice.&#39;)
+            last = ast
+            yield str(syn)
+
+    def execute(self, offset: int = 0, called: bool = False):
+        for _ in self.trace(offset, called=called):
+            pass
+
+    def trace(self, offset: int = 0, called: bool = False):
+        if (name := self.state.name):
+            self.state.create_file(name, self.parser.lexer.text)
+        length = len(self.parser.lexer.code)
+        labels = self.parser.lexer.labels
+
+        while offset &lt; length:
+            try:
+                for sequence in self.parser.parse(offset):
+                    if isinstance(sequence, AstError):
+                        yield Error(sequence.error)
+                        continue
+                    yield from self.trace_sequence(sequence, self.std, False)
+            except Goto as goto:
+                try:
+                    offset = labels[goto.label.upper()]
+                except KeyError:
+                    raise InvalidLabel(goto.label) from goto
+                continue
+            except Exit as exit:
+                self.state.ec = exit.code
+                if exit.exit and called:
+                    raise
+                else:
+                    break
+            except AbortExecution:
+                self.state.ec = 1
+                break
+            else:
+                break</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.state"><code class="name">var <span class="ident">state</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L232-L234" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def state(self):
+    return self.parser.state</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.environment"><code class="name">var <span class="ident">environment</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L236-L238" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def environment(self):
+    return self.state.environment</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.delayexpand"><code class="name">var <span class="ident">delayexpand</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L240-L242" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def delayexpand(self):
+    return self.state.delayexpand</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.spawn"><code class="name flex">
+<span>def <span class="ident">spawn</span></span>(<span>self, data, state=None, std=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L224-L230" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def spawn(self, data: str | buf | BatchParser, state: BatchState | None = None, std: IO | None = None):
+    return BatchEmulator(
+        data,
+        state,
+        self.cfg,
+        std,
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.clone_state"><code class="name flex">
+<span>def <span class="ident">clone_state</span></span>(<span>self, delayexpand=None, cmdextended=None, environment=Ellipsis, filename=None)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L244-L268" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def clone_state(
+    self,
+    delayexpand: bool | None = None,
+    cmdextended: bool | None = None,
+    environment: dict | None | ellipsis = ...,
+    filename: str | None = None,
+):
+    state = self.state
+    if delayexpand is None:
+        delayexpand = False
+    if cmdextended is None:
+        cmdextended = state.cmdextended
+    if environment is ...:
+        environment = dict(state.environment)
+    return BatchState(
+        delayexpand,
+        cmdextended,
+        environment=environment,
+        file_system=state.file_system,
+        username=state.username,
+        hostname=state.hostname,
+        now=state.now,
+        cwd=state.cwd,
+        filename=filename,
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.get_for_variable_regex"><code class="name flex">
+<span>def <span class="ident">get_for_variable_regex</span></span>(<span>self, vars)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L270-L271" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def get_for_variable_regex(self, vars: Iterable[str]):
+    return re.compile(RF&#39;%((?:~[fdpnxsatz]*)?)((?:\\$\\w+)?)([{&#34;&#34;.join(vars)}])&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.expand_delayed_variables"><code class="name flex">
+<span>def <span class="ident">expand_delayed_variables</span></span>(<span>self, block)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L273-L282" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def expand_delayed_variables(self, block: str):
+    def expansion(match: re.Match[str]):
+        name = match.group(1)
+        try:
+            return parse(name)
+        except MissingVariable:
+            _, _, rest = name.partition(&#39;:&#39;)
+            return rest
+    parse = self.parser.lexer.parse_env_variable
+    return re.sub(r&#39;!([^!\n]*)!&#39;, expansion, block)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.expand_forloop_variables"><code class="name flex">
+<span>def <span class="ident">expand_forloop_variables</span></span>(<span>self, block, vars)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L284-L293" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def expand_forloop_variables(self, block: str, vars: dict[str, str] | None):
+    def expansion(match: re.Match[str]):
+        flags = ArgVarFlags.Empty
+        for flag in match[1]:
+            flags |= ArgVarFlags.FromToken(ord(flag))
+        return _vars[match[3]]
+    if not vars:
+        return block
+    _vars = vars
+    return self.get_for_variable_regex(vars).sub(expansion, block)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.contains_for_variable"><code class="name flex">
+<span>def <span class="ident">contains_for_variable</span></span>(<span>self, ast, vars)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L295-L313" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def contains_for_variable(self, ast: AstNode, vars: Iterable[str]):
+    def check(token):
+        if isinstance(token, list):
+            return any(check(v) for v in token)
+        if isinstance(token, dict):
+            return any(check(v) for v in token.values())
+        if isinstance(token, Enum):
+            return False
+        if isinstance(token, str):
+            return bool(checker(token))
+        if isinstance(token, AstNode):
+            for tf in fields(token):
+                if tf.name == &#39;parent&#39;:
+                    continue
+                if check(getattr(token, tf.name)):
+                    return True
+        return False
+    checker = self.get_for_variable_regex(vars).search
+    return check(ast) # type:ignore</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.expand_ast_node"><code class="name flex">
+<span>def <span class="ident">expand_ast_node</span></span>(<span>self, ast)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L315-L340" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def expand_ast_node(self, ast: _T) -&gt; _T:
+    def expand(token):
+        if isinstance(token, list):
+            return [expand(v) for v in token]
+        if isinstance(token, dict):
+            return {k: expand(v) for k, v in token.items()}
+        if isinstance(token, Enum):
+            return token
+        if isinstance(token, str):
+            if delayexpand:
+                token = self.expand_delayed_variables(token)
+            return self.expand_forloop_variables(token, variables)
+        if isinstance(token, AstNode):
+            new = {}
+            for tf in fields(token):
+                value = getattr(token, tf.name)
+                if tf.name != &#39;parent&#39;:
+                    value = expand(value)
+                new[tf.name] = value
+            return token.__class__(**new)
+        return token
+    delayexpand = self.delayexpand
+    variables = self.state.for_loop_variables
+    if not variables and not delayexpand:
+        return ast
+    return expand(ast) # type:ignore</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_find_or_findstr"><code class="name flex">
+<span>def <span class="ident">execute_find_or_findstr</span></span>(<span>self, cmd, std, findstr)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L342-L450" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def execute_find_or_findstr(self, cmd: SynCommand, std: IO, findstr: bool):
+    needles = []
+    paths: list[str | ellipsis] = [...]
+    flags = {}
+    it = iter(cmd.args)
+    arg = None
+    yield cmd
+
+    for arg in it:
+        if not arg.startswith(&#39;/&#39;):
+            if not findstr and not arg.startswith(&#39;&#34;&#39;):
+                return 1
+            needles.extend(unquote(arg).split())
+            break
+        name, has_param, value = arg[1:].partition(&#39;:&#39;)
+        name = name.upper()
+        if name in (&#39;OFF&#39;, &#39;OFFLINE&#39;):
+            continue
+        elif len(name) &gt; 1:
+            return 1
+        elif name == &#39;C&#39;:
+            needles.append(unquote(value))
+        elif name == &#39;F&#39; and findstr:
+            if (p := self.state.ingest_file(value)) is None:
+                return 1
+            paths.extend(p.splitlines(False))
+        elif name == &#39;G&#39; and findstr:
+            if (n := self.state.ingest_file(value)) is None:
+                return 1
+            needles.extend(n.splitlines(False))
+        elif has_param:
+            flags[name] = value
+        else:
+            flags[name] = True
+
+    valid_flags = &#39;VNI&#39;
+    if findstr:
+        valid_flags += &#39;BELRSXMOPADQ&#39;
+
+    for v in flags:
+        if v not in valid_flags:
+            return 1
+
+    prefix_filename = False
+    state = self.state
+
+    for arg in it:
+        pattern = unquote(arg)
+        if &#39;*&#39; in pattern or &#39;?&#39; in pattern:
+            prefix_filename = True
+            for path in state.file_system:
+                if winfnmatch(path, pattern, state.cwd):
+                    paths.append(path)
+        else:
+            paths.append(pattern)
+
+    if len(paths) &gt; 1:
+        prefix_filename = True
+
+    for n, needle in enumerate(needles):
+        if not findstr or &#39;L&#39; in flags:
+            needle = re.escape(needle)
+        if &#39;X&#39; in flags:
+            needle = F&#39;^{needle}$&#39;
+        elif &#39;B&#39; in flags:
+            needle = F&#39;^{needle}&#39;
+        elif &#39;E&#39; in flags:
+            needle = F&#39;{needle}$&#39;
+        needles[n] = needle
+
+    _V = &#39;V&#39; in flags # noqa; Prints only lines that do not contain a match.
+    _P = &#39;P&#39; in flags # noqa; Skip files with non-printable characters.
+    _O = &#39;O&#39; in flags # noqa; Prints character offset before each matching line.
+    _N = &#39;N&#39; in flags # noqa; Prints the line number before each line that matches.
+    _M = &#39;M&#39; in flags # noqa; Prints only the filename if a file contains a match.
+
+    nothing_found = True
+    offset = 0
+
+    for path in paths:
+        if path is (...):
+            data = std.i.read()
+        else:
+            data = state.ingest_file(path)
+        if data is None:
+            return 1
+        if _P and not re.fullmatch(&#39;[\\s!-~]+&#39;, data):
+            continue
+        for n, line in enumerate(data.splitlines(True), 1):
+            for needle in needles:
+                hit = re.search(needle, line)
+                if _V == bool(hit):
+                    continue
+                nothing_found = False
+                if not _M:
+                    if _O:
+                        o = offset + (hit.start() if hit else 0)
+                        line = F&#39;{o}:{line}&#39;
+                    if _N:
+                        line = F&#39;{n}:{line}&#39;
+                    if prefix_filename:
+                        line = F&#39;{path}:{line}&#39;
+                    std.o.write(line)
+                elif path is not (...):
+                    std.o.write(path)
+                    break
+            offset += len(line)
+
+    return int(nothing_found)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_type"><code class="name flex">
+<span>def <span class="ident">execute_type</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L452-L461" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;TYPE&#39;)
+def execute_type(self, cmd: SynCommand, std: IO, *_):
+    path = cmd.argument_string.strip()
+    data = self.state.ingest_file(path)
+    if data is None:
+        yield ErrorCannotFindFile
+        return 1
+    else:
+        std.o.write(data)
+        return 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_find"><code class="name flex">
+<span>def <span class="ident">execute_find</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L463-L465" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;FIND&#39;)
+def execute_find(self, cmd: SynCommand, std: IO, *_):
+    return self.execute_find_or_findstr(cmd, std, findstr=False)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_findstr"><code class="name flex">
+<span>def <span class="ident">execute_findstr</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L467-L469" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;FINDSTR&#39;)
+def execute_findstr(self, cmd: SynCommand, std: IO, *_):
+    return self.execute_find_or_findstr(cmd, std, findstr=True)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_set"><code class="name flex">
+<span>def <span class="ident">execute_set</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L471-L593" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;SET&#39;)
+def execute_set(self, cmd: SynCommand, std: IO, *_):
+    if not (args := cmd.args):
+        raise EmulatorException(&#39;Empty SET instruction&#39;)
+
+    if cmd.verb.upper() != &#39;SET&#39;:
+        raise RuntimeError
+
+    # Since variables can be used in GOTO, a SET can be used to change the behavior of a GOTO.
+    self.block_labels.clear()
+
+    arithmetic = False
+    quote_mode = False
+    prompt = None
+
+    it = iter(args)
+    tk = next(it)
+
+    if tk.upper() == &#39;/P&#39;:
+        if std.i.closed:
+            prompt = &#39;&#39;
+        elif not (prompt := std.i.readline()).endswith(&#39;\n&#39;):
+            raise InputLocked
+        else:
+            prompt = prompt.rstrip(&#39;\r\n&#39;)
+        tk = next(it)
+    else:
+        cmd.junk = not self.cfg.show_sets
+
+    yield cmd
+
+    if tk.upper() == &#39;/A&#39;:
+        arithmetic = True
+        try:
+            tk = next(it)
+        except StopIteration:
+            tk = &#39;&#39;
+
+    args = [tk, *it, *cmd.trailing_spaces]
+
+    if arithmetic:
+        def defang(s: str):
+            def r(m: re.Match[str]):
+                return F&#39;_{prefix}{ord(m[0]):X}_&#39;
+            return re.sub(r&#39;[^-\s()!~*/%+&gt;&lt;&amp;^|_\w]&#39;, r, s)
+        def refang(s: str): # noqa
+            def r(m: re.Match[str]):
+                return chr(int(m[1], 16))
+            return re.sub(rf&#39;_{prefix}([A-F0-9]+)_&#39;, r, s)
+        prefix = F&#39;{uuid.uuid4().time_mid:X}&#39;
+        namespace = {}
+        translate = {}
+        value = None
+        if not (program := &#39;&#39;.join(args)):
+            std.e.write(&#39;The syntax of the command is incorrect.\r\n&#39;)
+            return ErrorZero.Val
+        for assignment in program.split(&#39;,&#39;):
+            assignment = assignment.strip()
+            if not assignment:
+                std.e.write(&#39;Missing operand.\r\n&#39;)
+                return ErrorZero.Val
+            name, operator, definition = re.split(r&#39;([*+^|/%-&amp;]|&lt;&lt;|&gt;&gt;|)=&#39;, assignment, maxsplit=1)
+            name = name.upper()
+            definition = re.sub(r&#39;\b0([0-7]+)\b&#39;, r&#39;0o\1&#39;, definition)
+            if operator:
+                definition = F&#39;{name}{operator}({definition})&#39;
+            definition = defang(definition)
+            expression = cautious_parse(definition)
+            names = names_in_expression(expression)
+            if names.stored or names.others:
+                raise EmulatorException(&#39;Arithmetic SET had unexpected variable access.&#39;)
+            for var in names.loaded:
+                original = refang(name).upper()
+                translate[original] = var
+                if var in namespace:
+                    continue
+                try:
+                    namespace[var] = batchint(self.environment[original])
+                except (KeyError, ValueError):
+                    namespace[var] = 0
+            code = compile(expression, filename=&#39;[ast]&#39;, mode=&#39;eval&#39;)
+            value = eval(code, namespace, {})
+            self.environment[name] = str(value)
+            namespace[defang(name)] = value
+        if value is None:
+            std.e.write(&#39;The syntax of the command is incorrect.&#39;)
+            return
+        else:
+            std.o.write(F&#39;{value!s}\r\n&#39;)
+    else:
+        try:
+            eq = args.index(Ctrl.Equals)
+        except ValueError:
+            assignment = cmd.argument_string
+            if assignment.startswith(&#39;&#34;&#39;):
+                quote_mode = True
+                assignment, _, unquoted = assignment[1:].rpartition(&#39;&#34;&#39;)
+                assignment = assignment or unquoted
+            else:
+                assignment = &#39;&#39;.join(args)
+            name, _, content = assignment.partition(&#39;=&#39;)
+        else:
+            with StringIO() as io:
+                for k in range(eq + 1, len(args)):
+                    io.write(args[k])
+                content = io.getvalue()
+                name = cmd.args[eq - 1] if eq else &#39;&#39;
+        name = name.upper()
+        trailing_caret, content = uncaret(content, quote_mode)
+        if trailing_caret:
+            content = content[:-1]
+        if prompt is not None:
+            if (qc := content.strip()).startswith(&#39;&#34;&#39;):
+                _, _, qc = qc. partition(&#39;&#34;&#39;) # noqa
+                qc, _, r = qc.rpartition(&#39;&#34;&#39;) # noqa
+                content = qc or r
+            std.o.write(content)
+            content = prompt
+        if name:
+            if content:
+                self.environment[name] = content
+            else:
+                self.environment.pop(name, None)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_call"><code class="name flex">
+<span>def <span class="ident">execute_call</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L595-L617" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;CALL&#39;)
+def execute_call(self, cmd: SynCommand, std: IO, *_):
+    cmdl = cmd.argument_string
+    empty, colon, label = cmdl.partition(&#39;:&#39;)
+    if colon and not empty:
+        try:
+            offset = self.parser.lexer.labels[label.upper()]
+        except KeyError as KE:
+            raise InvalidLabel(label) from KE
+        emu = self.spawn(self.parser, std=std)
+    else:
+        offset = 0
+        path = cmdl.strip()
+        code = self.state.ingest_file(path)
+        if code is None:
+            yield cmd
+            return
+        state = self.clone_state(environment=self.state.environment, filename=path)
+        emu = self.spawn(code, std=std, state=state)
+    if self.cfg.skip_call:
+        emu.execute(called=True)
+    else:
+        yield from emu.trace(offset, called=True)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_setlocal"><code class="name flex">
+<span>def <span class="ident">execute_setlocal</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L619-L633" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;SETLOCAL&#39;)
+def execute_setlocal(self, cmd: SynCommand, *_):
+    yield cmd
+    setting = cmd.argument_string.strip().upper()
+    delay = {
+        &#39;DISABLEDELAYEDEXPANSION&#39;: False,
+        &#39;ENABLEDELAYEDEXPANSION&#39; : True,
+    }.get(setting, self.state.delayexpand)
+    cmdxt = {
+        &#39;DISABLEEXTENSIONS&#39;: False,
+        &#39;ENABLEEXTENSIONS&#39; : True,
+    }.get(setting, self.state.cmdextended)
+    self.state.delayexpand_stack.append(delay)
+    self.state.cmdextended_stack.append(cmdxt)
+    self.state.environment_stack.append(dict(self.environment))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_endlocal"><code class="name flex">
+<span>def <span class="ident">execute_endlocal</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L635-L640" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;ENDLOCAL&#39;)
+def execute_endlocal(self, cmd: SynCommand, *_):
+    yield cmd
+    if len(self.state.environment_stack) &gt; 1:
+        self.state.environment_stack.pop()
+        self.state.delayexpand_stack.pop()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_goto"><code class="name flex">
+<span>def <span class="ident">execute_goto</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L642-L669" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;GOTO&#39;)
+def execute_goto(self, cmd: SynCommand, std: IO, *_):
+    if self.cfg.skip_goto:
+        yield cmd
+        return
+    it = iter(cmd.args)
+    mark = False
+    for label in it:
+        if not isinstance(label, Ctrl):
+            break
+        if label == Ctrl.Label:
+            mark = True
+            for label in it:
+                break
+            else:
+                label = &#39;&#39;
+            break
+    else:
+        std.e.write(&#39;No batch label specified to GOTO command.\r\n&#39;)
+        raise AbortExecution
+    label, *_ = label.split(maxsplit=1)
+    key = label.upper()
+    if mark and key == &#39;EOF&#39;:
+        raise Exit(int(self.state.ec), False)
+    if key not in self.block_labels:
+        raise Goto(label)
+    else:
+        yield Error(F&#39;Infinite Loop detected for label {key}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_exit"><code class="name flex">
+<span>def <span class="ident">execute_exit</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L671-L689" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;EXIT&#39;)
+def execute_exit(self, cmd: SynCommand, *_):
+    it = iter(cmd.args)
+    exit = True
+    token = 0
+    for arg in it:
+        if arg.upper() == &#39;/B&#39;:
+            exit = False
+            continue
+        token = arg
+        break
+    try:
+        code = int(token)
+    except ValueError:
+        code = 0
+    yield cmd
+    if self.cfg.skip_exit:
+        return
+    raise Exit(code, exit)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_chdir"><code class="name flex">
+<span>def <span class="ident">execute_chdir</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L691-L695" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;CHDIR&#39;)
+@_command(&#39;CD&#39;)
+def execute_chdir(self, cmd: SynCommand, *_):
+    yield cmd
+    self.state.cwd = cmd.argument_string.strip()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_pushd"><code class="name flex">
+<span>def <span class="ident">execute_pushd</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L697-L701" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;PUSHD&#39;)
+def execute_pushd(self, cmd: SynCommand, *_):
+    yield cmd
+    self.state.dirstack.append(self.state.cwd)
+    self.execute_chdir(cmd)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_popd"><code class="name flex">
+<span>def <span class="ident">execute_popd</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L703-L709" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;POPD&#39;)
+def execute_popd(self, cmd: SynCommand, *_):
+    yield cmd
+    try:
+        self.state.cwd = self.state.dirstack.pop()
+    except IndexError:
+        pass</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_echo"><code class="name flex">
+<span>def <span class="ident">execute_echo</span></span>(<span>self, cmd, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L711-L733" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;ECHO&#39;)
+def execute_echo(self, cmd: SynCommand, std: IO, in_group: bool):
+    cmdl = cmd.argument_string
+    mode = cmdl.strip().lower()
+    current_state = self.state.echo
+    if mode == &#39;on&#39;:
+        if self.cfg.show_nops or current_state is False:
+            yield cmd
+        self.state.echo = True
+        return
+    if mode == &#39;off&#39;:
+        if self.cfg.show_nops or current_state is True:
+            yield cmd
+        self.state.echo = False
+        return
+    yield cmd
+    if mode:
+        if in_group and not cmdl.endswith(&#39; &#39;):
+            cmdl += &#39; &#39;
+        std.o.write(F&#39;{cmdl}\r\n&#39;)
+    else:
+        mode = &#39;on&#39; if self.state.echo else &#39;off&#39;
+        std.o.write(F&#39;ECHO is {mode}.\r\n&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_cls"><code class="name flex">
+<span>def <span class="ident">execute_cls</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L735-L737" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;CLS&#39;)
+def execute_cls(self, cmd: SynCommand, *_):
+    yield cmd</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_del"><code class="name flex">
+<span>def <span class="ident">execute_del</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L739-L783" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;ERASE&#39;)
+@_command(&#39;DEL&#39;)
+def execute_del(self, cmd: SynCommand, std: IO, *_):
+    if not cmd.args:
+        yield Error(&#39;The syntax of the command is incorrect&#39;)
+        return 1
+    else:
+        yield cmd
+    flags = {}
+    it = iter(cmd.args)
+    while (arg := next(it)).startswith(&#39;/&#39;) and 1 &lt; len(arg):
+        flag = arg.upper()
+        if flag[:3] == &#39;/A:&#39;:
+            flags[&#39;A&#39;] = flag[3:]
+            continue
+        flags[flag[1]] = True
+    _P = &#39;P&#39; in flags # Prompts for confirmation before deleting each file.
+    _F = &#39;F&#39; in flags # Force deleting of read-only files.
+    _S = &#39;S&#39; in flags # Delete specified files from all subdirectories.
+    _Q = &#39;Q&#39; in flags # Quiet mode, do not ask if ok to delete on global wildcard
+    paths = [arg, *it]
+    state = self.state
+    cwd = state.cwd
+    for pattern in paths:
+        for path in list(state.file_system):
+            if not winfnmatch(pattern, path, cwd):
+                continue
+            if _F:
+                pass
+            if _S:
+                pass
+            if _Q:
+                pass
+            if _P and state.exists_file(pattern):
+                std.o.write(F&#39;{pattern}, Delete (Y/N)? &#39;)
+                decision = None
+                while decision not in (&#39;y&#39;, &#39;n&#39;):
+                    confirmation = std.i.readline()
+                    if not confirmation.endswith(&#39;\n&#39;):
+                        raise InputLocked
+                    decision = confirmation[:1].lower()
+                if decision == &#39;n&#39;:
+                    continue
+            state.remove_file(path)
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_start"><code class="name flex">
+<span>def <span class="ident">execute_start</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L785-L817" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;START&#39;)
+def execute_start(self, cmd: SynCommand, std: IO, *_):
+    yield cmd
+    it = iter(cmd.ast.fragments)
+    it = itertools.islice(it, cmd.argument_offset, None)
+    title = None
+    start = None
+    cwd = self.state.cwd
+    env = ...
+    for arg in it:
+        if title is None:
+            if &#39;&#34;&#39; not in arg:
+                title = &#39;&#39;
+            else:
+                title = unquote(arg)
+                continue
+        if arg.isspace():
+            continue
+        if not arg.startswith(&#39;/&#39;):
+            start = unquote(arg)
+            break
+        if (flag := arg.upper()) in (&#39;/NODE&#39;, &#39;/AFFINITY&#39;, &#39;/MACHINE&#39;):
+            next(it)
+        elif flag == &#39;/D&#39;:
+            cwd = next(it)
+        elif flag == &#39;/I&#39;:
+            env = None
+    if start and (batch := self.state.ingest_file(start)):
+        state = self.clone_state(environment=env)
+        state.cwd = cwd
+        state.command_line = _fuse(it).strip()
+        shell = self.spawn(batch, state, std)
+        yield from shell.trace()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_cmd"><code class="name flex">
+<span>def <span class="ident">execute_cmd</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L819-L863" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;CMD&#39;)
+def execute_cmd(self, cmd: SynCommand, std: IO, *_):
+    yield cmd
+    it = iter(cmd.ast.fragments)
+    command = None
+    quiet = False
+    strip = False
+    codec = &#39;cp1252&#39;
+    delayexpand = None
+    cmdextended = None
+
+    for arg in it:
+        if arg.isspace() or not arg.startswith(&#39;/&#39;):
+            continue
+        name, _, flag = arg[1:].partition(&#39;:&#39;)
+        flag = flag.upper()
+        name = name.upper()
+        if name in &#39;CKR&#39;:
+            command = _fuse(it)
+            break
+        elif name == &#39;Q&#39;:
+            quiet = True
+        elif name == &#39;S&#39;:
+            strip = True
+        elif name == &#39;U&#39;:
+            codec = &#39;utf-16le&#39;
+        elif name == &#39;E&#39;:
+            cmdextended = _onoff(flag)
+        elif name == &#39;V&#39;:
+            delayexpand = _onoff(flag)
+    else:
+        return 0
+
+    if (stripped := re.search(&#39;^\\s*&#34;(.*)&#34;&#39;, command)) and (strip
+        or command.count(&#39;&#34;&#39;) != 2
+        or re.search(&#39;[&amp;&lt;&gt;()@^|]&#39;, stripped[1])
+        or re.search(&#39;\\s&#39;, stripped[1]) is None
+    ):
+        command = stripped[1]
+
+    state = self.clone_state(delayexpand=delayexpand, cmdextended=cmdextended)
+    state.codec = codec
+    state.echo = not quiet
+    shell = self.spawn(command, state, std)
+    yield from shell.trace()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_program"><code class="name flex">
+<span>def <span class="ident">execute_unimplemented_program</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L865-L935" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;ARP&#39;)
+@_command(&#39;AT&#39;)
+@_command(&#39;ATBROKER&#39;)
+@_command(&#39;BGINFO&#39;)
+@_command(&#39;BITSADMIN&#39;)
+@_command(&#39;CERTUTIL&#39;)
+@_command(&#39;CLIP&#39;)
+@_command(&#39;CMSTP&#39;)
+@_command(&#39;COMPACT&#39;)
+@_command(&#39;CONTROL&#39;)
+@_command(&#39;CSCRIPT&#39;)
+@_command(&#39;CURL&#39;)
+@_command(&#39;DEFRAG&#39;)
+@_command(&#39;DISKSHADOW&#39;)
+@_command(&#39;ESENTUTL&#39;)
+@_command(&#39;EXPAND&#39;)
+@_command(&#39;EXPLORER&#39;)
+@_command(&#39;EXTRAC32&#39;)
+@_command(&#39;FODHELPER&#39;)
+@_command(&#39;FORFILES&#39;)
+@_command(&#39;FTP&#39;)
+@_command(&#39;HOSTNAME&#39;)
+@_command(&#39;HOSTNAME&#39;)
+@_command(&#39;INSTALLUTIL&#39;)
+@_command(&#39;IPCONFIG&#39;)
+@_command(&#39;LOGOFF&#39;)
+@_command(&#39;MAKECAB&#39;)
+@_command(&#39;MAVINJECT&#39;)
+@_command(&#39;MOUNTVOL&#39;)
+@_command(&#39;MSBUILD&#39;)
+@_command(&#39;MSHTA&#39;)
+@_command(&#39;MSIEXEC&#39;)
+@_command(&#39;MSTSC&#39;)
+@_command(&#39;NET&#39;)
+@_command(&#39;NET1&#39;)
+@_command(&#39;NETSH&#39;)
+@_command(&#39;NSLOOKUP&#39;)
+@_command(&#39;ODBCCONF&#39;)
+@_command(&#39;PATHPING&#39;)
+@_command(&#39;PING&#39;)
+@_command(&#39;POWERSHELL&#39;)
+@_command(&#39;PRESENTATIONHOST&#39;)
+@_command(&#39;PWSH&#39;)
+@_command(&#39;REG&#39;)
+@_command(&#39;REGSVR32&#39;)
+@_command(&#39;ROUTE&#39;)
+@_command(&#39;RUNDLL32&#39;)
+@_command(&#39;SCP&#39;)
+@_command(&#39;SDCLT&#39;)
+@_command(&#39;SETX&#39;)
+@_command(&#39;SFTP&#39;)
+@_command(&#39;SHUTDOWN&#39;)
+@_command(&#39;SSH&#39;)
+@_command(&#39;SUBST&#39;)
+@_command(&#39;SYNCAPPVPUBLISHINGSERVER&#39;)
+@_command(&#39;SYSTEMINFO&#39;)
+@_command(&#39;TAR&#39;)
+@_command(&#39;TELNET&#39;)
+@_command(&#39;TFTP&#39;)
+@_command(&#39;TIMEOUT&#39;)
+@_command(&#39;TRACERT&#39;)
+@_command(&#39;VSSADMIN&#39;)
+@_command(&#39;WBADMIN&#39;)
+@_command(&#39;WHERE&#39;)
+@_command(&#39;WHOAMI&#39;)
+@_command(&#39;WINRM&#39;)
+@_command(&#39;WINRS&#39;)
+@_command(&#39;WSCRIPT&#39;)
+def execute_unimplemented_program(self, cmd: SynCommand, *_):
+    yield cmd
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_command_unmodified_ec"><code class="name flex">
+<span>def <span class="ident">execute_unimplemented_command_unmodified_ec</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L937-L939" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;CLS&#39;)
+def execute_unimplemented_command_unmodified_ec(self, cmd: SynCommand, *_):
+    yield cmd</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_command"><code class="name flex">
+<span>def <span class="ident">execute_unimplemented_command</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L941-L1004" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;ASSOC&#39;)
+@_command(&#39;ATTRIB&#39;)
+@_command(&#39;BCDEDIT&#39;)
+@_command(&#39;BREAK&#39;)
+@_command(&#39;CACLS&#39;)
+@_command(&#39;CHCP&#39;)
+@_command(&#39;CHKDSK&#39;)
+@_command(&#39;CHKNTFS&#39;)
+@_command(&#39;COLOR&#39;)
+@_command(&#39;COMP&#39;)
+@_command(&#39;COMPACT&#39;)
+@_command(&#39;CONVERT&#39;)
+@_command(&#39;COPY&#39;)
+@_command(&#39;DATE&#39;)
+@_command(&#39;DIR&#39;)
+@_command(&#39;DISKPART&#39;)
+@_command(&#39;DOSKEY&#39;)
+@_command(&#39;DRIVERQUERY&#39;)
+@_command(&#39;FC&#39;)
+@_command(&#39;FORMAT&#39;)
+@_command(&#39;FSUTIL&#39;)
+@_command(&#39;FTYPE&#39;)
+@_command(&#39;GPRESULT&#39;)
+@_command(&#39;ICACLS&#39;)
+@_command(&#39;LABEL&#39;)
+@_command(&#39;MD&#39;)
+@_command(&#39;MKDIR&#39;)
+@_command(&#39;MKLINK&#39;)
+@_command(&#39;MODE&#39;)
+@_command(&#39;MORE&#39;)
+@_command(&#39;MOVE&#39;)
+@_command(&#39;OPENFILES&#39;)
+@_command(&#39;PATH&#39;)
+@_command(&#39;PAUSE&#39;)
+@_command(&#39;PRINT&#39;)
+@_command(&#39;PROMPT&#39;)
+@_command(&#39;RD&#39;)
+@_command(&#39;RECOVER&#39;)
+@_command(&#39;REN&#39;)
+@_command(&#39;RENAME&#39;)
+@_command(&#39;REPLACE&#39;)
+@_command(&#39;RMDIR&#39;)
+@_command(&#39;ROBOCOPY&#39;)
+@_command(&#39;SC&#39;)
+@_command(&#39;SCHTASKS&#39;)
+@_command(&#39;SHIFT&#39;)
+@_command(&#39;SHUTDOWN&#39;)
+@_command(&#39;SORT&#39;)
+@_command(&#39;SUBST&#39;)
+@_command(&#39;SYSTEMINFO&#39;)
+@_command(&#39;TASKKILL&#39;)
+@_command(&#39;TASKLIST&#39;)
+@_command(&#39;TIME&#39;)
+@_command(&#39;TITLE&#39;)
+@_command(&#39;TREE&#39;)
+@_command(&#39;TYPE&#39;)
+@_command(&#39;VER&#39;)
+@_command(&#39;VERIFY&#39;)
+@_command(&#39;VOL&#39;)
+@_command(&#39;WMIC&#39;)
+@_command(&#39;XCOPY&#39;)
+def execute_unimplemented_command(self, cmd: SynCommand, *_):
+    yield cmd
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_rem"><code class="name flex">
+<span>def <span class="ident">execute_rem</span></span>(<span>self, cmd, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1006-L1009" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;REM&#39;)
+def execute_rem(self, cmd: SynCommand, *_):
+    if self.cfg.show_comments:
+        yield cmd</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_help"><code class="name flex">
+<span>def <span class="ident">execute_help</span></span>(<span>self, cmd, std, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1011-L1015" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_command(&#39;HELP&#39;)
+def execute_help(self, cmd: SynCommand, std: IO, *_):
+    yield cmd
+    std.o.write(HelpOutput[&#39;HELP&#39;])
+    return 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute_command"><code class="name flex">
+<span>def <span class="ident">execute_command</span></span>(<span>self, cmd, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1017-L1081" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def execute_command(self, cmd: SynCommand, std: IO, in_group: bool):
+    verb = cmd.verb.upper().strip()
+    handler = self._command.handlers.get(verb)
+
+    if handler is None:
+        base, ext = ntpath.splitext(verb)
+        handler = None
+        if any(ext == pe.upper() for pe in self.state.envar(&#39;PATHEXT&#39;, &#39;&#39;).split(&#39;;&#39;)):
+            handler = self._command.handlers.get(base)
+
+    if handler is None:
+        if self.state.exists_file(verb):
+            self.state.ec = 0
+        elif not indicators.winfpath.value.fullmatch(verb):
+            if &#39;\uFFFD&#39; in verb or not verb.isprintable():
+                self.state.ec = 9009
+                cmd.junk = True
+            else:
+                cmd.junk = not self.cfg.show_junk
+        yield cmd
+        return
+
+    paths: dict[int, str] = {}
+
+    for src, r in cmd.ast.redirects.items():
+        if not 0 &lt;= src &lt;= 2 or (src == 0) != r.is_input:
+            continue
+        if isinstance((target := r.target), str):
+            if target.upper() == &#39;NUL&#39;:
+                std[src] = DevNull()
+            else:
+                data = self.state.ingest_file(target)
+                if src == 0:
+                    if data is None:
+                        yield ErrorCannotFindFile
+                        return
+                    std.i = StringIO(data)
+                else:
+                    if r.is_out_append:
+                        buffer = StringIO(data)
+                        buffer.seek(0, 2)
+                    else:
+                        buffer = StringIO()
+                    std[src] = buffer
+                    paths[src] = target
+        elif src == 1 and target == 2:
+            std.o = std.e
+        elif src == 2 and target == 1:
+            std.e = std.o
+
+    if &#39;/?&#39; in cmd.args:
+        std.o.write(HelpOutput[verb])
+        self.state.ec = 0
+        return
+
+    if (result := handler(self, cmd, std, in_group)) is None:
+        pass
+    elif not isinstance(result, (int, ErrorZero)):
+        result = (yield from result)
+
+    for k, path in paths.items():
+        self.state.create_file(path, std[k].getvalue())
+
+    if result is not None:
+        self.state.ec = result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_pipeline"><code class="name flex">
+<span>def <span class="ident">trace_pipeline</span></span>(<span>self, pipeline, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1083-L1103" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_node(AstPipeline)
+def trace_pipeline(self, pipeline: AstPipeline, std: IO, in_group: bool):
+    length = len(pipeline.parts)
+    streams = IO(*std)
+    if length &gt; 1:
+        yield synthesize(pipeline)
+    for k, part in enumerate(pipeline.parts, 1):
+        if k != 1:
+            streams.i = streams.o
+            streams.i.seek(0)
+        if k == length:
+            streams.o = std.o
+        else:
+            streams.o = StringIO()
+        if isinstance(part, AstGroup):
+            it = self.trace_group(part, streams, in_group)
+        else:
+            ast = self.expand_ast_node(part)
+            cmd = synthesize(ast)
+            it = self.execute_command(cmd, streams, in_group)
+        yield from it</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_sequence"><code class="name flex">
+<span>def <span class="ident">trace_sequence</span></span>(<span>self, sequence, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1105-L1115" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_node(AstSequence)
+def trace_sequence(self, sequence: AstSequence, std: IO, in_group: bool):
+    yield from self.trace_statement(sequence.head, std, in_group)
+    for cs in sequence.tail:
+        if cs.condition == AstCondition.Failure:
+            if bool(self.state.ec) is False:
+                continue
+        if cs.condition == AstCondition.Success:
+            if bool(self.state.ec) is True:
+                continue
+        yield from self.trace_statement(cs.statement, std, in_group)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_if"><code class="name flex">
+<span>def <span class="ident">trace_if</span></span>(<span>self, _if, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1117-L1164" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_node(AstIf)
+def trace_if(self, _if: AstIf, std: IO, in_group: bool):
+    yield synthesize(_if)
+    _if = self.expand_ast_node(_if)
+    self.block_labels.clear()
+
+    if _if.variant == AstIfVariant.ErrorLevel:
+        condition = _if.var_int &lt;= self.state.ec
+    elif _if.variant == AstIfVariant.CmdExtVersion:
+        condition = _if.var_int &lt;= self.state.extensions_version
+    elif _if.variant == AstIfVariant.Exist:
+        condition = self.state.exists_file(_if.var_str)
+    elif _if.variant == AstIfVariant.Defined:
+        condition = _if.var_str.upper() in self.state.environment
+    else:
+        lhs = _if.lhs
+        rhs = _if.rhs
+        cmp = _if.cmp
+        assert lhs is not None
+        assert rhs is not None
+        if cmp == AstIfCmp.STR:
+            if _if.casefold:
+                if isinstance(lhs, str):
+                    lhs = lhs.casefold()
+                if isinstance(rhs, str):
+                    rhs = rhs.casefold()
+            condition = lhs == rhs
+        elif cmp == AstIfCmp.GTR:
+            condition = lhs &gt; rhs
+        elif cmp == AstIfCmp.GEQ:
+            condition = lhs &gt;= rhs
+        elif cmp == AstIfCmp.NEQ:
+            condition = lhs != rhs
+        elif cmp == AstIfCmp.EQU:
+            condition = lhs == rhs
+        elif cmp == AstIfCmp.LSS:
+            condition = lhs &lt; rhs
+        elif cmp == AstIfCmp.LEQ:
+            condition = lhs &lt;= rhs
+        else:
+            raise RuntimeError(cmp)
+    if _if.negated:
+        condition = not condition
+
+    if condition:
+        yield from self.trace_sequence(_if.then_do, std, in_group)
+    elif (_else := _if.else_do):
+        yield from self.trace_sequence(_else, std, in_group)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_for"><code class="name flex">
+<span>def <span class="ident">trace_for</span></span>(<span>self, _for, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1166-L1227" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_node(AstFor)
+def trace_for(self, _for: AstFor, std: IO, in_group: bool):
+    state = self.state
+    cwd = state.cwd
+    vars = state.new_forloop()
+    body = _for.body
+    name = _for.variable
+    vars[name] = &#39;&#39;
+
+    if (
+        self.contains_for_variable(body, vars)
+            or _for.variant != AstForVariant.NumericLoop
+            or len(_for.spec) != 1
+    ):
+        yield synthesize(_for)
+
+    if _for.variant == AstForVariant.FileParsing:
+        if _for.mode == AstForParserMode.Command:
+            emulator = self.spawn(_for.specline, self.clone_state(filename=state.name))
+            yield from emulator.trace()
+            lines = emulator.std.o.getvalue().splitlines()
+        elif _for.mode == AstForParserMode.Literal:
+            lines = _for.spec
+        else:
+            def lines_from_files():
+                fs = state.file_system
+                for name in _for.spec:
+                    for path, content in fs.items():
+                        if not winfnmatch(path, name, cwd):
+                            continue
+                        yield from content.splitlines(False)
+            lines = lines_from_files()
+        opt = _for.options
+        tokens = sorted(opt.tokens)
+        split = re.compile(&#39;[{}]+&#39;.format(re.escape(opt.delims)))
+        count = tokens[-1] + 1 if tokens else 0
+        first_variable = ord(name)
+        if opt.asterisk:
+            tokens.append(count)
+        for n, line in enumerate(lines):
+            if n &lt; opt.skip:
+                continue
+            if opt.comment and line.startswith(opt.comment):
+                continue
+            if count:
+                tokenized = split.split(line, maxsplit=count)
+            else:
+                tokenized = (line,)
+            for k, tok in enumerate(tokens):
+                name = chr(first_variable + k)
+                if not name.isalpha():
+                    raise EmulatorException(&#39;Ran out of variables in FOR-Loop.&#39;)
+                try:
+                    vars[name] = tokenized[tok]
+                except IndexError:
+                    vars[name] = &#39;&#39;
+            yield from self.trace_sequence(body, std, in_group)
+    else:
+        for entry in _for.spec:
+            vars[name] = entry
+            yield from self.trace_sequence(body, std, in_group)
+    state.end_forloop()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_group"><code class="name flex">
+<span>def <span class="ident">trace_group</span></span>(<span>self, group, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1229-L1233" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_node(AstGroup)
+def trace_group(self, group: AstGroup, std: IO, in_group: bool):
+    for sequence in group.fragments:
+        yield from self.trace_sequence(sequence, std, True)
+    yield synthesize(group)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_label"><code class="name flex">
+<span>def <span class="ident">trace_label</span></span>(<span>self, label, *_)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1235-L1243" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@_node(AstLabel)
+def trace_label(self, label: AstLabel, *_):
+    if label.comment:
+        if self.cfg.show_comments:
+            yield synthesize(label)
+    else:
+        if self.cfg.show_labels:
+            yield synthesize(label)
+        self.block_labels.add(label.label.upper())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace_statement"><code class="name flex">
+<span>def <span class="ident">trace_statement</span></span>(<span>self, statement, std, in_group)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1245-L1250" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trace_statement(self, statement: AstStatement, std: IO, in_group: bool):
+    try:
+        handler = self._node.handlers[statement.__class__]
+    except KeyError:
+        raise RuntimeError(statement)
+    yield from handler(self, statement, std, in_group)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_commands"><code class="name flex">
+<span>def <span class="ident">emulate_commands</span></span>(<span>self, allow_junk=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1252-L1258" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emulate_commands(self, allow_junk=False):
+    for syn in self.trace():
+        if not isinstance(syn, SynCommand):
+            continue
+        if not allow_junk and syn.junk:
+            continue
+        yield str(syn)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate_to_depth"><code class="name flex">
+<span>def <span class="ident">emulate_to_depth</span></span>(<span>self, depth=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1260-L1265" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emulate_to_depth(self, depth: int = 0):
+    for syn in self.trace():
+        if not isinstance(syn, SynNodeBase):
+            continue
+        if syn.ast.depth &lt;= depth:
+            yield str(syn)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.emulate"><code class="name flex">
+<span>def <span class="ident">emulate</span></span>(<span>self, offset=0)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1267-L1295" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emulate(self, offset: int = 0):
+    last: AstNode | None = None
+    junk: AstNode | None = None
+    for syn in self.trace(offset):
+        if not isinstance(syn, SynNodeBase):
+            continue
+        ast = syn.ast
+        if isinstance(syn, SynCommand) and syn.junk:
+            junk = ast
+            continue
+        if junk is not None:
+            if junk.is_descendant_of(ast):
+                if not last or not last.is_descendant_of(ast):
+                    continue
+        if last is not None:
+            if ast.is_descendant_of(last):
+                # we already synthesized a parent construct, like a FOR loop or IF block
+                continue
+            if last.is_descendant_of(ast):
+                # we synthesized a command and no longer need to synthesize an AST node that
+                # wraps it, like a group
+                continue
+        if isinstance(ast, AstPipeline):
+            if len(ast.parts) == 1:
+                continue
+        if last is ast:
+            raise RuntimeError(&#39;Emulator attempted to synthesize the same command twice.&#39;)
+        last = ast
+        yield str(syn)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.execute"><code class="name flex">
+<span>def <span class="ident">execute</span></span>(<span>self, offset=0, called=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1297-L1299" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def execute(self, offset: int = 0, called: bool = False):
+    for _ in self.trace(offset, called=called):
+        pass</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.batch.emulator.BatchEmulator.trace"><code class="name flex">
+<span>def <span class="ident">trace</span></span>(<span>self, offset=0, called=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/lib/batch/emulator.py#L1301-L1330" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trace(self, offset: int = 0, called: bool = False):
+    if (name := self.state.name):
+        self.state.create_file(name, self.parser.lexer.text)
+    length = len(self.parser.lexer.code)
+    labels = self.parser.lexer.labels
+
+    while offset &lt; length:
+        try:
+            for sequence in self.parser.parse(offset):
+                if isinstance(sequence, AstError):
+                    yield Error(sequence.error)
+                    continue
+                yield from self.trace_sequence(sequence, self.std, False)
+        except Goto as goto:
+            try:
+                offset = labels[goto.label.upper()]
+            except KeyError:
+                raise InvalidLabel(goto.label) from goto
+            continue
+        except Exit as exit:
+            self.state.ec = exit.code
+            if exit.exit and called:
+                raise
+            else:
+                break
+        except AbortExecution:
+            self.state.ec = 1
+            break
+        else:
+            break</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.batch" href="index.html">refinery.lib.batch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.batch.emulator.winfnmatch" href="#refinery.lib.batch.emulator.winfnmatch">winfnmatch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.batch.emulator.DevNull" href="#refinery.lib.batch.emulator.DevNull">DevNull</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.batch.emulator.DevNull.getvalue" href="#refinery.lib.batch.emulator.DevNull.getvalue">getvalue</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.DevNull.detach" href="#refinery.lib.batch.emulator.DevNull.detach">detach</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.DevNull.readline" href="#refinery.lib.batch.emulator.DevNull.readline">readline</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.DevNull.read" href="#refinery.lib.batch.emulator.DevNull.read">read</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.DevNull.write" href="#refinery.lib.batch.emulator.DevNull.write">write</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.DevNull.seek" href="#refinery.lib.batch.emulator.DevNull.seek">seek</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.emulator.Error" href="#refinery.lib.batch.emulator.Error">Error</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.emulator.IO" href="#refinery.lib.batch.emulator.IO">IO</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.emulator.BatchEmulatorConfig" href="#refinery.lib.batch.emulator.BatchEmulatorConfig">BatchEmulatorConfig</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.batch.emulator.BatchEmulator" href="#refinery.lib.batch.emulator.BatchEmulator">BatchEmulator</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.spawn" href="#refinery.lib.batch.emulator.BatchEmulator.spawn">spawn</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.clone_state" href="#refinery.lib.batch.emulator.BatchEmulator.clone_state">clone_state</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.get_for_variable_regex" href="#refinery.lib.batch.emulator.BatchEmulator.get_for_variable_regex">get_for_variable_regex</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.expand_delayed_variables" href="#refinery.lib.batch.emulator.BatchEmulator.expand_delayed_variables">expand_delayed_variables</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.expand_forloop_variables" href="#refinery.lib.batch.emulator.BatchEmulator.expand_forloop_variables">expand_forloop_variables</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.contains_for_variable" href="#refinery.lib.batch.emulator.BatchEmulator.contains_for_variable">contains_for_variable</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.expand_ast_node" href="#refinery.lib.batch.emulator.BatchEmulator.expand_ast_node">expand_ast_node</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_find_or_findstr" href="#refinery.lib.batch.emulator.BatchEmulator.execute_find_or_findstr">execute_find_or_findstr</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_type" href="#refinery.lib.batch.emulator.BatchEmulator.execute_type">execute_type</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_find" href="#refinery.lib.batch.emulator.BatchEmulator.execute_find">execute_find</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_findstr" href="#refinery.lib.batch.emulator.BatchEmulator.execute_findstr">execute_findstr</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_set" href="#refinery.lib.batch.emulator.BatchEmulator.execute_set">execute_set</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_call" href="#refinery.lib.batch.emulator.BatchEmulator.execute_call">execute_call</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_setlocal" href="#refinery.lib.batch.emulator.BatchEmulator.execute_setlocal">execute_setlocal</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_endlocal" href="#refinery.lib.batch.emulator.BatchEmulator.execute_endlocal">execute_endlocal</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_goto" href="#refinery.lib.batch.emulator.BatchEmulator.execute_goto">execute_goto</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_exit" href="#refinery.lib.batch.emulator.BatchEmulator.execute_exit">execute_exit</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_chdir" href="#refinery.lib.batch.emulator.BatchEmulator.execute_chdir">execute_chdir</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_pushd" href="#refinery.lib.batch.emulator.BatchEmulator.execute_pushd">execute_pushd</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_popd" href="#refinery.lib.batch.emulator.BatchEmulator.execute_popd">execute_popd</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_echo" href="#refinery.lib.batch.emulator.BatchEmulator.execute_echo">execute_echo</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_cls" href="#refinery.lib.batch.emulator.BatchEmulator.execute_cls">execute_cls</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_del" href="#refinery.lib.batch.emulator.BatchEmulator.execute_del">execute_del</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_start" href="#refinery.lib.batch.emulator.BatchEmulator.execute_start">execute_start</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_cmd" href="#refinery.lib.batch.emulator.BatchEmulator.execute_cmd">execute_cmd</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_program" href="#refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_program">execute_unimplemented_program</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_command_unmodified_ec" href="#refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_command_unmodified_ec">execute_unimplemented_command_unmodified_ec</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_command" href="#refinery.lib.batch.emulator.BatchEmulator.execute_unimplemented_command">execute_unimplemented_command</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_rem" href="#refinery.lib.batch.emulator.BatchEmulator.execute_rem">execute_rem</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_help" href="#refinery.lib.batch.emulator.BatchEmulator.execute_help">execute_help</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute_command" href="#refinery.lib.batch.emulator.BatchEmulator.execute_command">execute_command</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_pipeline" href="#refinery.lib.batch.emulator.BatchEmulator.trace_pipeline">trace_pipeline</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_sequence" href="#refinery.lib.batch.emulator.BatchEmulator.trace_sequence">trace_sequence</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_if" href="#refinery.lib.batch.emulator.BatchEmulator.trace_if">trace_if</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_for" href="#refinery.lib.batch.emulator.BatchEmulator.trace_for">trace_for</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_group" href="#refinery.lib.batch.emulator.BatchEmulator.trace_group">trace_group</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_label" href="#refinery.lib.batch.emulator.BatchEmulator.trace_label">trace_label</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace_statement" href="#refinery.lib.batch.emulator.BatchEmulator.trace_statement">trace_statement</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_commands" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_commands">emulate_commands</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate_to_depth" href="#refinery.lib.batch.emulator.BatchEmulator.emulate_to_depth">emulate_to_depth</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.emulate" href="#refinery.lib.batch.emulator.BatchEmulator.emulate">emulate</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.execute" href="#refinery.lib.batch.emulator.BatchEmulator.execute">execute</a></code></li>
+<li><code><a title="refinery.lib.batch.emulator.BatchEmulator.trace" href="#refinery.lib.batch.emulator.BatchEmulator.trace">trace</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

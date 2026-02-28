@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.formats.winreg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.formats.winreg</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/winreg.py#L1-L185" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import contextlib
+import inspect
+import io
+import re
+import shlex
+
+from configparser import ConfigParser
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+from refinery.lib.id import get_reg_export_type
+from refinery.lib.structures import MemoryFile
+from refinery.units.encoding.esc import esc
+from refinery.units.formats import PathExtractorUnit, PathPattern, UnpackResult
+
+if TYPE_CHECKING:
+    from Registry.Registry import RegistryKey, RegistryValue
+
+
+class ParseException(Exception):
+    pass
+
+
+class WinRegFileParser(ConfigParser):
+    def optionxform(self, optionstr: str) -&gt; str:
+        return optionstr
+
+
+class winreg(PathExtractorUnit):
+    &#34;&#34;&#34;
+    Extract values from a Windows registry hive or from a registry export (.reg file).
+    &#34;&#34;&#34;
+    @PathExtractorUnit.Requires(&#39;python-registry&#39;, [&#39;formats&#39;])
+    def _registry():
+        import Registry
+        import Registry.Registry
+        import Registry.RegistryParse
+        return Registry
+
+    @staticmethod
+    def _walk(patterns: list[PathPattern], key: RegistryKey, *path: str):
+        here = &#39;/&#39;.join(path)
+        if not any(p.reach(here) for p in patterns):
+            winreg.log_debug(F&#39;pruning search at {here}&#39;)
+            return
+        for value in key.values():
+            def raw(v: RegistryValue = value):
+                return v.raw_data()
+            vpath = here
+            vname = value.name()
+            if vname != &#39;(default)&#39;:
+                vpath = F&#39;{vpath}/{vname}&#39;
+            yield UnpackResult(vpath, raw)
+        for subkey in key.subkeys():
+            yield from winreg._walk(patterns, subkey, *path, subkey.name())
+
+    def _unpack_hive(self, data: bytearray):
+        try:
+            with MemoryFile(data) as stream:
+                root = self._registry.Registry.Registry(stream).root()
+                yield from self._walk(self._patterns, root, root.name())
+        except self._registry.RegistryParse.ParseException:
+            raise ParseException
+
+    def _decode_registry_export(self, data: str):
+        def REG_BINARY(data: str) -&gt; bytes:
+            return bytes.fromhex(re.sub(&#39;[^a-f0-9]+&#39;, &#39;&#39;, data))
+
+        def REG_SZ(data: str) -&gt; bytes:
+            return data.encode(self.codec) | esc(quoted=True) | bytes
+
+        def REG_EXPAND_SZ(data: str):
+            return REG_BINARY(data).decode(&#39;UTF-16LE&#39;).rstrip(&#39;\0&#39;).encode(self.codec)
+
+        def REG_MULTI_SZ(data: str):
+            for string in REG_BINARY(data).decode(&#39;UTF-16LE&#39;).split(&#39;\0&#39;):
+                if string:
+                    yield string.encode(self.codec)
+
+        def REG_DWORD(data: str):
+            value = int(data, 16)
+            return F&#39;0x{value:X}&#39;.encode(self.codec)
+
+        def REG_QWORD(data: str):
+            value = int.from_bytes(REG_BINARY(data), &#39;little&#39;)
+            return F&#39;0x{value:X}&#39;.encode(self.codec)
+
+        class Missing:
+            def __init__(self, name: str):
+                self.name = name
+
+            def __str__(self):
+                return self.name
+
+        REG_NONE = REG_EXPAND_SZ
+        REG_DWORD_BIG_ENDIAN = Missing(&#39;REG_DWORD_BIG_ENDIAN&#39;)
+        REG_LINK = Missing(&#39;REG_LINK&#39;)
+        REG_RESOURCE_LIST = Missing(&#39;REG_RESOURCE_LIST&#39;)
+        REG_FULL_RESOURCE_DESCRIPTOR = Missing(&#39;REG_FULL_RESOURCE_DESCRIPTOR&#39;)
+        REG_RESOURCE_REQUIREMENTS_LIST = Missing(&#39;REG_RESOURCE_REQUIREMENTS_LIST&#39;)
+
+        prefix, _, encoded = data.partition(&#39;:&#39;)
+
+        try:
+            decoder = {
+                &#39;hex(0)&#39; : REG_NONE,
+                &#39;hex(1)&#39; : REG_SZ,
+                &#39;hex(2)&#39; : REG_EXPAND_SZ,
+                &#39;hex(3)&#39; : REG_BINARY,
+                &#39;hex&#39;    : REG_BINARY,
+                &#39;hex(4)&#39; : REG_DWORD,
+                &#39;dword&#39;  : REG_DWORD,
+                &#39;hex(5)&#39; : REG_DWORD_BIG_ENDIAN,
+                &#39;hex(6)&#39; : REG_LINK,
+                &#39;hex(7)&#39; : REG_MULTI_SZ,
+                &#39;hex(8)&#39; : REG_RESOURCE_LIST,
+                &#39;hex(9)&#39; : REG_FULL_RESOURCE_DESCRIPTOR,
+                &#39;hex(a)&#39; : REG_RESOURCE_REQUIREMENTS_LIST,
+                &#39;hex(b)&#39; : REG_QWORD,
+            }[prefix]
+        except KeyError:
+            decoder = REG_SZ
+            encoded = data
+
+        if isinstance(decoder, Missing):
+            self.log_warn(F&#39;Found registry type {decoder!s}; no decoder implemented.&#39;)
+            return
+        self.log_debug(F&#39;decoding as {decoder.__name__}: {encoded}&#39;)
+        it = decoder(encoded)
+        if not inspect.isgenerator(it):
+            it = (it,)
+        yield from it
+
+    def _unpack_file(self, data: bytearray):
+        for codec in (&#39;utf16&#39;, &#39;utf-16le&#39;, &#39;utf8&#39;):
+            try:
+                reg = data.decode(codec).splitlines(keepends=True)
+            except UnicodeError:
+                continue
+            lines = iter(reg)
+            if next(lines).startswith(&#39;Windows Registry Editor&#39;):
+                break
+        else:
+            raise ParseException
+
+        def _parse():
+            parser = WinRegFileParser()
+            section.seek(0)
+            parser.read_file(section)
+            for key in parser.sections():
+                self.log_debug(key)
+                for value in parser[key]:
+                    name = next(iter(shlex.split(value)))
+                    path = Path(key)
+                    if name != &#39;@&#39;:
+                        path = path / Path(name)
+                    decoded = list(self._decode_registry_export(parser[key][value]))
+                    if len(decoded) == 1:
+                        yield UnpackResult(str(path), decoded[0])
+                        continue
+                    for k, d in enumerate(decoded):
+                        yield UnpackResult(F&#39;{path!s}.{k}&#39;, d)
+
+        section = io.StringIO()
+
+        for line in lines:
+            if line.lstrip().startswith(&#39;[&#39;):
+                yield from _parse()
+                section.seek(0)
+                section.truncate(0)
+            section.write(line)
+
+        yield from _parse()
+
+    def unpack(self, data):
+        with contextlib.suppress(ParseException):
+            yield from self._unpack_hive(data)
+            return
+        yield from self._unpack_file(data)
+
+    @classmethod
+    def handles(cls, data):
+        return get_reg_export_type(data) is not None</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.formats.winreg.ParseException"><code class="flex name class">
+<span>class <span class="ident">ParseException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Common base class for all non-exit exceptions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/winreg.py#L22-L23" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ParseException(Exception):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.units.formats.winreg.WinRegFileParser"><code class="flex name class">
+<span>class <span class="ident">WinRegFileParser</span></span>
+<span>(</span><span>defaults=None, dict_type=builtins.dict, allow_no_value=False, *, delimiters=('=', ':'), comment_prefixes=('#', ';'), inline_comment_prefixes=None, strict=True, empty_lines_in_values=True, default_section='DEFAULT', interpolation=&lt;object object&gt;, converters=&lt;object object&gt;, allow_unnamed_section=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>ConfigParser implementing interpolation.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/winreg.py#L26-L28" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class WinRegFileParser(ConfigParser):
+    def optionxform(self, optionstr: str) -&gt; str:
+        return optionstr</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>configparser.ConfigParser</li>
+<li>configparser.RawConfigParser</li>
+<li>collections.abc.MutableMapping</li>
+<li>collections.abc.Mapping</li>
+<li>collections.abc.Collection</li>
+<li>collections.abc.Sized</li>
+<li>collections.abc.Iterable</li>
+<li>collections.abc.Container</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.formats.winreg.WinRegFileParser.optionxform"><code class="name flex">
+<span>def <span class="ident">optionxform</span></span>(<span>self, optionstr)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/winreg.py#L27-L28" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def optionxform(self, optionstr: str) -&gt; str:
+    return optionstr</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.units.formats.winreg.winreg"><code class="flex name class">
+<span>class <span class="ident">winreg</span></span>
+<span>(</span><span>*paths, list=False, join_path=False, drop_path=False, fuzzy=0, exact=False, regex=False, path=b'path')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Extract values from a Windows registry hive or from a registry export (.reg file).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/winreg.py#L31-L185" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class winreg(PathExtractorUnit):
+    &#34;&#34;&#34;
+    Extract values from a Windows registry hive or from a registry export (.reg file).
+    &#34;&#34;&#34;
+    @PathExtractorUnit.Requires(&#39;python-registry&#39;, [&#39;formats&#39;])
+    def _registry():
+        import Registry
+        import Registry.Registry
+        import Registry.RegistryParse
+        return Registry
+
+    @staticmethod
+    def _walk(patterns: list[PathPattern], key: RegistryKey, *path: str):
+        here = &#39;/&#39;.join(path)
+        if not any(p.reach(here) for p in patterns):
+            winreg.log_debug(F&#39;pruning search at {here}&#39;)
+            return
+        for value in key.values():
+            def raw(v: RegistryValue = value):
+                return v.raw_data()
+            vpath = here
+            vname = value.name()
+            if vname != &#39;(default)&#39;:
+                vpath = F&#39;{vpath}/{vname}&#39;
+            yield UnpackResult(vpath, raw)
+        for subkey in key.subkeys():
+            yield from winreg._walk(patterns, subkey, *path, subkey.name())
+
+    def _unpack_hive(self, data: bytearray):
+        try:
+            with MemoryFile(data) as stream:
+                root = self._registry.Registry.Registry(stream).root()
+                yield from self._walk(self._patterns, root, root.name())
+        except self._registry.RegistryParse.ParseException:
+            raise ParseException
+
+    def _decode_registry_export(self, data: str):
+        def REG_BINARY(data: str) -&gt; bytes:
+            return bytes.fromhex(re.sub(&#39;[^a-f0-9]+&#39;, &#39;&#39;, data))
+
+        def REG_SZ(data: str) -&gt; bytes:
+            return data.encode(self.codec) | esc(quoted=True) | bytes
+
+        def REG_EXPAND_SZ(data: str):
+            return REG_BINARY(data).decode(&#39;UTF-16LE&#39;).rstrip(&#39;\0&#39;).encode(self.codec)
+
+        def REG_MULTI_SZ(data: str):
+            for string in REG_BINARY(data).decode(&#39;UTF-16LE&#39;).split(&#39;\0&#39;):
+                if string:
+                    yield string.encode(self.codec)
+
+        def REG_DWORD(data: str):
+            value = int(data, 16)
+            return F&#39;0x{value:X}&#39;.encode(self.codec)
+
+        def REG_QWORD(data: str):
+            value = int.from_bytes(REG_BINARY(data), &#39;little&#39;)
+            return F&#39;0x{value:X}&#39;.encode(self.codec)
+
+        class Missing:
+            def __init__(self, name: str):
+                self.name = name
+
+            def __str__(self):
+                return self.name
+
+        REG_NONE = REG_EXPAND_SZ
+        REG_DWORD_BIG_ENDIAN = Missing(&#39;REG_DWORD_BIG_ENDIAN&#39;)
+        REG_LINK = Missing(&#39;REG_LINK&#39;)
+        REG_RESOURCE_LIST = Missing(&#39;REG_RESOURCE_LIST&#39;)
+        REG_FULL_RESOURCE_DESCRIPTOR = Missing(&#39;REG_FULL_RESOURCE_DESCRIPTOR&#39;)
+        REG_RESOURCE_REQUIREMENTS_LIST = Missing(&#39;REG_RESOURCE_REQUIREMENTS_LIST&#39;)
+
+        prefix, _, encoded = data.partition(&#39;:&#39;)
+
+        try:
+            decoder = {
+                &#39;hex(0)&#39; : REG_NONE,
+                &#39;hex(1)&#39; : REG_SZ,
+                &#39;hex(2)&#39; : REG_EXPAND_SZ,
+                &#39;hex(3)&#39; : REG_BINARY,
+                &#39;hex&#39;    : REG_BINARY,
+                &#39;hex(4)&#39; : REG_DWORD,
+                &#39;dword&#39;  : REG_DWORD,
+                &#39;hex(5)&#39; : REG_DWORD_BIG_ENDIAN,
+                &#39;hex(6)&#39; : REG_LINK,
+                &#39;hex(7)&#39; : REG_MULTI_SZ,
+                &#39;hex(8)&#39; : REG_RESOURCE_LIST,
+                &#39;hex(9)&#39; : REG_FULL_RESOURCE_DESCRIPTOR,
+                &#39;hex(a)&#39; : REG_RESOURCE_REQUIREMENTS_LIST,
+                &#39;hex(b)&#39; : REG_QWORD,
+            }[prefix]
+        except KeyError:
+            decoder = REG_SZ
+            encoded = data
+
+        if isinstance(decoder, Missing):
+            self.log_warn(F&#39;Found registry type {decoder!s}; no decoder implemented.&#39;)
+            return
+        self.log_debug(F&#39;decoding as {decoder.__name__}: {encoded}&#39;)
+        it = decoder(encoded)
+        if not inspect.isgenerator(it):
+            it = (it,)
+        yield from it
+
+    def _unpack_file(self, data: bytearray):
+        for codec in (&#39;utf16&#39;, &#39;utf-16le&#39;, &#39;utf8&#39;):
+            try:
+                reg = data.decode(codec).splitlines(keepends=True)
+            except UnicodeError:
+                continue
+            lines = iter(reg)
+            if next(lines).startswith(&#39;Windows Registry Editor&#39;):
+                break
+        else:
+            raise ParseException
+
+        def _parse():
+            parser = WinRegFileParser()
+            section.seek(0)
+            parser.read_file(section)
+            for key in parser.sections():
+                self.log_debug(key)
+                for value in parser[key]:
+                    name = next(iter(shlex.split(value)))
+                    path = Path(key)
+                    if name != &#39;@&#39;:
+                        path = path / Path(name)
+                    decoded = list(self._decode_registry_export(parser[key][value]))
+                    if len(decoded) == 1:
+                        yield UnpackResult(str(path), decoded[0])
+                        continue
+                    for k, d in enumerate(decoded):
+                        yield UnpackResult(F&#39;{path!s}.{k}&#39;, d)
+
+        section = io.StringIO()
+
+        for line in lines:
+            if line.lstrip().startswith(&#39;[&#39;):
+                yield from _parse()
+                section.seek(0)
+                section.truncate(0)
+            section.write(line)
+
+        yield from _parse()
+
+    def unpack(self, data):
+        with contextlib.suppress(ParseException):
+            yield from self._unpack_hive(data)
+            return
+        yield from self._unpack_file(data)
+
+    @classmethod
+    def handles(cls, data):
+        return get_reg_export_type(data) is not None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.PathExtractorUnit" href="index.html#refinery.units.formats.PathExtractorUnit">PathExtractorUnit</a></li>
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.formats.winreg.winreg" href="#refinery.units.formats.winreg.winreg">winreg</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.formats.winreg.winreg.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.units.formats.winreg.winreg.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/4c0004e3a5e038a14f699905f942361689d71fc3/refinery/units/formats/winreg.py#L177-L181" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unpack(self, data):
+    with contextlib.suppress(ParseException):
+        yield from self._unpack_hive(data)
+        return
+    yield from self._unpack_file(data)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.formats.PathExtractorUnit" href="index.html#refinery.units.formats.PathExtractorUnit">PathExtractorUnit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.formats.PathExtractorUnit.CustomJoinBehaviour" href="index.html#refinery.units.formats.PathExtractorUnit.CustomJoinBehaviour">CustomJoinBehaviour</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.CustomPathSeparator" href="index.html#refinery.units.formats.PathExtractorUnit.CustomPathSeparator">CustomPathSeparator</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.formats.PathExtractorUnit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.formats" href="index.html">refinery.units.formats</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.formats.winreg.ParseException" href="#refinery.units.formats.winreg.ParseException">ParseException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.winreg.WinRegFileParser" href="#refinery.units.formats.winreg.WinRegFileParser">WinRegFileParser</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.winreg.WinRegFileParser.optionxform" href="#refinery.units.formats.winreg.WinRegFileParser.optionxform">optionxform</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.units.formats.winreg.winreg" href="#refinery.units.formats.winreg.winreg">winreg</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.units.formats.winreg.winreg.unpack" href="#refinery.units.formats.winreg.winreg.unpack">unpack</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
