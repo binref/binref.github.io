@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.fast.argon2 documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.fast.argon2</code></h1>
+</header>
+<section id="section-intro">
+<p>Pure-Python implementation of the Argon2 password hashing function as specified
+in RFC 9106. Supports all three variants: Argon2d, Argon2i, and Argon2id.</p>
+<p>The implementation is designed for readability and Cython compatibility: all hot
+path functions are module-level with simple typed parameters, blocks are
+represented as list[int] (128 x uint64) which maps directly to uint64_t[128] in
+Cython, and no Python objects are allocated in the inner loops.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/fc3aff6b60ea00b726dc147eaf4d18cd438270cd/refinery/lib/fast/argon2.py#L1-L412" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Pure-Python implementation of the Argon2 password hashing function as specified
+in RFC 9106. Supports all three variants: Argon2d, Argon2i, and Argon2id.
+
+The implementation is designed for readability and Cython compatibility: all hot
+path functions are module-level with simple typed parameters, blocks are
+represented as list[int] (128 x uint64) which maps directly to uint64_t[128] in
+Cython, and no Python objects are allocated in the inner loops.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import hashlib
+import struct
+
+ARGON2D: int = 0
+ARGON2I: int = 1
+ARGON2ID: int = 2
+
+_BLOCK_SIZE: int = 1024
+_QWORDS_PER_BLOCK: int = 128
+_SYNC_POINTS: int = 4
+_MASK64: int = 0xFFFFFFFFFFFFFFFF
+_MASK32: int = 0xFFFFFFFF
+
+
+def _blake2b_long(data: bytes | bytearray | memoryview, digest_size: int) -&gt; bytes:
+    &#34;&#34;&#34;
+    Variable-length hash H&#39; as defined in RFC 9106 Section 3.1.
+    Uses hashlib.blake2b (stdlib) and chains 64-byte digests for outputs
+    longer than 64 bytes.
+    &#34;&#34;&#34;
+    if digest_size &lt;= 64:
+        return hashlib.blake2b(
+            struct.pack(&#39;&lt;I&#39;, digest_size) + bytes(data),
+            digest_size=digest_size,
+        ).digest()
+
+    result = bytearray()
+    vi = hashlib.blake2b(
+        struct.pack(&#39;&lt;I&#39;, digest_size) + bytes(data),
+        digest_size=64,
+    ).digest()
+    result.extend(vi[:32])
+
+    todo = digest_size - 32
+    while todo &gt; 64:
+        vi = hashlib.blake2b(vi, digest_size=64).digest()
+        result.extend(vi[:32])
+        todo -= 32
+
+    vi = hashlib.blake2b(vi, digest_size=todo).digest()
+    result.extend(vi)
+
+    return bytes(result[:digest_size])
+
+
+def _initial_hash(
+    parallelism: int,
+    tag_length: int,
+    memory_cost: int,
+    time_cost: int,
+    version: int,
+    variant: int,
+    password: bytes | bytearray | memoryview,
+    salt: bytes | bytearray | memoryview,
+    secret: bytes | bytearray | memoryview,
+    associated_data: bytes | bytearray | memoryview,
+) -&gt; bytes:
+    &#34;&#34;&#34;
+    Compute the 64-byte initial hash H0 from all input parameters as described
+    in RFC 9106 Section 3.2.
+    &#34;&#34;&#34;
+    pack = struct.pack
+    h = hashlib.blake2b(digest_size=64)
+    h.update(pack(&#39;&lt;I&#39;, parallelism))
+    h.update(pack(&#39;&lt;I&#39;, tag_length))
+    h.update(pack(&#39;&lt;I&#39;, memory_cost))
+    h.update(pack(&#39;&lt;I&#39;, time_cost))
+    h.update(pack(&#39;&lt;I&#39;, version))
+    h.update(pack(&#39;&lt;I&#39;, variant))
+    h.update(pack(&#39;&lt;I&#39;, len(password)))
+    h.update(bytes(password))
+    h.update(pack(&#39;&lt;I&#39;, len(salt)))
+    h.update(bytes(salt))
+    h.update(pack(&#39;&lt;I&#39;, len(secret)))
+    h.update(bytes(secret))
+    h.update(pack(&#39;&lt;I&#39;, len(associated_data)))
+    h.update(bytes(associated_data))
+    return h.digest()
+
+
+def _bytes_to_block(data: bytes | bytearray | memoryview) -&gt; list[int]:
+    return list(struct.unpack_from(&#39;&lt;128Q&#39;, data))
+
+
+def _block_to_bytes(block: list[int]) -&gt; bytes:
+    return struct.pack(&#39;&lt;128Q&#39;, *block)
+
+
+def _xor_blocks(a: list[int], b: list[int]) -&gt; list[int]:
+    return [x ^ y for x, y in zip(a, b)]
+
+
+def _gb(v: list[int], a: int, b: int, c: int, d: int) -&gt; None:
+    &#34;&#34;&#34;
+    In-place Blake2b-based quarter-round (RFC 9106 Section 3.5). Uses the fBlaMka multiplication:
+        2 * trunc(a) * trunc(b)
+    where trunc takes the lower 32 bits.
+    &#34;&#34;&#34;
+    va = v[a]
+    vb = v[b]
+    vc = v[c]
+    vd = v[d]
+
+    va = (va + vb + 2 * (va &amp; _MASK32) * (vb &amp; _MASK32)) &amp; _MASK64
+    vd = vd ^ va
+    vd = (vd &gt;&gt; 32) | ((vd &amp; _MASK32) &lt;&lt; 32)
+    vc = (vc + vd + 2 * (vc &amp; _MASK32) * (vd &amp; _MASK32)) &amp; _MASK64
+    vb = vb ^ vc
+    vb = (vb &gt;&gt; 24) | ((vb &amp; 0xFFFFFF) &lt;&lt; 40)
+
+    va = (va + vb + 2 * (va &amp; _MASK32) * (vb &amp; _MASK32)) &amp; _MASK64
+    vd = vd ^ va
+    vd = (vd &gt;&gt; 16) | ((vd &amp; 0xFFFF) &lt;&lt; 48)
+    vc = (vc + vd + 2 * (vc &amp; _MASK32) * (vd &amp; _MASK32)) &amp; _MASK64
+    vb = vb ^ vc
+    vb = (vb &gt;&gt; 63) | ((vb &lt;&lt; 1) &amp; _MASK64)
+
+    v[a] = va
+    v[b] = vb
+    v[c] = vc
+    v[d] = vd
+
+
+def _P(
+    _v: list[int],
+    i0: int,
+    i1: int,
+    i2: int,
+    i3: int,
+    i4: int,
+    i5: int,
+    i6: int,
+    i7: int,
+    i8: int,
+    i9: int,
+    iA: int,
+    iB: int,
+    iC: int,
+    iD: int,
+    iE: int,
+    iF: int,
+) -&gt; None:
+    _gb(_v, i0, i4, i8, iC)
+    _gb(_v, i1, i5, i9, iD)
+    _gb(_v, i2, i6, iA, iE)
+    _gb(_v, i3, i7, iB, iF)
+    _gb(_v, i0, i5, iA, iF)
+    _gb(_v, i1, i6, iB, iC)
+    _gb(_v, i2, i7, i8, iD)
+    _gb(_v, i3, i4, i9, iE)
+
+
+def _compress(x: list[int], y: list[int]) -&gt; list[int]:
+    &#34;&#34;&#34;
+    Compression function G(X, Y) per RFC 9106 Section 3.4.
+
+    The 128 uint64 values are treated as an 8x8 matrix of 128-bit cells (each cell = 2 consecutive
+    uint64 values). P is applied row-wise producing Q, then column-wise on Q producing Z, and the
+    result is R ^ Z.
+    &#34;&#34;&#34;
+    r = _xor_blocks(x, y)
+    q = list(r)
+    for row in range(8):
+        base = row * 16
+        _P(
+            q,
+            base + 0x0, base + 0x1, base + 0x2, base + 0x3,
+            base + 0x4, base + 0x5, base + 0x6, base + 0x7,
+            base + 0x8, base + 0x9, base + 0xA, base + 0xB,
+            base + 0xC, base + 0xD, base + 0xE, base + 0xF,
+        )
+    z = list(q)
+    for col in range(8):
+        base = col * 2
+        _P(
+            z,
+            base + 0x00, base + 0x01, base + 0x10, base + 0x11,
+            base + 0x20, base + 0x21, base + 0x30, base + 0x31,
+            base + 0x40, base + 0x41, base + 0x50, base + 0x51,
+            base + 0x60, base + 0x61, base + 0x70, base + 0x71,
+        )
+
+    return _xor_blocks(r, z)
+
+
+def _generate_addresses_i(
+    pass_number: int,
+    lane: int,
+    slice_number: int,
+    m_prime: int,
+    total_passes: int,
+    variant: int,
+    segment_length: int,
+) -&gt; list[tuple[int, int]]:
+    &#34;&#34;&#34;
+    Pre-generate (J1, J2) pairs for Argon2i-style independent indexing. Generates pairs via
+        G(G(zero, input_block))
+    as per RFC 9106 Section 3.3. Returns a list of (J1, J2) tuples, one per block in the segment.
+    &#34;&#34;&#34;
+    zero_block = [0] * _QWORDS_PER_BLOCK
+    pseudo_rands: list[tuple[int, int]] = []
+    counter = 0
+    while len(pseudo_rands) &lt; segment_length:
+        counter += 1
+        input_block = [0] * _QWORDS_PER_BLOCK
+        input_block[0] = pass_number
+        input_block[1] = lane
+        input_block[2] = slice_number
+        input_block[3] = m_prime
+        input_block[4] = total_passes
+        input_block[5] = variant
+        input_block[6] = counter
+        addr_block = _compress(zero_block, _compress(zero_block, input_block))
+        for qw in addr_block:
+            pseudo_rands.append((qw &amp; _MASK32, (qw &gt;&gt; 32) &amp; _MASK32))
+            if len(pseudo_rands) &gt;= segment_length:
+                break
+    return pseudo_rands
+
+
+def _fill_segment(
+    memory: list[list[int]],
+    pass_number: int,
+    lane: int,
+    slice_number: int,
+    lanes: int,
+    segment_length: int,
+    lane_length: int,
+    total_passes: int,
+    m_prime: int,
+    variant: int,
+    version: int,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Fill one segment of memory for a given (pass, lane, slice). Contains the single branching point
+    for variant selection.
+    &#34;&#34;&#34;
+    first_pass = (pass_number == 0)
+
+    data_independent = (
+        variant == ARGON2I
+        or (variant == ARGON2ID and pass_number == 0 and slice_number &lt;= 1)
+    )
+
+    pseudo_rands: list[tuple[int, int]] = []
+    if data_independent:
+        pseudo_rands = _generate_addresses_i(
+            pass_number, lane, slice_number, m_prime,
+            total_passes, variant, segment_length,
+        )
+
+    for index in range(segment_length):
+        j = slice_number * segment_length + index
+
+        if first_pass and j &lt; 2:
+            # First two blocks per lane are initialized separately
+            continue
+
+        # Previous block index (wraps around within the lane)
+        prev_j = (j - 1) % lane_length
+        lane_base = lane * lane_length
+
+        # Determine J1, J2
+        if data_independent:
+            j1, j2 = pseudo_rands[index]
+        else:
+            # Argon2d: derive from first 8 bytes of the previous block
+            prev_block = memory[lane_base + prev_j]
+            j1 = prev_block[0] &amp; _MASK32
+            j2 = (prev_block[0] &gt;&gt; 32) &amp; _MASK32
+
+        # Determine reference lane
+        ref_lane = j2 % lanes
+        if first_pass and slice_number == 0:
+            ref_lane = lane
+
+        # Determine reference area size
+        same_lane = (ref_lane == lane)
+        if first_pass:
+            if slice_number == 0 or same_lane:
+                ref_area_size = j - 1
+            elif index == 0:
+                ref_area_size = slice_number * segment_length - 1
+            else:
+                ref_area_size = slice_number * segment_length
+        else:
+            if same_lane:
+                ref_area_size = lane_length - segment_length + index - 1
+            elif index == 0:
+                ref_area_size = lane_length - segment_length - 1
+            else:
+                ref_area_size = lane_length - segment_length
+
+        # Map J1 to reference index using biased distribution
+        x = (j1 * j1) &gt;&gt; 32
+        ref_index = ref_area_size - 1 - ((ref_area_size * x) &gt;&gt; 32)
+
+        # Compute start position for the reference set
+        if first_pass or slice_number == 3:
+            start_pos = 0
+        else:
+            start_pos = (slice_number + 1) * segment_length
+
+        ref_index = (start_pos + ref_index) % lane_length
+
+        # Compress previous block with reference block
+        prev_block = memory[lane_base + prev_j]
+        ref_block = memory[ref_lane * lane_length + ref_index]
+        new_block = _compress(prev_block, ref_block)
+
+        if pass_number &gt; 0 and version == 0x13:
+            old_block = memory[lane_base + j]
+            new_block = _xor_blocks(new_block, old_block)
+
+        memory[lane_base + j] = new_block
+
+
+def argon2hash(
+    password: bytes | bytearray | memoryview,
+    salt: bytes | bytearray | memoryview,
+    time_cost: int,
+    memory_cost: int,
+    parallelism: int,
+    tag_length: int,
+    variant: int = ARGON2ID,
+    version: int = 0x13,
+    secret: bytes | bytearray | memoryview = b&#39;&#39;,
+    associated_data: bytes | bytearray | memoryview = b&#39;&#39;,
+) -&gt; bytes:
+    &#34;&#34;&#34;
+    Compute an Argon2 hash tag.
+
+    Args:
+        password:        Input password bytes
+        salt:            Salt bytes
+        time_cost:       Number of passes (iterations)
+        memory_cost:     Memory size in KiB
+        parallelism:     Degree of parallelism (number of lanes)
+        tag_length:      Desired output tag length in bytes
+        variant:         ARGON2D (0), ARGON2I (1), or ARGON2ID (2)
+        version:         Protocol version (0x13 for v1.3)
+        secret:          Optional secret/key bytes
+        associated_data: Optional associated data bytes
+    &#34;&#34;&#34;
+    if variant not in (ARGON2D, ARGON2I, ARGON2ID):
+        raise ValueError(F&#39;invalid Argon2 variant: {variant}&#39;)
+    if time_cost &lt; 1:
+        raise ValueError(F&#39;time_cost must be at least 1, got {time_cost}&#39;)
+    if parallelism &lt; 1:
+        raise ValueError(F&#39;parallelism must be at least 1, got {parallelism}&#39;)
+    if tag_length &lt; 4:
+        raise ValueError(F&#39;tag_length must be at least 4, got {tag_length}&#39;)
+
+    # Compute memory layout: m&#39; must be a multiple of 4*parallelism
+    m_prime = (memory_cost // (4 * parallelism)) * (4 * parallelism)
+    lane_length = m_prime // parallelism
+    segment_length = lane_length // 4
+
+    if segment_length &lt; 1:
+        segment_length = 1
+        lane_length = 4
+        m_prime = lane_length * parallelism
+
+    # Step 1: Compute H0
+    h0 = _initial_hash(
+        parallelism, tag_length, memory_cost, time_cost,
+        version, variant, password, salt, secret, associated_data,
+    )
+
+    # Step 2: Initialize memory - flat list of blocks
+    total_blocks = lane_length * parallelism
+    memory: list[list[int]] = [[0] * _QWORDS_PER_BLOCK for _ in range(total_blocks)]
+
+    # Step 3: Compute first two blocks for each lane
+    for lane_idx in range(parallelism):
+        h_input_0 = h0 + struct.pack(&#39;&lt;II&#39;, 0, lane_idx)
+        block_bytes = _blake2b_long(h_input_0, _BLOCK_SIZE)
+        memory[lane_idx * lane_length + 0] = _bytes_to_block(block_bytes)
+
+        h_input_1 = h0 + struct.pack(&#39;&lt;II&#39;, 1, lane_idx)
+        block_bytes = _blake2b_long(h_input_1, _BLOCK_SIZE)
+        memory[lane_idx * lane_length + 1] = _bytes_to_block(block_bytes)
+
+    # Step 4: Fill memory passes
+    for pass_number in range(time_cost):
+        for slice_number in range(_SYNC_POINTS):
+            for lane_idx in range(parallelism):
+                _fill_segment(
+                    memory, pass_number, lane_idx, slice_number,
+                    parallelism, segment_length, lane_length,
+                    time_cost, m_prime, variant, version,
+                )
+
+    # Step 5: Finalize - XOR last column of all lanes
+    final_block = list(memory[0 * lane_length + lane_length - 1])
+    for lane_idx in range(1, parallelism):
+        last_block = memory[lane_idx * lane_length + lane_length - 1]
+        final_block = _xor_blocks(final_block, last_block)
+
+    # Step 6: Produce tag
+    return _blake2b_long(_block_to_bytes(final_block), tag_length)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.fast.argon2.argon2hash"><code class="name flex">
+<span>def <span class="ident">argon2hash</span></span>(<span>password, salt, time_cost, memory_cost, parallelism, tag_length, variant=2, version=19, secret=b'', associated_data=b'')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Compute an Argon2 hash tag.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>password</code></strong></dt>
+<dd>
+<p>Input password bytes</p>
+</dd>
+<dt><strong><code>salt</code></strong></dt>
+<dd>
+<pre><code>   Salt bytes
+</code></pre>
+</dd>
+<dt><strong><code>time_cost</code></strong></dt>
+<dd>
+<p>Number of passes (iterations)</p>
+</dd>
+<dt><strong><code>memory_cost</code></strong></dt>
+<dd>
+<p>Memory size in KiB</p>
+</dd>
+<dt><strong><code>parallelism</code></strong></dt>
+<dd>
+<p>Degree of parallelism (number of lanes)</p>
+</dd>
+<dt><strong><code>tag_length</code></strong></dt>
+<dd>
+<p>Desired output tag length in bytes</p>
+</dd>
+<dt><strong><code>variant</code></strong></dt>
+<dd>
+<pre><code>ARGON2D (0), ARGON2I (1), or ARGON2ID (2)
+</code></pre>
+</dd>
+<dt><strong><code>version</code></strong></dt>
+<dd>
+<pre><code>Protocol version (0x13 for v1.3)
+</code></pre>
+</dd>
+<dt><strong><code>secret</code></strong></dt>
+<dd>
+<pre><code> Optional secret/key bytes
+</code></pre>
+</dd>
+<dt><strong><code>associated_data</code></strong></dt>
+<dd>Optional associated data bytes</dd>
+</dl></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/fc3aff6b60ea00b726dc147eaf4d18cd438270cd/refinery/lib/fast/argon2.py#L329-L412" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def argon2hash(
+    password: bytes | bytearray | memoryview,
+    salt: bytes | bytearray | memoryview,
+    time_cost: int,
+    memory_cost: int,
+    parallelism: int,
+    tag_length: int,
+    variant: int = ARGON2ID,
+    version: int = 0x13,
+    secret: bytes | bytearray | memoryview = b&#39;&#39;,
+    associated_data: bytes | bytearray | memoryview = b&#39;&#39;,
+) -&gt; bytes:
+    &#34;&#34;&#34;
+    Compute an Argon2 hash tag.
+
+    Args:
+        password:        Input password bytes
+        salt:            Salt bytes
+        time_cost:       Number of passes (iterations)
+        memory_cost:     Memory size in KiB
+        parallelism:     Degree of parallelism (number of lanes)
+        tag_length:      Desired output tag length in bytes
+        variant:         ARGON2D (0), ARGON2I (1), or ARGON2ID (2)
+        version:         Protocol version (0x13 for v1.3)
+        secret:          Optional secret/key bytes
+        associated_data: Optional associated data bytes
+    &#34;&#34;&#34;
+    if variant not in (ARGON2D, ARGON2I, ARGON2ID):
+        raise ValueError(F&#39;invalid Argon2 variant: {variant}&#39;)
+    if time_cost &lt; 1:
+        raise ValueError(F&#39;time_cost must be at least 1, got {time_cost}&#39;)
+    if parallelism &lt; 1:
+        raise ValueError(F&#39;parallelism must be at least 1, got {parallelism}&#39;)
+    if tag_length &lt; 4:
+        raise ValueError(F&#39;tag_length must be at least 4, got {tag_length}&#39;)
+
+    # Compute memory layout: m&#39; must be a multiple of 4*parallelism
+    m_prime = (memory_cost // (4 * parallelism)) * (4 * parallelism)
+    lane_length = m_prime // parallelism
+    segment_length = lane_length // 4
+
+    if segment_length &lt; 1:
+        segment_length = 1
+        lane_length = 4
+        m_prime = lane_length * parallelism
+
+    # Step 1: Compute H0
+    h0 = _initial_hash(
+        parallelism, tag_length, memory_cost, time_cost,
+        version, variant, password, salt, secret, associated_data,
+    )
+
+    # Step 2: Initialize memory - flat list of blocks
+    total_blocks = lane_length * parallelism
+    memory: list[list[int]] = [[0] * _QWORDS_PER_BLOCK for _ in range(total_blocks)]
+
+    # Step 3: Compute first two blocks for each lane
+    for lane_idx in range(parallelism):
+        h_input_0 = h0 + struct.pack(&#39;&lt;II&#39;, 0, lane_idx)
+        block_bytes = _blake2b_long(h_input_0, _BLOCK_SIZE)
+        memory[lane_idx * lane_length + 0] = _bytes_to_block(block_bytes)
+
+        h_input_1 = h0 + struct.pack(&#39;&lt;II&#39;, 1, lane_idx)
+        block_bytes = _blake2b_long(h_input_1, _BLOCK_SIZE)
+        memory[lane_idx * lane_length + 1] = _bytes_to_block(block_bytes)
+
+    # Step 4: Fill memory passes
+    for pass_number in range(time_cost):
+        for slice_number in range(_SYNC_POINTS):
+            for lane_idx in range(parallelism):
+                _fill_segment(
+                    memory, pass_number, lane_idx, slice_number,
+                    parallelism, segment_length, lane_length,
+                    time_cost, m_prime, variant, version,
+                )
+
+    # Step 5: Finalize - XOR last column of all lanes
+    final_block = list(memory[0 * lane_length + lane_length - 1])
+    for lane_idx in range(1, parallelism):
+        last_block = memory[lane_idx * lane_length + lane_length - 1]
+        final_block = _xor_blocks(final_block, last_block)
+
+    # Step 6: Produce tag
+    return _blake2b_long(_block_to_bytes(final_block), tag_length)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.fast" href="index.html">refinery.lib.fast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.fast.argon2.argon2hash" href="#refinery.lib.fast.argon2.argon2hash">argon2hash</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
