@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.asn1.cms documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.asn1.cms</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a5b422e13e523d2e1cdfa919f4ccb273eae6515c/refinery/lib/asn1/cms.py#L1-L461" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import hashlib
+import re
+
+from collections import OrderedDict
+from datetime import datetime, timezone
+
+from refinery.lib.asn1 import ASN1Reader
+from refinery.lib.asn1.defs import ContentInfo, SignedContentInfo, SpcSpOpusInfo
+from refinery.lib.structures import StructReader
+
+_TIME_VALUED_ATTRIBUTES = {&#39;signingTime&#39;}
+
+
+def _skip00(sr: StructReader[memoryview]):
+    if (zero := sr.peek(2) == b&#39;\0\0&#39;):
+        sr.skip(2)
+    return zero
+
+
+def _parse_asn1_time(value):
+    if not isinstance(value, str):
+        return value
+    if m := re.fullmatch(r&#39;(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z&#39;, value):
+        yy = int(m[1])
+        year = 2000 + yy if yy &lt; 50 else 1900 + yy
+        try:
+            dt = datetime(year, int(m[2]), int(m[3]), int(m[4]), int(m[5]), int(m[6]), tzinfo=timezone.utc)
+            return dt.isoformat(sep=&#39; &#39;)
+        except ValueError:
+            return value
+    if m := re.fullmatch(r&#39;(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z&#39;, value):
+        try:
+            dt = datetime(int(m[1]), int(m[2]), int(m[3]), int(m[4]), int(m[5]), int(m[6]), tzinfo=timezone.utc)
+            return dt.isoformat(sep=&#39; &#39;)
+        except ValueError:
+            return value
+    return value
+
+
+def _flatten_name(name: list) -&gt; OrderedDict:
+    result: OrderedDict[str, str] = OrderedDict()
+    if not isinstance(name, list):
+        return result
+    for rdn in name:
+        items = rdn if isinstance(rdn, list) else [rdn]
+        for atv in items:
+            if not isinstance(atv, dict):
+                continue
+            oid = atv.get(&#39;type&#39;, &#39;&#39;)
+            val = atv.get(&#39;value&#39;, &#39;&#39;)
+            if isinstance(oid, str) and oid:
+                result[oid] = val
+    return result
+
+
+def _flatten_generic_name(name) -&gt; OrderedDict:
+    result: OrderedDict[str, str] = OrderedDict()
+    if not isinstance(name, list):
+        return result
+    for rdn in name:
+        if isinstance(rdn, list) and len(rdn) == 2 and isinstance(rdn[0], str):
+            result[rdn[0]] = rdn[1]
+        elif isinstance(rdn, list):
+            for atv in rdn:
+                if isinstance(atv, list) and len(atv) == 2 and isinstance(atv[0], str):
+                    result[atv[0]] = atv[1]
+                elif isinstance(atv, dict):
+                    oid = atv.get(&#39;type&#39;, &#39;&#39;)
+                    val = atv.get(&#39;value&#39;, &#39;&#39;)
+                    if isinstance(oid, str) and oid:
+                        result[oid] = val
+        elif isinstance(rdn, dict):
+            oid = rdn.get(&#39;type&#39;, &#39;&#39;)
+            val = rdn.get(&#39;value&#39;, &#39;&#39;)
+            if isinstance(oid, str) and oid:
+                result[oid] = val
+    return result
+
+
+def _interpret_spc_opus(value) -&gt; OrderedDict:
+    result: OrderedDict = OrderedDict()
+    items = value if isinstance(value, list) else [value]
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        tag = item.get(&#39;tag&#39;, &#39;&#39;)
+        val = item.get(&#39;value&#39;)
+        if tag == &#39;context-0&#39;:
+            result[&#39;programName&#39;] = _extract_spc_string(val)
+        elif tag == &#39;context-1&#39;:
+            result[&#39;moreInfo&#39;] = _extract_spc_link(val)
+    return result
+
+
+def _extract_spc_string(value):
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        try:
+            return bytes(value).decode(&#39;utf-16-be&#39;)
+        except Exception:
+            return bytes(value).decode(&#39;latin-1&#39;)
+    if isinstance(value, dict):
+        inner = value.get(&#39;value&#39;, value)
+        return _extract_spc_string(inner)
+    if isinstance(value, list):
+        for item in value:
+            result = _extract_spc_string(item)
+            if isinstance(result, str):
+                return result
+    return value
+
+
+def _extract_spc_link(value):
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (bytes, bytearray, memoryview)):
+        try:
+            return bytes(value).decode(&#39;ascii&#39;)
+        except Exception:
+            return bytes(value).decode(&#39;latin-1&#39;)
+    if isinstance(value, dict):
+        tag = value.get(&#39;tag&#39;, &#39;&#39;)
+        inner = value.get(&#39;value&#39;, value)
+        if tag == &#39;context-0&#39;:
+            if isinstance(inner, (bytes, bytearray, memoryview)):
+                try:
+                    return bytes(inner).decode(&#39;ascii&#39;)
+                except Exception:
+                    return bytes(inner).decode(&#39;latin-1&#39;)
+            return inner
+        if tag == &#39;context-2&#39;:
+            return _extract_spc_string(inner)
+        if isinstance(inner, (bytes, bytearray, memoryview)):
+            try:
+                return bytes(inner).decode(&#39;ascii&#39;)
+            except Exception:
+                return bytes(inner).decode(&#39;latin-1&#39;)
+        return _extract_spc_string(inner) if not isinstance(inner, dict) else inner
+    return value
+
+
+def _interpret_counter_signature(value) -&gt; OrderedDict:
+    result: OrderedDict = OrderedDict()
+    if not isinstance(value, list) or len(value) &lt; 5:
+        return result
+    sid_raw = value[1]
+    if isinstance(sid_raw, list) and len(sid_raw) == 2:
+        sid = OrderedDict()
+        sid[&#39;issuer&#39;] = _flatten_generic_name(sid_raw[0])
+        sid[&#39;serialNumber&#39;] = sid_raw[1]
+        result[&#39;sid&#39;] = sid
+    for item in value:
+        if isinstance(item, dict) and item.get(&#39;tag&#39;) == &#39;context-0&#39;:
+            attrs_raw = item.get(&#39;value&#39;, [])
+            if isinstance(attrs_raw, list):
+                result[&#39;signedAttrs&#39;] = [
+                    _interpret_generic_attribute(a) for a in attrs_raw]
+            break
+    return result
+
+
+def _interpret_generic_attribute(value) -&gt; OrderedDict:
+    result: OrderedDict = OrderedDict()
+    if isinstance(value, list) and len(value) &gt;= 2:
+        result[&#39;type&#39;] = value[0]
+        vals = value[1] if isinstance(value[1], list) else [value[1]]
+        if len(vals) == 1:
+            result[&#39;value&#39;] = vals[0]
+        else:
+            result[&#39;values&#39;] = vals
+    elif isinstance(value, dict):
+        result[&#39;type&#39;] = value.get(&#39;attrType&#39;, value.get(&#39;type&#39;, &#39;&#39;))
+        result[&#39;value&#39;] = value.get(&#39;attrValues&#39;, value.get(&#39;value&#39;, &#39;&#39;))
+    return result
+
+
+def _decode_attribute_value(oid: str, values: list) -&gt; list:
+    if oid == &#39;spcSpOpusInfo&#39;:
+        decoded = []
+        for v in values:
+            if isinstance(v, (bytes, bytearray, memoryview)):
+                try:
+                    reader = ASN1Reader(memoryview(v), bigendian=True)
+                    decoded.append(reader.decode_with_schema(SpcSpOpusInfo))
+                except Exception:
+                    decoded.append(v)
+            else:
+                decoded.append(_interpret_spc_opus(v))
+        return decoded
+    if oid == &#39;microsoftNestedSignature&#39;:
+        decoded = []
+        for v in values:
+            if isinstance(v, (bytes, bytearray, memoryview)):
+                try:
+                    parsed = parse_content_info(v)
+                    decoded.append(parsed)
+                except Exception:
+                    decoded.append(v)
+            else:
+                decoded.append(v)
+        return decoded
+    if oid == &#39;counterSignature&#39;:
+        return [_interpret_counter_signature(v) for v in values]
+    return values
+
+
+def _unsign(data):
+    if isinstance(data, int):
+        size = data.bit_length()
+        if data &lt; 0:
+            data = (1 &lt;&lt; (size + 1)) - ~data - 1
+        if data &gt; 0xFFFFFFFF_FFFFFFFF:
+            size, r = divmod(size, 8)
+            size += bool(r)
+            data = data.to_bytes(size, &#39;big&#39;).hex()
+        return data
+    elif isinstance(data, dict):
+        for key in list(data):
+            data[key] = _unsign(data[key])
+    elif isinstance(data, list):
+        return [_unsign(x) for x in data]
+    return data
+
+
+def _postprocess(obj, raw: bytes | memoryview | None = None):
+    if isinstance(obj, OrderedDict):
+        for key in list(obj.keys()):
+            value = obj[key]
+            if key in (&#39;issuer&#39;, &#39;subject&#39;):
+                if isinstance(value, list):
+                    obj[key] = _flatten_name(value)
+                elif isinstance(value, dict):
+                    obj[key] = _postprocess(value)
+            elif key == &#39;validity&#39; and isinstance(value, dict):
+                obj[key] = OrderedDict(
+                    (k, _parse_asn1_time(_postprocess(v)))
+                    for k, v in value.items()
+                )
+            elif key in (&#39;signedAttrs&#39;, &#39;unsignedAttrs&#39;) and isinstance(value, list):
+                obj[key] = [_postprocess_attribute(attr) for attr in value]
+            elif key == &#39;certificates&#39; and isinstance(value, list):
+                obj[key] = [_postprocess(cert) for cert in value]
+            elif key == &#39;signerInfos&#39; and isinstance(value, list):
+                obj[key] = [_postprocess(si) for si in value]
+            elif key == &#39;content&#39; and isinstance(value, dict):
+                obj[key] = _postprocess(value, raw)
+            elif key == &#39;tbsCertificate&#39; and isinstance(value, dict):
+                obj[key] = _postprocess(value)
+            elif key == &#39;sid&#39; and isinstance(value, dict):
+                obj[key] = _postprocess(value)
+            else:
+                obj[key] = _postprocess(value)
+        return obj
+    if isinstance(obj, list):
+        return [_postprocess(item) for item in obj]
+    if isinstance(obj, bytes):
+        return obj.hex().upper()
+    return obj
+
+
+def _postprocess_attribute(attr) -&gt; OrderedDict:
+    if not isinstance(attr, dict):
+        return attr
+    if &#39;type&#39; in attr and &#39;attrType&#39; not in attr:
+        result = OrderedDict()
+        oid = attr[&#39;type&#39;]
+        result[&#39;type&#39;] = oid
+        if &#39;value&#39; in attr:
+            v = _postprocess(attr[&#39;value&#39;])
+            if oid in _TIME_VALUED_ATTRIBUTES:
+                v = _parse_asn1_time(v)
+            result[&#39;value&#39;] = v
+        elif &#39;values&#39; in attr:
+            vals = [_postprocess(v) for v in attr[&#39;values&#39;]]
+            if oid in _TIME_VALUED_ATTRIBUTES:
+                vals = [_parse_asn1_time(v) for v in vals]
+            result[&#39;values&#39;] = vals
+        return result
+    result = OrderedDict()
+    oid = attr.get(&#39;attrType&#39;, &#39;&#39;)
+    values = attr.get(&#39;attrValues&#39;, [])
+    result[&#39;type&#39;] = oid
+    decoded = _decode_attribute_value(oid, values)
+    if len(decoded) == 1:
+        v = _postprocess(decoded[0])
+        if oid in _TIME_VALUED_ATTRIBUTES:
+            v = _parse_asn1_time(v)
+        result[&#39;value&#39;] = v
+    else:
+        vals = [_postprocess(v) for v in decoded]
+        if oid in _TIME_VALUED_ATTRIBUTES:
+            vals = [_parse_asn1_time(v) for v in vals]
+        result[&#39;values&#39;] = vals
+    return result
+
+
+def _read_tag_length(sr: StructReader) -&gt; tuple[int, int, int]:
+    b = sr.u8()
+    tag_class = (b &gt;&gt; 6) &amp; 3
+    tag_number = b &amp; 0x1F
+    if tag_number == 0x1F:
+        tag_number = 0
+        while True:
+            b = sr.u8()
+            tag_number = (tag_number &lt;&lt; 7) | (b &amp; 0x7F)
+            if not (b &amp; 0x80):
+                break
+    b = sr.u8()
+    if b &lt; 0x80:
+        length = b
+    elif b == 0x80:
+        length = -1
+    else:
+        n = b &amp; 0x7F
+        length = 0
+        for _ in range(n):
+            length = (length &lt;&lt; 8) | sr.u8()
+    return tag_class, tag_number, length
+
+
+def _skip_tlv_complete(sr: StructReader) -&gt; int:
+    start = sr.tell()
+    b = sr.u8()
+    constructed = bool(b &amp; 0x20)
+    tag_number = b &amp; 0x1F
+    if tag_number == 0x1F:
+        while sr.u8() &amp; 0x80:
+            pass
+    b = sr.u8()
+    if b &lt; 0x80:
+        length = b
+    elif b == 0x80:
+        length = -1
+    else:
+        n = b &amp; 0x7F
+        length = 0
+        for _ in range(n):
+            length = (length &lt;&lt; 8) | sr.u8()
+    if length &gt;= 0:
+        sr.seekrel(length)
+    elif constructed:
+        while not _skip00(sr):
+            _skip_tlv_complete(sr)
+    return sr.tell() - start
+
+
+def _find_implicit_set_of_certificates(
+    sr: StructReader,
+) -&gt; list[tuple[int, int]]:
+    _read_tag_length(sr)
+    _skip_tlv_complete(sr)
+    tc, tn, outer_len = _read_tag_length(sr)
+    if tc != 2 or tn != 0:
+        return []
+    if outer_len &lt; 0:
+        outer_end = sr.tell() + sr.remaining_bytes
+    else:
+        outer_end = sr.tell() + outer_len
+    _read_tag_length(sr)
+    _skip_tlv_complete(sr)
+    _skip_tlv_complete(sr)
+    _skip_tlv_complete(sr)
+    positions = []
+    while sr.tell() &lt; outer_end:
+        if sr.remaining_bytes &gt;= 2 and _skip00(sr):
+            break
+        tc, tn, length = _read_tag_length(sr)
+        if tc == 2 and tn == 0:
+            if length &lt; 0:
+                cert_set_end = sr.tell() + sr.remaining_bytes
+            else:
+                cert_set_end = sr.tell() + length
+            while sr.tell() &lt; cert_set_end:
+                if sr.remaining_bytes &gt;= 2 and _skip00(sr):
+                    break
+                cert_start = sr.tell()
+                _skip_tlv_complete(sr)
+                positions.append((cert_start, sr.tell()))
+            break
+        elif tc == 2 and tn == 1:
+            if length &gt;= 0:
+                sr.seekrel(length)
+            else:
+                while not _skip00(sr):
+                    _skip_tlv_complete(sr)
+        else:
+            if length &gt;= 0:
+                sr.seekrel(length)
+            break
+    return positions
+
+
+def _find_certificate_hashes(raw: bytes | memoryview) -&gt; list[str]:
+    hashes: list[str] = []
+    try:
+        sr = StructReader(memoryview(raw), bigendian=True)
+        positions = _find_implicit_set_of_certificates(sr)
+        for cert_start, cert_end in positions:
+            cert_bytes = bytes(raw[cert_start:cert_end])
+            hashes.append(hashlib.sha1(cert_bytes).hexdigest())
+    except Exception:
+        pass
+    return hashes
+
+
+def parse_content_info(data: bytes | bytearray | memoryview) -&gt; OrderedDict:
+    &#34;&#34;&#34;
+    Parse a DER-encoded PKCS#7/CMS ContentInfo structure and return a fully post-processed
+    OrderedDict ready for JSON serialization. Names are flattened, times are formatted,
+    attribute values are decoded, and negative ASN.1 integers are converted to unsigned
+    representation.
+    &#34;&#34;&#34;
+    mv = memoryview(data)
+    best_result = None
+    best_remaining = len(mv) + 1
+    for schema in (SignedContentInfo, ContentInfo):
+        try:
+            reader = ASN1Reader(mv, bigendian=True)
+            result = reader.decode_with_schema(schema)
+            remaining = reader.remaining_bytes
+            if remaining &lt; best_remaining:
+                best_result = result
+                best_remaining = remaining
+            if remaining == 0:
+                break
+        except Exception:
+            continue
+    if best_result is not None:
+        result = _unsign(_postprocess(best_result, mv))
+    else:
+        reader = ASN1Reader(mv, bigendian=True)
+        result = reader.read_tlv()
+    if not isinstance(result, OrderedDict):
+        raise RuntimeError(&#39;The ContentInfo data did not parse as a dictionary.&#39;)
+    return result
+
+
+def compute_certificate_fingerprints(
+    result,
+    raw: bytes | memoryview,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Compute SHA-1 fingerprints for each certificate by locating their DER boundaries in the raw
+    data and add them in-place to the result dict.
+    &#34;&#34;&#34;
+    if not isinstance(result, dict):
+        return
+    content = result.get(&#39;content&#39;)
+    if not isinstance(content, dict):
+        return
+    certs = content.get(&#39;certificates&#39;)
+    if not isinstance(certs, list):
+        return
+    mv = memoryview(raw)
+    cert_hashes = _find_certificate_hashes(mv)
+    for i, cert in enumerate(certs):
+        if isinstance(cert, dict) and i &lt; len(cert_hashes):
+            cert[&#39;fingerprint&#39;] = cert_hashes[i]</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.asn1.cms.parse_content_info"><code class="name flex">
+<span>def <span class="ident">parse_content_info</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Parse a DER-encoded PKCS#7/CMS ContentInfo structure and return a fully post-processed
+OrderedDict ready for JSON serialization. Names are flattened, times are formatted,
+attribute values are decoded, and negative ASN.1 integers are converted to unsigned
+representation.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a5b422e13e523d2e1cdfa919f4ccb273eae6515c/refinery/lib/asn1/cms.py#L409-L438" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_content_info(data: bytes | bytearray | memoryview) -&gt; OrderedDict:
+    &#34;&#34;&#34;
+    Parse a DER-encoded PKCS#7/CMS ContentInfo structure and return a fully post-processed
+    OrderedDict ready for JSON serialization. Names are flattened, times are formatted,
+    attribute values are decoded, and negative ASN.1 integers are converted to unsigned
+    representation.
+    &#34;&#34;&#34;
+    mv = memoryview(data)
+    best_result = None
+    best_remaining = len(mv) + 1
+    for schema in (SignedContentInfo, ContentInfo):
+        try:
+            reader = ASN1Reader(mv, bigendian=True)
+            result = reader.decode_with_schema(schema)
+            remaining = reader.remaining_bytes
+            if remaining &lt; best_remaining:
+                best_result = result
+                best_remaining = remaining
+            if remaining == 0:
+                break
+        except Exception:
+            continue
+    if best_result is not None:
+        result = _unsign(_postprocess(best_result, mv))
+    else:
+        reader = ASN1Reader(mv, bigendian=True)
+        result = reader.read_tlv()
+    if not isinstance(result, OrderedDict):
+        raise RuntimeError(&#39;The ContentInfo data did not parse as a dictionary.&#39;)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.asn1.cms.compute_certificate_fingerprints"><code class="name flex">
+<span>def <span class="ident">compute_certificate_fingerprints</span></span>(<span>result, raw)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Compute SHA-1 fingerprints for each certificate by locating their DER boundaries in the raw
+data and add them in-place to the result dict.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a5b422e13e523d2e1cdfa919f4ccb273eae6515c/refinery/lib/asn1/cms.py#L441-L461" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def compute_certificate_fingerprints(
+    result,
+    raw: bytes | memoryview,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Compute SHA-1 fingerprints for each certificate by locating their DER boundaries in the raw
+    data and add them in-place to the result dict.
+    &#34;&#34;&#34;
+    if not isinstance(result, dict):
+        return
+    content = result.get(&#39;content&#39;)
+    if not isinstance(content, dict):
+        return
+    certs = content.get(&#39;certificates&#39;)
+    if not isinstance(certs, list):
+        return
+    mv = memoryview(raw)
+    cert_hashes = _find_certificate_hashes(mv)
+    for i, cert in enumerate(certs):
+        if isinstance(cert, dict) and i &lt; len(cert_hashes):
+            cert[&#39;fingerprint&#39;] = cert_hashes[i]</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.asn1" href="index.html">refinery.lib.asn1</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.asn1.cms.parse_content_info" href="#refinery.lib.asn1.cms.parse_content_info">parse_content_info</a></code></li>
+<li><code><a title="refinery.lib.asn1.cms.compute_certificate_fingerprints" href="#refinery.lib.asn1.cms.compute_certificate_fingerprints">compute_certificate_fingerprints</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
