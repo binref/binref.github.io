@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.qr.correct documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.qr.correct</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L1-L130" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+_PRIMITIVE_POLY = 0x11D
+
+EXP_TABLE = [0] * 256
+LOG_TABLE = [0] * 256
+
+_x = 1
+for i in range(256):
+    EXP_TABLE[i] = _x
+    LOG_TABLE[_x] = i
+    _x &lt;&lt;= 1
+    if _x &gt;= 256:
+        _x ^= _PRIMITIVE_POLY
+del _x
+
+
+def gf_mul(a: int, b: int) -&gt; int:
+    if a == 0 or b == 0:
+        return 0
+    return EXP_TABLE[(LOG_TABLE[a] + LOG_TABLE[b]) % 255]
+
+
+def gf_div(a: int, b: int) -&gt; int:
+    if b == 0:
+        raise ZeroDivisionError
+    if a == 0:
+        return 0
+    return EXP_TABLE[(LOG_TABLE[a] - LOG_TABLE[b]) % 255]
+
+
+def gf_pow(a: int, n: int) -&gt; int:
+    if a == 0:
+        return 0
+    return EXP_TABLE[(LOG_TABLE[a] * n) % 255]
+
+
+def gf_poly_eval(poly: list[int], x: int) -&gt; int:
+    result = poly[0]
+    for coeff in poly[1:]:
+        result = gf_mul(result, x) ^ coeff
+    return result
+
+
+def gf_poly_mul(p: list[int], q: list[int]) -&gt; list[int]:
+    result = [0] * (len(p) + len(q) - 1)
+    for i, a in enumerate(p):
+        for j, b in enumerate(q):
+            result[i + j] ^= gf_mul(a, b)
+    return result
+
+
+def rs_calc_syndromes(
+    data: bytes | bytearray | memoryview,
+    nsym: int,
+) -&gt; list[int]:
+    return [gf_poly_eval(list(data), gf_pow(2, i)) for i in range(nsym)]
+
+
+def rs_find_error_locator(syndromes: list[int], nsym: int) -&gt; list[int]:
+    error_locator = [1]
+    old_locator = [1]
+    for i in range(nsym):
+        delta = syndromes[i]
+        for j in range(1, len(error_locator)):
+            delta ^= gf_mul(error_locator[-(j + 1)], syndromes[i - j])
+        old_locator.append(0)
+        if delta != 0:
+            if len(old_locator) &gt; len(error_locator):
+                new_locator = [gf_mul(c, delta) for c in old_locator]
+                old_locator = [gf_mul(c, gf_div(1, delta))
+                    for c in error_locator]
+                error_locator = new_locator
+            error_locator = [
+                error_locator[k] ^ gf_mul(delta, old_locator[k])
+                if k &lt; len(old_locator) else error_locator[k]
+                for k in range(len(error_locator))
+            ]
+    return error_locator
+
+
+def rs_find_errors(error_locator: list[int], n: int) -&gt; list[int]:
+    errs = len(error_locator) - 1
+    positions = []
+    for i in range(n):
+        if gf_poly_eval(error_locator, gf_pow(2, i)) == 0:
+            positions.append(n - 1 - i)
+    if len(positions) != errs:
+        raise ValueError(
+            F&#39;found {len(positions)} error positions but expected {errs}&#39;)
+    return positions
+
+
+def rs_correct(
+    data: bytes | bytearray | memoryview,
+    nsym: int,
+) -&gt; bytearray:
+    &#34;&#34;&#34;
+    Perform Reed-Solomon error correction on the given data block.
+    The last `nsym` bytes of `data` are the EC codewords.
+    Returns the corrected data (without EC codewords) as a bytearray.
+    &#34;&#34;&#34;
+    output = bytearray(data)
+    syndromes = rs_calc_syndromes(output, nsym)
+    if max(syndromes) == 0:
+        return bytearray(output[:len(output) - nsym])
+    error_locator = rs_find_error_locator(syndromes, nsym)
+    positions = rs_find_errors(error_locator, len(output))
+    if not positions:
+        raise ValueError(&#39;could not locate errors&#39;)
+    error_evaluator = gf_poly_mul(syndromes + [0], error_locator)
+    error_evaluator = error_evaluator[len(error_evaluator) - nsym:]
+    x_list = [gf_pow(2, len(output) - 1 - p) for p in positions]
+    for i, xi in enumerate(x_list):
+        xi_inv = gf_div(1, xi)
+        error_eval = gf_poly_eval(
+            list(reversed(error_evaluator)), xi_inv)
+        locator_prime = 1
+        for j, xj in enumerate(x_list):
+            if j != i:
+                locator_prime = gf_mul(
+                    locator_prime, 1 ^ gf_mul(xi_inv, xj))
+        if locator_prime == 0:
+            raise ValueError(&#39;could not correct errors&#39;)
+        magnitude = gf_div(error_eval, locator_prime)
+        output[positions[i]] ^= magnitude
+    corrected_syndromes = rs_calc_syndromes(output, nsym)
+    if max(corrected_syndromes) != 0:
+        raise ValueError(&#39;error correction failed: residual syndrome&#39;)
+    return bytearray(output[:len(output) - nsym])</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.qr.correct.gf_mul"><code class="name flex">
+<span>def <span class="ident">gf_mul</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L18-L21" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def gf_mul(a: int, b: int) -&gt; int:
+    if a == 0 or b == 0:
+        return 0
+    return EXP_TABLE[(LOG_TABLE[a] + LOG_TABLE[b]) % 255]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.gf_div"><code class="name flex">
+<span>def <span class="ident">gf_div</span></span>(<span>a, b)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L24-L29" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def gf_div(a: int, b: int) -&gt; int:
+    if b == 0:
+        raise ZeroDivisionError
+    if a == 0:
+        return 0
+    return EXP_TABLE[(LOG_TABLE[a] - LOG_TABLE[b]) % 255]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.gf_pow"><code class="name flex">
+<span>def <span class="ident">gf_pow</span></span>(<span>a, n)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L32-L35" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def gf_pow(a: int, n: int) -&gt; int:
+    if a == 0:
+        return 0
+    return EXP_TABLE[(LOG_TABLE[a] * n) % 255]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.gf_poly_eval"><code class="name flex">
+<span>def <span class="ident">gf_poly_eval</span></span>(<span>poly, x)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L38-L42" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def gf_poly_eval(poly: list[int], x: int) -&gt; int:
+    result = poly[0]
+    for coeff in poly[1:]:
+        result = gf_mul(result, x) ^ coeff
+    return result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.gf_poly_mul"><code class="name flex">
+<span>def <span class="ident">gf_poly_mul</span></span>(<span>p, q)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L45-L50" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def gf_poly_mul(p: list[int], q: list[int]) -&gt; list[int]:
+    result = [0] * (len(p) + len(q) - 1)
+    for i, a in enumerate(p):
+        for j, b in enumerate(q):
+            result[i + j] ^= gf_mul(a, b)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.rs_calc_syndromes"><code class="name flex">
+<span>def <span class="ident">rs_calc_syndromes</span></span>(<span>data, nsym)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L53-L57" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def rs_calc_syndromes(
+    data: bytes | bytearray | memoryview,
+    nsym: int,
+) -&gt; list[int]:
+    return [gf_poly_eval(list(data), gf_pow(2, i)) for i in range(nsym)]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.rs_find_error_locator"><code class="name flex">
+<span>def <span class="ident">rs_find_error_locator</span></span>(<span>syndromes, nsym)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L60-L79" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def rs_find_error_locator(syndromes: list[int], nsym: int) -&gt; list[int]:
+    error_locator = [1]
+    old_locator = [1]
+    for i in range(nsym):
+        delta = syndromes[i]
+        for j in range(1, len(error_locator)):
+            delta ^= gf_mul(error_locator[-(j + 1)], syndromes[i - j])
+        old_locator.append(0)
+        if delta != 0:
+            if len(old_locator) &gt; len(error_locator):
+                new_locator = [gf_mul(c, delta) for c in old_locator]
+                old_locator = [gf_mul(c, gf_div(1, delta))
+                    for c in error_locator]
+                error_locator = new_locator
+            error_locator = [
+                error_locator[k] ^ gf_mul(delta, old_locator[k])
+                if k &lt; len(old_locator) else error_locator[k]
+                for k in range(len(error_locator))
+            ]
+    return error_locator</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.rs_find_errors"><code class="name flex">
+<span>def <span class="ident">rs_find_errors</span></span>(<span>error_locator, n)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L82-L91" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def rs_find_errors(error_locator: list[int], n: int) -&gt; list[int]:
+    errs = len(error_locator) - 1
+    positions = []
+    for i in range(n):
+        if gf_poly_eval(error_locator, gf_pow(2, i)) == 0:
+            positions.append(n - 1 - i)
+    if len(positions) != errs:
+        raise ValueError(
+            F&#39;found {len(positions)} error positions but expected {errs}&#39;)
+    return positions</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.qr.correct.rs_correct"><code class="name flex">
+<span>def <span class="ident">rs_correct</span></span>(<span>data, nsym)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Perform Reed-Solomon error correction on the given data block.
+The last <code>nsym</code> bytes of <code>data</code> are the EC codewords.
+Returns the corrected data (without EC codewords) as a bytearray.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/5155026d0e12829fe9d39f633dd91d6b716faef4/refinery/lib/qr/correct.py#L94-L130" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def rs_correct(
+    data: bytes | bytearray | memoryview,
+    nsym: int,
+) -&gt; bytearray:
+    &#34;&#34;&#34;
+    Perform Reed-Solomon error correction on the given data block.
+    The last `nsym` bytes of `data` are the EC codewords.
+    Returns the corrected data (without EC codewords) as a bytearray.
+    &#34;&#34;&#34;
+    output = bytearray(data)
+    syndromes = rs_calc_syndromes(output, nsym)
+    if max(syndromes) == 0:
+        return bytearray(output[:len(output) - nsym])
+    error_locator = rs_find_error_locator(syndromes, nsym)
+    positions = rs_find_errors(error_locator, len(output))
+    if not positions:
+        raise ValueError(&#39;could not locate errors&#39;)
+    error_evaluator = gf_poly_mul(syndromes + [0], error_locator)
+    error_evaluator = error_evaluator[len(error_evaluator) - nsym:]
+    x_list = [gf_pow(2, len(output) - 1 - p) for p in positions]
+    for i, xi in enumerate(x_list):
+        xi_inv = gf_div(1, xi)
+        error_eval = gf_poly_eval(
+            list(reversed(error_evaluator)), xi_inv)
+        locator_prime = 1
+        for j, xj in enumerate(x_list):
+            if j != i:
+                locator_prime = gf_mul(
+                    locator_prime, 1 ^ gf_mul(xi_inv, xj))
+        if locator_prime == 0:
+            raise ValueError(&#39;could not correct errors&#39;)
+        magnitude = gf_div(error_eval, locator_prime)
+        output[positions[i]] ^= magnitude
+    corrected_syndromes = rs_calc_syndromes(output, nsym)
+    if max(corrected_syndromes) != 0:
+        raise ValueError(&#39;error correction failed: residual syndrome&#39;)
+    return bytearray(output[:len(output) - nsym])</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.qr" href="index.html">refinery.lib.qr</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.qr.correct.gf_mul" href="#refinery.lib.qr.correct.gf_mul">gf_mul</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.gf_div" href="#refinery.lib.qr.correct.gf_div">gf_div</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.gf_pow" href="#refinery.lib.qr.correct.gf_pow">gf_pow</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.gf_poly_eval" href="#refinery.lib.qr.correct.gf_poly_eval">gf_poly_eval</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.gf_poly_mul" href="#refinery.lib.qr.correct.gf_poly_mul">gf_poly_mul</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.rs_calc_syndromes" href="#refinery.lib.qr.correct.rs_calc_syndromes">rs_calc_syndromes</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.rs_find_error_locator" href="#refinery.lib.qr.correct.rs_find_error_locator">rs_find_error_locator</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.rs_find_errors" href="#refinery.lib.qr.correct.rs_find_errors">rs_find_errors</a></code></li>
+<li><code><a title="refinery.lib.qr.correct.rs_correct" href="#refinery.lib.qr.correct.rs_correct">rs_correct</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
