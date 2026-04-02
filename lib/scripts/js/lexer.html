@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/js/lexer.py#L1-L531" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Generator
+
+from refinery.lib.scripts.js.token import KEYWORDS, JsToken, JsTokenKind
+
+_ESCAPE_MAP: dict[str, str] = {
+    &#39;b&#39;  : &#39;\b&#39;,
+    &#39;f&#39;  : &#39;\f&#39;,
+    &#39;n&#39;  : &#39;\n&#39;,
+    &#39;r&#39;  : &#39;\r&#39;,
+    &#39;t&#39;  : &#39;\t&#39;,
+    &#39;v&#39;  : &#39;\v&#39;,
+    &#39;0&#39;  : &#39;\0&#39;,
+    &#39;\\&#39; : &#39;\\&#39;,
+    &#34;&#39;&#34;  : &#34;&#39;&#34;,
+    &#39;&#34;&#39;  : &#39;&#34;&#39;,
+    &#39;`&#39;  : &#39;`&#39;,
+}
+
+_FOUR_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;&gt;&gt;&gt;=&#39; : JsTokenKind.GT3_ASSIGN,
+}
+
+_THREE_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;===&#39; : JsTokenKind.EQ3,
+    &#39;!==&#39; : JsTokenKind.BANG_EQ2,
+    &#39;&gt;&gt;&gt;&#39; : JsTokenKind.GT3,
+    &#39;**=&#39; : JsTokenKind.STAR2_ASSIGN,
+    &#39;&lt;&lt;=&#39; : JsTokenKind.LT2_ASSIGN,
+    &#39;&gt;&gt;=&#39; : JsTokenKind.GT2_ASSIGN,
+    &#39;&amp;&amp;=&#39; : JsTokenKind.AND_ASSIGN,
+    &#39;||=&#39; : JsTokenKind.OR_ASSIGN,
+    &#39;??=&#39; : JsTokenKind.NULLISH_ASSIGN,
+    &#39;...&#39; : JsTokenKind.ELLIPSIS,
+}
+
+_TWO_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;==&#39; : JsTokenKind.EQ2,
+    &#39;!=&#39; : JsTokenKind.BANG_EQ,
+    &#39;&lt;=&#39; : JsTokenKind.LT_EQ,
+    &#39;&gt;=&#39; : JsTokenKind.GT_EQ,
+    &#39;+=&#39; : JsTokenKind.PLUS_ASSIGN,
+    &#39;-=&#39; : JsTokenKind.MINUS_ASSIGN,
+    &#39;*=&#39; : JsTokenKind.STAR_ASSIGN,
+    &#39;/=&#39; : JsTokenKind.SLASH_ASSIGN,
+    &#39;%=&#39; : JsTokenKind.PERCENT_ASSIGN,
+    &#39;&amp;=&#39; : JsTokenKind.AMP_ASSIGN,
+    &#39;|=&#39; : JsTokenKind.PIPE_ASSIGN,
+    &#39;^=&#39; : JsTokenKind.CARET_ASSIGN,
+    &#39;**&#39; : JsTokenKind.STAR2,
+    &#39;++&#39; : JsTokenKind.INC,
+    &#39;--&#39; : JsTokenKind.DEC,
+    &#39;&amp;&amp;&#39; : JsTokenKind.AND,
+    &#39;||&#39; : JsTokenKind.OR,
+    &#39;??&#39; : JsTokenKind.QQ,
+    &#39;?.&#39; : JsTokenKind.QUESTION_DOT,
+    &#39;=&gt;&#39; : JsTokenKind.ARROW,
+    &#39;&lt;&lt;&#39; : JsTokenKind.LT2,
+    &#39;&gt;&gt;&#39; : JsTokenKind.GT2,
+}
+
+_ONE_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;+&#39; : JsTokenKind.PLUS,
+    &#39;-&#39; : JsTokenKind.MINUS,
+    &#39;*&#39; : JsTokenKind.STAR,
+    &#39;%&#39; : JsTokenKind.PERCENT,
+    &#39;=&#39; : JsTokenKind.EQUALS,
+    &#39;!&#39; : JsTokenKind.BANG,
+    &#39;&lt;&#39; : JsTokenKind.LT,
+    &#39;&gt;&#39; : JsTokenKind.GT,
+    &#39;&amp;&#39; : JsTokenKind.AMP,
+    &#39;|&#39; : JsTokenKind.PIPE,
+    &#39;^&#39; : JsTokenKind.CARET,
+    &#39;~&#39; : JsTokenKind.TILDE,
+    &#39;.&#39; : JsTokenKind.DOT,
+    &#39;?&#39; : JsTokenKind.QUESTION,
+    &#39;:&#39; : JsTokenKind.COLON,
+    &#39;(&#39; : JsTokenKind.LPAREN,
+    &#39;)&#39; : JsTokenKind.RPAREN,
+    &#39;{&#39; : JsTokenKind.LBRACE,
+    &#39;}&#39; : JsTokenKind.RBRACE,
+    &#39;[&#39; : JsTokenKind.LBRACKET,
+    &#39;]&#39; : JsTokenKind.RBRACKET,
+    &#39;;&#39; : JsTokenKind.SEMICOLON,
+    &#39;,&#39; : JsTokenKind.COMMA,
+}
+
+_EXPR_END_KINDS = frozenset({
+    JsTokenKind.IDENTIFIER,
+    JsTokenKind.INTEGER,
+    JsTokenKind.FLOAT,
+    JsTokenKind.BIGINT,
+    JsTokenKind.STRING_SINGLE,
+    JsTokenKind.STRING_DOUBLE,
+    JsTokenKind.TEMPLATE_FULL,
+    JsTokenKind.TEMPLATE_TAIL,
+    JsTokenKind.REGEXP,
+    JsTokenKind.RPAREN,
+    JsTokenKind.RBRACKET,
+    JsTokenKind.INC,
+    JsTokenKind.DEC,
+    JsTokenKind.TRUE,
+    JsTokenKind.FALSE,
+    JsTokenKind.NULL,
+    JsTokenKind.THIS,
+    JsTokenKind.SUPER,
+})
+
+
+@dataclass
+class JsLexer:
+    source: str
+    pos: int = 0
+    _template_depth: int = 0
+    _brace_stack: list[int] = field(default_factory=list)
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+            self.pos += 1
+        return self.pos &gt; start
+
+    def _read_line_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        while self.pos &lt; length and src[self.pos] != &#39;\n&#39;:
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_block_comment(self) -&gt; tuple[str, bool]:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        has_newline = False
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;*&#39; and src[self.pos + 1] == &#39;/&#39;:
+                self.pos += 2
+                return src[start:self.pos], has_newline
+            if src[self.pos] in &#39;\r\n&#39;:
+                has_newline = True
+            self.pos += 1
+        self.pos = length
+        return src[start:self.pos], has_newline
+
+    def _read_string_escape(self) -&gt; str:
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        if self.pos &gt;= length:
+            return &#39;&#39;
+        c = src[self.pos]
+        self.pos += 1
+        mapped = _ESCAPE_MAP.get(c)
+        if mapped is not None:
+            return mapped
+        if c == &#39;x&#39; and self.pos + 1 &lt; length:
+            hexstr = src[self.pos:self.pos + 2]
+            if len(hexstr) == 2 and all(
+                h in &#39;0123456789abcdefABCDEF&#39; for h in hexstr
+            ):
+                self.pos += 2
+                return chr(int(hexstr, 16))
+            return &#39;x&#39;
+        if c == &#39;u&#39;:
+            if self.pos &lt; length and src[self.pos] == &#39;{&#39;:
+                end = src.find(&#39;}&#39;, self.pos + 1)
+                if end != -1:
+                    hexstr = src[self.pos + 1:end]
+                    if hexstr and all(
+                        h in &#39;0123456789abcdefABCDEF&#39; for h in hexstr
+                    ):
+                        self.pos = end + 1
+                        return chr(int(hexstr, 16))
+                    self.pos = end + 1
+                    return &#39;u&#39;
+            elif self.pos + 3 &lt; length:
+                hexstr = src[self.pos:self.pos + 4]
+                if len(hexstr) == 4 and all(
+                    h in &#39;0123456789abcdefABCDEF&#39; for h in hexstr
+                ):
+                    self.pos += 4
+                    return chr(int(hexstr, 16))
+            return &#39;u&#39;
+        if c in &#39;\r\n&#39;:
+            if c == &#39;\r&#39; and self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                self.pos += 1
+            return &#39;&#39;
+        return c
+
+    def _read_single_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            self.pos += 1
+            if c == &#34;&#39;&#34;:
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+        return src[start:self.pos]
+
+    def _read_double_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            self.pos += 1
+            if c == &#39;&#34;&#39;:
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+        return src[start:self.pos]
+
+    def _read_template(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c == &#39;`&#39;:
+                self.pos += 1
+                return JsToken(JsTokenKind.TEMPLATE_FULL, src[start:self.pos], start)
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;{&#39;:
+                self.pos += 2
+                self._template_depth += 1
+                self._brace_stack.append(0)
+                return JsToken(JsTokenKind.TEMPLATE_HEAD, src[start:self.pos], start)
+            self.pos += 1
+        return JsToken(JsTokenKind.TEMPLATE_FULL, src[start:self.pos], start)
+
+    def _resume_template(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c == &#39;`&#39;:
+                self.pos += 1
+                self._template_depth -= 1
+                return JsToken(JsTokenKind.TEMPLATE_TAIL, src[start:self.pos], start)
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;{&#39;:
+                self.pos += 2
+                self._brace_stack.append(0)
+                return JsToken(JsTokenKind.TEMPLATE_MIDDLE, src[start:self.pos], start)
+            self.pos += 1
+        self._template_depth -= 1
+        return JsToken(JsTokenKind.TEMPLATE_TAIL, src[start:self.pos], start)
+
+    def _read_regexp(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        in_class = False
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;[&#39;:
+                in_class = True
+                self.pos += 1
+                continue
+            if c == &#39;]&#39; and in_class:
+                in_class = False
+                self.pos += 1
+                continue
+            if c == &#39;/&#39; and not in_class:
+                self.pos += 1
+                while self.pos &lt; length and src[self.pos].isalpha():
+                    self.pos += 1
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                break
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_number(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+
+        if src[self.pos] == &#39;0&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in &#39;xX&#39;:
+                self.pos += 2
+                while self.pos &lt; length and (
+                    src[self.pos] in &#39;0123456789abcdefABCDEF_&#39;
+                ):
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+                    self.pos += 1
+                    return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+                return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+            if nc in &#39;oO&#39;:
+                self.pos += 2
+                while self.pos &lt; length and (
+                    src[self.pos] in &#39;01234567_&#39;
+                ):
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+                    self.pos += 1
+                    return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+                return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+            if nc in &#39;bB&#39;:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in &#39;01_&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+                    self.pos += 1
+                    return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+                return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+
+        while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+            self.pos += 1
+
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39;:
+            next_pos = self.pos + 1
+            if next_pos &lt; length and src[next_pos].isdigit():
+                is_float = True
+                self.pos += 1
+                while self.pos &lt; length and (
+                    src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;
+                ):
+                    self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            is_float = True
+            self.pos += 1
+            if self.pos &lt; length and src[self.pos] in &#39;+-&#39;:
+                self.pos += 1
+            while self.pos &lt; length and (
+                src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;
+            ):
+                self.pos += 1
+
+        if not is_float and self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+            self.pos += 1
+            return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+
+        kind = JsTokenKind.FLOAT if is_float else JsTokenKind.INTEGER
+        return JsToken(kind, src[start:self.pos], start)
+
+    def _read_identifier_or_keyword(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c.isalnum() or c == &#39;_&#39; or c == &#39;$&#39;:
+                self.pos += 1
+            elif c == &#39;\\&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;u&#39;:
+                self._read_string_escape()
+            else:
+                break
+        word = src[start:self.pos]
+        kw = KEYWORDS.get(word)
+        if kw is not None:
+            return JsToken(kw, word, start)
+        return JsToken(JsTokenKind.IDENTIFIER, word, start)
+
+    def tokenize(self) -&gt; Generator[JsToken, None, None]:
+        src = self.source
+        length = len(src)
+        prev_allows_regex = True
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield JsToken(JsTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+                yield JsToken(JsTokenKind.NEWLINE, &#39;\r\n&#39;, start)
+                continue
+            if c in &#39;\r\n&#39;:
+                self.pos += 1
+                yield JsToken(JsTokenKind.NEWLINE, c, start)
+                continue
+
+            if c2 == &#39;//&#39;:
+                text = self._read_line_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                continue
+            if c2 == &#39;/*&#39;:
+                text, has_newline = self._read_block_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                if has_newline:
+                    yield JsToken(JsTokenKind.NEWLINE, &#39;&#39;, self.pos)
+                continue
+
+            if c == &#34;&#39;&#34;:
+                text = self._read_single_string()
+                prev_allows_regex = False
+                yield JsToken(JsTokenKind.STRING_SINGLE, text, start)
+                continue
+            if c == &#39;&#34;&#39;:
+                text = self._read_double_string()
+                prev_allows_regex = False
+                yield JsToken(JsTokenKind.STRING_DOUBLE, text, start)
+                continue
+            if c == &#39;`&#39;:
+                tok = self._read_template()
+                prev_allows_regex = False
+                yield tok
+                continue
+
+            if c == &#39;}&#39; and self._template_depth &gt; 0 and self._brace_stack:
+                if self._brace_stack[-1] == 0:
+                    self._brace_stack.pop()
+                    tok = self._resume_template()
+                    prev_allows_regex = False
+                    yield tok
+                    continue
+                else:
+                    self._brace_stack[-1] -= 1
+
+            if c.isdigit() or (
+                c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()
+            ):
+                tok = self._read_number()
+                prev_allows_regex = False
+                yield tok
+                continue
+
+            if c.isalpha() or c == &#39;_&#39; or c == &#39;$&#39; or c == &#39;\\&#39;:
+                tok = self._read_identifier_or_keyword()
+                prev_allows_regex = tok.kind not in _EXPR_END_KINDS
+                yield tok
+                continue
+
+            if c == &#39;/&#39;:
+                if prev_allows_regex:
+                    text = self._read_regexp()
+                    prev_allows_regex = False
+                    yield JsToken(JsTokenKind.REGEXP, text, start)
+                    continue
+                c2_slash = src[self.pos:self.pos + 2]
+                if c2_slash == &#39;/=&#39;:
+                    self.pos += 2
+                    prev_allows_regex = True
+                    yield JsToken(JsTokenKind.SLASH_ASSIGN, &#39;/=&#39;, start)
+                    continue
+                self.pos += 1
+                prev_allows_regex = True
+                yield JsToken(JsTokenKind.SLASH, &#39;/&#39;, start)
+                continue
+
+            c4 = src[self.pos:self.pos + 4]
+            if c4 in _FOUR_CHAR_OPS:
+                self.pos += 4
+                kind = _FOUR_CHAR_OPS[c4]
+                prev_allows_regex = True
+                yield JsToken(kind, c4, start)
+                continue
+
+            c3 = src[self.pos:self.pos + 3]
+            if c3 in _THREE_CHAR_OPS:
+                self.pos += 3
+                kind = _THREE_CHAR_OPS[c3]
+                prev_allows_regex = True
+                yield JsToken(kind, c3, start)
+                continue
+
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                kind = _TWO_CHAR_OPS[c2]
+                if kind in (JsTokenKind.INC, JsTokenKind.DEC):
+                    pass
+                else:
+                    prev_allows_regex = True
+                yield JsToken(kind, c2, start)
+                continue
+
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                kind = _ONE_CHAR_OPS[c]
+                if kind in (
+                    JsTokenKind.RPAREN,
+                    JsTokenKind.RBRACKET,
+                ):
+                    prev_allows_regex = False
+                elif kind == JsTokenKind.RBRACE:
+                    prev_allows_regex = True
+                else:
+                    prev_allows_regex = kind not in _EXPR_END_KINDS
+                if kind == JsTokenKind.LBRACE and self._brace_stack:
+                    self._brace_stack[-1] += 1
+                yield JsToken(kind, c, start)
+                continue
+
+            self.pos += 1
+            prev_allows_regex = True
+            yield JsToken(JsTokenKind.ERROR, c, start)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer"><code class="flex name class">
+<span>class <span class="ident">JsLexer</span></span>
+<span>(</span><span>source, pos=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>JsLexer(source: 'str', pos: 'int' = 0, _template_depth: 'int' = 0, _brace_stack: 'list[int]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/js/lexer.py#L112-L531" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class JsLexer:
+    source: str
+    pos: int = 0
+    _template_depth: int = 0
+    _brace_stack: list[int] = field(default_factory=list)
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+            self.pos += 1
+        return self.pos &gt; start
+
+    def _read_line_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        while self.pos &lt; length and src[self.pos] != &#39;\n&#39;:
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_block_comment(self) -&gt; tuple[str, bool]:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        has_newline = False
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;*&#39; and src[self.pos + 1] == &#39;/&#39;:
+                self.pos += 2
+                return src[start:self.pos], has_newline
+            if src[self.pos] in &#39;\r\n&#39;:
+                has_newline = True
+            self.pos += 1
+        self.pos = length
+        return src[start:self.pos], has_newline
+
+    def _read_string_escape(self) -&gt; str:
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        if self.pos &gt;= length:
+            return &#39;&#39;
+        c = src[self.pos]
+        self.pos += 1
+        mapped = _ESCAPE_MAP.get(c)
+        if mapped is not None:
+            return mapped
+        if c == &#39;x&#39; and self.pos + 1 &lt; length:
+            hexstr = src[self.pos:self.pos + 2]
+            if len(hexstr) == 2 and all(
+                h in &#39;0123456789abcdefABCDEF&#39; for h in hexstr
+            ):
+                self.pos += 2
+                return chr(int(hexstr, 16))
+            return &#39;x&#39;
+        if c == &#39;u&#39;:
+            if self.pos &lt; length and src[self.pos] == &#39;{&#39;:
+                end = src.find(&#39;}&#39;, self.pos + 1)
+                if end != -1:
+                    hexstr = src[self.pos + 1:end]
+                    if hexstr and all(
+                        h in &#39;0123456789abcdefABCDEF&#39; for h in hexstr
+                    ):
+                        self.pos = end + 1
+                        return chr(int(hexstr, 16))
+                    self.pos = end + 1
+                    return &#39;u&#39;
+            elif self.pos + 3 &lt; length:
+                hexstr = src[self.pos:self.pos + 4]
+                if len(hexstr) == 4 and all(
+                    h in &#39;0123456789abcdefABCDEF&#39; for h in hexstr
+                ):
+                    self.pos += 4
+                    return chr(int(hexstr, 16))
+            return &#39;u&#39;
+        if c in &#39;\r\n&#39;:
+            if c == &#39;\r&#39; and self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                self.pos += 1
+            return &#39;&#39;
+        return c
+
+    def _read_single_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            self.pos += 1
+            if c == &#34;&#39;&#34;:
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+        return src[start:self.pos]
+
+    def _read_double_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            self.pos += 1
+            if c == &#39;&#34;&#39;:
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+        return src[start:self.pos]
+
+    def _read_template(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c == &#39;`&#39;:
+                self.pos += 1
+                return JsToken(JsTokenKind.TEMPLATE_FULL, src[start:self.pos], start)
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;{&#39;:
+                self.pos += 2
+                self._template_depth += 1
+                self._brace_stack.append(0)
+                return JsToken(JsTokenKind.TEMPLATE_HEAD, src[start:self.pos], start)
+            self.pos += 1
+        return JsToken(JsTokenKind.TEMPLATE_FULL, src[start:self.pos], start)
+
+    def _resume_template(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c == &#39;`&#39;:
+                self.pos += 1
+                self._template_depth -= 1
+                return JsToken(JsTokenKind.TEMPLATE_TAIL, src[start:self.pos], start)
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;{&#39;:
+                self.pos += 2
+                self._brace_stack.append(0)
+                return JsToken(JsTokenKind.TEMPLATE_MIDDLE, src[start:self.pos], start)
+            self.pos += 1
+        self._template_depth -= 1
+        return JsToken(JsTokenKind.TEMPLATE_TAIL, src[start:self.pos], start)
+
+    def _read_regexp(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        in_class = False
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;[&#39;:
+                in_class = True
+                self.pos += 1
+                continue
+            if c == &#39;]&#39; and in_class:
+                in_class = False
+                self.pos += 1
+                continue
+            if c == &#39;/&#39; and not in_class:
+                self.pos += 1
+                while self.pos &lt; length and src[self.pos].isalpha():
+                    self.pos += 1
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                break
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_number(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+
+        if src[self.pos] == &#39;0&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in &#39;xX&#39;:
+                self.pos += 2
+                while self.pos &lt; length and (
+                    src[self.pos] in &#39;0123456789abcdefABCDEF_&#39;
+                ):
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+                    self.pos += 1
+                    return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+                return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+            if nc in &#39;oO&#39;:
+                self.pos += 2
+                while self.pos &lt; length and (
+                    src[self.pos] in &#39;01234567_&#39;
+                ):
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+                    self.pos += 1
+                    return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+                return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+            if nc in &#39;bB&#39;:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in &#39;01_&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+                    self.pos += 1
+                    return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+                return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+
+        while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+            self.pos += 1
+
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39;:
+            next_pos = self.pos + 1
+            if next_pos &lt; length and src[next_pos].isdigit():
+                is_float = True
+                self.pos += 1
+                while self.pos &lt; length and (
+                    src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;
+                ):
+                    self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            is_float = True
+            self.pos += 1
+            if self.pos &lt; length and src[self.pos] in &#39;+-&#39;:
+                self.pos += 1
+            while self.pos &lt; length and (
+                src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;
+            ):
+                self.pos += 1
+
+        if not is_float and self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+            self.pos += 1
+            return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+
+        kind = JsTokenKind.FLOAT if is_float else JsTokenKind.INTEGER
+        return JsToken(kind, src[start:self.pos], start)
+
+    def _read_identifier_or_keyword(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c.isalnum() or c == &#39;_&#39; or c == &#39;$&#39;:
+                self.pos += 1
+            elif c == &#39;\\&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;u&#39;:
+                self._read_string_escape()
+            else:
+                break
+        word = src[start:self.pos]
+        kw = KEYWORDS.get(word)
+        if kw is not None:
+            return JsToken(kw, word, start)
+        return JsToken(JsTokenKind.IDENTIFIER, word, start)
+
+    def tokenize(self) -&gt; Generator[JsToken, None, None]:
+        src = self.source
+        length = len(src)
+        prev_allows_regex = True
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield JsToken(JsTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+                yield JsToken(JsTokenKind.NEWLINE, &#39;\r\n&#39;, start)
+                continue
+            if c in &#39;\r\n&#39;:
+                self.pos += 1
+                yield JsToken(JsTokenKind.NEWLINE, c, start)
+                continue
+
+            if c2 == &#39;//&#39;:
+                text = self._read_line_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                continue
+            if c2 == &#39;/*&#39;:
+                text, has_newline = self._read_block_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                if has_newline:
+                    yield JsToken(JsTokenKind.NEWLINE, &#39;&#39;, self.pos)
+                continue
+
+            if c == &#34;&#39;&#34;:
+                text = self._read_single_string()
+                prev_allows_regex = False
+                yield JsToken(JsTokenKind.STRING_SINGLE, text, start)
+                continue
+            if c == &#39;&#34;&#39;:
+                text = self._read_double_string()
+                prev_allows_regex = False
+                yield JsToken(JsTokenKind.STRING_DOUBLE, text, start)
+                continue
+            if c == &#39;`&#39;:
+                tok = self._read_template()
+                prev_allows_regex = False
+                yield tok
+                continue
+
+            if c == &#39;}&#39; and self._template_depth &gt; 0 and self._brace_stack:
+                if self._brace_stack[-1] == 0:
+                    self._brace_stack.pop()
+                    tok = self._resume_template()
+                    prev_allows_regex = False
+                    yield tok
+                    continue
+                else:
+                    self._brace_stack[-1] -= 1
+
+            if c.isdigit() or (
+                c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()
+            ):
+                tok = self._read_number()
+                prev_allows_regex = False
+                yield tok
+                continue
+
+            if c.isalpha() or c == &#39;_&#39; or c == &#39;$&#39; or c == &#39;\\&#39;:
+                tok = self._read_identifier_or_keyword()
+                prev_allows_regex = tok.kind not in _EXPR_END_KINDS
+                yield tok
+                continue
+
+            if c == &#39;/&#39;:
+                if prev_allows_regex:
+                    text = self._read_regexp()
+                    prev_allows_regex = False
+                    yield JsToken(JsTokenKind.REGEXP, text, start)
+                    continue
+                c2_slash = src[self.pos:self.pos + 2]
+                if c2_slash == &#39;/=&#39;:
+                    self.pos += 2
+                    prev_allows_regex = True
+                    yield JsToken(JsTokenKind.SLASH_ASSIGN, &#39;/=&#39;, start)
+                    continue
+                self.pos += 1
+                prev_allows_regex = True
+                yield JsToken(JsTokenKind.SLASH, &#39;/&#39;, start)
+                continue
+
+            c4 = src[self.pos:self.pos + 4]
+            if c4 in _FOUR_CHAR_OPS:
+                self.pos += 4
+                kind = _FOUR_CHAR_OPS[c4]
+                prev_allows_regex = True
+                yield JsToken(kind, c4, start)
+                continue
+
+            c3 = src[self.pos:self.pos + 3]
+            if c3 in _THREE_CHAR_OPS:
+                self.pos += 3
+                kind = _THREE_CHAR_OPS[c3]
+                prev_allows_regex = True
+                yield JsToken(kind, c3, start)
+                continue
+
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                kind = _TWO_CHAR_OPS[c2]
+                if kind in (JsTokenKind.INC, JsTokenKind.DEC):
+                    pass
+                else:
+                    prev_allows_regex = True
+                yield JsToken(kind, c2, start)
+                continue
+
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                kind = _ONE_CHAR_OPS[c]
+                if kind in (
+                    JsTokenKind.RPAREN,
+                    JsTokenKind.RBRACKET,
+                ):
+                    prev_allows_regex = False
+                elif kind == JsTokenKind.RBRACE:
+                    prev_allows_regex = True
+                else:
+                    prev_allows_regex = kind not in _EXPR_END_KINDS
+                if kind == JsTokenKind.LBRACE and self._brace_stack:
+                    self._brace_stack[-1] += 1
+                yield JsToken(kind, c, start)
+                continue
+
+            self.pos += 1
+            prev_allows_regex = True
+            yield JsToken(JsTokenKind.ERROR, c, start)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/js/lexer.py#L394-L531" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokenize(self) -&gt; Generator[JsToken, None, None]:
+    src = self.source
+    length = len(src)
+    prev_allows_regex = True
+
+    while True:
+        self._skip_whitespace()
+        if self._at_end():
+            yield JsToken(JsTokenKind.EOF, &#39;&#39;, self.pos)
+            return
+
+        start = self.pos
+        c = src[self.pos]
+        c2 = src[self.pos:self.pos + 2]
+
+        if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+            self.pos += 2
+            yield JsToken(JsTokenKind.NEWLINE, &#39;\r\n&#39;, start)
+            continue
+        if c in &#39;\r\n&#39;:
+            self.pos += 1
+            yield JsToken(JsTokenKind.NEWLINE, c, start)
+            continue
+
+        if c2 == &#39;//&#39;:
+            text = self._read_line_comment()
+            yield JsToken(JsTokenKind.COMMENT, text, start)
+            continue
+        if c2 == &#39;/*&#39;:
+            text, has_newline = self._read_block_comment()
+            yield JsToken(JsTokenKind.COMMENT, text, start)
+            if has_newline:
+                yield JsToken(JsTokenKind.NEWLINE, &#39;&#39;, self.pos)
+            continue
+
+        if c == &#34;&#39;&#34;:
+            text = self._read_single_string()
+            prev_allows_regex = False
+            yield JsToken(JsTokenKind.STRING_SINGLE, text, start)
+            continue
+        if c == &#39;&#34;&#39;:
+            text = self._read_double_string()
+            prev_allows_regex = False
+            yield JsToken(JsTokenKind.STRING_DOUBLE, text, start)
+            continue
+        if c == &#39;`&#39;:
+            tok = self._read_template()
+            prev_allows_regex = False
+            yield tok
+            continue
+
+        if c == &#39;}&#39; and self._template_depth &gt; 0 and self._brace_stack:
+            if self._brace_stack[-1] == 0:
+                self._brace_stack.pop()
+                tok = self._resume_template()
+                prev_allows_regex = False
+                yield tok
+                continue
+            else:
+                self._brace_stack[-1] -= 1
+
+        if c.isdigit() or (
+            c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()
+        ):
+            tok = self._read_number()
+            prev_allows_regex = False
+            yield tok
+            continue
+
+        if c.isalpha() or c == &#39;_&#39; or c == &#39;$&#39; or c == &#39;\\&#39;:
+            tok = self._read_identifier_or_keyword()
+            prev_allows_regex = tok.kind not in _EXPR_END_KINDS
+            yield tok
+            continue
+
+        if c == &#39;/&#39;:
+            if prev_allows_regex:
+                text = self._read_regexp()
+                prev_allows_regex = False
+                yield JsToken(JsTokenKind.REGEXP, text, start)
+                continue
+            c2_slash = src[self.pos:self.pos + 2]
+            if c2_slash == &#39;/=&#39;:
+                self.pos += 2
+                prev_allows_regex = True
+                yield JsToken(JsTokenKind.SLASH_ASSIGN, &#39;/=&#39;, start)
+                continue
+            self.pos += 1
+            prev_allows_regex = True
+            yield JsToken(JsTokenKind.SLASH, &#39;/&#39;, start)
+            continue
+
+        c4 = src[self.pos:self.pos + 4]
+        if c4 in _FOUR_CHAR_OPS:
+            self.pos += 4
+            kind = _FOUR_CHAR_OPS[c4]
+            prev_allows_regex = True
+            yield JsToken(kind, c4, start)
+            continue
+
+        c3 = src[self.pos:self.pos + 3]
+        if c3 in _THREE_CHAR_OPS:
+            self.pos += 3
+            kind = _THREE_CHAR_OPS[c3]
+            prev_allows_regex = True
+            yield JsToken(kind, c3, start)
+            continue
+
+        if c2 in _TWO_CHAR_OPS:
+            self.pos += 2
+            kind = _TWO_CHAR_OPS[c2]
+            if kind in (JsTokenKind.INC, JsTokenKind.DEC):
+                pass
+            else:
+                prev_allows_regex = True
+            yield JsToken(kind, c2, start)
+            continue
+
+        if c in _ONE_CHAR_OPS:
+            self.pos += 1
+            kind = _ONE_CHAR_OPS[c]
+            if kind in (
+                JsTokenKind.RPAREN,
+                JsTokenKind.RBRACKET,
+            ):
+                prev_allows_regex = False
+            elif kind == JsTokenKind.RBRACE:
+                prev_allows_regex = True
+            else:
+                prev_allows_regex = kind not in _EXPR_END_KINDS
+            if kind == JsTokenKind.LBRACE and self._brace_stack:
+                self._brace_stack[-1] += 1
+            yield JsToken(kind, c, start)
+            continue
+
+        self.pos += 1
+        prev_allows_regex = True
+        yield JsToken(JsTokenKind.ERROR, c, start)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js" href="index.html">refinery.lib.scripts.js</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.lexer.JsLexer" href="#refinery.lib.scripts.js.lexer.JsLexer">JsLexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.lexer.JsLexer.tokenize" href="#refinery.lib.scripts.js.lexer.JsLexer.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

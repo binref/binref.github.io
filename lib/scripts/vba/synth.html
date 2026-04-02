@@ -1,0 +1,2404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.vba.synth documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.vba.synth</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L1-L574" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import io
+
+from refinery.lib.scripts import Node, Visitor
+from refinery.lib.scripts.vba.model import (
+    Statement,
+    VbaBangAccess,
+    VbaBinaryExpression,
+    VbaBooleanLiteral,
+    VbaCallExpression,
+    VbaCallStatement,
+    VbaCaseClause,
+    VbaConstDeclaration,
+    VbaDateLiteral,
+    VbaDebugPrintStatement,
+    VbaDeclareStatement,
+    VbaDoLoopStatement,
+    VbaElseIfClause,
+    VbaEmptyLiteral,
+    VbaEndStatement,
+    VbaEnumDefinition,
+    VbaEnumMember,
+    VbaEraseStatement,
+    VbaErrorNode,
+    VbaEventDeclaration,
+    VbaExitStatement,
+    VbaExpressionStatement,
+    VbaFloatLiteral,
+    VbaForEachStatement,
+    VbaForStatement,
+    VbaFunctionDeclaration,
+    VbaGosubStatement,
+    VbaGotoStatement,
+    VbaIdentifier,
+    VbaIfStatement,
+    VbaImplementsStatement,
+    VbaIndexExpression,
+    VbaIntegerLiteral,
+    VbaLabelStatement,
+    VbaLetStatement,
+    VbaMeExpression,
+    VbaMemberAccess,
+    VbaModule,
+    VbaNewExpression,
+    VbaNothingLiteral,
+    VbaNullLiteral,
+    VbaOnErrorStatement,
+    VbaOptionStatement,
+    VbaParameter,
+    VbaParenExpression,
+    VbaPropertyDeclaration,
+    VbaRaiseEventStatement,
+    VbaRedimStatement,
+    VbaResumeStatement,
+    VbaReturnStatement,
+    VbaSelectCaseStatement,
+    VbaSetStatement,
+    VbaStopStatement,
+    VbaStringLiteral,
+    VbaSubDeclaration,
+    VbaTypeDefinition,
+    VbaTypedIdentifier,
+    VbaTypeOfIsExpression,
+    VbaUnaryExpression,
+    VbaVariableDeclaration,
+    VbaVariableDeclarator,
+    VbaWhileStatement,
+    VbaWithStatement,
+)
+
+
+class VbaSynthesizer(Visitor):
+
+    def __init__(self, indent: str = &#39;  &#39;):
+        self._indent = indent
+        self._depth = 0
+        self._parts = io.StringIO()
+
+    def convert(self, node: Node) -&gt; str:
+        self._parts.seek(0)
+        self._parts.truncate(0)
+        self._depth = 0
+        self.visit(node)
+        return self._parts.getvalue()
+
+    def _write(self, text: str):
+        self._parts.write(text)
+
+    def _newline(self):
+        self._parts.write(&#39;\n&#39;)
+        self._parts.write(self._indent * self._depth)
+
+    def _emit_body(self, body: list[Statement]):
+        self._depth += 1
+        for stmt in body:
+            self._newline()
+            self.visit(stmt)
+        self._depth -= 1
+
+    def _comma_separated(self, nodes: list):
+        for i, node in enumerate(nodes):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            if node is None:
+                continue
+            self.visit(node)
+
+    def _emit_params(self, params: list[VbaParameter]):
+        self._write(&#39;(&#39;)
+        for i, p in enumerate(params):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            self.visit(p)
+        self._write(&#39;)&#39;)
+
+    def generic_visit(self, node: Node):
+        self._write(F&#39;&lt;{type(node).__name__}&gt;&#39;)
+
+    def visit_VbaIntegerLiteral(self, node: VbaIntegerLiteral):
+        self._write(node.raw)
+
+    def visit_VbaFloatLiteral(self, node: VbaFloatLiteral):
+        self._write(node.raw)
+
+    def visit_VbaStringLiteral(self, node: VbaStringLiteral):
+        self._write(node.raw)
+
+    def visit_VbaDateLiteral(self, node: VbaDateLiteral):
+        self._write(node.raw)
+
+    def visit_VbaBooleanLiteral(self, node: VbaBooleanLiteral):
+        self._write(&#39;True&#39; if node.value else &#39;False&#39;)
+
+    def visit_VbaNothingLiteral(self, node: VbaNothingLiteral):
+        self._write(&#39;Nothing&#39;)
+
+    def visit_VbaNullLiteral(self, node: VbaNullLiteral):
+        self._write(&#39;Null&#39;)
+
+    def visit_VbaEmptyLiteral(self, node: VbaEmptyLiteral):
+        self._write(&#39;Empty&#39;)
+
+    def visit_VbaMeExpression(self, node: VbaMeExpression):
+        self._write(&#39;Me&#39;)
+
+    def visit_VbaIdentifier(self, node: VbaIdentifier):
+        self._write(node.name)
+
+    def visit_VbaTypedIdentifier(self, node: VbaTypedIdentifier):
+        self._write(F&#39;{node.name}{node.suffix}&#39;)
+
+    def visit_VbaErrorNode(self, node: VbaErrorNode):
+        self._write(node.text)
+
+    def visit_VbaBinaryExpression(self, node: VbaBinaryExpression):
+        if node.left:
+            self.visit(node.left)
+        self._write(F&#39; {node.operator} &#39;)
+        if node.right:
+            self.visit(node.right)
+
+    def visit_VbaUnaryExpression(self, node: VbaUnaryExpression):
+        op = node.operator
+        self._write(op)
+        if op.isalpha():
+            self._write(&#39; &#39;)
+        if node.operand:
+            self.visit(node.operand)
+
+    def visit_VbaCallExpression(self, node: VbaCallExpression):
+        if node.callee:
+            self.visit(node.callee)
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.arguments)
+        self._write(&#39;)&#39;)
+
+    def visit_VbaMemberAccess(self, node: VbaMemberAccess):
+        if node.object:
+            self.visit(node.object)
+        self._write(F&#39;.{node.member}&#39;)
+
+    def visit_VbaBangAccess(self, node: VbaBangAccess):
+        if node.object:
+            self.visit(node.object)
+        self._write(F&#39;!{node.member}&#39;)
+
+    def visit_VbaIndexExpression(self, node: VbaIndexExpression):
+        if node.object:
+            self.visit(node.object)
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.arguments)
+        self._write(&#39;)&#39;)
+
+    def visit_VbaNewExpression(self, node: VbaNewExpression):
+        self._write(&#39;New &#39;)
+        if node.class_name:
+            self.visit(node.class_name)
+
+    def visit_VbaTypeOfIsExpression(self, node: VbaTypeOfIsExpression):
+        self._write(&#39;TypeOf &#39;)
+        if node.operand:
+            self.visit(node.operand)
+        self._write(&#39; Is &#39;)
+        if node.type_name:
+            self.visit(node.type_name)
+
+    def visit_VbaParenExpression(self, node: VbaParenExpression):
+        self._write(&#39;(&#39;)
+        if node.expression:
+            self.visit(node.expression)
+        self._write(&#39;)&#39;)
+
+    def visit_VbaModule(self, node: VbaModule):
+        for i, stmt in enumerate(node.body):
+            if i &gt; 0:
+                self._newline()
+            self.visit(stmt)
+
+    def visit_VbaOptionStatement(self, node: VbaOptionStatement):
+        self._write(F&#39;Option {node.keyword}&#39;)
+        if node.value:
+            self._write(F&#39; {node.value}&#39;)
+
+    def visit_VbaDeclareStatement(self, node: VbaDeclareStatement):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        kind = &#39;Function&#39; if node.is_function else &#39;Sub&#39;
+        self._write(F&#39;Declare {kind} {node.name}&#39;)
+        if node.lib:
+            self._write(F&#39; Lib {node.lib}&#39;)
+        if node.alias:
+            self._write(F&#39; Alias {node.alias}&#39;)
+        self._emit_params(node.params)
+        if node.return_type:
+            self._write(F&#39; As {node.return_type}&#39;)
+
+    def visit_VbaTypeDefinition(self, node: VbaTypeDefinition):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Type {node.name}&#39;)
+        self._depth += 1
+        for m in node.members:
+            self._newline()
+            self._write(m.name)
+            if m.bounds:
+                self._write(&#39;(&#39;)
+                self._comma_separated(m.bounds)
+                self._write(&#39;)&#39;)
+            if m.type_name:
+                self._write(F&#39; As {m.type_name}&#39;)
+        self._depth -= 1
+        self._newline()
+        self._write(&#39;End Type&#39;)
+
+    def visit_VbaEnumDefinition(self, node: VbaEnumDefinition):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Enum {node.name}&#39;)
+        self._depth += 1
+        for m in node.members:
+            self._newline()
+            self.visit(m)
+        self._depth -= 1
+        self._newline()
+        self._write(&#39;End Enum&#39;)
+
+    def visit_VbaEnumMember(self, node: VbaEnumMember):
+        self._write(node.name)
+        if node.value is not None:
+            self._write(&#39; = &#39;)
+            self.visit(node.value)
+
+    def visit_VbaConstDeclaration(self, node: VbaConstDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Const {node.name}&#39;)
+        if node.type_name:
+            self._write(F&#39; As {node.type_name}&#39;)
+        self._write(&#39; = &#39;)
+        if node.value:
+            self.visit(node.value)
+
+    def visit_VbaVariableDeclaration(self, node: VbaVariableDeclaration):
+        self._write(F&#39;{node.scope} &#39;)
+        for i, d in enumerate(node.declarators):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            self.visit(d)
+
+    def visit_VbaVariableDeclarator(self, node: VbaVariableDeclarator):
+        self._write(node.name)
+        if node.is_array or node.bounds:
+            self._write(&#39;(&#39;)
+            self._comma_separated(node.bounds)
+            self._write(&#39;)&#39;)
+        if node.type_name:
+            if node.is_new:
+                self._write(F&#39; As New {node.type_name}&#39;)
+            else:
+                self._write(F&#39; As {node.type_name}&#39;)
+
+    def visit_VbaEventDeclaration(self, node: VbaEventDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Event {node.name}&#39;)
+        self._emit_params(node.params)
+
+    def visit_VbaParameter(self, node: VbaParameter):
+        if node.is_optional:
+            self._write(&#39;Optional &#39;)
+        if node.passing:
+            self._write(F&#39;{node.passing} &#39;)
+        if node.is_paramarray:
+            self._write(&#39;ParamArray &#39;)
+        self._write(node.name)
+        if node.is_array:
+            self._write(&#39;()&#39;)
+        if node.type_name:
+            self._write(F&#39; As {node.type_name}&#39;)
+        if node.default is not None:
+            self._write(&#39; = &#39;)
+            self.visit(node.default)
+
+    def visit_VbaSubDeclaration(self, node: VbaSubDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        if node.is_static:
+            self._write(&#39;Static &#39;)
+        self._write(F&#39;Sub {node.name}&#39;)
+        self._emit_params(node.params)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End Sub&#39;)
+
+    def visit_VbaFunctionDeclaration(self, node: VbaFunctionDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        if node.is_static:
+            self._write(&#39;Static &#39;)
+        self._write(F&#39;Function {node.name}&#39;)
+        self._emit_params(node.params)
+        if node.return_type:
+            self._write(F&#39; As {node.return_type}&#39;)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End Function&#39;)
+
+    def visit_VbaPropertyDeclaration(self, node: VbaPropertyDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        if node.is_static:
+            self._write(&#39;Static &#39;)
+        self._write(F&#39;Property {node.kind} {node.name}&#39;)
+        self._emit_params(node.params)
+        if node.return_type:
+            self._write(F&#39; As {node.return_type}&#39;)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End Property&#39;)
+
+    def visit_VbaExpressionStatement(self, node: VbaExpressionStatement):
+        if node.expression:
+            self.visit(node.expression)
+        if node.arguments:
+            self._write(&#39; &#39;)
+            self._comma_separated(node.arguments)
+
+    def visit_VbaCallStatement(self, node: VbaCallStatement):
+        self._write(&#39;Call &#39;)
+        if node.callee:
+            self.visit(node.callee)
+        if node.arguments:
+            self._write(&#39;(&#39;)
+            self._comma_separated(node.arguments)
+            self._write(&#39;)&#39;)
+
+    def visit_VbaLetStatement(self, node: VbaLetStatement):
+        if node.explicit:
+            self._write(&#39;Let &#39;)
+        if node.target:
+            self.visit(node.target)
+        self._write(&#39; = &#39;)
+        if node.value:
+            self.visit(node.value)
+
+    def visit_VbaSetStatement(self, node: VbaSetStatement):
+        self._write(&#39;Set &#39;)
+        if node.target:
+            self.visit(node.target)
+        self._write(&#39; = &#39;)
+        if node.value:
+            self.visit(node.value)
+
+    def visit_VbaIfStatement(self, node: VbaIfStatement):
+        if node.single_line:
+            self._write(&#39;If &#39;)
+            if node.condition:
+                self.visit(node.condition)
+            self._write(&#39; Then &#39;)
+            for i, stmt in enumerate(node.body):
+                if i &gt; 0:
+                    self._write(&#39;: &#39;)
+                self.visit(stmt)
+            if node.else_body:
+                self._write(&#39; Else &#39;)
+                for i, stmt in enumerate(node.else_body):
+                    if i &gt; 0:
+                        self._write(&#39;: &#39;)
+                    self.visit(stmt)
+            return
+        self._write(&#39;If &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._write(&#39; Then&#39;)
+        self._emit_body(node.body)
+        for clause in node.elseif_clauses:
+            self._newline()
+            self.visit(clause)
+        if node.else_body:
+            self._newline()
+            self._write(&#39;Else&#39;)
+            self._emit_body(node.else_body)
+        self._newline()
+        self._write(&#39;End If&#39;)
+
+    def visit_VbaElseIfClause(self, node: VbaElseIfClause):
+        self._write(&#39;ElseIf &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._write(&#39; Then&#39;)
+        self._emit_body(node.body)
+
+    def visit_VbaForStatement(self, node: VbaForStatement):
+        self._write(&#39;For &#39;)
+        if node.variable:
+            self.visit(node.variable)
+        self._write(&#39; = &#39;)
+        if node.start:
+            self.visit(node.start)
+        self._write(&#39; To &#39;)
+        if node.end:
+            self.visit(node.end)
+        if node.step:
+            self._write(&#39; Step &#39;)
+            self.visit(node.step)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Next&#39;)
+
+    def visit_VbaForEachStatement(self, node: VbaForEachStatement):
+        self._write(&#39;For Each &#39;)
+        if node.variable:
+            self.visit(node.variable)
+        self._write(&#39; In &#39;)
+        if node.collection:
+            self.visit(node.collection)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Next&#39;)
+
+    def visit_VbaDoLoopStatement(self, node: VbaDoLoopStatement):
+        self._write(&#39;Do&#39;)
+        if node.condition_position == &#39;pre&#39; and node.condition:
+            self._write(F&#39; {node.condition_type} &#39;)
+            self.visit(node.condition)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Loop&#39;)
+        if node.condition_position == &#39;post&#39; and node.condition:
+            self._write(F&#39; {node.condition_type} &#39;)
+            self.visit(node.condition)
+
+    def visit_VbaWhileStatement(self, node: VbaWhileStatement):
+        self._write(&#39;While &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Wend&#39;)
+
+    def visit_VbaSelectCaseStatement(self, node: VbaSelectCaseStatement):
+        self._write(&#39;Select Case &#39;)
+        if node.expression:
+            self.visit(node.expression)
+        self._depth += 1
+        for c in node.cases:
+            self._newline()
+            self.visit(c)
+        self._depth -= 1
+        self._newline()
+        self._write(&#39;End Select&#39;)
+
+    def visit_VbaCaseClause(self, node: VbaCaseClause):
+        if node.is_else:
+            self._write(&#39;Case Else&#39;)
+        else:
+            self._write(&#39;Case &#39;)
+            self._comma_separated(node.tests)
+        self._emit_body(node.body)
+
+    def visit_VbaWithStatement(self, node: VbaWithStatement):
+        self._write(&#39;With &#39;)
+        if node.object:
+            self.visit(node.object)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End With&#39;)
+
+    def visit_VbaGotoStatement(self, node: VbaGotoStatement):
+        self._write(F&#39;GoTo {node.label}&#39;)
+
+    def visit_VbaGosubStatement(self, node: VbaGosubStatement):
+        self._write(F&#39;GoSub {node.label}&#39;)
+
+    def visit_VbaOnErrorStatement(self, node: VbaOnErrorStatement):
+        if node.action == &#39;ResumeNext&#39;:
+            self._write(&#39;On Error Resume Next&#39;)
+        elif node.action == &#39;GoTo&#39;:
+            self._write(F&#39;On Error GoTo {node.label}&#39;)
+        else:
+            self._write(&#39;On Error&#39;)
+
+    def visit_VbaExitStatement(self, node: VbaExitStatement):
+        self._write(F&#39;Exit {node.kind}&#39;)
+
+    def visit_VbaReturnStatement(self, node: VbaReturnStatement):
+        self._write(&#39;Return&#39;)
+
+    def visit_VbaRedimStatement(self, node: VbaRedimStatement):
+        self._write(&#39;ReDim &#39;)
+        if node.preserve:
+            self._write(&#39;Preserve &#39;)
+        for i, d in enumerate(node.declarators):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            self.visit(d)
+
+    def visit_VbaEraseStatement(self, node: VbaEraseStatement):
+        self._write(&#39;Erase &#39;)
+        self._comma_separated(node.targets)
+
+    def visit_VbaRaiseEventStatement(self, node: VbaRaiseEventStatement):
+        self._write(F&#39;RaiseEvent {node.name}&#39;)
+        if node.arguments:
+            self._write(&#39;(&#39;)
+            self._comma_separated(node.arguments)
+            self._write(&#39;)&#39;)
+
+    def visit_VbaLabelStatement(self, node: VbaLabelStatement):
+        self._write(F&#39;{node.label}:&#39;)
+
+    def visit_VbaStopStatement(self, node: VbaStopStatement):
+        self._write(&#39;Stop&#39;)
+
+    def visit_VbaEndStatement(self, node: VbaEndStatement):
+        self._write(&#39;End&#39;)
+
+    def visit_VbaDebugPrintStatement(self, node: VbaDebugPrintStatement):
+        self._write(&#39;Debug.Print&#39;)
+        if node.arguments:
+            self._write(&#39; &#39;)
+            for i, arg in enumerate(node.arguments):
+                if i &gt; 0:
+                    self._write(&#39;; &#39;)
+                self.visit(arg)
+
+    def visit_VbaResumeStatement(self, node: VbaResumeStatement):
+        self._write(&#39;Resume&#39;)
+        if node.label:
+            self._write(F&#39; {node.label}&#39;)
+
+    def visit_VbaImplementsStatement(self, node: VbaImplementsStatement):
+        self._write(F&#39;Implements {node.name}&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer"><code class="flex name class">
+<span>class <span class="ident">VbaSynthesizer</span></span>
+<span>(</span><span>indent='
+')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Dispatch-based tree walker. Subclasses define visit_ClassName methods;
+unhandled nodes fall through to generic_visit.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L73-L574" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class VbaSynthesizer(Visitor):
+
+    def __init__(self, indent: str = &#39;  &#39;):
+        self._indent = indent
+        self._depth = 0
+        self._parts = io.StringIO()
+
+    def convert(self, node: Node) -&gt; str:
+        self._parts.seek(0)
+        self._parts.truncate(0)
+        self._depth = 0
+        self.visit(node)
+        return self._parts.getvalue()
+
+    def _write(self, text: str):
+        self._parts.write(text)
+
+    def _newline(self):
+        self._parts.write(&#39;\n&#39;)
+        self._parts.write(self._indent * self._depth)
+
+    def _emit_body(self, body: list[Statement]):
+        self._depth += 1
+        for stmt in body:
+            self._newline()
+            self.visit(stmt)
+        self._depth -= 1
+
+    def _comma_separated(self, nodes: list):
+        for i, node in enumerate(nodes):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            if node is None:
+                continue
+            self.visit(node)
+
+    def _emit_params(self, params: list[VbaParameter]):
+        self._write(&#39;(&#39;)
+        for i, p in enumerate(params):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            self.visit(p)
+        self._write(&#39;)&#39;)
+
+    def generic_visit(self, node: Node):
+        self._write(F&#39;&lt;{type(node).__name__}&gt;&#39;)
+
+    def visit_VbaIntegerLiteral(self, node: VbaIntegerLiteral):
+        self._write(node.raw)
+
+    def visit_VbaFloatLiteral(self, node: VbaFloatLiteral):
+        self._write(node.raw)
+
+    def visit_VbaStringLiteral(self, node: VbaStringLiteral):
+        self._write(node.raw)
+
+    def visit_VbaDateLiteral(self, node: VbaDateLiteral):
+        self._write(node.raw)
+
+    def visit_VbaBooleanLiteral(self, node: VbaBooleanLiteral):
+        self._write(&#39;True&#39; if node.value else &#39;False&#39;)
+
+    def visit_VbaNothingLiteral(self, node: VbaNothingLiteral):
+        self._write(&#39;Nothing&#39;)
+
+    def visit_VbaNullLiteral(self, node: VbaNullLiteral):
+        self._write(&#39;Null&#39;)
+
+    def visit_VbaEmptyLiteral(self, node: VbaEmptyLiteral):
+        self._write(&#39;Empty&#39;)
+
+    def visit_VbaMeExpression(self, node: VbaMeExpression):
+        self._write(&#39;Me&#39;)
+
+    def visit_VbaIdentifier(self, node: VbaIdentifier):
+        self._write(node.name)
+
+    def visit_VbaTypedIdentifier(self, node: VbaTypedIdentifier):
+        self._write(F&#39;{node.name}{node.suffix}&#39;)
+
+    def visit_VbaErrorNode(self, node: VbaErrorNode):
+        self._write(node.text)
+
+    def visit_VbaBinaryExpression(self, node: VbaBinaryExpression):
+        if node.left:
+            self.visit(node.left)
+        self._write(F&#39; {node.operator} &#39;)
+        if node.right:
+            self.visit(node.right)
+
+    def visit_VbaUnaryExpression(self, node: VbaUnaryExpression):
+        op = node.operator
+        self._write(op)
+        if op.isalpha():
+            self._write(&#39; &#39;)
+        if node.operand:
+            self.visit(node.operand)
+
+    def visit_VbaCallExpression(self, node: VbaCallExpression):
+        if node.callee:
+            self.visit(node.callee)
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.arguments)
+        self._write(&#39;)&#39;)
+
+    def visit_VbaMemberAccess(self, node: VbaMemberAccess):
+        if node.object:
+            self.visit(node.object)
+        self._write(F&#39;.{node.member}&#39;)
+
+    def visit_VbaBangAccess(self, node: VbaBangAccess):
+        if node.object:
+            self.visit(node.object)
+        self._write(F&#39;!{node.member}&#39;)
+
+    def visit_VbaIndexExpression(self, node: VbaIndexExpression):
+        if node.object:
+            self.visit(node.object)
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.arguments)
+        self._write(&#39;)&#39;)
+
+    def visit_VbaNewExpression(self, node: VbaNewExpression):
+        self._write(&#39;New &#39;)
+        if node.class_name:
+            self.visit(node.class_name)
+
+    def visit_VbaTypeOfIsExpression(self, node: VbaTypeOfIsExpression):
+        self._write(&#39;TypeOf &#39;)
+        if node.operand:
+            self.visit(node.operand)
+        self._write(&#39; Is &#39;)
+        if node.type_name:
+            self.visit(node.type_name)
+
+    def visit_VbaParenExpression(self, node: VbaParenExpression):
+        self._write(&#39;(&#39;)
+        if node.expression:
+            self.visit(node.expression)
+        self._write(&#39;)&#39;)
+
+    def visit_VbaModule(self, node: VbaModule):
+        for i, stmt in enumerate(node.body):
+            if i &gt; 0:
+                self._newline()
+            self.visit(stmt)
+
+    def visit_VbaOptionStatement(self, node: VbaOptionStatement):
+        self._write(F&#39;Option {node.keyword}&#39;)
+        if node.value:
+            self._write(F&#39; {node.value}&#39;)
+
+    def visit_VbaDeclareStatement(self, node: VbaDeclareStatement):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        kind = &#39;Function&#39; if node.is_function else &#39;Sub&#39;
+        self._write(F&#39;Declare {kind} {node.name}&#39;)
+        if node.lib:
+            self._write(F&#39; Lib {node.lib}&#39;)
+        if node.alias:
+            self._write(F&#39; Alias {node.alias}&#39;)
+        self._emit_params(node.params)
+        if node.return_type:
+            self._write(F&#39; As {node.return_type}&#39;)
+
+    def visit_VbaTypeDefinition(self, node: VbaTypeDefinition):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Type {node.name}&#39;)
+        self._depth += 1
+        for m in node.members:
+            self._newline()
+            self._write(m.name)
+            if m.bounds:
+                self._write(&#39;(&#39;)
+                self._comma_separated(m.bounds)
+                self._write(&#39;)&#39;)
+            if m.type_name:
+                self._write(F&#39; As {m.type_name}&#39;)
+        self._depth -= 1
+        self._newline()
+        self._write(&#39;End Type&#39;)
+
+    def visit_VbaEnumDefinition(self, node: VbaEnumDefinition):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Enum {node.name}&#39;)
+        self._depth += 1
+        for m in node.members:
+            self._newline()
+            self.visit(m)
+        self._depth -= 1
+        self._newline()
+        self._write(&#39;End Enum&#39;)
+
+    def visit_VbaEnumMember(self, node: VbaEnumMember):
+        self._write(node.name)
+        if node.value is not None:
+            self._write(&#39; = &#39;)
+            self.visit(node.value)
+
+    def visit_VbaConstDeclaration(self, node: VbaConstDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Const {node.name}&#39;)
+        if node.type_name:
+            self._write(F&#39; As {node.type_name}&#39;)
+        self._write(&#39; = &#39;)
+        if node.value:
+            self.visit(node.value)
+
+    def visit_VbaVariableDeclaration(self, node: VbaVariableDeclaration):
+        self._write(F&#39;{node.scope} &#39;)
+        for i, d in enumerate(node.declarators):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            self.visit(d)
+
+    def visit_VbaVariableDeclarator(self, node: VbaVariableDeclarator):
+        self._write(node.name)
+        if node.is_array or node.bounds:
+            self._write(&#39;(&#39;)
+            self._comma_separated(node.bounds)
+            self._write(&#39;)&#39;)
+        if node.type_name:
+            if node.is_new:
+                self._write(F&#39; As New {node.type_name}&#39;)
+            else:
+                self._write(F&#39; As {node.type_name}&#39;)
+
+    def visit_VbaEventDeclaration(self, node: VbaEventDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        self._write(F&#39;Event {node.name}&#39;)
+        self._emit_params(node.params)
+
+    def visit_VbaParameter(self, node: VbaParameter):
+        if node.is_optional:
+            self._write(&#39;Optional &#39;)
+        if node.passing:
+            self._write(F&#39;{node.passing} &#39;)
+        if node.is_paramarray:
+            self._write(&#39;ParamArray &#39;)
+        self._write(node.name)
+        if node.is_array:
+            self._write(&#39;()&#39;)
+        if node.type_name:
+            self._write(F&#39; As {node.type_name}&#39;)
+        if node.default is not None:
+            self._write(&#39; = &#39;)
+            self.visit(node.default)
+
+    def visit_VbaSubDeclaration(self, node: VbaSubDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        if node.is_static:
+            self._write(&#39;Static &#39;)
+        self._write(F&#39;Sub {node.name}&#39;)
+        self._emit_params(node.params)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End Sub&#39;)
+
+    def visit_VbaFunctionDeclaration(self, node: VbaFunctionDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        if node.is_static:
+            self._write(&#39;Static &#39;)
+        self._write(F&#39;Function {node.name}&#39;)
+        self._emit_params(node.params)
+        if node.return_type:
+            self._write(F&#39; As {node.return_type}&#39;)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End Function&#39;)
+
+    def visit_VbaPropertyDeclaration(self, node: VbaPropertyDeclaration):
+        if node.scope:
+            self._write(F&#39;{node.scope} &#39;)
+        if node.is_static:
+            self._write(&#39;Static &#39;)
+        self._write(F&#39;Property {node.kind} {node.name}&#39;)
+        self._emit_params(node.params)
+        if node.return_type:
+            self._write(F&#39; As {node.return_type}&#39;)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End Property&#39;)
+
+    def visit_VbaExpressionStatement(self, node: VbaExpressionStatement):
+        if node.expression:
+            self.visit(node.expression)
+        if node.arguments:
+            self._write(&#39; &#39;)
+            self._comma_separated(node.arguments)
+
+    def visit_VbaCallStatement(self, node: VbaCallStatement):
+        self._write(&#39;Call &#39;)
+        if node.callee:
+            self.visit(node.callee)
+        if node.arguments:
+            self._write(&#39;(&#39;)
+            self._comma_separated(node.arguments)
+            self._write(&#39;)&#39;)
+
+    def visit_VbaLetStatement(self, node: VbaLetStatement):
+        if node.explicit:
+            self._write(&#39;Let &#39;)
+        if node.target:
+            self.visit(node.target)
+        self._write(&#39; = &#39;)
+        if node.value:
+            self.visit(node.value)
+
+    def visit_VbaSetStatement(self, node: VbaSetStatement):
+        self._write(&#39;Set &#39;)
+        if node.target:
+            self.visit(node.target)
+        self._write(&#39; = &#39;)
+        if node.value:
+            self.visit(node.value)
+
+    def visit_VbaIfStatement(self, node: VbaIfStatement):
+        if node.single_line:
+            self._write(&#39;If &#39;)
+            if node.condition:
+                self.visit(node.condition)
+            self._write(&#39; Then &#39;)
+            for i, stmt in enumerate(node.body):
+                if i &gt; 0:
+                    self._write(&#39;: &#39;)
+                self.visit(stmt)
+            if node.else_body:
+                self._write(&#39; Else &#39;)
+                for i, stmt in enumerate(node.else_body):
+                    if i &gt; 0:
+                        self._write(&#39;: &#39;)
+                    self.visit(stmt)
+            return
+        self._write(&#39;If &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._write(&#39; Then&#39;)
+        self._emit_body(node.body)
+        for clause in node.elseif_clauses:
+            self._newline()
+            self.visit(clause)
+        if node.else_body:
+            self._newline()
+            self._write(&#39;Else&#39;)
+            self._emit_body(node.else_body)
+        self._newline()
+        self._write(&#39;End If&#39;)
+
+    def visit_VbaElseIfClause(self, node: VbaElseIfClause):
+        self._write(&#39;ElseIf &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._write(&#39; Then&#39;)
+        self._emit_body(node.body)
+
+    def visit_VbaForStatement(self, node: VbaForStatement):
+        self._write(&#39;For &#39;)
+        if node.variable:
+            self.visit(node.variable)
+        self._write(&#39; = &#39;)
+        if node.start:
+            self.visit(node.start)
+        self._write(&#39; To &#39;)
+        if node.end:
+            self.visit(node.end)
+        if node.step:
+            self._write(&#39; Step &#39;)
+            self.visit(node.step)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Next&#39;)
+
+    def visit_VbaForEachStatement(self, node: VbaForEachStatement):
+        self._write(&#39;For Each &#39;)
+        if node.variable:
+            self.visit(node.variable)
+        self._write(&#39; In &#39;)
+        if node.collection:
+            self.visit(node.collection)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Next&#39;)
+
+    def visit_VbaDoLoopStatement(self, node: VbaDoLoopStatement):
+        self._write(&#39;Do&#39;)
+        if node.condition_position == &#39;pre&#39; and node.condition:
+            self._write(F&#39; {node.condition_type} &#39;)
+            self.visit(node.condition)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Loop&#39;)
+        if node.condition_position == &#39;post&#39; and node.condition:
+            self._write(F&#39; {node.condition_type} &#39;)
+            self.visit(node.condition)
+
+    def visit_VbaWhileStatement(self, node: VbaWhileStatement):
+        self._write(&#39;While &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;Wend&#39;)
+
+    def visit_VbaSelectCaseStatement(self, node: VbaSelectCaseStatement):
+        self._write(&#39;Select Case &#39;)
+        if node.expression:
+            self.visit(node.expression)
+        self._depth += 1
+        for c in node.cases:
+            self._newline()
+            self.visit(c)
+        self._depth -= 1
+        self._newline()
+        self._write(&#39;End Select&#39;)
+
+    def visit_VbaCaseClause(self, node: VbaCaseClause):
+        if node.is_else:
+            self._write(&#39;Case Else&#39;)
+        else:
+            self._write(&#39;Case &#39;)
+            self._comma_separated(node.tests)
+        self._emit_body(node.body)
+
+    def visit_VbaWithStatement(self, node: VbaWithStatement):
+        self._write(&#39;With &#39;)
+        if node.object:
+            self.visit(node.object)
+        self._emit_body(node.body)
+        self._newline()
+        self._write(&#39;End With&#39;)
+
+    def visit_VbaGotoStatement(self, node: VbaGotoStatement):
+        self._write(F&#39;GoTo {node.label}&#39;)
+
+    def visit_VbaGosubStatement(self, node: VbaGosubStatement):
+        self._write(F&#39;GoSub {node.label}&#39;)
+
+    def visit_VbaOnErrorStatement(self, node: VbaOnErrorStatement):
+        if node.action == &#39;ResumeNext&#39;:
+            self._write(&#39;On Error Resume Next&#39;)
+        elif node.action == &#39;GoTo&#39;:
+            self._write(F&#39;On Error GoTo {node.label}&#39;)
+        else:
+            self._write(&#39;On Error&#39;)
+
+    def visit_VbaExitStatement(self, node: VbaExitStatement):
+        self._write(F&#39;Exit {node.kind}&#39;)
+
+    def visit_VbaReturnStatement(self, node: VbaReturnStatement):
+        self._write(&#39;Return&#39;)
+
+    def visit_VbaRedimStatement(self, node: VbaRedimStatement):
+        self._write(&#39;ReDim &#39;)
+        if node.preserve:
+            self._write(&#39;Preserve &#39;)
+        for i, d in enumerate(node.declarators):
+            if i &gt; 0:
+                self._write(&#39;, &#39;)
+            self.visit(d)
+
+    def visit_VbaEraseStatement(self, node: VbaEraseStatement):
+        self._write(&#39;Erase &#39;)
+        self._comma_separated(node.targets)
+
+    def visit_VbaRaiseEventStatement(self, node: VbaRaiseEventStatement):
+        self._write(F&#39;RaiseEvent {node.name}&#39;)
+        if node.arguments:
+            self._write(&#39;(&#39;)
+            self._comma_separated(node.arguments)
+            self._write(&#39;)&#39;)
+
+    def visit_VbaLabelStatement(self, node: VbaLabelStatement):
+        self._write(F&#39;{node.label}:&#39;)
+
+    def visit_VbaStopStatement(self, node: VbaStopStatement):
+        self._write(&#39;Stop&#39;)
+
+    def visit_VbaEndStatement(self, node: VbaEndStatement):
+        self._write(&#39;End&#39;)
+
+    def visit_VbaDebugPrintStatement(self, node: VbaDebugPrintStatement):
+        self._write(&#39;Debug.Print&#39;)
+        if node.arguments:
+            self._write(&#39; &#39;)
+            for i, arg in enumerate(node.arguments):
+                if i &gt; 0:
+                    self._write(&#39;; &#39;)
+                self.visit(arg)
+
+    def visit_VbaResumeStatement(self, node: VbaResumeStatement):
+        self._write(&#39;Resume&#39;)
+        if node.label:
+            self._write(F&#39; {node.label}&#39;)
+
+    def visit_VbaImplementsStatement(self, node: VbaImplementsStatement):
+        self._write(F&#39;Implements {node.name}&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.Visitor" href="../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.convert"><code class="name flex">
+<span>def <span class="ident">convert</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L80-L85" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def convert(self, node: Node) -&gt; str:
+    self._parts.seek(0)
+    self._parts.truncate(0)
+    self._depth = 0
+    self.visit(node)
+    return self._parts.getvalue()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.generic_visit"><code class="name flex">
+<span>def <span class="ident">generic_visit</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L117-L118" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def generic_visit(self, node: Node):
+    self._write(F&#39;&lt;{type(node).__name__}&gt;&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIntegerLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaIntegerLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L120-L121" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaIntegerLiteral(self, node: VbaIntegerLiteral):
+    self._write(node.raw)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaFloatLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaFloatLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L123-L124" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaFloatLiteral(self, node: VbaFloatLiteral):
+    self._write(node.raw)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaStringLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaStringLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L126-L127" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaStringLiteral(self, node: VbaStringLiteral):
+    self._write(node.raw)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDateLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaDateLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L129-L130" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaDateLiteral(self, node: VbaDateLiteral):
+    self._write(node.raw)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBooleanLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaBooleanLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L132-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaBooleanLiteral(self, node: VbaBooleanLiteral):
+    self._write(&#39;True&#39; if node.value else &#39;False&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNothingLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaNothingLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L135-L136" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaNothingLiteral(self, node: VbaNothingLiteral):
+    self._write(&#39;Nothing&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNullLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaNullLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L138-L139" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaNullLiteral(self, node: VbaNullLiteral):
+    self._write(&#39;Null&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEmptyLiteral"><code class="name flex">
+<span>def <span class="ident">visit_VbaEmptyLiteral</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L141-L142" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaEmptyLiteral(self, node: VbaEmptyLiteral):
+    self._write(&#39;Empty&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaMeExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaMeExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L144-L145" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaMeExpression(self, node: VbaMeExpression):
+    self._write(&#39;Me&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIdentifier"><code class="name flex">
+<span>def <span class="ident">visit_VbaIdentifier</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L147-L148" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaIdentifier(self, node: VbaIdentifier):
+    self._write(node.name)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypedIdentifier"><code class="name flex">
+<span>def <span class="ident">visit_VbaTypedIdentifier</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L150-L151" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaTypedIdentifier(self, node: VbaTypedIdentifier):
+    self._write(F&#39;{node.name}{node.suffix}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaErrorNode"><code class="name flex">
+<span>def <span class="ident">visit_VbaErrorNode</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L153-L154" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaErrorNode(self, node: VbaErrorNode):
+    self._write(node.text)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBinaryExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaBinaryExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L156-L161" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaBinaryExpression(self, node: VbaBinaryExpression):
+    if node.left:
+        self.visit(node.left)
+    self._write(F&#39; {node.operator} &#39;)
+    if node.right:
+        self.visit(node.right)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaUnaryExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaUnaryExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L163-L169" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaUnaryExpression(self, node: VbaUnaryExpression):
+    op = node.operator
+    self._write(op)
+    if op.isalpha():
+        self._write(&#39; &#39;)
+    if node.operand:
+        self.visit(node.operand)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCallExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaCallExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L171-L176" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaCallExpression(self, node: VbaCallExpression):
+    if node.callee:
+        self.visit(node.callee)
+    self._write(&#39;(&#39;)
+    self._comma_separated(node.arguments)
+    self._write(&#39;)&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaMemberAccess"><code class="name flex">
+<span>def <span class="ident">visit_VbaMemberAccess</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L178-L181" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaMemberAccess(self, node: VbaMemberAccess):
+    if node.object:
+        self.visit(node.object)
+    self._write(F&#39;.{node.member}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBangAccess"><code class="name flex">
+<span>def <span class="ident">visit_VbaBangAccess</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L183-L186" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaBangAccess(self, node: VbaBangAccess):
+    if node.object:
+        self.visit(node.object)
+    self._write(F&#39;!{node.member}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIndexExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaIndexExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L188-L193" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaIndexExpression(self, node: VbaIndexExpression):
+    if node.object:
+        self.visit(node.object)
+    self._write(&#39;(&#39;)
+    self._comma_separated(node.arguments)
+    self._write(&#39;)&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNewExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaNewExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L195-L198" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaNewExpression(self, node: VbaNewExpression):
+    self._write(&#39;New &#39;)
+    if node.class_name:
+        self.visit(node.class_name)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypeOfIsExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaTypeOfIsExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L200-L206" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaTypeOfIsExpression(self, node: VbaTypeOfIsExpression):
+    self._write(&#39;TypeOf &#39;)
+    if node.operand:
+        self.visit(node.operand)
+    self._write(&#39; Is &#39;)
+    if node.type_name:
+        self.visit(node.type_name)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaParenExpression"><code class="name flex">
+<span>def <span class="ident">visit_VbaParenExpression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L208-L212" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaParenExpression(self, node: VbaParenExpression):
+    self._write(&#39;(&#39;)
+    if node.expression:
+        self.visit(node.expression)
+    self._write(&#39;)&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaModule"><code class="name flex">
+<span>def <span class="ident">visit_VbaModule</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L214-L218" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaModule(self, node: VbaModule):
+    for i, stmt in enumerate(node.body):
+        if i &gt; 0:
+            self._newline()
+        self.visit(stmt)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaOptionStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaOptionStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L220-L223" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaOptionStatement(self, node: VbaOptionStatement):
+    self._write(F&#39;Option {node.keyword}&#39;)
+    if node.value:
+        self._write(F&#39; {node.value}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDeclareStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaDeclareStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L225-L236" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaDeclareStatement(self, node: VbaDeclareStatement):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    kind = &#39;Function&#39; if node.is_function else &#39;Sub&#39;
+    self._write(F&#39;Declare {kind} {node.name}&#39;)
+    if node.lib:
+        self._write(F&#39; Lib {node.lib}&#39;)
+    if node.alias:
+        self._write(F&#39; Alias {node.alias}&#39;)
+    self._emit_params(node.params)
+    if node.return_type:
+        self._write(F&#39; As {node.return_type}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypeDefinition"><code class="name flex">
+<span>def <span class="ident">visit_VbaTypeDefinition</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L238-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaTypeDefinition(self, node: VbaTypeDefinition):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    self._write(F&#39;Type {node.name}&#39;)
+    self._depth += 1
+    for m in node.members:
+        self._newline()
+        self._write(m.name)
+        if m.bounds:
+            self._write(&#39;(&#39;)
+            self._comma_separated(m.bounds)
+            self._write(&#39;)&#39;)
+        if m.type_name:
+            self._write(F&#39; As {m.type_name}&#39;)
+    self._depth -= 1
+    self._newline()
+    self._write(&#39;End Type&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEnumDefinition"><code class="name flex">
+<span>def <span class="ident">visit_VbaEnumDefinition</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L256-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaEnumDefinition(self, node: VbaEnumDefinition):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    self._write(F&#39;Enum {node.name}&#39;)
+    self._depth += 1
+    for m in node.members:
+        self._newline()
+        self.visit(m)
+    self._depth -= 1
+    self._newline()
+    self._write(&#39;End Enum&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEnumMember"><code class="name flex">
+<span>def <span class="ident">visit_VbaEnumMember</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L268-L272" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaEnumMember(self, node: VbaEnumMember):
+    self._write(node.name)
+    if node.value is not None:
+        self._write(&#39; = &#39;)
+        self.visit(node.value)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaConstDeclaration"><code class="name flex">
+<span>def <span class="ident">visit_VbaConstDeclaration</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L274-L282" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaConstDeclaration(self, node: VbaConstDeclaration):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    self._write(F&#39;Const {node.name}&#39;)
+    if node.type_name:
+        self._write(F&#39; As {node.type_name}&#39;)
+    self._write(&#39; = &#39;)
+    if node.value:
+        self.visit(node.value)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaVariableDeclaration"><code class="name flex">
+<span>def <span class="ident">visit_VbaVariableDeclaration</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L284-L289" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaVariableDeclaration(self, node: VbaVariableDeclaration):
+    self._write(F&#39;{node.scope} &#39;)
+    for i, d in enumerate(node.declarators):
+        if i &gt; 0:
+            self._write(&#39;, &#39;)
+        self.visit(d)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaVariableDeclarator"><code class="name flex">
+<span>def <span class="ident">visit_VbaVariableDeclarator</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L291-L301" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaVariableDeclarator(self, node: VbaVariableDeclarator):
+    self._write(node.name)
+    if node.is_array or node.bounds:
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.bounds)
+        self._write(&#39;)&#39;)
+    if node.type_name:
+        if node.is_new:
+            self._write(F&#39; As New {node.type_name}&#39;)
+        else:
+            self._write(F&#39; As {node.type_name}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEventDeclaration"><code class="name flex">
+<span>def <span class="ident">visit_VbaEventDeclaration</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L303-L307" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaEventDeclaration(self, node: VbaEventDeclaration):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    self._write(F&#39;Event {node.name}&#39;)
+    self._emit_params(node.params)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaParameter"><code class="name flex">
+<span>def <span class="ident">visit_VbaParameter</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L309-L323" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaParameter(self, node: VbaParameter):
+    if node.is_optional:
+        self._write(&#39;Optional &#39;)
+    if node.passing:
+        self._write(F&#39;{node.passing} &#39;)
+    if node.is_paramarray:
+        self._write(&#39;ParamArray &#39;)
+    self._write(node.name)
+    if node.is_array:
+        self._write(&#39;()&#39;)
+    if node.type_name:
+        self._write(F&#39; As {node.type_name}&#39;)
+    if node.default is not None:
+        self._write(&#39; = &#39;)
+        self.visit(node.default)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSubDeclaration"><code class="name flex">
+<span>def <span class="ident">visit_VbaSubDeclaration</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L325-L334" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaSubDeclaration(self, node: VbaSubDeclaration):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    if node.is_static:
+        self._write(&#39;Static &#39;)
+    self._write(F&#39;Sub {node.name}&#39;)
+    self._emit_params(node.params)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;End Sub&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaFunctionDeclaration"><code class="name flex">
+<span>def <span class="ident">visit_VbaFunctionDeclaration</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L336-L347" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaFunctionDeclaration(self, node: VbaFunctionDeclaration):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    if node.is_static:
+        self._write(&#39;Static &#39;)
+    self._write(F&#39;Function {node.name}&#39;)
+    self._emit_params(node.params)
+    if node.return_type:
+        self._write(F&#39; As {node.return_type}&#39;)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;End Function&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaPropertyDeclaration"><code class="name flex">
+<span>def <span class="ident">visit_VbaPropertyDeclaration</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L349-L360" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaPropertyDeclaration(self, node: VbaPropertyDeclaration):
+    if node.scope:
+        self._write(F&#39;{node.scope} &#39;)
+    if node.is_static:
+        self._write(&#39;Static &#39;)
+    self._write(F&#39;Property {node.kind} {node.name}&#39;)
+    self._emit_params(node.params)
+    if node.return_type:
+        self._write(F&#39; As {node.return_type}&#39;)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;End Property&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaExpressionStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaExpressionStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L362-L367" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaExpressionStatement(self, node: VbaExpressionStatement):
+    if node.expression:
+        self.visit(node.expression)
+    if node.arguments:
+        self._write(&#39; &#39;)
+        self._comma_separated(node.arguments)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCallStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaCallStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L369-L376" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaCallStatement(self, node: VbaCallStatement):
+    self._write(&#39;Call &#39;)
+    if node.callee:
+        self.visit(node.callee)
+    if node.arguments:
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.arguments)
+        self._write(&#39;)&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaLetStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaLetStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L378-L385" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaLetStatement(self, node: VbaLetStatement):
+    if node.explicit:
+        self._write(&#39;Let &#39;)
+    if node.target:
+        self.visit(node.target)
+    self._write(&#39; = &#39;)
+    if node.value:
+        self.visit(node.value)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSetStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaSetStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L387-L393" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaSetStatement(self, node: VbaSetStatement):
+    self._write(&#39;Set &#39;)
+    if node.target:
+        self.visit(node.target)
+    self._write(&#39; = &#39;)
+    if node.value:
+        self.visit(node.value)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIfStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaIfStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L395-L425" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaIfStatement(self, node: VbaIfStatement):
+    if node.single_line:
+        self._write(&#39;If &#39;)
+        if node.condition:
+            self.visit(node.condition)
+        self._write(&#39; Then &#39;)
+        for i, stmt in enumerate(node.body):
+            if i &gt; 0:
+                self._write(&#39;: &#39;)
+            self.visit(stmt)
+        if node.else_body:
+            self._write(&#39; Else &#39;)
+            for i, stmt in enumerate(node.else_body):
+                if i &gt; 0:
+                    self._write(&#39;: &#39;)
+                self.visit(stmt)
+        return
+    self._write(&#39;If &#39;)
+    if node.condition:
+        self.visit(node.condition)
+    self._write(&#39; Then&#39;)
+    self._emit_body(node.body)
+    for clause in node.elseif_clauses:
+        self._newline()
+        self.visit(clause)
+    if node.else_body:
+        self._newline()
+        self._write(&#39;Else&#39;)
+        self._emit_body(node.else_body)
+    self._newline()
+    self._write(&#39;End If&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaElseIfClause"><code class="name flex">
+<span>def <span class="ident">visit_VbaElseIfClause</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L427-L432" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaElseIfClause(self, node: VbaElseIfClause):
+    self._write(&#39;ElseIf &#39;)
+    if node.condition:
+        self.visit(node.condition)
+    self._write(&#39; Then&#39;)
+    self._emit_body(node.body)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaForStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaForStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L434-L449" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaForStatement(self, node: VbaForStatement):
+    self._write(&#39;For &#39;)
+    if node.variable:
+        self.visit(node.variable)
+    self._write(&#39; = &#39;)
+    if node.start:
+        self.visit(node.start)
+    self._write(&#39; To &#39;)
+    if node.end:
+        self.visit(node.end)
+    if node.step:
+        self._write(&#39; Step &#39;)
+        self.visit(node.step)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;Next&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaForEachStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaForEachStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L451-L460" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaForEachStatement(self, node: VbaForEachStatement):
+    self._write(&#39;For Each &#39;)
+    if node.variable:
+        self.visit(node.variable)
+    self._write(&#39; In &#39;)
+    if node.collection:
+        self.visit(node.collection)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;Next&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDoLoopStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaDoLoopStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L462-L472" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaDoLoopStatement(self, node: VbaDoLoopStatement):
+    self._write(&#39;Do&#39;)
+    if node.condition_position == &#39;pre&#39; and node.condition:
+        self._write(F&#39; {node.condition_type} &#39;)
+        self.visit(node.condition)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;Loop&#39;)
+    if node.condition_position == &#39;post&#39; and node.condition:
+        self._write(F&#39; {node.condition_type} &#39;)
+        self.visit(node.condition)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaWhileStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaWhileStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L474-L480" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaWhileStatement(self, node: VbaWhileStatement):
+    self._write(&#39;While &#39;)
+    if node.condition:
+        self.visit(node.condition)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;Wend&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSelectCaseStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaSelectCaseStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L482-L492" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaSelectCaseStatement(self, node: VbaSelectCaseStatement):
+    self._write(&#39;Select Case &#39;)
+    if node.expression:
+        self.visit(node.expression)
+    self._depth += 1
+    for c in node.cases:
+        self._newline()
+        self.visit(c)
+    self._depth -= 1
+    self._newline()
+    self._write(&#39;End Select&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCaseClause"><code class="name flex">
+<span>def <span class="ident">visit_VbaCaseClause</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L494-L500" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaCaseClause(self, node: VbaCaseClause):
+    if node.is_else:
+        self._write(&#39;Case Else&#39;)
+    else:
+        self._write(&#39;Case &#39;)
+        self._comma_separated(node.tests)
+    self._emit_body(node.body)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaWithStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaWithStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L502-L508" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaWithStatement(self, node: VbaWithStatement):
+    self._write(&#39;With &#39;)
+    if node.object:
+        self.visit(node.object)
+    self._emit_body(node.body)
+    self._newline()
+    self._write(&#39;End With&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaGotoStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaGotoStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L510-L511" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaGotoStatement(self, node: VbaGotoStatement):
+    self._write(F&#39;GoTo {node.label}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaGosubStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaGosubStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L513-L514" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaGosubStatement(self, node: VbaGosubStatement):
+    self._write(F&#39;GoSub {node.label}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaOnErrorStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaOnErrorStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L516-L522" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaOnErrorStatement(self, node: VbaOnErrorStatement):
+    if node.action == &#39;ResumeNext&#39;:
+        self._write(&#39;On Error Resume Next&#39;)
+    elif node.action == &#39;GoTo&#39;:
+        self._write(F&#39;On Error GoTo {node.label}&#39;)
+    else:
+        self._write(&#39;On Error&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaExitStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaExitStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L524-L525" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaExitStatement(self, node: VbaExitStatement):
+    self._write(F&#39;Exit {node.kind}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaReturnStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaReturnStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L527-L528" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaReturnStatement(self, node: VbaReturnStatement):
+    self._write(&#39;Return&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaRedimStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaRedimStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L530-L537" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaRedimStatement(self, node: VbaRedimStatement):
+    self._write(&#39;ReDim &#39;)
+    if node.preserve:
+        self._write(&#39;Preserve &#39;)
+    for i, d in enumerate(node.declarators):
+        if i &gt; 0:
+            self._write(&#39;, &#39;)
+        self.visit(d)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEraseStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaEraseStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L539-L541" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaEraseStatement(self, node: VbaEraseStatement):
+    self._write(&#39;Erase &#39;)
+    self._comma_separated(node.targets)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaRaiseEventStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaRaiseEventStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L543-L548" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaRaiseEventStatement(self, node: VbaRaiseEventStatement):
+    self._write(F&#39;RaiseEvent {node.name}&#39;)
+    if node.arguments:
+        self._write(&#39;(&#39;)
+        self._comma_separated(node.arguments)
+        self._write(&#39;)&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaLabelStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaLabelStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L550-L551" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaLabelStatement(self, node: VbaLabelStatement):
+    self._write(F&#39;{node.label}:&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaStopStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaStopStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L553-L554" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaStopStatement(self, node: VbaStopStatement):
+    self._write(&#39;Stop&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEndStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaEndStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L556-L557" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaEndStatement(self, node: VbaEndStatement):
+    self._write(&#39;End&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDebugPrintStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaDebugPrintStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L559-L566" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaDebugPrintStatement(self, node: VbaDebugPrintStatement):
+    self._write(&#39;Debug.Print&#39;)
+    if node.arguments:
+        self._write(&#39; &#39;)
+        for i, arg in enumerate(node.arguments):
+            if i &gt; 0:
+                self._write(&#39;; &#39;)
+            self.visit(arg)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaResumeStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaResumeStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L568-L571" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaResumeStatement(self, node: VbaResumeStatement):
+    self._write(&#39;Resume&#39;)
+    if node.label:
+        self._write(F&#39; {node.label}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaImplementsStatement"><code class="name flex">
+<span>def <span class="ident">visit_VbaImplementsStatement</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ba45665d086cfe03fcbd24bd8aa7149fdc8d0e2e/refinery/lib/scripts/vba/synth.py#L573-L574" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_VbaImplementsStatement(self, node: VbaImplementsStatement):
+    self._write(F&#39;Implements {node.name}&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.vba" href="index.html">refinery.lib.scripts.vba</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer">VbaSynthesizer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.convert" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.convert">convert</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.generic_visit" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.generic_visit">generic_visit</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIntegerLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIntegerLiteral">visit_VbaIntegerLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaFloatLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaFloatLiteral">visit_VbaFloatLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaStringLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaStringLiteral">visit_VbaStringLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDateLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDateLiteral">visit_VbaDateLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBooleanLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBooleanLiteral">visit_VbaBooleanLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNothingLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNothingLiteral">visit_VbaNothingLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNullLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNullLiteral">visit_VbaNullLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEmptyLiteral" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEmptyLiteral">visit_VbaEmptyLiteral</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaMeExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaMeExpression">visit_VbaMeExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIdentifier" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIdentifier">visit_VbaIdentifier</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypedIdentifier" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypedIdentifier">visit_VbaTypedIdentifier</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaErrorNode" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaErrorNode">visit_VbaErrorNode</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBinaryExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBinaryExpression">visit_VbaBinaryExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaUnaryExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaUnaryExpression">visit_VbaUnaryExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCallExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCallExpression">visit_VbaCallExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaMemberAccess" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaMemberAccess">visit_VbaMemberAccess</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBangAccess" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaBangAccess">visit_VbaBangAccess</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIndexExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIndexExpression">visit_VbaIndexExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNewExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaNewExpression">visit_VbaNewExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypeOfIsExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypeOfIsExpression">visit_VbaTypeOfIsExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaParenExpression" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaParenExpression">visit_VbaParenExpression</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaModule" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaModule">visit_VbaModule</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaOptionStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaOptionStatement">visit_VbaOptionStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDeclareStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDeclareStatement">visit_VbaDeclareStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypeDefinition" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaTypeDefinition">visit_VbaTypeDefinition</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEnumDefinition" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEnumDefinition">visit_VbaEnumDefinition</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEnumMember" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEnumMember">visit_VbaEnumMember</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaConstDeclaration" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaConstDeclaration">visit_VbaConstDeclaration</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaVariableDeclaration" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaVariableDeclaration">visit_VbaVariableDeclaration</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaVariableDeclarator" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaVariableDeclarator">visit_VbaVariableDeclarator</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEventDeclaration" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEventDeclaration">visit_VbaEventDeclaration</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaParameter" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaParameter">visit_VbaParameter</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSubDeclaration" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSubDeclaration">visit_VbaSubDeclaration</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaFunctionDeclaration" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaFunctionDeclaration">visit_VbaFunctionDeclaration</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaPropertyDeclaration" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaPropertyDeclaration">visit_VbaPropertyDeclaration</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaExpressionStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaExpressionStatement">visit_VbaExpressionStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCallStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCallStatement">visit_VbaCallStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaLetStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaLetStatement">visit_VbaLetStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSetStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSetStatement">visit_VbaSetStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIfStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaIfStatement">visit_VbaIfStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaElseIfClause" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaElseIfClause">visit_VbaElseIfClause</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaForStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaForStatement">visit_VbaForStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaForEachStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaForEachStatement">visit_VbaForEachStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDoLoopStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDoLoopStatement">visit_VbaDoLoopStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaWhileStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaWhileStatement">visit_VbaWhileStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSelectCaseStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaSelectCaseStatement">visit_VbaSelectCaseStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCaseClause" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaCaseClause">visit_VbaCaseClause</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaWithStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaWithStatement">visit_VbaWithStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaGotoStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaGotoStatement">visit_VbaGotoStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaGosubStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaGosubStatement">visit_VbaGosubStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaOnErrorStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaOnErrorStatement">visit_VbaOnErrorStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaExitStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaExitStatement">visit_VbaExitStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaReturnStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaReturnStatement">visit_VbaReturnStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaRedimStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaRedimStatement">visit_VbaRedimStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEraseStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEraseStatement">visit_VbaEraseStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaRaiseEventStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaRaiseEventStatement">visit_VbaRaiseEventStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaLabelStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaLabelStatement">visit_VbaLabelStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaStopStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaStopStatement">visit_VbaStopStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEndStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaEndStatement">visit_VbaEndStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDebugPrintStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaDebugPrintStatement">visit_VbaDebugPrintStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaResumeStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaResumeStatement">visit_VbaResumeStatement</a></code></li>
+<li><code><a title="refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaImplementsStatement" href="#refinery.lib.scripts.vba.synth.VbaSynthesizer.visit_VbaImplementsStatement">visit_VbaImplementsStatement</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
