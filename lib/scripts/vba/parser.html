@@ -1,0 +1,3218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.vba.parser documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.vba.parser</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/vba/parser.py#L1-L1599" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from refinery.lib.scripts.vba.lexer import VbaLexer
+from refinery.lib.scripts.vba.model import (
+    Expression,
+    Statement,
+    VbaBangAccess,
+    VbaBinaryExpression,
+    VbaBooleanLiteral,
+    VbaByValArgument,
+    VbaCallExpression,
+    VbaCallStatement,
+    VbaCaseClause,
+    VbaConstDeclaration,
+    VbaConstDeclarator,
+    VbaDateLiteral,
+    VbaDebugPrintStatement,
+    VbaDeclareStatement,
+    VbaDoLoopStatement,
+    VbaElseIfClause,
+    VbaEmptyLiteral,
+    VbaEndStatement,
+    VbaEnumDefinition,
+    VbaEnumMember,
+    VbaEraseStatement,
+    VbaErrorNode,
+    VbaEventDeclaration,
+    VbaExitKind,
+    VbaExitStatement,
+    VbaExpressionStatement,
+    VbaFloatLiteral,
+    VbaForEachStatement,
+    VbaForStatement,
+    VbaFunctionDeclaration,
+    VbaGosubStatement,
+    VbaGotoStatement,
+    VbaIdentifier,
+    VbaIfStatement,
+    VbaImplementsStatement,
+    VbaIntegerLiteral,
+    VbaLabelStatement,
+    VbaLetStatement,
+    VbaLoopConditionPosition,
+    VbaLoopConditionType,
+    VbaMeExpression,
+    VbaMemberAccess,
+    VbaModule,
+    VbaNamedArgument,
+    VbaNewExpression,
+    VbaNothingLiteral,
+    VbaNullLiteral,
+    VbaOnBranchKind,
+    VbaOnBranchStatement,
+    VbaOnErrorAction,
+    VbaOnErrorStatement,
+    VbaOptionStatement,
+    VbaParameter,
+    VbaParameterPassing,
+    VbaParenExpression,
+    VbaPropertyDeclaration,
+    VbaPropertyKind,
+    VbaRaiseEventStatement,
+    VbaRangeExpression,
+    VbaRedimStatement,
+    VbaResumeStatement,
+    VbaReturnStatement,
+    VbaScopeModifier,
+    VbaSelectCaseStatement,
+    VbaSetStatement,
+    VbaStopStatement,
+    VbaStringLiteral,
+    VbaSubDeclaration,
+    VbaTypeDefinition,
+    VbaTypeOfIsExpression,
+    VbaUnaryExpression,
+    VbaVariableDeclaration,
+    VbaVariableDeclarator,
+    VbaWhileStatement,
+    VbaWithStatement,
+)
+from refinery.lib.scripts.vba.token import VbaToken, VbaTokenKind
+
+
+class VbaParser:
+
+    def __init__(self, source: str):
+        self._lexer = VbaLexer(source)
+        self._source = source
+        self._tokens = self._lexer.tokenize()
+        self._current: VbaToken = VbaToken(VbaTokenKind.EOF, &#39;&#39;, 0)
+        self._in_single_line_if = False
+        self._pending_next: int = 0
+        self._advance()
+
+    def _advance(self) -&gt; VbaToken:
+        prev = self._current
+        while True:
+            tok = next(self._tokens, VbaToken(VbaTokenKind.EOF, &#39;&#39;, len(self._source)))
+            if tok.kind == VbaTokenKind.COMMENT:
+                continue
+            break
+        self._current = tok
+        return prev
+
+    def _at(self, *kinds: VbaTokenKind) -&gt; bool:
+        return self._current.kind in kinds
+
+    def _at_keyword(self, *words: str) -&gt; bool:
+        if self._current.kind == VbaTokenKind.IDENTIFIER:
+            return self._current.value.lower() in words
+        if self._current.kind.is_keyword:
+            return self._current.value.lower() in words
+        return False
+
+    def _eat(self, kind: VbaTokenKind) -&gt; VbaToken | None:
+        if self._current.kind == kind:
+            return self._advance()
+        return None
+
+    def _expect(self, kind: VbaTokenKind) -&gt; VbaToken:
+        if self._current.kind == kind:
+            return self._advance()
+        tok = self._current
+        self._advance()
+        return VbaToken(kind, tok.value, tok.offset)
+
+    def _eat_eos(self):
+        while self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON):
+            self._advance()
+
+    def _expect_eos(self):
+        if self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            self._eat_eos()
+        else:
+            self._advance()
+            self._eat_eos()
+
+    def _eat_end(self, keyword: str) -&gt; bool:
+        if self._at(VbaTokenKind.END):
+            saved = self._current
+            self._advance()
+            if self._current.value.lower() == keyword:
+                self._advance()
+                return True
+            self._current = saved
+        if (
+            self._at(VbaTokenKind.IDENTIFIER)
+            and self._current.value.lower() == F&#39;end{keyword}&#39;
+        ):
+            self._advance()
+            return True
+        return False
+
+    def _eat_go_token(self, keyword: str) -&gt; bool:
+        fused = VbaTokenKind.GOTO if keyword == &#39;to&#39; else VbaTokenKind.GOSUB
+        if self._at(fused):
+            self._advance()
+            return True
+        if (
+            self._at(VbaTokenKind.IDENTIFIER)
+            and self._current.value.lower() == &#39;go&#39;
+        ):
+            self._advance()
+            target = VbaTokenKind.TO if keyword == &#39;to&#39; else VbaTokenKind.SUB
+            if self._at(target):
+                self._advance()
+                return True
+        return False
+
+    def _eat_go_branch(self) -&gt; str:
+        if self._at(VbaTokenKind.GOTO):
+            self._advance()
+            return &#39;goto&#39;
+        if self._at(VbaTokenKind.GOSUB):
+            self._advance()
+            return &#39;gosub&#39;
+        if (
+            self._at(VbaTokenKind.IDENTIFIER)
+            and self._current.value.lower() == &#39;go&#39;
+        ):
+            self._advance()
+            if self._at(VbaTokenKind.TO):
+                self._advance()
+                return &#39;goto&#39;
+            if self._at(VbaTokenKind.SUB):
+                self._advance()
+                return &#39;gosub&#39;
+        return &#39;&#39;
+
+    def parse(self) -&gt; VbaModule:
+        return self._parse_module()
+
+    def _parse_module(self) -&gt; VbaModule:
+        offset = self._current.offset
+        body: list[Statement] = []
+        self._eat_eos()
+        while not self._at(VbaTokenKind.EOF):
+            stmt = self._parse_module_element()
+            if stmt is not None:
+                body.append(stmt)
+            self._eat_eos()
+        return VbaModule(body=body, offset=offset)
+
+    def _parse_module_element(self) -&gt; Statement | None:
+        kw = self._current.value.lower() if self._current.kind != VbaTokenKind.EOF else &#39;&#39;
+
+        if kw == &#39;option&#39;:
+            return self._parse_option_statement()
+
+        scope = VbaScopeModifier.NONE
+        is_static = False
+        if kw in (&#39;public&#39;, &#39;private&#39;, &#39;friend&#39;):
+            scope = VbaScopeModifier(self._current.value.capitalize())
+            self._advance()
+            kw = self._current.value.lower()
+        if kw == &#39;static&#39;:
+            is_static = True
+            self._advance()
+            kw = self._current.value.lower()
+
+        if kw == &#39;sub&#39;:
+            return self._parse_sub_declaration(scope, is_static)
+        if kw == &#39;function&#39;:
+            return self._parse_function_declaration(scope, is_static)
+        if kw == &#39;property&#39;:
+            return self._parse_property_declaration(scope, is_static)
+        if kw == &#39;declare&#39;:
+            return self._parse_declare_statement(scope)
+        if kw == &#39;type&#39;:
+            return self._parse_type_definition(scope)
+        if kw == &#39;enum&#39;:
+            return self._parse_enum_definition(scope)
+        if kw == &#39;const&#39;:
+            return self._parse_const_declaration(scope)
+        if kw in (&#39;dim&#39;, &#39;global&#39;):
+            dim_scope = scope if scope is not VbaScopeModifier.NONE else VbaScopeModifier(
+                self._current.value.capitalize())
+            return self._parse_variable_declaration(dim_scope)
+        if kw == &#39;event&#39;:
+            return self._parse_event_declaration(scope)
+        if kw == &#39;implements&#39;:
+            return self._parse_implements_statement()
+        if scope is not VbaScopeModifier.NONE and not is_static:
+            return self._parse_variable_declaration(scope)
+        if kw == &#39;withevents&#39;:
+            we_scope = scope if scope is not VbaScopeModifier.NONE else VbaScopeModifier.PRIVATE
+            return self._parse_variable_declaration(we_scope)
+
+        if kw == &#39;attribute&#39;:
+            return self._skip_to_eos()
+
+        return self._parse_statement()
+
+    def _parse_option_statement(self) -&gt; VbaOptionStatement:
+        offset = self._current.offset
+        self._advance()
+        keyword = self._current.value
+        self._advance()
+        value = &#39;&#39;
+        if not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            value = self._current.value
+            self._advance()
+        self._eat_eos()
+        return VbaOptionStatement(keyword=keyword, value=value, offset=offset)
+
+    def _parse_declare_statement(self, scope: VbaScopeModifier) -&gt; VbaDeclareStatement:
+        offset = self._current.offset
+        self._advance()
+        if self._current.value.lower() == &#39;ptrsafe&#39;:
+            self._advance()
+        is_function = self._current.value.lower() == &#39;function&#39;
+        self._advance()
+        name = self._current.value
+        self._advance()
+        lib = &#39;&#39;
+        if self._current.value.lower() == &#39;lib&#39;:
+            self._advance()
+            lib = self._current.value
+            self._advance()
+        alias = &#39;&#39;
+        if self._current.value.lower() == &#39;alias&#39;:
+            self._advance()
+            alias = self._current.value
+            self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        return_type = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            return_type = self._parse_type_name()
+        self._eat_eos()
+        return VbaDeclareStatement(
+            scope=scope, name=name, lib=lib, alias=alias,
+            is_function=is_function, params=params,
+            return_type=return_type, offset=offset,
+        )
+
+    def _parse_type_definition(self, scope: VbaScopeModifier) -&gt; VbaTypeDefinition:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        self._eat_eos()
+        members: list[VbaVariableDeclarator] = []
+        while not self._at(VbaTokenKind.EOF):
+            if self._at(VbaTokenKind.END):
+                saved = self._current
+                self._advance()
+                if self._current.value.lower() == &#39;type&#39;:
+                    self._advance()
+                    break
+                self._current = saved
+            m_offset = self._current.offset
+            m_name = self._current.value
+            self._advance()
+            bounds: list[Expression] = []
+            if self._at(VbaTokenKind.LPAREN):
+                self._advance()
+                if not self._at(VbaTokenKind.RPAREN):
+                    bounds = self._parse_bounds_list()
+                self._expect(VbaTokenKind.RPAREN)
+            type_name = &#39;&#39;
+            if self._eat(VbaTokenKind.AS):
+                type_name = self._parse_type_name()
+            members.append(VbaVariableDeclarator(
+                name=m_name, type_name=type_name, bounds=bounds, offset=m_offset))
+            self._eat_eos()
+        self._eat_eos()
+        return VbaTypeDefinition(scope=scope, name=name, members=members, offset=offset)
+
+    def _parse_enum_definition(self, scope: VbaScopeModifier) -&gt; VbaEnumDefinition:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        self._eat_eos()
+        members: list[VbaEnumMember] = []
+        while not self._at(VbaTokenKind.EOF):
+            if self._at(VbaTokenKind.END):
+                saved = self._current
+                self._advance()
+                if self._current.value.lower() == &#39;enum&#39;:
+                    self._advance()
+                    break
+                self._current = saved
+            m_offset = self._current.offset
+            m_name = self._current.value
+            self._advance()
+            value: Expression | None = None
+            if self._eat(VbaTokenKind.EQ):
+                value = self._parse_expression()
+            members.append(VbaEnumMember(name=m_name, value=value, offset=m_offset))
+            self._eat_eos()
+        self._eat_eos()
+        return VbaEnumDefinition(scope=scope, name=name, members=members, offset=offset)
+
+    def _parse_const_declarator(self) -&gt; VbaConstDeclarator:
+        offset = self._current.offset
+        name = self._current.value
+        self._advance()
+        type_name = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            type_name = self._parse_type_name()
+        self._expect(VbaTokenKind.EQ)
+        value = self._parse_expression()
+        return VbaConstDeclarator(name=name, type_name=type_name, value=value, offset=offset)
+
+    def _parse_const_declaration(self, scope: VbaScopeModifier) -&gt; VbaConstDeclaration:
+        offset = self._current.offset
+        self._advance()
+        declarators = [self._parse_const_declarator()]
+        while self._eat(VbaTokenKind.COMMA):
+            declarators.append(self._parse_const_declarator())
+        self._eat_eos()
+        return VbaConstDeclaration(scope=scope, declarators=declarators, offset=offset)
+
+    def _parse_variable_declaration(self, scope: VbaScopeModifier) -&gt; VbaVariableDeclaration:
+        offset = self._current.offset
+        if self._current.value.lower() in (&#39;dim&#39;, &#39;global&#39;, &#39;static&#39;):
+            self._advance()
+        if self._current.value.lower() == &#39;shared&#39;:
+            self._advance()
+        declarators: list[VbaVariableDeclarator] = []
+        declarators.append(self._parse_variable_declarator())
+        while self._eat(VbaTokenKind.COMMA):
+            declarators.append(self._parse_variable_declarator())
+        self._eat_eos()
+        return VbaVariableDeclaration(
+            scope=scope, declarators=declarators, offset=offset)
+
+    def _parse_variable_declarator(self) -&gt; VbaVariableDeclarator:
+        offset = self._current.offset
+        with_events = bool(self._eat(VbaTokenKind.WITHEVENTS))
+        name = self._current.value
+        self._advance()
+        bounds: list[Expression] = []
+        is_array = False
+        if self._at(VbaTokenKind.LPAREN):
+            is_array = True
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                bounds = self._parse_bounds_list()
+            self._expect(VbaTokenKind.RPAREN)
+        type_name = &#39;&#39;
+        is_new = False
+        if self._eat(VbaTokenKind.AS):
+            if self._eat(VbaTokenKind.NEW):
+                is_new = True
+            type_name = self._parse_type_name()
+        return VbaVariableDeclarator(
+            name=name, type_name=type_name, is_array=is_array,
+            bounds=bounds, is_new=is_new, with_events=with_events, offset=offset,
+        )
+
+    def _parse_event_declaration(self, scope: VbaScopeModifier) -&gt; VbaEventDeclaration:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        self._eat_eos()
+        return VbaEventDeclaration(scope=scope, name=name, params=params, offset=offset)
+
+    def _parse_implements_statement(self) -&gt; VbaImplementsStatement:
+        offset = self._current.offset
+        self._advance()
+        name = self._parse_type_name()
+        self._eat_eos()
+        return VbaImplementsStatement(name=name, offset=offset)
+
+    def _parse_sub_declaration(
+        self, scope: VbaScopeModifier, is_static: bool,
+    ) -&gt; VbaSubDeclaration:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;sub&#39;)
+        return VbaSubDeclaration(
+            scope=scope, name=name, params=params,
+            body=body, is_static=is_static, offset=offset,
+        )
+
+    def _parse_function_declaration(
+        self, scope: VbaScopeModifier, is_static: bool,
+    ) -&gt; VbaFunctionDeclaration:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        return_type = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            return_type = self._parse_type_name()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;function&#39;)
+        return VbaFunctionDeclaration(
+            scope=scope, name=name, params=params,
+            return_type=return_type, body=body,
+            is_static=is_static, offset=offset,
+        )
+
+    def _parse_property_declaration(
+        self, scope: VbaScopeModifier, is_static: bool,
+    ) -&gt; VbaPropertyDeclaration:
+        offset = self._current.offset
+        self._advance()
+        kind = VbaPropertyKind(self._current.value.capitalize())
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        return_type = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            return_type = self._parse_type_name()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;property&#39;)
+        return VbaPropertyDeclaration(
+            scope=scope, kind=kind, name=name, params=params,
+            return_type=return_type, body=body,
+            is_static=is_static, offset=offset,
+        )
+
+    def _parse_parameter_list(self) -&gt; list[VbaParameter]:
+        self._expect(VbaTokenKind.LPAREN)
+        params: list[VbaParameter] = []
+        while not self._at(VbaTokenKind.RPAREN, VbaTokenKind.EOF):
+            params.append(self._parse_parameter())
+            if not self._at(VbaTokenKind.RPAREN):
+                self._expect(VbaTokenKind.COMMA)
+        self._expect(VbaTokenKind.RPAREN)
+        return params
+
+    def _parse_parameter(self) -&gt; VbaParameter:
+        offset = self._current.offset
+        is_optional = False
+        is_paramarray = False
+        passing = VbaParameterPassing.NONE
+
+        while True:
+            if self._current.value.lower() == &#39;optional&#39;:
+                is_optional = True
+                self._advance()
+            elif self._at(VbaTokenKind.BYVAL):
+                passing = VbaParameterPassing.BY_VAL
+                self._advance()
+            elif self._at(VbaTokenKind.BYREF):
+                passing = VbaParameterPassing.BY_REF
+                self._advance()
+            else:
+                break
+        if self._current.value.lower() == &#39;paramarray&#39;:
+            is_paramarray = True
+            self._advance()
+
+        name = self._current.value
+        self._advance()
+
+        is_array = False
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            self._expect(VbaTokenKind.RPAREN)
+            is_array = True
+
+        type_name = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            type_name = self._parse_type_name()
+
+        default: Expression | None = None
+        if self._eat(VbaTokenKind.EQ):
+            default = self._parse_expression()
+
+        return VbaParameter(
+            name=name, passing=passing, type_name=type_name,
+            is_optional=is_optional, is_paramarray=is_paramarray,
+            default=default, is_array=is_array, offset=offset,
+        )
+
+    def _parse_type_name(self) -&gt; str:
+        parts: list[str] = []
+        parts.append(self._current.value)
+        self._advance()
+        while self._eat(VbaTokenKind.DOT):
+            parts.append(self._current.value)
+            self._advance()
+        name = &#39;.&#39;.join(parts)
+        if name.lower() == &#39;string&#39; and self._eat(VbaTokenKind.STAR):
+            length = self._current.value
+            self._advance()
+            return F&#39;{name} * {length}&#39;
+        return name
+
+    def _parse_block_until(self, end_keyword: str) -&gt; list[Statement]:
+        merged = F&#39;end{end_keyword}&#39;
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.EOF):
+                break
+            if self._at(VbaTokenKind.END):
+                saved_offset = self._current.offset
+                saved = self._current
+                self._advance()
+                next_kw = self._current.value.lower()
+                if next_kw == end_keyword:
+                    self._advance()
+                    return body
+                self._current = saved
+                self._current.offset = saved_offset
+            elif (
+                self._at(VbaTokenKind.IDENTIFIER)
+                and self._current.value.lower() == merged
+            ):
+                self._advance()
+                return body
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return body
+
+    def _parse_statement(self) -&gt; Statement | None:
+        offset = self._current.offset
+        kind = self._current.kind
+        kw = self._current.value.lower() if kind != VbaTokenKind.EOF else &#39;&#39;
+
+        if kind.is_end_of_statement:
+            self._advance()
+            return None
+
+        if kind == VbaTokenKind.INTEGER:
+            label_val = self._current.value
+            self._advance()
+            if self._in_single_line_if:
+                return VbaGotoStatement(label=label_val, offset=offset)
+            return VbaLabelStatement(label=label_val, offset=offset)
+
+        if kind == VbaTokenKind.IDENTIFIER and not kind.is_keyword:
+            next_peek = self._source[self._current.offset + len(self._current.value):].lstrip(&#39; \t&#39;)
+            if next_peek.startswith(&#39;:&#39;) and not next_peek.startswith(&#39;:=&#39;):
+                label_val = self._current.value
+                self._advance()
+                self._eat(VbaTokenKind.COLON)
+                return VbaLabelStatement(label=label_val, offset=offset)
+
+        if kw == &#39;if&#39;:
+            return self._parse_if_statement()
+        if kw == &#39;for&#39;:
+            return self._parse_for_statement()
+        if kw == &#39;do&#39;:
+            return self._parse_do_loop_statement()
+        if kw == &#39;while&#39;:
+            return self._parse_while_statement()
+        if kw == &#39;select&#39;:
+            return self._parse_select_case_statement()
+        if kw == &#39;with&#39;:
+            return self._parse_with_statement()
+        if kw == &#39;set&#39;:
+            return self._parse_set_statement()
+        if kw == &#39;let&#39;:
+            return self._parse_let_statement()
+        if kw == &#39;call&#39;:
+            return self._parse_call_statement()
+        if kw == &#39;dim&#39; or kw == &#39;static&#39;:
+            return self._parse_variable_declaration(
+                VbaScopeModifier(self._current.value.capitalize()))
+        if kw == &#39;redim&#39;:
+            return self._parse_redim_statement()
+        if kw == &#39;const&#39;:
+            return self._parse_const_declaration(VbaScopeModifier.NONE)
+        if kw == &#39;goto&#39;:
+            return self._parse_goto_statement()
+        if kw == &#39;gosub&#39;:
+            return self._parse_gosub_statement()
+        if kw == &#39;on&#39;:
+            return self._parse_on_statement()
+        if kw == &#39;exit&#39;:
+            return self._parse_exit_statement()
+        if kw == &#39;return&#39;:
+            self._advance()
+            return VbaReturnStatement(offset=offset)
+        if kw == &#39;resume&#39;:
+            return self._parse_resume_statement()
+        if kw == &#39;stop&#39;:
+            self._advance()
+            return VbaStopStatement(offset=offset)
+        if kw == &#39;end&#39;:
+            return self._parse_end_statement()
+        if kw == &#39;erase&#39;:
+            return self._parse_erase_statement()
+        if kw == &#39;raiseevent&#39;:
+            return self._parse_raiseevent_statement()
+        if kw == &#39;debug&#39;:
+            return self._parse_debug_print_statement()
+
+        if kind == VbaTokenKind.IDENTIFIER and self._current.value.lower() in (&#39;lset&#39;, &#39;rset&#39;):
+            return self._parse_let_statement()
+
+        if kind == VbaTokenKind.IDENTIFIER and self._current.value.lower() == &#39;go&#39;:
+            after = self._source[self._current.offset + len(self._current.value):].lstrip(&#39; \t&#39;)
+            word = after.split()[0].lower() if after.split() else &#39;&#39;
+            if word == &#39;to&#39;:
+                self._advance()
+                self._advance()
+                label = self._current.value
+                self._advance()
+                return VbaGotoStatement(label=label, offset=offset)
+            if word == &#39;sub&#39;:
+                self._advance()
+                self._advance()
+                label = self._current.value
+                self._advance()
+                return VbaGosubStatement(label=label, offset=offset)
+
+        if kw == &#39;open&#39;:
+            return self._skip_to_eos()
+
+        if kw == &#39;line&#39;:
+            peek = self._source[self._current.offset + len(self._current.value):].lstrip(&#39; \t&#39;)
+            if peek.lower().startswith(&#39;input&#39;):
+                return self._skip_to_eos()
+
+        return self._parse_implicit_call_or_assignment()
+
+    def _skip_to_eos(self) -&gt; VbaExpressionStatement:
+        offset = self._current.offset
+        start = offset
+        while not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            self._advance()
+        raw = self._source[start:self._current.offset]
+        return VbaExpressionStatement(
+            expression=VbaIdentifier(name=raw.strip(), offset=offset),
+            offset=offset,
+        )
+
+    def _parse_if_statement(self) -&gt; VbaIfStatement:
+        offset = self._current.offset
+        self._advance()
+        condition = self._parse_expression()
+        self._expect(VbaTokenKind.THEN)
+
+        while self._at(VbaTokenKind.COLON):
+            self._advance()
+
+        if not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.EOF):
+            return self._parse_single_line_if(condition, offset)
+
+        self._eat_eos()
+        body: list[Statement] = []
+        elseif_clauses: list[VbaElseIfClause] = []
+        else_body: list[Statement] = []
+        found_else = False
+
+        while not self._at(VbaTokenKind.EOF):
+            if self._eat_end(&#39;if&#39;):
+                break
+            if self._at(VbaTokenKind.ELSEIF):
+                ei_offset = self._current.offset
+                self._advance()
+                ei_cond = self._parse_expression()
+                self._expect(VbaTokenKind.THEN)
+                self._eat_eos()
+                elseif_clauses.append(VbaElseIfClause(
+                    condition=ei_cond, body=[], offset=ei_offset))
+                continue
+            if self._at(VbaTokenKind.ELSE):
+                ei_offset = self._current.offset
+                self._advance()
+                if self._at(VbaTokenKind.IF):
+                    self._advance()
+                    ei_cond = self._parse_expression()
+                    self._expect(VbaTokenKind.THEN)
+                    self._eat_eos()
+                    elseif_clauses.append(VbaElseIfClause(
+                        condition=ei_cond, body=[], offset=ei_offset))
+                    continue
+                self._eat_eos()
+                found_else = True
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                if elseif_clauses:
+                    elseif_clauses[-1].body.append(stmt)
+                else:
+                    body.append(stmt)
+            self._eat_eos()
+
+        if found_else:
+            while not self._at(VbaTokenKind.EOF):
+                if self._eat_end(&#39;if&#39;):
+                    break
+                stmt = self._parse_statement()
+                if stmt is not None:
+                    else_body.append(stmt)
+                self._eat_eos()
+
+        return VbaIfStatement(
+            condition=condition, body=body,
+            elseif_clauses=elseif_clauses,
+            else_body=else_body, offset=offset,
+        )
+
+    def _parse_single_line_if(
+        self, condition: Expression, offset: int,
+    ) -&gt; VbaIfStatement:
+        saved = self._in_single_line_if
+        self._in_single_line_if = True
+        try:
+            body: list[Statement] = []
+            else_body: list[Statement] = []
+            while not self._at(
+                VbaTokenKind.NEWLINE, VbaTokenKind.EOF,
+                VbaTokenKind.ELSE,
+            ):
+                if self._at(VbaTokenKind.COLON):
+                    self._advance()
+                    continue
+                stmt = self._parse_statement()
+                if stmt is not None:
+                    body.append(stmt)
+            if self._eat(VbaTokenKind.ELSE):
+                while not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.EOF, VbaTokenKind.ELSE):
+                    if self._at(VbaTokenKind.COLON):
+                        self._advance()
+                        continue
+                    stmt = self._parse_statement()
+                    if stmt is not None:
+                        else_body.append(stmt)
+            return VbaIfStatement(
+                condition=condition, body=body,
+                else_body=else_body, single_line=True, offset=offset,
+            )
+        finally:
+            self._in_single_line_if = saved
+
+    def _consume_next_variable(self):
+        if not self._at(
+            VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF,
+        ):
+            self._parse_expression()
+        while self._eat(VbaTokenKind.COMMA):
+            self._pending_next += 1
+
+    def _parse_for_body(self) -&gt; list[Statement]:
+        self._eat_eos()
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._pending_next &gt; 0:
+                self._pending_next -= 1
+                self._consume_next_variable()
+                break
+            if self._at(VbaTokenKind.NEXT):
+                self._advance()
+                self._consume_next_variable()
+                break
+            if self._at(VbaTokenKind.EOF):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return body
+
+    def _parse_for_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+
+        if self._eat(VbaTokenKind.EACH):
+            variable = self._parse_postfix_expression()
+            self._expect(VbaTokenKind.IN)
+            collection = self._parse_expression()
+            body = self._parse_for_body()
+            return VbaForEachStatement(
+                variable=variable, collection=collection,
+                body=body, offset=offset,
+            )
+
+        variable = self._parse_postfix_expression()
+        self._expect(VbaTokenKind.EQ)
+        start = self._parse_expression()
+        self._expect(VbaTokenKind.TO)
+        end = self._parse_expression()
+        step: Expression | None = None
+        if self._eat(VbaTokenKind.STEP):
+            step = self._parse_expression()
+        body = self._parse_for_body()
+        return VbaForStatement(
+            variable=variable, start=start, end=end,
+            step=step, body=body, offset=offset,
+        )
+
+    def _parse_do_loop_statement(self) -&gt; VbaDoLoopStatement:
+        offset = self._current.offset
+        self._advance()
+
+        condition: Expression | None = None
+        condition_type: VbaLoopConditionType | None = None
+        condition_position: VbaLoopConditionPosition | None = None
+
+        if self._at(VbaTokenKind.WHILE):
+            condition_type = VbaLoopConditionType.WHILE
+            condition_position = VbaLoopConditionPosition.PRE
+            self._advance()
+            condition = self._parse_expression()
+        elif self._at(VbaTokenKind.UNTIL):
+            condition_type = VbaLoopConditionType.UNTIL
+            condition_position = VbaLoopConditionPosition.PRE
+            self._advance()
+            condition = self._parse_expression()
+
+        self._eat_eos()
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.LOOP):
+                self._advance()
+                if self._at(VbaTokenKind.WHILE):
+                    condition_type = VbaLoopConditionType.WHILE
+                    condition_position = VbaLoopConditionPosition.POST
+                    self._advance()
+                    condition = self._parse_expression()
+                elif self._at(VbaTokenKind.UNTIL):
+                    condition_type = VbaLoopConditionType.UNTIL
+                    condition_position = VbaLoopConditionPosition.POST
+                    self._advance()
+                    condition = self._parse_expression()
+                break
+            if self._at(VbaTokenKind.EOF):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+
+        return VbaDoLoopStatement(
+            condition=condition, condition_type=condition_type,
+            condition_position=condition_position,
+            body=body, offset=offset,
+        )
+
+    def _parse_while_statement(self) -&gt; VbaWhileStatement:
+        offset = self._current.offset
+        self._advance()
+        condition = self._parse_expression()
+        self._eat_eos()
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.WEND):
+                self._advance()
+                break
+            if self._at(VbaTokenKind.EOF):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return VbaWhileStatement(
+            condition=condition, body=body, offset=offset)
+
+    def _parse_select_case_statement(self) -&gt; VbaSelectCaseStatement:
+        offset = self._current.offset
+        self._advance()
+        self._expect(VbaTokenKind.CASE)
+        expr = self._parse_expression()
+        self._eat_eos()
+        cases: list[VbaCaseClause] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._eat_end(&#39;select&#39;):
+                break
+            if self._at(VbaTokenKind.CASE):
+                cases.append(self._parse_case_clause())
+            elif self._at(VbaTokenKind.EOF):
+                break
+            else:
+                if cases:
+                    stmt = self._parse_statement()
+                    if stmt is not None:
+                        cases[-1].body.append(stmt)
+                else:
+                    self._advance()
+        return VbaSelectCaseStatement(
+            expression=expr, cases=cases, offset=offset)
+
+    def _parse_case_body(self) -&gt; list[Statement]:
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.CASE):
+                break
+            if self._at(VbaTokenKind.END):
+                after = self._source[
+                    self._current.offset + len(self._current.value):
+                ].lstrip(&#39; \t&#39;)
+                if after[:6].lower() == &#39;select&#39; and not after[6:7].isalnum():
+                    break
+            if (
+                self._at(VbaTokenKind.IDENTIFIER)
+                and self._current.value.lower() == &#39;endselect&#39;
+            ):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return body
+
+    def _parse_case_clause(self) -&gt; VbaCaseClause:
+        offset = self._current.offset
+        self._advance()
+        if self._current.value.lower() == &#39;else&#39;:
+            self._advance()
+            self._eat_eos()
+            body = self._parse_case_body()
+            return VbaCaseClause(is_else=True, body=body, offset=offset)
+
+        tests: list[Expression] = []
+        tests.append(self._parse_case_test())
+        while self._eat(VbaTokenKind.COMMA):
+            tests.append(self._parse_case_test())
+        self._eat_eos()
+        body = self._parse_case_body()
+        return VbaCaseClause(tests=tests, body=body, offset=offset)
+
+    def _parse_with_statement(self) -&gt; VbaWithStatement:
+        offset = self._current.offset
+        self._advance()
+        obj = self._parse_expression()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;with&#39;)
+        return VbaWithStatement(object=obj, body=body, offset=offset)
+
+    def _parse_set_statement(self) -&gt; VbaSetStatement:
+        offset = self._current.offset
+        self._advance()
+        target = self._parse_postfix_expression()
+        self._expect(VbaTokenKind.EQ)
+        value = self._parse_expression()
+        return VbaSetStatement(target=target, value=value, offset=offset)
+
+    def _parse_let_statement(self) -&gt; VbaLetStatement:
+        offset = self._current.offset
+        keyword = self._current.value
+        self._advance()
+        target = self._parse_postfix_expression()
+        self._expect(VbaTokenKind.EQ)
+        value = self._parse_expression()
+        return VbaLetStatement(
+            target=target, value=value, explicit=True, keyword=keyword, offset=offset)
+
+    def _parse_call_statement(self) -&gt; VbaCallStatement:
+        offset = self._current.offset
+        self._advance()
+        callee = self._parse_postfix_expression()
+        args: list[Expression | None] = []
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                args = self._parse_argument_list()
+            self._expect(VbaTokenKind.RPAREN)
+        return VbaCallStatement(callee=callee, arguments=args, offset=offset)
+
+    def _parse_redim_statement(self) -&gt; VbaRedimStatement:
+        offset = self._current.offset
+        self._advance()
+        preserve = False
+        if self._current.value.lower() == &#39;preserve&#39;:
+            preserve = True
+            self._advance()
+        declarators: list[VbaVariableDeclarator] = []
+        declarators.append(self._parse_redim_declarator())
+        while self._eat(VbaTokenKind.COMMA):
+            declarators.append(self._parse_redim_declarator())
+        return VbaRedimStatement(
+            preserve=preserve, declarators=declarators, offset=offset)
+
+    def _parse_redim_declarator(self) -&gt; VbaVariableDeclarator:
+        offset = self._current.offset
+        parts: list[str] = []
+        if self._at(VbaTokenKind.DOT):
+            parts.append(&#39;&#39;)
+            self._advance()
+            parts.append(self._current.value)
+            self._advance()
+        else:
+            parts.append(self._current.value)
+            self._advance()
+        while self._eat(VbaTokenKind.DOT):
+            parts.append(self._current.value)
+            self._advance()
+        name = &#39;.&#39;.join(parts)
+        bounds: list[Expression] = []
+        is_array = False
+        if self._at(VbaTokenKind.LPAREN):
+            is_array = True
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                bounds = self._parse_bounds_list()
+            self._expect(VbaTokenKind.RPAREN)
+        type_name = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            type_name = self._parse_type_name()
+        return VbaVariableDeclarator(
+            name=name, type_name=type_name, is_array=is_array,
+            bounds=bounds, offset=offset,
+        )
+
+    def _parse_erase_statement(self) -&gt; VbaEraseStatement:
+        offset = self._current.offset
+        self._advance()
+        targets: list[Expression] = []
+        targets.append(self._parse_expression())
+        while self._eat(VbaTokenKind.COMMA):
+            targets.append(self._parse_expression())
+        return VbaEraseStatement(targets=targets, offset=offset)
+
+    def _parse_raiseevent_statement(self) -&gt; VbaRaiseEventStatement:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        arguments: list[Expression] = []
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                arguments = self._parse_expression_list()
+            self._expect(VbaTokenKind.RPAREN)
+        return VbaRaiseEventStatement(
+            name=name, arguments=arguments, offset=offset)
+
+    def _parse_goto_statement(self) -&gt; VbaGotoStatement:
+        offset = self._current.offset
+        self._advance()
+        label = self._current.value
+        self._advance()
+        return VbaGotoStatement(label=label, offset=offset)
+
+    def _parse_gosub_statement(self) -&gt; VbaGosubStatement:
+        offset = self._current.offset
+        self._advance()
+        label = self._current.value
+        self._advance()
+        return VbaGosubStatement(label=label, offset=offset)
+
+    def _parse_on_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+        if self._at(VbaTokenKind.ERROR):
+            self._advance()
+            if self._current.value.lower() == &#39;resume&#39;:
+                self._advance()
+                if self._current.value.lower() == &#39;next&#39;:
+                    self._advance()
+                    return VbaOnErrorStatement(
+                        action=VbaOnErrorAction.RESUME_NEXT, offset=offset)
+                return VbaOnErrorStatement(
+                    action=VbaOnErrorAction.RESUME, offset=offset)
+            if self._eat_go_token(&#39;to&#39;):
+                if self._at(VbaTokenKind.MINUS):
+                    self._advance()
+                    label = F&#39;-{self._current.value}&#39;
+                else:
+                    label = self._current.value
+                self._advance()
+                return VbaOnErrorStatement(
+                    action=VbaOnErrorAction.GOTO, label=label, offset=offset)
+            return VbaOnErrorStatement(action=VbaOnErrorAction.NONE, offset=offset)
+        expr = self._parse_expression()
+        branch = self._eat_go_branch()
+        if branch == &#39;goto&#39;:
+            kind = VbaOnBranchKind.GOTO
+        elif branch == &#39;gosub&#39;:
+            kind = VbaOnBranchKind.GOSUB
+        else:
+            return VbaOnErrorStatement(action=VbaOnErrorAction.NONE, offset=offset)
+        labels = [self._current.value]
+        self._advance()
+        while self._eat(VbaTokenKind.COMMA):
+            labels.append(self._current.value)
+            self._advance()
+        return VbaOnBranchStatement(
+            expression=expr, kind=kind, labels=labels, offset=offset)
+
+    def _parse_exit_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+        try:
+            kind = VbaExitKind(self._current.value.capitalize())
+        except ValueError:
+            self._advance()
+            return VbaErrorNode(offset=offset)
+        self._advance()
+        return VbaExitStatement(kind=kind, offset=offset)
+
+    def _parse_resume_statement(self) -&gt; VbaResumeStatement:
+        offset = self._current.offset
+        self._advance()
+        label = &#39;&#39;
+        if self._current.value.lower() == &#39;next&#39;:
+            label = &#39;Next&#39;
+            self._advance()
+        elif not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            label = self._current.value
+            self._advance()
+        return VbaResumeStatement(label=label, offset=offset)
+
+    def _parse_end_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+        return VbaEndStatement(offset=offset)
+
+    def _parse_debug_print_statement(self) -&gt; VbaDebugPrintStatement:
+        offset = self._current.offset
+        self._advance()
+        self._eat(VbaTokenKind.DOT)
+        method = self._current.value
+        self._advance()
+        arguments: list[Expression] = []
+        separators: list[str] = []
+        if not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            arguments, separators = self._parse_print_argument_list()
+        return VbaDebugPrintStatement(
+            method=method, arguments=arguments, separators=separators, offset=offset)
+
+    def _parse_print_argument_list(self) -&gt; tuple[list[Expression], list[str]]:
+        args: list[Expression] = []
+        separators: list[str] = []
+        args.append(self._parse_expression())
+        while self._at(VbaTokenKind.SEMICOLON, VbaTokenKind.COMMA):
+            sep = &#39;;&#39; if self._at(VbaTokenKind.SEMICOLON) else &#39;,&#39;
+            separators.append(sep)
+            self._advance()
+            if self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+                break
+            args.append(self._parse_expression())
+        return args, separators
+
+    def _parse_implicit_call_or_assignment(self) -&gt; Statement:
+        offset = self._current.offset
+        expr = self._parse_postfix_expression()
+
+        if self._eat(VbaTokenKind.EQ):
+            value = self._parse_expression()
+            return VbaLetStatement(
+                target=expr, value=value, explicit=False, offset=offset)
+
+        if not self._at(
+            VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF,
+            VbaTokenKind.ELSE,
+        ):
+            args = self._parse_argument_list()
+            return VbaExpressionStatement(
+                expression=expr, arguments=args, offset=offset)
+
+        return VbaExpressionStatement(expression=expr, offset=offset)
+
+    def _parse_argument_list(self) -&gt; list[Expression | None]:
+        args: list[Expression | None] = []
+        while True:
+            if self._at(
+                VbaTokenKind.NEWLINE, VbaTokenKind.COLON,
+                VbaTokenKind.EOF, VbaTokenKind.RPAREN,
+                VbaTokenKind.ELSE,
+            ):
+                break
+            if self._at(VbaTokenKind.COMMA):
+                args.append(None)
+                self._advance()
+                continue
+            args.append(self._parse_argument_expression())
+            if not self._eat(VbaTokenKind.COMMA):
+                break
+        return args
+
+    def _parse_argument_expression(self) -&gt; Expression:
+        if self._at(VbaTokenKind.BYVAL):
+            offset = self._current.offset
+            self._advance()
+            return VbaByValArgument(
+                expression=self._parse_expression(), offset=offset)
+        expr = self._parse_expression()
+        if self._at(VbaTokenKind.ASSIGN):
+            self._advance()
+            name = expr.name if isinstance(expr, VbaIdentifier) else &#39;&#39;
+            value = self._parse_expression()
+            return VbaNamedArgument(
+                name=name, expression=value, offset=expr.offset)
+        return expr
+
+    def _parse_expression_list(self) -&gt; list[Expression]:
+        exprs: list[Expression] = []
+        exprs.append(self._parse_expression())
+        while self._eat(VbaTokenKind.COMMA):
+            exprs.append(self._parse_expression())
+        return exprs
+
+    def _parse_bounds_list(self) -&gt; list[Expression]:
+        bounds: list[Expression] = []
+        bounds.append(self._parse_bound_expression())
+        while self._eat(VbaTokenKind.COMMA):
+            bounds.append(self._parse_bound_expression())
+        return bounds
+
+    _COMPARISON_OPS = frozenset({
+        VbaTokenKind.EQ,
+        VbaTokenKind.NEQ,
+        VbaTokenKind.LT,
+        VbaTokenKind.GT,
+        VbaTokenKind.LTE,
+        VbaTokenKind.GTE,
+    })
+
+    def _parse_case_test(self) -&gt; Expression:
+        offset = self._current.offset
+        if self._at(VbaTokenKind.IS):
+            self._advance()
+            if self._at(*self._COMPARISON_OPS):
+                op = self._advance().value
+                right = self._parse_expression()
+                return VbaBinaryExpression(
+                    left=VbaIdentifier(name=&#39;Is&#39;, offset=offset),
+                    operator=op, right=right, offset=offset,
+                )
+            return self._reparse_is_as_expression(offset)
+        if self._at(*self._COMPARISON_OPS):
+            op = self._advance().value
+            right = self._parse_expression()
+            return VbaBinaryExpression(
+                left=VbaIdentifier(name=&#39;Is&#39;, offset=offset),
+                operator=op, right=right, offset=offset,
+            )
+        return self._parse_bound_expression()
+
+    def _reparse_is_as_expression(self, offset: int) -&gt; Expression:
+        expr: Expression = VbaIdentifier(name=&#39;Is&#39;, offset=offset)
+        while True:
+            if self._eat(VbaTokenKind.DOT):
+                member = self._current.value
+                self._advance()
+                expr = VbaMemberAccess(object=expr, member=member, offset=offset)
+            elif self._at(VbaTokenKind.LPAREN):
+                self._advance()
+                args: list[Expression | None] = []
+                if not self._at(VbaTokenKind.RPAREN):
+                    args = self._parse_call_argument_list()
+                self._expect(VbaTokenKind.RPAREN)
+                expr = VbaCallExpression(callee=expr, arguments=args, offset=offset)
+            else:
+                break
+        if self._eat(VbaTokenKind.TO):
+            upper = self._parse_expression()
+            return VbaRangeExpression(start=expr, end=upper, offset=offset)
+        return expr
+
+    def _parse_bound_expression(self) -&gt; Expression:
+        expr = self._parse_expression()
+        if self._eat(VbaTokenKind.TO):
+            upper = self._parse_expression()
+            expr = VbaRangeExpression(start=expr, end=upper, offset=expr.offset)
+        return expr
+
+    def _parse_expression(self) -&gt; Expression:
+        return self._parse_imp_expression()
+
+    def _parse_imp_expression(self) -&gt; Expression:
+        left = self._parse_eqv_expression()
+        while self._eat(VbaTokenKind.IMP):
+            right = self._parse_eqv_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Imp&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_eqv_expression(self) -&gt; Expression:
+        left = self._parse_xor_expression()
+        while self._eat(VbaTokenKind.EQV):
+            right = self._parse_xor_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Eqv&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_xor_expression(self) -&gt; Expression:
+        left = self._parse_or_expression()
+        while self._eat(VbaTokenKind.XOR):
+            right = self._parse_or_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Xor&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_or_expression(self) -&gt; Expression:
+        left = self._parse_and_expression()
+        while self._eat(VbaTokenKind.OR):
+            right = self._parse_and_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Or&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_and_expression(self) -&gt; Expression:
+        left = self._parse_not_expression()
+        while self._eat(VbaTokenKind.AND):
+            right = self._parse_not_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;And&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_not_expression(self) -&gt; Expression:
+        tok = self._eat(VbaTokenKind.NOT)
+        if tok:
+            operand = self._parse_not_expression()
+            return VbaUnaryExpression(
+                operator=&#39;Not&#39;, operand=operand, offset=tok.offset)
+        return self._parse_comparison_expression()
+
+    def _parse_comparison_expression(self) -&gt; Expression:
+        left = self._parse_concat_expression()
+        while self._at(
+            VbaTokenKind.EQ, VbaTokenKind.NEQ,
+            VbaTokenKind.LT, VbaTokenKind.GT,
+            VbaTokenKind.LTE, VbaTokenKind.GTE,
+            VbaTokenKind.IS, VbaTokenKind.LIKE,
+        ):
+            op_tok = self._advance()
+            right = self._parse_concat_expression()
+            op_str = op_tok.value
+            if op_tok.kind == VbaTokenKind.EQ:
+                op_str = &#39;=&#39;
+            left = VbaBinaryExpression(
+                left=left, operator=op_str, right=right, offset=left.offset)
+        return left
+
+    def _parse_concat_expression(self) -&gt; Expression:
+        left = self._parse_additive_expression()
+        while self._eat(VbaTokenKind.AMPERSAND):
+            right = self._parse_additive_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;&amp;&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_additive_expression(self) -&gt; Expression:
+        left = self._parse_mod_expression()
+        while self._at(VbaTokenKind.PLUS, VbaTokenKind.MINUS):
+            op = self._advance().value
+            right = self._parse_mod_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_mod_expression(self) -&gt; Expression:
+        left = self._parse_integer_div_expression()
+        while self._eat(VbaTokenKind.MOD):
+            right = self._parse_integer_div_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Mod&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_integer_div_expression(self) -&gt; Expression:
+        left = self._parse_multiplicative_expression()
+        while self._eat(VbaTokenKind.BACKSLASH):
+            right = self._parse_multiplicative_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;\\&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_multiplicative_expression(self) -&gt; Expression:
+        left = self._parse_unary_expression()
+        while self._at(VbaTokenKind.STAR, VbaTokenKind.SLASH):
+            op = self._advance().value
+            right = self._parse_unary_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_exponentiation_expression(self) -&gt; Expression:
+        left = self._parse_postfix_expression()
+        while self._eat(VbaTokenKind.CARET):
+            right = self._parse_exponentiation_rhs()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;^&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_exponentiation_rhs(self) -&gt; Expression:
+        if self._at(VbaTokenKind.MINUS):
+            tok = self._advance()
+            operand = self._parse_exponentiation_rhs()
+            return VbaUnaryExpression(
+                operator=&#39;-&#39;, operand=operand, offset=tok.offset)
+        if self._at(VbaTokenKind.PLUS):
+            self._advance()
+            return self._parse_exponentiation_rhs()
+        return self._parse_postfix_expression()
+
+    def _parse_unary_expression(self) -&gt; Expression:
+        if self._at(VbaTokenKind.MINUS):
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return VbaUnaryExpression(
+                operator=&#39;-&#39;, operand=operand, offset=tok.offset)
+        if self._at(VbaTokenKind.PLUS):
+            self._advance()
+            return self._parse_unary_expression()
+        return self._parse_exponentiation_expression()
+
+    def _parse_postfix_expression(self) -&gt; Expression:
+        expr = self._parse_primary_expression()
+        while True:
+            if self._eat(VbaTokenKind.DOT):
+                member = self._current.value
+                self._advance()
+                expr = VbaMemberAccess(
+                    object=expr, member=member, offset=expr.offset)
+            elif self._eat(VbaTokenKind.BANG):
+                member = self._current.value
+                self._advance()
+                expr = VbaBangAccess(
+                    object=expr, member=member, offset=expr.offset)
+            elif self._at(VbaTokenKind.LPAREN):
+                self._advance()
+                args: list[Expression | None] = []
+                if not self._at(VbaTokenKind.RPAREN):
+                    args = self._parse_call_argument_list()
+                self._expect(VbaTokenKind.RPAREN)
+                expr = VbaCallExpression(
+                    callee=expr, arguments=args, offset=expr.offset)
+            else:
+                break
+        return expr
+
+    def _parse_call_argument_list(self) -&gt; list[Expression | None]:
+        args: list[Expression | None] = []
+        while True:
+            if self._at(VbaTokenKind.RPAREN):
+                break
+            if self._at(VbaTokenKind.COMMA):
+                args.append(None)
+                self._advance()
+                continue
+            args.append(self._parse_argument_expression())
+            if not self._eat(VbaTokenKind.COMMA):
+                break
+        return args
+
+    def _parse_primary_expression(self) -&gt; Expression:
+        tok = self._current
+        offset = tok.offset
+
+        if self._at(VbaTokenKind.INTEGER):
+            self._advance()
+            raw = tok.value
+            text = raw.rstrip(&#39;%&amp;!#@&#39;)
+            if text.lower().startswith(&#39;&amp;h&#39;):
+                value = int(text[2:], 16)
+            elif text.lower().startswith(&#39;&amp;o&#39;):
+                value = int(text[2:], 8)
+            else:
+                value = int(text)
+            return VbaIntegerLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(VbaTokenKind.FLOAT):
+            self._advance()
+            raw = tok.value
+            text = raw.rstrip(&#39;%&amp;!#@&#39;).replace(&#39;d&#39;, &#39;e&#39;).replace(&#39;D&#39;, &#39;E&#39;)
+            value = float(text)
+            return VbaFloatLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(VbaTokenKind.STRING):
+            self._advance()
+            raw = tok.value
+            if len(raw) &gt;= 2:
+                value = raw[1:-1].replace(&#39;&#34;&#34;&#39;, &#39;&#34;&#39;)
+            else:
+                value = raw
+            return VbaStringLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(VbaTokenKind.DATE_LITERAL):
+            self._advance()
+            return VbaDateLiteral(raw=tok.value, offset=offset)
+
+        if self._at(VbaTokenKind.BOOLEAN_TRUE):
+            self._advance()
+            return VbaBooleanLiteral(value=True, offset=offset)
+
+        if self._at(VbaTokenKind.BOOLEAN_FALSE):
+            self._advance()
+            return VbaBooleanLiteral(value=False, offset=offset)
+
+        if self._at(VbaTokenKind.NOTHING):
+            self._advance()
+            return VbaNothingLiteral(offset=offset)
+
+        if self._at(VbaTokenKind.NULL):
+            self._advance()
+            return VbaNullLiteral(offset=offset)
+
+        if self._at(VbaTokenKind.EMPTY):
+            self._advance()
+            return VbaEmptyLiteral(offset=offset)
+
+        if self._at(VbaTokenKind.ME):
+            self._advance()
+            return VbaMeExpression(offset=offset)
+
+        if self._at(VbaTokenKind.NEW):
+            self._advance()
+            class_name = self._parse_postfix_expression()
+            return VbaNewExpression(class_name=class_name, offset=offset)
+
+        if self._at(VbaTokenKind.TYPEOF):
+            self._advance()
+            operand = self._parse_postfix_expression()
+            self._expect(VbaTokenKind.IS)
+            type_name = self._parse_postfix_expression()
+            return VbaTypeOfIsExpression(
+                operand=operand, type_name=type_name, offset=offset)
+
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            inner = self._parse_expression()
+            self._expect(VbaTokenKind.RPAREN)
+            return VbaParenExpression(expression=inner, offset=offset)
+
+        if self._at(VbaTokenKind.DOT):
+            self._advance()
+            member = self._current.value
+            self._advance()
+            return VbaMemberAccess(object=None, member=member, offset=offset)
+
+        if self._at(VbaTokenKind.IDENTIFIER) or self._current.kind.is_keyword:
+            name = tok.value
+            self._advance()
+            return VbaIdentifier(name=name, offset=offset)
+
+        self._advance()
+        return VbaErrorNode(text=tok.value, message=&#39;unexpected token&#39;, offset=offset)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.vba.parser.VbaParser"><code class="flex name class">
+<span>class <span class="ident">VbaParser</span></span>
+<span>(</span><span>source)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/vba/parser.py#L84-L1599" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class VbaParser:
+
+    def __init__(self, source: str):
+        self._lexer = VbaLexer(source)
+        self._source = source
+        self._tokens = self._lexer.tokenize()
+        self._current: VbaToken = VbaToken(VbaTokenKind.EOF, &#39;&#39;, 0)
+        self._in_single_line_if = False
+        self._pending_next: int = 0
+        self._advance()
+
+    def _advance(self) -&gt; VbaToken:
+        prev = self._current
+        while True:
+            tok = next(self._tokens, VbaToken(VbaTokenKind.EOF, &#39;&#39;, len(self._source)))
+            if tok.kind == VbaTokenKind.COMMENT:
+                continue
+            break
+        self._current = tok
+        return prev
+
+    def _at(self, *kinds: VbaTokenKind) -&gt; bool:
+        return self._current.kind in kinds
+
+    def _at_keyword(self, *words: str) -&gt; bool:
+        if self._current.kind == VbaTokenKind.IDENTIFIER:
+            return self._current.value.lower() in words
+        if self._current.kind.is_keyword:
+            return self._current.value.lower() in words
+        return False
+
+    def _eat(self, kind: VbaTokenKind) -&gt; VbaToken | None:
+        if self._current.kind == kind:
+            return self._advance()
+        return None
+
+    def _expect(self, kind: VbaTokenKind) -&gt; VbaToken:
+        if self._current.kind == kind:
+            return self._advance()
+        tok = self._current
+        self._advance()
+        return VbaToken(kind, tok.value, tok.offset)
+
+    def _eat_eos(self):
+        while self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON):
+            self._advance()
+
+    def _expect_eos(self):
+        if self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            self._eat_eos()
+        else:
+            self._advance()
+            self._eat_eos()
+
+    def _eat_end(self, keyword: str) -&gt; bool:
+        if self._at(VbaTokenKind.END):
+            saved = self._current
+            self._advance()
+            if self._current.value.lower() == keyword:
+                self._advance()
+                return True
+            self._current = saved
+        if (
+            self._at(VbaTokenKind.IDENTIFIER)
+            and self._current.value.lower() == F&#39;end{keyword}&#39;
+        ):
+            self._advance()
+            return True
+        return False
+
+    def _eat_go_token(self, keyword: str) -&gt; bool:
+        fused = VbaTokenKind.GOTO if keyword == &#39;to&#39; else VbaTokenKind.GOSUB
+        if self._at(fused):
+            self._advance()
+            return True
+        if (
+            self._at(VbaTokenKind.IDENTIFIER)
+            and self._current.value.lower() == &#39;go&#39;
+        ):
+            self._advance()
+            target = VbaTokenKind.TO if keyword == &#39;to&#39; else VbaTokenKind.SUB
+            if self._at(target):
+                self._advance()
+                return True
+        return False
+
+    def _eat_go_branch(self) -&gt; str:
+        if self._at(VbaTokenKind.GOTO):
+            self._advance()
+            return &#39;goto&#39;
+        if self._at(VbaTokenKind.GOSUB):
+            self._advance()
+            return &#39;gosub&#39;
+        if (
+            self._at(VbaTokenKind.IDENTIFIER)
+            and self._current.value.lower() == &#39;go&#39;
+        ):
+            self._advance()
+            if self._at(VbaTokenKind.TO):
+                self._advance()
+                return &#39;goto&#39;
+            if self._at(VbaTokenKind.SUB):
+                self._advance()
+                return &#39;gosub&#39;
+        return &#39;&#39;
+
+    def parse(self) -&gt; VbaModule:
+        return self._parse_module()
+
+    def _parse_module(self) -&gt; VbaModule:
+        offset = self._current.offset
+        body: list[Statement] = []
+        self._eat_eos()
+        while not self._at(VbaTokenKind.EOF):
+            stmt = self._parse_module_element()
+            if stmt is not None:
+                body.append(stmt)
+            self._eat_eos()
+        return VbaModule(body=body, offset=offset)
+
+    def _parse_module_element(self) -&gt; Statement | None:
+        kw = self._current.value.lower() if self._current.kind != VbaTokenKind.EOF else &#39;&#39;
+
+        if kw == &#39;option&#39;:
+            return self._parse_option_statement()
+
+        scope = VbaScopeModifier.NONE
+        is_static = False
+        if kw in (&#39;public&#39;, &#39;private&#39;, &#39;friend&#39;):
+            scope = VbaScopeModifier(self._current.value.capitalize())
+            self._advance()
+            kw = self._current.value.lower()
+        if kw == &#39;static&#39;:
+            is_static = True
+            self._advance()
+            kw = self._current.value.lower()
+
+        if kw == &#39;sub&#39;:
+            return self._parse_sub_declaration(scope, is_static)
+        if kw == &#39;function&#39;:
+            return self._parse_function_declaration(scope, is_static)
+        if kw == &#39;property&#39;:
+            return self._parse_property_declaration(scope, is_static)
+        if kw == &#39;declare&#39;:
+            return self._parse_declare_statement(scope)
+        if kw == &#39;type&#39;:
+            return self._parse_type_definition(scope)
+        if kw == &#39;enum&#39;:
+            return self._parse_enum_definition(scope)
+        if kw == &#39;const&#39;:
+            return self._parse_const_declaration(scope)
+        if kw in (&#39;dim&#39;, &#39;global&#39;):
+            dim_scope = scope if scope is not VbaScopeModifier.NONE else VbaScopeModifier(
+                self._current.value.capitalize())
+            return self._parse_variable_declaration(dim_scope)
+        if kw == &#39;event&#39;:
+            return self._parse_event_declaration(scope)
+        if kw == &#39;implements&#39;:
+            return self._parse_implements_statement()
+        if scope is not VbaScopeModifier.NONE and not is_static:
+            return self._parse_variable_declaration(scope)
+        if kw == &#39;withevents&#39;:
+            we_scope = scope if scope is not VbaScopeModifier.NONE else VbaScopeModifier.PRIVATE
+            return self._parse_variable_declaration(we_scope)
+
+        if kw == &#39;attribute&#39;:
+            return self._skip_to_eos()
+
+        return self._parse_statement()
+
+    def _parse_option_statement(self) -&gt; VbaOptionStatement:
+        offset = self._current.offset
+        self._advance()
+        keyword = self._current.value
+        self._advance()
+        value = &#39;&#39;
+        if not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            value = self._current.value
+            self._advance()
+        self._eat_eos()
+        return VbaOptionStatement(keyword=keyword, value=value, offset=offset)
+
+    def _parse_declare_statement(self, scope: VbaScopeModifier) -&gt; VbaDeclareStatement:
+        offset = self._current.offset
+        self._advance()
+        if self._current.value.lower() == &#39;ptrsafe&#39;:
+            self._advance()
+        is_function = self._current.value.lower() == &#39;function&#39;
+        self._advance()
+        name = self._current.value
+        self._advance()
+        lib = &#39;&#39;
+        if self._current.value.lower() == &#39;lib&#39;:
+            self._advance()
+            lib = self._current.value
+            self._advance()
+        alias = &#39;&#39;
+        if self._current.value.lower() == &#39;alias&#39;:
+            self._advance()
+            alias = self._current.value
+            self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        return_type = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            return_type = self._parse_type_name()
+        self._eat_eos()
+        return VbaDeclareStatement(
+            scope=scope, name=name, lib=lib, alias=alias,
+            is_function=is_function, params=params,
+            return_type=return_type, offset=offset,
+        )
+
+    def _parse_type_definition(self, scope: VbaScopeModifier) -&gt; VbaTypeDefinition:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        self._eat_eos()
+        members: list[VbaVariableDeclarator] = []
+        while not self._at(VbaTokenKind.EOF):
+            if self._at(VbaTokenKind.END):
+                saved = self._current
+                self._advance()
+                if self._current.value.lower() == &#39;type&#39;:
+                    self._advance()
+                    break
+                self._current = saved
+            m_offset = self._current.offset
+            m_name = self._current.value
+            self._advance()
+            bounds: list[Expression] = []
+            if self._at(VbaTokenKind.LPAREN):
+                self._advance()
+                if not self._at(VbaTokenKind.RPAREN):
+                    bounds = self._parse_bounds_list()
+                self._expect(VbaTokenKind.RPAREN)
+            type_name = &#39;&#39;
+            if self._eat(VbaTokenKind.AS):
+                type_name = self._parse_type_name()
+            members.append(VbaVariableDeclarator(
+                name=m_name, type_name=type_name, bounds=bounds, offset=m_offset))
+            self._eat_eos()
+        self._eat_eos()
+        return VbaTypeDefinition(scope=scope, name=name, members=members, offset=offset)
+
+    def _parse_enum_definition(self, scope: VbaScopeModifier) -&gt; VbaEnumDefinition:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        self._eat_eos()
+        members: list[VbaEnumMember] = []
+        while not self._at(VbaTokenKind.EOF):
+            if self._at(VbaTokenKind.END):
+                saved = self._current
+                self._advance()
+                if self._current.value.lower() == &#39;enum&#39;:
+                    self._advance()
+                    break
+                self._current = saved
+            m_offset = self._current.offset
+            m_name = self._current.value
+            self._advance()
+            value: Expression | None = None
+            if self._eat(VbaTokenKind.EQ):
+                value = self._parse_expression()
+            members.append(VbaEnumMember(name=m_name, value=value, offset=m_offset))
+            self._eat_eos()
+        self._eat_eos()
+        return VbaEnumDefinition(scope=scope, name=name, members=members, offset=offset)
+
+    def _parse_const_declarator(self) -&gt; VbaConstDeclarator:
+        offset = self._current.offset
+        name = self._current.value
+        self._advance()
+        type_name = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            type_name = self._parse_type_name()
+        self._expect(VbaTokenKind.EQ)
+        value = self._parse_expression()
+        return VbaConstDeclarator(name=name, type_name=type_name, value=value, offset=offset)
+
+    def _parse_const_declaration(self, scope: VbaScopeModifier) -&gt; VbaConstDeclaration:
+        offset = self._current.offset
+        self._advance()
+        declarators = [self._parse_const_declarator()]
+        while self._eat(VbaTokenKind.COMMA):
+            declarators.append(self._parse_const_declarator())
+        self._eat_eos()
+        return VbaConstDeclaration(scope=scope, declarators=declarators, offset=offset)
+
+    def _parse_variable_declaration(self, scope: VbaScopeModifier) -&gt; VbaVariableDeclaration:
+        offset = self._current.offset
+        if self._current.value.lower() in (&#39;dim&#39;, &#39;global&#39;, &#39;static&#39;):
+            self._advance()
+        if self._current.value.lower() == &#39;shared&#39;:
+            self._advance()
+        declarators: list[VbaVariableDeclarator] = []
+        declarators.append(self._parse_variable_declarator())
+        while self._eat(VbaTokenKind.COMMA):
+            declarators.append(self._parse_variable_declarator())
+        self._eat_eos()
+        return VbaVariableDeclaration(
+            scope=scope, declarators=declarators, offset=offset)
+
+    def _parse_variable_declarator(self) -&gt; VbaVariableDeclarator:
+        offset = self._current.offset
+        with_events = bool(self._eat(VbaTokenKind.WITHEVENTS))
+        name = self._current.value
+        self._advance()
+        bounds: list[Expression] = []
+        is_array = False
+        if self._at(VbaTokenKind.LPAREN):
+            is_array = True
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                bounds = self._parse_bounds_list()
+            self._expect(VbaTokenKind.RPAREN)
+        type_name = &#39;&#39;
+        is_new = False
+        if self._eat(VbaTokenKind.AS):
+            if self._eat(VbaTokenKind.NEW):
+                is_new = True
+            type_name = self._parse_type_name()
+        return VbaVariableDeclarator(
+            name=name, type_name=type_name, is_array=is_array,
+            bounds=bounds, is_new=is_new, with_events=with_events, offset=offset,
+        )
+
+    def _parse_event_declaration(self, scope: VbaScopeModifier) -&gt; VbaEventDeclaration:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        self._eat_eos()
+        return VbaEventDeclaration(scope=scope, name=name, params=params, offset=offset)
+
+    def _parse_implements_statement(self) -&gt; VbaImplementsStatement:
+        offset = self._current.offset
+        self._advance()
+        name = self._parse_type_name()
+        self._eat_eos()
+        return VbaImplementsStatement(name=name, offset=offset)
+
+    def _parse_sub_declaration(
+        self, scope: VbaScopeModifier, is_static: bool,
+    ) -&gt; VbaSubDeclaration:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;sub&#39;)
+        return VbaSubDeclaration(
+            scope=scope, name=name, params=params,
+            body=body, is_static=is_static, offset=offset,
+        )
+
+    def _parse_function_declaration(
+        self, scope: VbaScopeModifier, is_static: bool,
+    ) -&gt; VbaFunctionDeclaration:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        return_type = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            return_type = self._parse_type_name()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;function&#39;)
+        return VbaFunctionDeclaration(
+            scope=scope, name=name, params=params,
+            return_type=return_type, body=body,
+            is_static=is_static, offset=offset,
+        )
+
+    def _parse_property_declaration(
+        self, scope: VbaScopeModifier, is_static: bool,
+    ) -&gt; VbaPropertyDeclaration:
+        offset = self._current.offset
+        self._advance()
+        kind = VbaPropertyKind(self._current.value.capitalize())
+        self._advance()
+        name = self._current.value
+        self._advance()
+        params: list[VbaParameter] = []
+        if self._at(VbaTokenKind.LPAREN):
+            params = self._parse_parameter_list()
+        return_type = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            return_type = self._parse_type_name()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;property&#39;)
+        return VbaPropertyDeclaration(
+            scope=scope, kind=kind, name=name, params=params,
+            return_type=return_type, body=body,
+            is_static=is_static, offset=offset,
+        )
+
+    def _parse_parameter_list(self) -&gt; list[VbaParameter]:
+        self._expect(VbaTokenKind.LPAREN)
+        params: list[VbaParameter] = []
+        while not self._at(VbaTokenKind.RPAREN, VbaTokenKind.EOF):
+            params.append(self._parse_parameter())
+            if not self._at(VbaTokenKind.RPAREN):
+                self._expect(VbaTokenKind.COMMA)
+        self._expect(VbaTokenKind.RPAREN)
+        return params
+
+    def _parse_parameter(self) -&gt; VbaParameter:
+        offset = self._current.offset
+        is_optional = False
+        is_paramarray = False
+        passing = VbaParameterPassing.NONE
+
+        while True:
+            if self._current.value.lower() == &#39;optional&#39;:
+                is_optional = True
+                self._advance()
+            elif self._at(VbaTokenKind.BYVAL):
+                passing = VbaParameterPassing.BY_VAL
+                self._advance()
+            elif self._at(VbaTokenKind.BYREF):
+                passing = VbaParameterPassing.BY_REF
+                self._advance()
+            else:
+                break
+        if self._current.value.lower() == &#39;paramarray&#39;:
+            is_paramarray = True
+            self._advance()
+
+        name = self._current.value
+        self._advance()
+
+        is_array = False
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            self._expect(VbaTokenKind.RPAREN)
+            is_array = True
+
+        type_name = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            type_name = self._parse_type_name()
+
+        default: Expression | None = None
+        if self._eat(VbaTokenKind.EQ):
+            default = self._parse_expression()
+
+        return VbaParameter(
+            name=name, passing=passing, type_name=type_name,
+            is_optional=is_optional, is_paramarray=is_paramarray,
+            default=default, is_array=is_array, offset=offset,
+        )
+
+    def _parse_type_name(self) -&gt; str:
+        parts: list[str] = []
+        parts.append(self._current.value)
+        self._advance()
+        while self._eat(VbaTokenKind.DOT):
+            parts.append(self._current.value)
+            self._advance()
+        name = &#39;.&#39;.join(parts)
+        if name.lower() == &#39;string&#39; and self._eat(VbaTokenKind.STAR):
+            length = self._current.value
+            self._advance()
+            return F&#39;{name} * {length}&#39;
+        return name
+
+    def _parse_block_until(self, end_keyword: str) -&gt; list[Statement]:
+        merged = F&#39;end{end_keyword}&#39;
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.EOF):
+                break
+            if self._at(VbaTokenKind.END):
+                saved_offset = self._current.offset
+                saved = self._current
+                self._advance()
+                next_kw = self._current.value.lower()
+                if next_kw == end_keyword:
+                    self._advance()
+                    return body
+                self._current = saved
+                self._current.offset = saved_offset
+            elif (
+                self._at(VbaTokenKind.IDENTIFIER)
+                and self._current.value.lower() == merged
+            ):
+                self._advance()
+                return body
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return body
+
+    def _parse_statement(self) -&gt; Statement | None:
+        offset = self._current.offset
+        kind = self._current.kind
+        kw = self._current.value.lower() if kind != VbaTokenKind.EOF else &#39;&#39;
+
+        if kind.is_end_of_statement:
+            self._advance()
+            return None
+
+        if kind == VbaTokenKind.INTEGER:
+            label_val = self._current.value
+            self._advance()
+            if self._in_single_line_if:
+                return VbaGotoStatement(label=label_val, offset=offset)
+            return VbaLabelStatement(label=label_val, offset=offset)
+
+        if kind == VbaTokenKind.IDENTIFIER and not kind.is_keyword:
+            next_peek = self._source[self._current.offset + len(self._current.value):].lstrip(&#39; \t&#39;)
+            if next_peek.startswith(&#39;:&#39;) and not next_peek.startswith(&#39;:=&#39;):
+                label_val = self._current.value
+                self._advance()
+                self._eat(VbaTokenKind.COLON)
+                return VbaLabelStatement(label=label_val, offset=offset)
+
+        if kw == &#39;if&#39;:
+            return self._parse_if_statement()
+        if kw == &#39;for&#39;:
+            return self._parse_for_statement()
+        if kw == &#39;do&#39;:
+            return self._parse_do_loop_statement()
+        if kw == &#39;while&#39;:
+            return self._parse_while_statement()
+        if kw == &#39;select&#39;:
+            return self._parse_select_case_statement()
+        if kw == &#39;with&#39;:
+            return self._parse_with_statement()
+        if kw == &#39;set&#39;:
+            return self._parse_set_statement()
+        if kw == &#39;let&#39;:
+            return self._parse_let_statement()
+        if kw == &#39;call&#39;:
+            return self._parse_call_statement()
+        if kw == &#39;dim&#39; or kw == &#39;static&#39;:
+            return self._parse_variable_declaration(
+                VbaScopeModifier(self._current.value.capitalize()))
+        if kw == &#39;redim&#39;:
+            return self._parse_redim_statement()
+        if kw == &#39;const&#39;:
+            return self._parse_const_declaration(VbaScopeModifier.NONE)
+        if kw == &#39;goto&#39;:
+            return self._parse_goto_statement()
+        if kw == &#39;gosub&#39;:
+            return self._parse_gosub_statement()
+        if kw == &#39;on&#39;:
+            return self._parse_on_statement()
+        if kw == &#39;exit&#39;:
+            return self._parse_exit_statement()
+        if kw == &#39;return&#39;:
+            self._advance()
+            return VbaReturnStatement(offset=offset)
+        if kw == &#39;resume&#39;:
+            return self._parse_resume_statement()
+        if kw == &#39;stop&#39;:
+            self._advance()
+            return VbaStopStatement(offset=offset)
+        if kw == &#39;end&#39;:
+            return self._parse_end_statement()
+        if kw == &#39;erase&#39;:
+            return self._parse_erase_statement()
+        if kw == &#39;raiseevent&#39;:
+            return self._parse_raiseevent_statement()
+        if kw == &#39;debug&#39;:
+            return self._parse_debug_print_statement()
+
+        if kind == VbaTokenKind.IDENTIFIER and self._current.value.lower() in (&#39;lset&#39;, &#39;rset&#39;):
+            return self._parse_let_statement()
+
+        if kind == VbaTokenKind.IDENTIFIER and self._current.value.lower() == &#39;go&#39;:
+            after = self._source[self._current.offset + len(self._current.value):].lstrip(&#39; \t&#39;)
+            word = after.split()[0].lower() if after.split() else &#39;&#39;
+            if word == &#39;to&#39;:
+                self._advance()
+                self._advance()
+                label = self._current.value
+                self._advance()
+                return VbaGotoStatement(label=label, offset=offset)
+            if word == &#39;sub&#39;:
+                self._advance()
+                self._advance()
+                label = self._current.value
+                self._advance()
+                return VbaGosubStatement(label=label, offset=offset)
+
+        if kw == &#39;open&#39;:
+            return self._skip_to_eos()
+
+        if kw == &#39;line&#39;:
+            peek = self._source[self._current.offset + len(self._current.value):].lstrip(&#39; \t&#39;)
+            if peek.lower().startswith(&#39;input&#39;):
+                return self._skip_to_eos()
+
+        return self._parse_implicit_call_or_assignment()
+
+    def _skip_to_eos(self) -&gt; VbaExpressionStatement:
+        offset = self._current.offset
+        start = offset
+        while not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            self._advance()
+        raw = self._source[start:self._current.offset]
+        return VbaExpressionStatement(
+            expression=VbaIdentifier(name=raw.strip(), offset=offset),
+            offset=offset,
+        )
+
+    def _parse_if_statement(self) -&gt; VbaIfStatement:
+        offset = self._current.offset
+        self._advance()
+        condition = self._parse_expression()
+        self._expect(VbaTokenKind.THEN)
+
+        while self._at(VbaTokenKind.COLON):
+            self._advance()
+
+        if not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.EOF):
+            return self._parse_single_line_if(condition, offset)
+
+        self._eat_eos()
+        body: list[Statement] = []
+        elseif_clauses: list[VbaElseIfClause] = []
+        else_body: list[Statement] = []
+        found_else = False
+
+        while not self._at(VbaTokenKind.EOF):
+            if self._eat_end(&#39;if&#39;):
+                break
+            if self._at(VbaTokenKind.ELSEIF):
+                ei_offset = self._current.offset
+                self._advance()
+                ei_cond = self._parse_expression()
+                self._expect(VbaTokenKind.THEN)
+                self._eat_eos()
+                elseif_clauses.append(VbaElseIfClause(
+                    condition=ei_cond, body=[], offset=ei_offset))
+                continue
+            if self._at(VbaTokenKind.ELSE):
+                ei_offset = self._current.offset
+                self._advance()
+                if self._at(VbaTokenKind.IF):
+                    self._advance()
+                    ei_cond = self._parse_expression()
+                    self._expect(VbaTokenKind.THEN)
+                    self._eat_eos()
+                    elseif_clauses.append(VbaElseIfClause(
+                        condition=ei_cond, body=[], offset=ei_offset))
+                    continue
+                self._eat_eos()
+                found_else = True
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                if elseif_clauses:
+                    elseif_clauses[-1].body.append(stmt)
+                else:
+                    body.append(stmt)
+            self._eat_eos()
+
+        if found_else:
+            while not self._at(VbaTokenKind.EOF):
+                if self._eat_end(&#39;if&#39;):
+                    break
+                stmt = self._parse_statement()
+                if stmt is not None:
+                    else_body.append(stmt)
+                self._eat_eos()
+
+        return VbaIfStatement(
+            condition=condition, body=body,
+            elseif_clauses=elseif_clauses,
+            else_body=else_body, offset=offset,
+        )
+
+    def _parse_single_line_if(
+        self, condition: Expression, offset: int,
+    ) -&gt; VbaIfStatement:
+        saved = self._in_single_line_if
+        self._in_single_line_if = True
+        try:
+            body: list[Statement] = []
+            else_body: list[Statement] = []
+            while not self._at(
+                VbaTokenKind.NEWLINE, VbaTokenKind.EOF,
+                VbaTokenKind.ELSE,
+            ):
+                if self._at(VbaTokenKind.COLON):
+                    self._advance()
+                    continue
+                stmt = self._parse_statement()
+                if stmt is not None:
+                    body.append(stmt)
+            if self._eat(VbaTokenKind.ELSE):
+                while not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.EOF, VbaTokenKind.ELSE):
+                    if self._at(VbaTokenKind.COLON):
+                        self._advance()
+                        continue
+                    stmt = self._parse_statement()
+                    if stmt is not None:
+                        else_body.append(stmt)
+            return VbaIfStatement(
+                condition=condition, body=body,
+                else_body=else_body, single_line=True, offset=offset,
+            )
+        finally:
+            self._in_single_line_if = saved
+
+    def _consume_next_variable(self):
+        if not self._at(
+            VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF,
+        ):
+            self._parse_expression()
+        while self._eat(VbaTokenKind.COMMA):
+            self._pending_next += 1
+
+    def _parse_for_body(self) -&gt; list[Statement]:
+        self._eat_eos()
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._pending_next &gt; 0:
+                self._pending_next -= 1
+                self._consume_next_variable()
+                break
+            if self._at(VbaTokenKind.NEXT):
+                self._advance()
+                self._consume_next_variable()
+                break
+            if self._at(VbaTokenKind.EOF):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return body
+
+    def _parse_for_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+
+        if self._eat(VbaTokenKind.EACH):
+            variable = self._parse_postfix_expression()
+            self._expect(VbaTokenKind.IN)
+            collection = self._parse_expression()
+            body = self._parse_for_body()
+            return VbaForEachStatement(
+                variable=variable, collection=collection,
+                body=body, offset=offset,
+            )
+
+        variable = self._parse_postfix_expression()
+        self._expect(VbaTokenKind.EQ)
+        start = self._parse_expression()
+        self._expect(VbaTokenKind.TO)
+        end = self._parse_expression()
+        step: Expression | None = None
+        if self._eat(VbaTokenKind.STEP):
+            step = self._parse_expression()
+        body = self._parse_for_body()
+        return VbaForStatement(
+            variable=variable, start=start, end=end,
+            step=step, body=body, offset=offset,
+        )
+
+    def _parse_do_loop_statement(self) -&gt; VbaDoLoopStatement:
+        offset = self._current.offset
+        self._advance()
+
+        condition: Expression | None = None
+        condition_type: VbaLoopConditionType | None = None
+        condition_position: VbaLoopConditionPosition | None = None
+
+        if self._at(VbaTokenKind.WHILE):
+            condition_type = VbaLoopConditionType.WHILE
+            condition_position = VbaLoopConditionPosition.PRE
+            self._advance()
+            condition = self._parse_expression()
+        elif self._at(VbaTokenKind.UNTIL):
+            condition_type = VbaLoopConditionType.UNTIL
+            condition_position = VbaLoopConditionPosition.PRE
+            self._advance()
+            condition = self._parse_expression()
+
+        self._eat_eos()
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.LOOP):
+                self._advance()
+                if self._at(VbaTokenKind.WHILE):
+                    condition_type = VbaLoopConditionType.WHILE
+                    condition_position = VbaLoopConditionPosition.POST
+                    self._advance()
+                    condition = self._parse_expression()
+                elif self._at(VbaTokenKind.UNTIL):
+                    condition_type = VbaLoopConditionType.UNTIL
+                    condition_position = VbaLoopConditionPosition.POST
+                    self._advance()
+                    condition = self._parse_expression()
+                break
+            if self._at(VbaTokenKind.EOF):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+
+        return VbaDoLoopStatement(
+            condition=condition, condition_type=condition_type,
+            condition_position=condition_position,
+            body=body, offset=offset,
+        )
+
+    def _parse_while_statement(self) -&gt; VbaWhileStatement:
+        offset = self._current.offset
+        self._advance()
+        condition = self._parse_expression()
+        self._eat_eos()
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.WEND):
+                self._advance()
+                break
+            if self._at(VbaTokenKind.EOF):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return VbaWhileStatement(
+            condition=condition, body=body, offset=offset)
+
+    def _parse_select_case_statement(self) -&gt; VbaSelectCaseStatement:
+        offset = self._current.offset
+        self._advance()
+        self._expect(VbaTokenKind.CASE)
+        expr = self._parse_expression()
+        self._eat_eos()
+        cases: list[VbaCaseClause] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._eat_end(&#39;select&#39;):
+                break
+            if self._at(VbaTokenKind.CASE):
+                cases.append(self._parse_case_clause())
+            elif self._at(VbaTokenKind.EOF):
+                break
+            else:
+                if cases:
+                    stmt = self._parse_statement()
+                    if stmt is not None:
+                        cases[-1].body.append(stmt)
+                else:
+                    self._advance()
+        return VbaSelectCaseStatement(
+            expression=expr, cases=cases, offset=offset)
+
+    def _parse_case_body(self) -&gt; list[Statement]:
+        body: list[Statement] = []
+        while not self._at(VbaTokenKind.EOF):
+            self._eat_eos()
+            if self._at(VbaTokenKind.CASE):
+                break
+            if self._at(VbaTokenKind.END):
+                after = self._source[
+                    self._current.offset + len(self._current.value):
+                ].lstrip(&#39; \t&#39;)
+                if after[:6].lower() == &#39;select&#39; and not after[6:7].isalnum():
+                    break
+            if (
+                self._at(VbaTokenKind.IDENTIFIER)
+                and self._current.value.lower() == &#39;endselect&#39;
+            ):
+                break
+            stmt = self._parse_statement()
+            if stmt is not None:
+                body.append(stmt)
+        return body
+
+    def _parse_case_clause(self) -&gt; VbaCaseClause:
+        offset = self._current.offset
+        self._advance()
+        if self._current.value.lower() == &#39;else&#39;:
+            self._advance()
+            self._eat_eos()
+            body = self._parse_case_body()
+            return VbaCaseClause(is_else=True, body=body, offset=offset)
+
+        tests: list[Expression] = []
+        tests.append(self._parse_case_test())
+        while self._eat(VbaTokenKind.COMMA):
+            tests.append(self._parse_case_test())
+        self._eat_eos()
+        body = self._parse_case_body()
+        return VbaCaseClause(tests=tests, body=body, offset=offset)
+
+    def _parse_with_statement(self) -&gt; VbaWithStatement:
+        offset = self._current.offset
+        self._advance()
+        obj = self._parse_expression()
+        self._eat_eos()
+        body = self._parse_block_until(&#39;with&#39;)
+        return VbaWithStatement(object=obj, body=body, offset=offset)
+
+    def _parse_set_statement(self) -&gt; VbaSetStatement:
+        offset = self._current.offset
+        self._advance()
+        target = self._parse_postfix_expression()
+        self._expect(VbaTokenKind.EQ)
+        value = self._parse_expression()
+        return VbaSetStatement(target=target, value=value, offset=offset)
+
+    def _parse_let_statement(self) -&gt; VbaLetStatement:
+        offset = self._current.offset
+        keyword = self._current.value
+        self._advance()
+        target = self._parse_postfix_expression()
+        self._expect(VbaTokenKind.EQ)
+        value = self._parse_expression()
+        return VbaLetStatement(
+            target=target, value=value, explicit=True, keyword=keyword, offset=offset)
+
+    def _parse_call_statement(self) -&gt; VbaCallStatement:
+        offset = self._current.offset
+        self._advance()
+        callee = self._parse_postfix_expression()
+        args: list[Expression | None] = []
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                args = self._parse_argument_list()
+            self._expect(VbaTokenKind.RPAREN)
+        return VbaCallStatement(callee=callee, arguments=args, offset=offset)
+
+    def _parse_redim_statement(self) -&gt; VbaRedimStatement:
+        offset = self._current.offset
+        self._advance()
+        preserve = False
+        if self._current.value.lower() == &#39;preserve&#39;:
+            preserve = True
+            self._advance()
+        declarators: list[VbaVariableDeclarator] = []
+        declarators.append(self._parse_redim_declarator())
+        while self._eat(VbaTokenKind.COMMA):
+            declarators.append(self._parse_redim_declarator())
+        return VbaRedimStatement(
+            preserve=preserve, declarators=declarators, offset=offset)
+
+    def _parse_redim_declarator(self) -&gt; VbaVariableDeclarator:
+        offset = self._current.offset
+        parts: list[str] = []
+        if self._at(VbaTokenKind.DOT):
+            parts.append(&#39;&#39;)
+            self._advance()
+            parts.append(self._current.value)
+            self._advance()
+        else:
+            parts.append(self._current.value)
+            self._advance()
+        while self._eat(VbaTokenKind.DOT):
+            parts.append(self._current.value)
+            self._advance()
+        name = &#39;.&#39;.join(parts)
+        bounds: list[Expression] = []
+        is_array = False
+        if self._at(VbaTokenKind.LPAREN):
+            is_array = True
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                bounds = self._parse_bounds_list()
+            self._expect(VbaTokenKind.RPAREN)
+        type_name = &#39;&#39;
+        if self._eat(VbaTokenKind.AS):
+            type_name = self._parse_type_name()
+        return VbaVariableDeclarator(
+            name=name, type_name=type_name, is_array=is_array,
+            bounds=bounds, offset=offset,
+        )
+
+    def _parse_erase_statement(self) -&gt; VbaEraseStatement:
+        offset = self._current.offset
+        self._advance()
+        targets: list[Expression] = []
+        targets.append(self._parse_expression())
+        while self._eat(VbaTokenKind.COMMA):
+            targets.append(self._parse_expression())
+        return VbaEraseStatement(targets=targets, offset=offset)
+
+    def _parse_raiseevent_statement(self) -&gt; VbaRaiseEventStatement:
+        offset = self._current.offset
+        self._advance()
+        name = self._current.value
+        self._advance()
+        arguments: list[Expression] = []
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            if not self._at(VbaTokenKind.RPAREN):
+                arguments = self._parse_expression_list()
+            self._expect(VbaTokenKind.RPAREN)
+        return VbaRaiseEventStatement(
+            name=name, arguments=arguments, offset=offset)
+
+    def _parse_goto_statement(self) -&gt; VbaGotoStatement:
+        offset = self._current.offset
+        self._advance()
+        label = self._current.value
+        self._advance()
+        return VbaGotoStatement(label=label, offset=offset)
+
+    def _parse_gosub_statement(self) -&gt; VbaGosubStatement:
+        offset = self._current.offset
+        self._advance()
+        label = self._current.value
+        self._advance()
+        return VbaGosubStatement(label=label, offset=offset)
+
+    def _parse_on_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+        if self._at(VbaTokenKind.ERROR):
+            self._advance()
+            if self._current.value.lower() == &#39;resume&#39;:
+                self._advance()
+                if self._current.value.lower() == &#39;next&#39;:
+                    self._advance()
+                    return VbaOnErrorStatement(
+                        action=VbaOnErrorAction.RESUME_NEXT, offset=offset)
+                return VbaOnErrorStatement(
+                    action=VbaOnErrorAction.RESUME, offset=offset)
+            if self._eat_go_token(&#39;to&#39;):
+                if self._at(VbaTokenKind.MINUS):
+                    self._advance()
+                    label = F&#39;-{self._current.value}&#39;
+                else:
+                    label = self._current.value
+                self._advance()
+                return VbaOnErrorStatement(
+                    action=VbaOnErrorAction.GOTO, label=label, offset=offset)
+            return VbaOnErrorStatement(action=VbaOnErrorAction.NONE, offset=offset)
+        expr = self._parse_expression()
+        branch = self._eat_go_branch()
+        if branch == &#39;goto&#39;:
+            kind = VbaOnBranchKind.GOTO
+        elif branch == &#39;gosub&#39;:
+            kind = VbaOnBranchKind.GOSUB
+        else:
+            return VbaOnErrorStatement(action=VbaOnErrorAction.NONE, offset=offset)
+        labels = [self._current.value]
+        self._advance()
+        while self._eat(VbaTokenKind.COMMA):
+            labels.append(self._current.value)
+            self._advance()
+        return VbaOnBranchStatement(
+            expression=expr, kind=kind, labels=labels, offset=offset)
+
+    def _parse_exit_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+        try:
+            kind = VbaExitKind(self._current.value.capitalize())
+        except ValueError:
+            self._advance()
+            return VbaErrorNode(offset=offset)
+        self._advance()
+        return VbaExitStatement(kind=kind, offset=offset)
+
+    def _parse_resume_statement(self) -&gt; VbaResumeStatement:
+        offset = self._current.offset
+        self._advance()
+        label = &#39;&#39;
+        if self._current.value.lower() == &#39;next&#39;:
+            label = &#39;Next&#39;
+            self._advance()
+        elif not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            label = self._current.value
+            self._advance()
+        return VbaResumeStatement(label=label, offset=offset)
+
+    def _parse_end_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._advance()
+        return VbaEndStatement(offset=offset)
+
+    def _parse_debug_print_statement(self) -&gt; VbaDebugPrintStatement:
+        offset = self._current.offset
+        self._advance()
+        self._eat(VbaTokenKind.DOT)
+        method = self._current.value
+        self._advance()
+        arguments: list[Expression] = []
+        separators: list[str] = []
+        if not self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+            arguments, separators = self._parse_print_argument_list()
+        return VbaDebugPrintStatement(
+            method=method, arguments=arguments, separators=separators, offset=offset)
+
+    def _parse_print_argument_list(self) -&gt; tuple[list[Expression], list[str]]:
+        args: list[Expression] = []
+        separators: list[str] = []
+        args.append(self._parse_expression())
+        while self._at(VbaTokenKind.SEMICOLON, VbaTokenKind.COMMA):
+            sep = &#39;;&#39; if self._at(VbaTokenKind.SEMICOLON) else &#39;,&#39;
+            separators.append(sep)
+            self._advance()
+            if self._at(VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF):
+                break
+            args.append(self._parse_expression())
+        return args, separators
+
+    def _parse_implicit_call_or_assignment(self) -&gt; Statement:
+        offset = self._current.offset
+        expr = self._parse_postfix_expression()
+
+        if self._eat(VbaTokenKind.EQ):
+            value = self._parse_expression()
+            return VbaLetStatement(
+                target=expr, value=value, explicit=False, offset=offset)
+
+        if not self._at(
+            VbaTokenKind.NEWLINE, VbaTokenKind.COLON, VbaTokenKind.EOF,
+            VbaTokenKind.ELSE,
+        ):
+            args = self._parse_argument_list()
+            return VbaExpressionStatement(
+                expression=expr, arguments=args, offset=offset)
+
+        return VbaExpressionStatement(expression=expr, offset=offset)
+
+    def _parse_argument_list(self) -&gt; list[Expression | None]:
+        args: list[Expression | None] = []
+        while True:
+            if self._at(
+                VbaTokenKind.NEWLINE, VbaTokenKind.COLON,
+                VbaTokenKind.EOF, VbaTokenKind.RPAREN,
+                VbaTokenKind.ELSE,
+            ):
+                break
+            if self._at(VbaTokenKind.COMMA):
+                args.append(None)
+                self._advance()
+                continue
+            args.append(self._parse_argument_expression())
+            if not self._eat(VbaTokenKind.COMMA):
+                break
+        return args
+
+    def _parse_argument_expression(self) -&gt; Expression:
+        if self._at(VbaTokenKind.BYVAL):
+            offset = self._current.offset
+            self._advance()
+            return VbaByValArgument(
+                expression=self._parse_expression(), offset=offset)
+        expr = self._parse_expression()
+        if self._at(VbaTokenKind.ASSIGN):
+            self._advance()
+            name = expr.name if isinstance(expr, VbaIdentifier) else &#39;&#39;
+            value = self._parse_expression()
+            return VbaNamedArgument(
+                name=name, expression=value, offset=expr.offset)
+        return expr
+
+    def _parse_expression_list(self) -&gt; list[Expression]:
+        exprs: list[Expression] = []
+        exprs.append(self._parse_expression())
+        while self._eat(VbaTokenKind.COMMA):
+            exprs.append(self._parse_expression())
+        return exprs
+
+    def _parse_bounds_list(self) -&gt; list[Expression]:
+        bounds: list[Expression] = []
+        bounds.append(self._parse_bound_expression())
+        while self._eat(VbaTokenKind.COMMA):
+            bounds.append(self._parse_bound_expression())
+        return bounds
+
+    _COMPARISON_OPS = frozenset({
+        VbaTokenKind.EQ,
+        VbaTokenKind.NEQ,
+        VbaTokenKind.LT,
+        VbaTokenKind.GT,
+        VbaTokenKind.LTE,
+        VbaTokenKind.GTE,
+    })
+
+    def _parse_case_test(self) -&gt; Expression:
+        offset = self._current.offset
+        if self._at(VbaTokenKind.IS):
+            self._advance()
+            if self._at(*self._COMPARISON_OPS):
+                op = self._advance().value
+                right = self._parse_expression()
+                return VbaBinaryExpression(
+                    left=VbaIdentifier(name=&#39;Is&#39;, offset=offset),
+                    operator=op, right=right, offset=offset,
+                )
+            return self._reparse_is_as_expression(offset)
+        if self._at(*self._COMPARISON_OPS):
+            op = self._advance().value
+            right = self._parse_expression()
+            return VbaBinaryExpression(
+                left=VbaIdentifier(name=&#39;Is&#39;, offset=offset),
+                operator=op, right=right, offset=offset,
+            )
+        return self._parse_bound_expression()
+
+    def _reparse_is_as_expression(self, offset: int) -&gt; Expression:
+        expr: Expression = VbaIdentifier(name=&#39;Is&#39;, offset=offset)
+        while True:
+            if self._eat(VbaTokenKind.DOT):
+                member = self._current.value
+                self._advance()
+                expr = VbaMemberAccess(object=expr, member=member, offset=offset)
+            elif self._at(VbaTokenKind.LPAREN):
+                self._advance()
+                args: list[Expression | None] = []
+                if not self._at(VbaTokenKind.RPAREN):
+                    args = self._parse_call_argument_list()
+                self._expect(VbaTokenKind.RPAREN)
+                expr = VbaCallExpression(callee=expr, arguments=args, offset=offset)
+            else:
+                break
+        if self._eat(VbaTokenKind.TO):
+            upper = self._parse_expression()
+            return VbaRangeExpression(start=expr, end=upper, offset=offset)
+        return expr
+
+    def _parse_bound_expression(self) -&gt; Expression:
+        expr = self._parse_expression()
+        if self._eat(VbaTokenKind.TO):
+            upper = self._parse_expression()
+            expr = VbaRangeExpression(start=expr, end=upper, offset=expr.offset)
+        return expr
+
+    def _parse_expression(self) -&gt; Expression:
+        return self._parse_imp_expression()
+
+    def _parse_imp_expression(self) -&gt; Expression:
+        left = self._parse_eqv_expression()
+        while self._eat(VbaTokenKind.IMP):
+            right = self._parse_eqv_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Imp&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_eqv_expression(self) -&gt; Expression:
+        left = self._parse_xor_expression()
+        while self._eat(VbaTokenKind.EQV):
+            right = self._parse_xor_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Eqv&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_xor_expression(self) -&gt; Expression:
+        left = self._parse_or_expression()
+        while self._eat(VbaTokenKind.XOR):
+            right = self._parse_or_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Xor&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_or_expression(self) -&gt; Expression:
+        left = self._parse_and_expression()
+        while self._eat(VbaTokenKind.OR):
+            right = self._parse_and_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Or&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_and_expression(self) -&gt; Expression:
+        left = self._parse_not_expression()
+        while self._eat(VbaTokenKind.AND):
+            right = self._parse_not_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;And&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_not_expression(self) -&gt; Expression:
+        tok = self._eat(VbaTokenKind.NOT)
+        if tok:
+            operand = self._parse_not_expression()
+            return VbaUnaryExpression(
+                operator=&#39;Not&#39;, operand=operand, offset=tok.offset)
+        return self._parse_comparison_expression()
+
+    def _parse_comparison_expression(self) -&gt; Expression:
+        left = self._parse_concat_expression()
+        while self._at(
+            VbaTokenKind.EQ, VbaTokenKind.NEQ,
+            VbaTokenKind.LT, VbaTokenKind.GT,
+            VbaTokenKind.LTE, VbaTokenKind.GTE,
+            VbaTokenKind.IS, VbaTokenKind.LIKE,
+        ):
+            op_tok = self._advance()
+            right = self._parse_concat_expression()
+            op_str = op_tok.value
+            if op_tok.kind == VbaTokenKind.EQ:
+                op_str = &#39;=&#39;
+            left = VbaBinaryExpression(
+                left=left, operator=op_str, right=right, offset=left.offset)
+        return left
+
+    def _parse_concat_expression(self) -&gt; Expression:
+        left = self._parse_additive_expression()
+        while self._eat(VbaTokenKind.AMPERSAND):
+            right = self._parse_additive_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;&amp;&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_additive_expression(self) -&gt; Expression:
+        left = self._parse_mod_expression()
+        while self._at(VbaTokenKind.PLUS, VbaTokenKind.MINUS):
+            op = self._advance().value
+            right = self._parse_mod_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_mod_expression(self) -&gt; Expression:
+        left = self._parse_integer_div_expression()
+        while self._eat(VbaTokenKind.MOD):
+            right = self._parse_integer_div_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;Mod&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_integer_div_expression(self) -&gt; Expression:
+        left = self._parse_multiplicative_expression()
+        while self._eat(VbaTokenKind.BACKSLASH):
+            right = self._parse_multiplicative_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;\\&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_multiplicative_expression(self) -&gt; Expression:
+        left = self._parse_unary_expression()
+        while self._at(VbaTokenKind.STAR, VbaTokenKind.SLASH):
+            op = self._advance().value
+            right = self._parse_unary_expression()
+            left = VbaBinaryExpression(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_exponentiation_expression(self) -&gt; Expression:
+        left = self._parse_postfix_expression()
+        while self._eat(VbaTokenKind.CARET):
+            right = self._parse_exponentiation_rhs()
+            left = VbaBinaryExpression(
+                left=left, operator=&#39;^&#39;, right=right, offset=left.offset)
+        return left
+
+    def _parse_exponentiation_rhs(self) -&gt; Expression:
+        if self._at(VbaTokenKind.MINUS):
+            tok = self._advance()
+            operand = self._parse_exponentiation_rhs()
+            return VbaUnaryExpression(
+                operator=&#39;-&#39;, operand=operand, offset=tok.offset)
+        if self._at(VbaTokenKind.PLUS):
+            self._advance()
+            return self._parse_exponentiation_rhs()
+        return self._parse_postfix_expression()
+
+    def _parse_unary_expression(self) -&gt; Expression:
+        if self._at(VbaTokenKind.MINUS):
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return VbaUnaryExpression(
+                operator=&#39;-&#39;, operand=operand, offset=tok.offset)
+        if self._at(VbaTokenKind.PLUS):
+            self._advance()
+            return self._parse_unary_expression()
+        return self._parse_exponentiation_expression()
+
+    def _parse_postfix_expression(self) -&gt; Expression:
+        expr = self._parse_primary_expression()
+        while True:
+            if self._eat(VbaTokenKind.DOT):
+                member = self._current.value
+                self._advance()
+                expr = VbaMemberAccess(
+                    object=expr, member=member, offset=expr.offset)
+            elif self._eat(VbaTokenKind.BANG):
+                member = self._current.value
+                self._advance()
+                expr = VbaBangAccess(
+                    object=expr, member=member, offset=expr.offset)
+            elif self._at(VbaTokenKind.LPAREN):
+                self._advance()
+                args: list[Expression | None] = []
+                if not self._at(VbaTokenKind.RPAREN):
+                    args = self._parse_call_argument_list()
+                self._expect(VbaTokenKind.RPAREN)
+                expr = VbaCallExpression(
+                    callee=expr, arguments=args, offset=expr.offset)
+            else:
+                break
+        return expr
+
+    def _parse_call_argument_list(self) -&gt; list[Expression | None]:
+        args: list[Expression | None] = []
+        while True:
+            if self._at(VbaTokenKind.RPAREN):
+                break
+            if self._at(VbaTokenKind.COMMA):
+                args.append(None)
+                self._advance()
+                continue
+            args.append(self._parse_argument_expression())
+            if not self._eat(VbaTokenKind.COMMA):
+                break
+        return args
+
+    def _parse_primary_expression(self) -&gt; Expression:
+        tok = self._current
+        offset = tok.offset
+
+        if self._at(VbaTokenKind.INTEGER):
+            self._advance()
+            raw = tok.value
+            text = raw.rstrip(&#39;%&amp;!#@&#39;)
+            if text.lower().startswith(&#39;&amp;h&#39;):
+                value = int(text[2:], 16)
+            elif text.lower().startswith(&#39;&amp;o&#39;):
+                value = int(text[2:], 8)
+            else:
+                value = int(text)
+            return VbaIntegerLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(VbaTokenKind.FLOAT):
+            self._advance()
+            raw = tok.value
+            text = raw.rstrip(&#39;%&amp;!#@&#39;).replace(&#39;d&#39;, &#39;e&#39;).replace(&#39;D&#39;, &#39;E&#39;)
+            value = float(text)
+            return VbaFloatLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(VbaTokenKind.STRING):
+            self._advance()
+            raw = tok.value
+            if len(raw) &gt;= 2:
+                value = raw[1:-1].replace(&#39;&#34;&#34;&#39;, &#39;&#34;&#39;)
+            else:
+                value = raw
+            return VbaStringLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(VbaTokenKind.DATE_LITERAL):
+            self._advance()
+            return VbaDateLiteral(raw=tok.value, offset=offset)
+
+        if self._at(VbaTokenKind.BOOLEAN_TRUE):
+            self._advance()
+            return VbaBooleanLiteral(value=True, offset=offset)
+
+        if self._at(VbaTokenKind.BOOLEAN_FALSE):
+            self._advance()
+            return VbaBooleanLiteral(value=False, offset=offset)
+
+        if self._at(VbaTokenKind.NOTHING):
+            self._advance()
+            return VbaNothingLiteral(offset=offset)
+
+        if self._at(VbaTokenKind.NULL):
+            self._advance()
+            return VbaNullLiteral(offset=offset)
+
+        if self._at(VbaTokenKind.EMPTY):
+            self._advance()
+            return VbaEmptyLiteral(offset=offset)
+
+        if self._at(VbaTokenKind.ME):
+            self._advance()
+            return VbaMeExpression(offset=offset)
+
+        if self._at(VbaTokenKind.NEW):
+            self._advance()
+            class_name = self._parse_postfix_expression()
+            return VbaNewExpression(class_name=class_name, offset=offset)
+
+        if self._at(VbaTokenKind.TYPEOF):
+            self._advance()
+            operand = self._parse_postfix_expression()
+            self._expect(VbaTokenKind.IS)
+            type_name = self._parse_postfix_expression()
+            return VbaTypeOfIsExpression(
+                operand=operand, type_name=type_name, offset=offset)
+
+        if self._at(VbaTokenKind.LPAREN):
+            self._advance()
+            inner = self._parse_expression()
+            self._expect(VbaTokenKind.RPAREN)
+            return VbaParenExpression(expression=inner, offset=offset)
+
+        if self._at(VbaTokenKind.DOT):
+            self._advance()
+            member = self._current.value
+            self._advance()
+            return VbaMemberAccess(object=None, member=member, offset=offset)
+
+        if self._at(VbaTokenKind.IDENTIFIER) or self._current.kind.is_keyword:
+            name = tok.value
+            self._advance()
+            return VbaIdentifier(name=name, offset=offset)
+
+        self._advance()
+        return VbaErrorNode(text=tok.value, message=&#39;unexpected token&#39;, offset=offset)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.vba.parser.VbaParser.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/vba/parser.py#L190-L191" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse(self) -&gt; VbaModule:
+    return self._parse_module()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.vba" href="index.html">refinery.lib.scripts.vba</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.vba.parser.VbaParser" href="#refinery.lib.scripts.vba.parser.VbaParser">VbaParser</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.vba.parser.VbaParser.parse" href="#refinery.lib.scripts.vba.parser.VbaParser.parse">parse</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

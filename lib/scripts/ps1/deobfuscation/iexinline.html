@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.deobfuscation.iexinline documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.deobfuscation.iexinline</code></h1>
+</header>
+<section id="section-intro">
+<p>Inline constant IEX (Invoke-Expression) and [scriptblock]::Create() calls
+by parsing the string argument.</p>
+<p>When the argument is not a plain string literal but a .NET expression chain
+(e.g. base64-decode -&gt; decompress -&gt; stream-read), the evaluator attempts to
+resolve it to a string value at deobfuscation time.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/deobfuscation/iexinline.py#L1-L583" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Inline constant IEX (Invoke-Expression) and [scriptblock]::Create() calls
+by parsing the string argument.
+
+When the argument is not a plain string literal but a .NET expression chain
+(e.g. base64-decode -&gt; decompress -&gt; stream-read), the evaluator attempts to
+resolve it to a string value at deobfuscation time.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import base64
+import gzip
+import zlib
+
+from refinery.lib.scripts import Expression, Transformer
+from refinery.lib.scripts.ps1.deobfuscation._helpers import (
+    _ENCODING_MAP,
+    _extract_foreach_scriptblock,
+    _get_body,
+    _normalize_dotnet_type_name,
+    _string_value,
+)
+from refinery.lib.scripts.ps1.model import (
+    Ps1AccessKind,
+    Ps1ArrayExpression,
+    Ps1ArrayLiteral,
+    Ps1AssignmentExpression,
+    Ps1BinaryExpression,
+    Ps1CastExpression,
+    Ps1CommandArgument,
+    Ps1CommandArgumentKind,
+    Ps1CommandInvocation,
+    Ps1ExpressionStatement,
+    Ps1IntegerLiteral,
+    Ps1InvokeMember,
+    Ps1MemberAccess,
+    Ps1ParenExpression,
+    Ps1Pipeline,
+    Ps1PipelineElement,
+    Ps1StringLiteral,
+    Ps1SubExpression,
+    Ps1TypeExpression,
+    Ps1Variable,
+)
+
+_IEX_NAMES = frozenset({&#39;iex&#39;, &#39;invoke-expression&#39;})
+
+_INVOKE_METHODS = frozenset({&#39;invoke&#39;, &#39;invokereturnasis&#39;})
+
+
+def _is_command_switch(arg) -&gt; bool:
+    return (
+        isinstance(arg, Ps1CommandArgument)
+        and arg.kind == Ps1CommandArgumentKind.SWITCH
+        and isinstance(arg.name, str)
+        and arg.name.lower().startswith(&#39;-c&#39;)
+    )
+
+
+def _extract_iex_value(cmd: Ps1CommandInvocation) -&gt; Expression | None:
+    args = cmd.arguments
+    if len(args) == 1:
+        arg = args[0]
+    elif len(args) == 2 and _is_command_switch(args[0]):
+        arg = args[1]
+    else:
+        return None
+    if isinstance(arg, Ps1CommandArgument):
+        if arg.kind != Ps1CommandArgumentKind.POSITIONAL:
+            return None
+        return arg.value
+    return arg
+
+
+_SCRIPTBLOCK_TYPE_NAMES = frozenset({
+    &#39;scriptblock&#39;,
+    &#39;management.automation.scriptblock&#39;,
+})
+
+
+def _try_extract_scriptblock_create_arg(expr: Expression) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    If `expr` is `[scriptblock]::Create(arg)`, return the single argument.
+    &#34;&#34;&#34;
+    if not isinstance(expr, Ps1InvokeMember):
+        return None
+    if expr.access != Ps1AccessKind.STATIC:
+        return None
+    if not isinstance(expr.object, Ps1TypeExpression):
+        return None
+    tn = _normalize_dotnet_type_name(expr.object.name)
+    if tn not in _SCRIPTBLOCK_TYPE_NAMES:
+        return None
+    if not isinstance(expr.member, str) or expr.member.lower() != &#39;create&#39;:
+        return None
+    if len(expr.arguments) != 1:
+        return None
+    return expr.arguments[0]
+
+
+def _try_evaluate_byte_array(elements: list) -&gt; bytes | None:
+    &#34;&#34;&#34;
+    Convert a list of `Ps1IntegerLiteral` elements to `bytes`.
+    &#34;&#34;&#34;
+    values = []
+    for elem in elements:
+        if not isinstance(elem, Ps1IntegerLiteral):
+            return None
+        values.append(elem.value)
+    try:
+        return bytes(bytearray(values))
+    except (ValueError, OverflowError):
+        return None
+
+
+def _extract_new_object_args(cmd: Ps1CommandInvocation) -&gt; tuple[str, list[Expression]] | None:
+    &#34;&#34;&#34;
+    Extract type name and constructor arguments from a `New-Object` invocation.
+
+    Returns `(type_name, [arg_expressions])` or `None`.
+    &#34;&#34;&#34;
+    if not isinstance(cmd.name, Ps1StringLiteral):
+        return None
+    if cmd.name.value.lower() != &#39;new-object&#39;:
+        return None
+    positional: list[Expression] = []
+    for arg in cmd.arguments:
+        if isinstance(arg, Ps1CommandArgument):
+            if arg.kind != Ps1CommandArgumentKind.POSITIONAL or arg.value is None:
+                return None
+            positional.append(arg.value)
+        elif isinstance(arg, Expression):
+            positional.append(arg)
+        else:
+            return None
+    if not positional:
+        return None
+    type_name_expr = positional[0]
+    if not isinstance(type_name_expr, Ps1StringLiteral):
+        return None
+    type_name = type_name_expr.value
+    ctor_args: list[Expression] = []
+    if len(positional) &gt;= 2:
+        second = positional[1]
+        if isinstance(second, Ps1ParenExpression) and second.expression is not None:
+            inner = second.expression
+            if isinstance(inner, Ps1ArrayLiteral):
+                ctor_args = list(inner.elements)
+            else:
+                ctor_args = [inner]
+        else:
+            ctor_args = [second]
+    return type_name, ctor_args
+
+
+def _resolve_encoding(expr: Expression) -&gt; str | None:
+    &#34;&#34;&#34;
+    Resolve `[Text.Encoding]::ASCII` and similar to a Python codec name.
+    &#34;&#34;&#34;
+    if not isinstance(expr, Ps1MemberAccess):
+        return None
+    if expr.access != Ps1AccessKind.STATIC:
+        return None
+    if not isinstance(expr.object, Ps1TypeExpression):
+        return None
+    if _normalize_dotnet_type_name(expr.object.name) != &#39;text.encoding&#39;:
+        return None
+    if not isinstance(expr.member, str):
+        return None
+    return _ENCODING_MAP.get(expr.member.lower())
+
+
+def _try_evaluate(
+    expr: Expression,
+    bindings: dict[str, str | bytes] | None = None,
+) -&gt; str | bytes | None:
+    &#34;&#34;&#34;
+    Recursively evaluate a .NET expression chain to `str` or `bytes`. Handles
+    the pattern:
+
+        [Convert]::FromBase64String(literal)
+        -&gt; [IO.MemoryStream]
+        -&gt; New-Object DeflateStream/GZipStream(stream, Decompress)
+        -&gt; New-Object StreamReader(stream, encoding)
+        -&gt; .ReadToEnd()
+
+    Also handles pipelines of the form
+
+        expr | %{ body } | %{ body }
+
+    where the `ForEach-Object` stage receives the previous result via `$_`.
+    &#34;&#34;&#34;
+    if isinstance(expr, Ps1StringLiteral):
+        return expr.value
+
+    if isinstance(expr, Ps1ParenExpression) and expr.expression is not None:
+        return _try_evaluate(expr.expression, bindings)
+
+    if isinstance(expr, Ps1SubExpression):
+        if len(expr.body) == 1:
+            stmt = expr.body[0]
+            if isinstance(stmt, Ps1ExpressionStatement) and stmt.expression is not None:
+                return _try_evaluate(stmt.expression, bindings)
+        return None
+
+    if isinstance(expr, Ps1Variable):
+        if bindings and expr.name.lower() in bindings:
+            return bindings[expr.name.lower()]
+        return None
+
+    if isinstance(expr, Ps1ArrayLiteral):
+        return _try_evaluate_byte_array(expr.elements)
+
+    if isinstance(expr, Ps1ArrayExpression):
+        if len(expr.body) == 1:
+            stmt = expr.body[0]
+            inner = stmt.expression if isinstance(stmt, Ps1ExpressionStatement) else None
+            if isinstance(inner, Ps1ArrayLiteral):
+                return _try_evaluate_byte_array(inner.elements)
+        return None
+
+    if isinstance(expr, Ps1BinaryExpression) and expr.operator == &#39;+&#39;:
+        if expr.left is not None and expr.right is not None:
+            left = _try_evaluate(expr.left, bindings)
+            right = _try_evaluate(expr.right, bindings)
+            if isinstance(left, str) and isinstance(right, str):
+                return left + right
+
+    if isinstance(expr, Ps1InvokeMember):
+        if (
+            expr.access == Ps1AccessKind.STATIC
+            and isinstance(expr.object, Ps1TypeExpression)
+            and _normalize_dotnet_type_name(expr.object.name) == &#39;convert&#39;
+            and isinstance(expr.member, str)
+            and expr.member.lower() == &#39;frombase64string&#39;
+            and len(expr.arguments) == 1
+        ):
+            sv = _string_value(expr.arguments[0])
+            if sv is not None:
+                try:
+                    return base64.b64decode(sv)
+                except Exception:
+                    return None
+
+        if (
+            expr.access == Ps1AccessKind.INSTANCE
+            and isinstance(expr.member, str)
+            and expr.member.lower() == &#39;readtoend&#39;
+            and len(expr.arguments) == 0
+            and expr.object is not None
+        ):
+            return _try_evaluate(expr.object, bindings)
+
+    if isinstance(expr, Ps1CastExpression) and expr.operand is not None:
+        tn = _normalize_dotnet_type_name(expr.type_name)
+        if tn == &#39;io.memorystream&#39;:
+            return _try_evaluate(expr.operand, bindings)
+
+    if isinstance(expr, Ps1CommandInvocation):
+        result = _extract_new_object_args(expr)
+        if result is None:
+            return None
+        type_name, ctor_args = result
+        tn = _normalize_dotnet_type_name(type_name)
+
+        if tn == &#39;io.memorystream&#39; and len(ctor_args) &gt;= 1:
+            return _try_evaluate(ctor_args[0], bindings)
+
+        if tn == &#39;io.compression.deflatestream&#39; and len(ctor_args) &gt;= 1:
+            data = _try_evaluate(ctor_args[0], bindings)
+            if isinstance(data, bytes):
+                try:
+                    return zlib.decompress(data, -15)
+                except Exception:
+                    return None
+
+        if tn == &#39;io.compression.gzipstream&#39; and len(ctor_args) &gt;= 1:
+            data = _try_evaluate(ctor_args[0], bindings)
+            if isinstance(data, bytes):
+                try:
+                    return gzip.decompress(data)
+                except Exception:
+                    return None
+
+        if tn == &#39;io.streamreader&#39; and len(ctor_args) &gt;= 1:
+            data = _try_evaluate(ctor_args[0], bindings)
+            if not isinstance(data, bytes):
+                return None
+            codec = &#39;utf-8&#39;
+            if len(ctor_args) &gt;= 2:
+                resolved = _resolve_encoding(ctor_args[1])
+                if resolved is not None:
+                    codec = resolved
+            try:
+                return data.decode(codec)
+            except Exception:
+                return None
+
+    if isinstance(expr, Ps1Pipeline):
+        return _try_evaluate_pipeline(expr, bindings)
+
+    return None
+
+
+def _try_evaluate_pipeline(
+    node: Ps1Pipeline,
+    bindings: dict[str, str | bytes] | None = None,
+) -&gt; str | bytes | None:
+    &#34;&#34;&#34;
+    Evaluate a pipeline `expr | %{ body } | %{ body }` by threading the result of each stage into
+    the next via `$_` bindings.
+    &#34;&#34;&#34;
+    if not node.elements:
+        return None
+    first = node.elements[0]
+    if not isinstance(first, Ps1PipelineElement):
+        return None
+    if first.expression is None:
+        return None
+    value = _try_evaluate(first.expression, bindings)
+    if value is None:
+        return None
+    for elem in node.elements[1:]:
+        if not isinstance(elem, Ps1PipelineElement):
+            return None
+        if elem.expression is None:
+            return None
+        script_block = _extract_foreach_scriptblock(elem.expression)
+        if script_block is None:
+            return None
+        if len(script_block.body) != 1:
+            return None
+        stmt = script_block.body[0]
+        if isinstance(stmt, Ps1ExpressionStatement):
+            inner_expr = stmt.expression
+        elif isinstance(stmt, Expression):
+            inner_expr = stmt
+        else:
+            return None
+        if inner_expr is None:
+            return None
+        stage_bindings: dict[str, str | bytes] = {**(bindings or {}), &#39;_&#39;: value}
+        value = _try_evaluate(inner_expr, stage_bindings)
+        if value is None:
+            return None
+    return value
+
+
+def _resolve_to_string(expr: Expression) -&gt; str | None:
+    &#34;&#34;&#34;
+    Try to resolve an expression to a string: first as a literal, then via evaluation.
+    &#34;&#34;&#34;
+    s = _string_value(expr)
+    if s is not None:
+        return s
+    result = _try_evaluate(expr)
+    if isinstance(result, str):
+        return result
+    return None
+
+
+def _try_extract_scriptblock_create_from_statement(expr: Expression) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    Given a top-level expression, check whether it is one of:
+
+    - `&amp;([scriptblock]::Create(arg))`
+    - `[scriptblock]::Create(arg).Invoke()`
+    - `[scriptblock]::Create(arg).InvokeReturnAsIs()`
+
+    Returns the `Create` argument expression, or `None`.
+    &#34;&#34;&#34;
+    if isinstance(expr, Ps1CommandInvocation) and expr.invocation_operator == &#39;&amp;&#39;:
+        name = expr.name
+        if isinstance(name, Ps1ParenExpression):
+            name = name.expression
+        if name is not None:
+            return _try_extract_scriptblock_create_arg(name)
+    if isinstance(expr, Ps1InvokeMember):
+        if (
+            expr.access == Ps1AccessKind.INSTANCE
+            and isinstance(expr.member, str)
+            and expr.member.lower() in _INVOKE_METHODS
+            and expr.object is not None
+        ):
+            return _try_extract_scriptblock_create_arg(expr.object)
+    return None
+
+
+class Ps1IexInlining(Transformer):
+    &#34;&#34;&#34;
+    Replaces the following patterns with the parsed statements from the
+    reflectively loaded code:
+
+    - `&#39;CODE&#39; | Invoke-Expression`
+    - `Invoke-Expression &#39;CODE&#39;`
+    - `[scriptblock]::Create(&#39;CODE&#39;)`
+    &#34;&#34;&#34;
+
+    def visit(self, node):
+        self._inline_statements(node)
+        self._inline_expressions(node)
+        return None
+
+    def _inline_statements(self, node):
+        for container in list(node.walk()):
+            body = _get_body(container)
+            if body is None:
+                continue
+            i = 0
+            while i &lt; len(body):
+                code = self._try_extract_iex_string(body[i])
+                if code is None:
+                    code = self._try_extract_piped_iex_string(body[i])
+                if code is None:
+                    code = self._try_extract_scriptblock_create_string(body[i])
+                if code is None:
+                    i += 1
+                    continue
+                parsed = self._try_parse(code)
+                if parsed is None:
+                    i += 1
+                    continue
+                for stmt in parsed:
+                    stmt.parent = container
+                body[i:i + 1] = parsed
+                self.mark_changed()
+                i += len(parsed)
+
+    def _inline_expressions(self, node):
+        for expr in list(node.walk()):
+            if isinstance(expr, Ps1CommandInvocation):
+                if isinstance(expr.parent, Ps1ExpressionStatement):
+                    continue
+                replacement = self._try_inline_expression(expr)
+            elif isinstance(expr, Ps1InvokeMember):
+                if isinstance(expr.parent, Ps1ExpressionStatement):
+                    continue
+                replacement = self._try_inline_scriptblock_create_expression(expr)
+            else:
+                continue
+            if replacement is None:
+                continue
+            parent = expr.parent
+            for attr_name in vars(parent):
+                if attr_name.startswith(&#39;_&#39;) or attr_name in (&#39;parent&#39;, &#39;offset&#39;):
+                    continue
+                value = getattr(parent, attr_name)
+                if value is expr:
+                    replacement.parent = parent
+                    setattr(parent, attr_name, replacement)
+                    self.mark_changed()
+                    break
+                if isinstance(value, list):
+                    for idx, item in enumerate(value):
+                        if item is expr:
+                            replacement.parent = parent
+                            value[idx] = replacement
+                            self.mark_changed()
+                            break
+
+    def _try_inline_expression(self, node: Ps1CommandInvocation) -&gt; Expression | None:
+        sb_arg = _try_extract_scriptblock_create_from_statement(node)
+        if sb_arg is not None:
+            code = _resolve_to_string(sb_arg)
+        else:
+            if not isinstance(node.name, Ps1StringLiteral):
+                return None
+            if node.name.value.lower() not in _IEX_NAMES:
+                return None
+            val = _extract_iex_value(node)
+            if val is None:
+                return None
+            code = _resolve_to_string(val)
+        if code is None:
+            return None
+        parsed = self._try_parse(code)
+        if parsed is None or len(parsed) != 1:
+            return None
+        stmt = parsed[0]
+        if not isinstance(stmt, Ps1ExpressionStatement) or stmt.expression is None:
+            return None
+        return stmt.expression
+
+    def _try_inline_scriptblock_create_expression(self, node: Ps1InvokeMember) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Handle `[scriptblock]::Create(expr).Invoke()` in expression position.
+        &#34;&#34;&#34;
+        if (
+            node.access != Ps1AccessKind.INSTANCE
+            or not isinstance(node.member, str)
+            or node.member.lower() not in _INVOKE_METHODS
+            or node.object is None
+        ):
+            return None
+        sb_arg = _try_extract_scriptblock_create_arg(node.object)
+        if sb_arg is None:
+            return None
+        code = _resolve_to_string(sb_arg)
+        if code is None:
+            return None
+        parsed = self._try_parse(code)
+        if parsed is None or len(parsed) != 1:
+            return None
+        stmt = parsed[0]
+        if not isinstance(stmt, Ps1ExpressionStatement) or stmt.expression is None:
+            return None
+        return stmt.expression
+
+    @staticmethod
+    def _is_bare_iex(cmd) -&gt; bool:
+        if not isinstance(cmd, Ps1CommandInvocation):
+            return False
+        if not isinstance(cmd.name, Ps1StringLiteral):
+            return False
+        if cmd.name.value.lower() not in _IEX_NAMES:
+            return False
+        if len(cmd.arguments) == 0:
+            return True
+        return len(cmd.arguments) == 1 and _is_command_switch(cmd.arguments[0])
+
+    @staticmethod
+    def _try_extract_iex_string(stmt) -&gt; str | None:
+        if not isinstance(stmt, Ps1ExpressionStatement):
+            return None
+        cmd = stmt.expression
+        if not isinstance(cmd, Ps1CommandInvocation):
+            return None
+        if not isinstance(cmd.name, Ps1StringLiteral):
+            return None
+        if cmd.name.value.lower() not in _IEX_NAMES:
+            return None
+        val = _extract_iex_value(cmd)
+        if val is None:
+            return None
+        return _resolve_to_string(val)
+
+    @classmethod
+    def _try_extract_piped_iex_string(cls, stmt) -&gt; str | None:
+        if not isinstance(stmt, Ps1ExpressionStatement):
+            return None
+        pipeline = stmt.expression
+        if isinstance(pipeline, Ps1AssignmentExpression):
+            pipeline = pipeline.value
+        if not isinstance(pipeline, Ps1Pipeline):
+            return None
+        if len(pipeline.elements) &lt; 2:
+            return None
+        last = pipeline.elements[-1]
+        if not cls._is_bare_iex(last.expression):
+            return None
+        if len(pipeline.elements) != 2:
+            return None
+        source = pipeline.elements[0].expression
+        if source is None:
+            return None
+        return _resolve_to_string(source)
+
+    @staticmethod
+    def _try_extract_scriptblock_create_string(stmt) -&gt; str | None:
+        &#34;&#34;&#34;
+        Match `&amp;([scriptblock]::Create(expr))` and
+        `[scriptblock]::Create(expr).Invoke()` at the statement level.
+        &#34;&#34;&#34;
+        if not isinstance(stmt, Ps1ExpressionStatement):
+            return None
+        expr = stmt.expression
+        if expr is None:
+            return None
+        sb_arg = _try_extract_scriptblock_create_from_statement(expr)
+        if sb_arg is None:
+            return None
+        return _resolve_to_string(sb_arg)
+
+    @staticmethod
+    def _try_parse(code: str) -&gt; list | None:
+        try:
+            from refinery.lib.scripts.ps1.parser import Ps1Parser
+            parsed = Ps1Parser(code).parse()
+        except Exception:
+            return None
+        if not parsed.body:
+            return None
+        return list(parsed.body)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.iexinline.Ps1IexInlining"><code class="flex name class">
+<span>class <span class="ident">Ps1IexInlining</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Replaces the following patterns with the parsed statements from the
+reflectively loaded code:</p>
+<ul>
+<li><code>'CODE' | Invoke-Expression</code></li>
+<li><code>Invoke-Expression 'CODE'</code></li>
+<li><code>[scriptblock]::Create('CODE')</code></li>
+</ul></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/deobfuscation/iexinline.py#L389-L583" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1IexInlining(Transformer):
+    &#34;&#34;&#34;
+    Replaces the following patterns with the parsed statements from the
+    reflectively loaded code:
+
+    - `&#39;CODE&#39; | Invoke-Expression`
+    - `Invoke-Expression &#39;CODE&#39;`
+    - `[scriptblock]::Create(&#39;CODE&#39;)`
+    &#34;&#34;&#34;
+
+    def visit(self, node):
+        self._inline_statements(node)
+        self._inline_expressions(node)
+        return None
+
+    def _inline_statements(self, node):
+        for container in list(node.walk()):
+            body = _get_body(container)
+            if body is None:
+                continue
+            i = 0
+            while i &lt; len(body):
+                code = self._try_extract_iex_string(body[i])
+                if code is None:
+                    code = self._try_extract_piped_iex_string(body[i])
+                if code is None:
+                    code = self._try_extract_scriptblock_create_string(body[i])
+                if code is None:
+                    i += 1
+                    continue
+                parsed = self._try_parse(code)
+                if parsed is None:
+                    i += 1
+                    continue
+                for stmt in parsed:
+                    stmt.parent = container
+                body[i:i + 1] = parsed
+                self.mark_changed()
+                i += len(parsed)
+
+    def _inline_expressions(self, node):
+        for expr in list(node.walk()):
+            if isinstance(expr, Ps1CommandInvocation):
+                if isinstance(expr.parent, Ps1ExpressionStatement):
+                    continue
+                replacement = self._try_inline_expression(expr)
+            elif isinstance(expr, Ps1InvokeMember):
+                if isinstance(expr.parent, Ps1ExpressionStatement):
+                    continue
+                replacement = self._try_inline_scriptblock_create_expression(expr)
+            else:
+                continue
+            if replacement is None:
+                continue
+            parent = expr.parent
+            for attr_name in vars(parent):
+                if attr_name.startswith(&#39;_&#39;) or attr_name in (&#39;parent&#39;, &#39;offset&#39;):
+                    continue
+                value = getattr(parent, attr_name)
+                if value is expr:
+                    replacement.parent = parent
+                    setattr(parent, attr_name, replacement)
+                    self.mark_changed()
+                    break
+                if isinstance(value, list):
+                    for idx, item in enumerate(value):
+                        if item is expr:
+                            replacement.parent = parent
+                            value[idx] = replacement
+                            self.mark_changed()
+                            break
+
+    def _try_inline_expression(self, node: Ps1CommandInvocation) -&gt; Expression | None:
+        sb_arg = _try_extract_scriptblock_create_from_statement(node)
+        if sb_arg is not None:
+            code = _resolve_to_string(sb_arg)
+        else:
+            if not isinstance(node.name, Ps1StringLiteral):
+                return None
+            if node.name.value.lower() not in _IEX_NAMES:
+                return None
+            val = _extract_iex_value(node)
+            if val is None:
+                return None
+            code = _resolve_to_string(val)
+        if code is None:
+            return None
+        parsed = self._try_parse(code)
+        if parsed is None or len(parsed) != 1:
+            return None
+        stmt = parsed[0]
+        if not isinstance(stmt, Ps1ExpressionStatement) or stmt.expression is None:
+            return None
+        return stmt.expression
+
+    def _try_inline_scriptblock_create_expression(self, node: Ps1InvokeMember) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Handle `[scriptblock]::Create(expr).Invoke()` in expression position.
+        &#34;&#34;&#34;
+        if (
+            node.access != Ps1AccessKind.INSTANCE
+            or not isinstance(node.member, str)
+            or node.member.lower() not in _INVOKE_METHODS
+            or node.object is None
+        ):
+            return None
+        sb_arg = _try_extract_scriptblock_create_arg(node.object)
+        if sb_arg is None:
+            return None
+        code = _resolve_to_string(sb_arg)
+        if code is None:
+            return None
+        parsed = self._try_parse(code)
+        if parsed is None or len(parsed) != 1:
+            return None
+        stmt = parsed[0]
+        if not isinstance(stmt, Ps1ExpressionStatement) or stmt.expression is None:
+            return None
+        return stmt.expression
+
+    @staticmethod
+    def _is_bare_iex(cmd) -&gt; bool:
+        if not isinstance(cmd, Ps1CommandInvocation):
+            return False
+        if not isinstance(cmd.name, Ps1StringLiteral):
+            return False
+        if cmd.name.value.lower() not in _IEX_NAMES:
+            return False
+        if len(cmd.arguments) == 0:
+            return True
+        return len(cmd.arguments) == 1 and _is_command_switch(cmd.arguments[0])
+
+    @staticmethod
+    def _try_extract_iex_string(stmt) -&gt; str | None:
+        if not isinstance(stmt, Ps1ExpressionStatement):
+            return None
+        cmd = stmt.expression
+        if not isinstance(cmd, Ps1CommandInvocation):
+            return None
+        if not isinstance(cmd.name, Ps1StringLiteral):
+            return None
+        if cmd.name.value.lower() not in _IEX_NAMES:
+            return None
+        val = _extract_iex_value(cmd)
+        if val is None:
+            return None
+        return _resolve_to_string(val)
+
+    @classmethod
+    def _try_extract_piped_iex_string(cls, stmt) -&gt; str | None:
+        if not isinstance(stmt, Ps1ExpressionStatement):
+            return None
+        pipeline = stmt.expression
+        if isinstance(pipeline, Ps1AssignmentExpression):
+            pipeline = pipeline.value
+        if not isinstance(pipeline, Ps1Pipeline):
+            return None
+        if len(pipeline.elements) &lt; 2:
+            return None
+        last = pipeline.elements[-1]
+        if not cls._is_bare_iex(last.expression):
+            return None
+        if len(pipeline.elements) != 2:
+            return None
+        source = pipeline.elements[0].expression
+        if source is None:
+            return None
+        return _resolve_to_string(source)
+
+    @staticmethod
+    def _try_extract_scriptblock_create_string(stmt) -&gt; str | None:
+        &#34;&#34;&#34;
+        Match `&amp;([scriptblock]::Create(expr))` and
+        `[scriptblock]::Create(expr).Invoke()` at the statement level.
+        &#34;&#34;&#34;
+        if not isinstance(stmt, Ps1ExpressionStatement):
+            return None
+        expr = stmt.expression
+        if expr is None:
+            return None
+        sb_arg = _try_extract_scriptblock_create_from_statement(expr)
+        if sb_arg is None:
+            return None
+        return _resolve_to_string(sb_arg)
+
+    @staticmethod
+    def _try_parse(code: str) -&gt; list | None:
+        try:
+            from refinery.lib.scripts.ps1.parser import Ps1Parser
+            parsed = Ps1Parser(code).parse()
+        except Exception:
+            return None
+        if not parsed.body:
+            return None
+        return list(parsed.body)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.iexinline.Ps1IexInlining.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/deobfuscation/iexinline.py#L399-L402" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit(self, node):
+    self._inline_statements(node)
+    self._inline_expressions(node)
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation" href="index.html">refinery.lib.scripts.ps1.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.deobfuscation.iexinline.Ps1IexInlining" href="#refinery.lib.scripts.ps1.deobfuscation.iexinline.Ps1IexInlining">Ps1IexInlining</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation.iexinline.Ps1IexInlining.visit" href="#refinery.lib.scripts.ps1.deobfuscation.iexinline.Ps1IexInlining.visit">visit</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

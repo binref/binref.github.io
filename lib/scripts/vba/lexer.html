@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.vba.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.vba.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/vba/lexer.py#L1-L321" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Generator
+
+from refinery.lib.scripts.vba.token import _KEYWORDS, VbaToken, VbaTokenKind
+
+_ONE_CHAR_OPS: dict[str, VbaTokenKind] = {
+    &#39;+&#39; : VbaTokenKind.PLUS,
+    &#39;-&#39; : VbaTokenKind.MINUS,
+    &#39;*&#39; : VbaTokenKind.STAR,
+    &#39;/&#39; : VbaTokenKind.SLASH,
+    &#39;\\&#39;: VbaTokenKind.BACKSLASH,
+    &#39;^&#39; : VbaTokenKind.CARET,
+    &#39;&amp;&#39; : VbaTokenKind.AMPERSAND,
+    &#39;=&#39; : VbaTokenKind.EQ,
+    &#39;&lt;&#39; : VbaTokenKind.LT,
+    &#39;&gt;&#39; : VbaTokenKind.GT,
+    &#39;.&#39; : VbaTokenKind.DOT,
+    &#39;!&#39; : VbaTokenKind.BANG,
+    &#39;(&#39; : VbaTokenKind.LPAREN,
+    &#39;)&#39; : VbaTokenKind.RPAREN,
+    &#39;,&#39; : VbaTokenKind.COMMA,
+    &#39;;&#39; : VbaTokenKind.SEMICOLON,
+    &#39;:&#39; : VbaTokenKind.COLON,
+}
+
+
+@dataclass
+class VbaLexer:
+    source: str
+    pos: int = 0
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+            self.pos += 1
+        return self.pos &gt; start
+
+    def _read_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;&#34;&#39;:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;&#34;&#39;:
+                    self.pos += 1
+                    continue
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_date_literal(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;#&#39;:
+                self.pos += 1
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_number(self) -&gt; VbaToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+
+        if src[self.pos] == &#39;&amp;&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1].lower()
+            if nc == &#39;h&#39;:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in &#39;0123456789abcdefABCDEF&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] in &#39;&amp;%&#39;:
+                    self.pos += 1
+                return VbaToken(VbaTokenKind.INTEGER, src[start:self.pos], start)
+            if nc == &#39;o&#39;:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in &#39;01234567&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] in &#39;&amp;%&#39;:
+                    self.pos += 1
+                return VbaToken(VbaTokenKind.INTEGER, src[start:self.pos], start)
+
+        while self.pos &lt; length and src[self.pos].isdigit():
+            self.pos += 1
+
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39;:
+            next_pos = self.pos + 1
+            if next_pos &lt; length and src[next_pos].isdigit():
+                is_float = True
+                self.pos += 1
+                while self.pos &lt; length and src[self.pos].isdigit():
+                    self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;eEdD&#39;:
+            is_float = True
+            self.pos += 1
+            if self.pos &lt; length and src[self.pos] in &#39;+-&#39;:
+                self.pos += 1
+            while self.pos &lt; length and src[self.pos].isdigit():
+                self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;%&amp;!#@&#39;:
+            self.pos += 1
+
+        kind = VbaTokenKind.FLOAT if is_float else VbaTokenKind.INTEGER
+        return VbaToken(kind, src[start:self.pos], start)
+
+    def _read_identifier_or_keyword(self) -&gt; VbaToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c.isalnum() or c == &#39;_&#39;:
+                self.pos += 1
+            else:
+                break
+        word = src[start:self.pos]
+        suffix = &#39;&#39;
+        if self.pos &lt; length and src[self.pos] in &#39;%&amp;!#@$&#39;:
+            c_suffix = src[self.pos]
+            consume = True
+            if c_suffix == &#39;&amp;&#39; and not (
+                self.pos + 1 &gt;= length
+                or src[self.pos + 1] in &#39; \t\r\n)],;:\x00(.!&#39;
+            ):
+                consume = False
+            elif c_suffix == &#39;!&#39; and (
+                self.pos + 1 &lt; length
+                and (src[self.pos + 1].isalpha() or src[self.pos + 1] in &#39;_[&#39;)
+            ):
+                consume = False
+            if consume:
+                suffix = c_suffix
+                self.pos += 1
+        kw = _KEYWORDS.get(word.lower())
+        if kw is not None and not suffix:
+            return VbaToken(kw, word, start)
+        return VbaToken(VbaTokenKind.IDENTIFIER, word + suffix, start)
+
+    def _read_bracket_identifier(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;]&#39;:
+                self.pos += 1
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+            self.pos += 1
+        return src[start:self.pos]
+
+    def tokenize(self) -&gt; Generator[VbaToken, None, None]:
+        src = self.source
+        length = len(src)
+        last_was_newline = True
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield VbaToken(VbaTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+
+            if c == &#39;_&#39;:
+                p = self.pos + 1
+                while p &lt; length and src[p] in &#39; \t&#39;:
+                    p += 1
+                if p &gt;= length or src[p] in &#39;\r\n&#39;:
+                    self.pos = p
+                    if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+                        self.pos += 1
+                    if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                        self.pos += 1
+                    continue
+
+            if c == &#39;\r&#39; or c == &#39;\n&#39;:
+                if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                    self.pos += 2
+                else:
+                    self.pos += 1
+                if not last_was_newline:
+                    yield VbaToken(VbaTokenKind.NEWLINE, &#39;\n&#39;, start)
+                    last_was_newline = True
+                continue
+
+            if c == &#34;&#39;&#34;:
+                text = self._read_comment()
+                yield VbaToken(VbaTokenKind.COMMENT, text, start)
+                continue
+
+            if c == &#39;&#34;&#39;:
+                text = self._read_string()
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.STRING, text, start)
+                continue
+
+            if c == &#39;#&#39;:
+                if last_was_newline and self.pos + 1 &lt; length and src[self.pos + 1].isalpha():
+                    peek = self.pos + 1
+                    while peek &lt; length and src[peek].isalpha():
+                        peek += 1
+                    word = src[self.pos + 1:peek].lower()
+                    if word in (&#39;if&#39;, &#39;elseif&#39;, &#39;else&#39;, &#39;end&#39;, &#39;endif&#39;, &#39;const&#39;):
+                        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+                            self.pos += 1
+                        continue
+                if self.pos + 1 &lt; length and not src[self.pos + 1].isspace():
+                    text = self._read_date_literal()
+                    last_was_newline = False
+                    yield VbaToken(VbaTokenKind.DATE_LITERAL, text, start)
+                    continue
+                self.pos += 1
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.IDENTIFIER, &#39;#&#39;, start)
+                continue
+
+            if c == &#39;&amp;&#39; and self.pos + 1 &lt; length and src[self.pos + 1].lower() in &#39;ho&#39;:
+                tok = self._read_number()
+                last_was_newline = False
+                yield tok
+                continue
+
+            if c.isdigit() or (c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()):
+                tok = self._read_number()
+                last_was_newline = False
+                yield tok
+                continue
+
+            if c.isalpha() or c == &#39;_&#39;:
+                tok = self._read_identifier_or_keyword()
+                if tok.kind in (
+                    VbaTokenKind.BOOLEAN_TRUE,
+                    VbaTokenKind.BOOLEAN_FALSE,
+                ):
+                    last_was_newline = False
+                    yield tok
+                    continue
+                if tok.value.lower() == &#39;rem&#39;:
+                    text = self._read_comment()
+                    yield VbaToken(VbaTokenKind.COMMENT, tok.value + text, start)
+                    continue
+                last_was_newline = False
+                yield tok
+                continue
+
+            if c == &#39;[&#39;:
+                text = self._read_bracket_identifier()
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.IDENTIFIER, text, start)
+                continue
+
+            c2 = src[self.pos:self.pos + 2]
+            if c2 == &#39;&lt;&gt;&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.NEQ, &#39;&lt;&gt;&#39;, start)
+                continue
+            if c2 == &#39;&lt;=&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.LTE, &#39;&lt;=&#39;, start)
+                continue
+            if c2 == &#39;&gt;=&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.GTE, &#39;&gt;=&#39;, start)
+                continue
+            if c2 == &#39;:=&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.ASSIGN, &#39;:=&#39;, start)
+                continue
+
+            op_kind = _ONE_CHAR_OPS.get(c)
+            if op_kind is not None:
+                self.pos += 1
+                last_was_newline = False
+                if op_kind == VbaTokenKind.COLON:
+                    yield VbaToken(VbaTokenKind.COLON, &#39;:&#39;, start)
+                else:
+                    yield VbaToken(op_kind, c, start)
+                continue
+
+            self.pos += 1
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.IDENTIFIER, c, start)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.vba.lexer.VbaLexer"><code class="flex name class">
+<span>class <span class="ident">VbaLexer</span></span>
+<span>(</span><span>source, pos=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>VbaLexer(source: 'str', pos: 'int' = 0)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/vba/lexer.py#L29-L321" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class VbaLexer:
+    source: str
+    pos: int = 0
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+            self.pos += 1
+        return self.pos &gt; start
+
+    def _read_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;&#34;&#39;:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;&#34;&#39;:
+                    self.pos += 1
+                    continue
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_date_literal(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;#&#39;:
+                self.pos += 1
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_number(self) -&gt; VbaToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+
+        if src[self.pos] == &#39;&amp;&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1].lower()
+            if nc == &#39;h&#39;:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in &#39;0123456789abcdefABCDEF&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] in &#39;&amp;%&#39;:
+                    self.pos += 1
+                return VbaToken(VbaTokenKind.INTEGER, src[start:self.pos], start)
+            if nc == &#39;o&#39;:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in &#39;01234567&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] in &#39;&amp;%&#39;:
+                    self.pos += 1
+                return VbaToken(VbaTokenKind.INTEGER, src[start:self.pos], start)
+
+        while self.pos &lt; length and src[self.pos].isdigit():
+            self.pos += 1
+
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39;:
+            next_pos = self.pos + 1
+            if next_pos &lt; length and src[next_pos].isdigit():
+                is_float = True
+                self.pos += 1
+                while self.pos &lt; length and src[self.pos].isdigit():
+                    self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;eEdD&#39;:
+            is_float = True
+            self.pos += 1
+            if self.pos &lt; length and src[self.pos] in &#39;+-&#39;:
+                self.pos += 1
+            while self.pos &lt; length and src[self.pos].isdigit():
+                self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;%&amp;!#@&#39;:
+            self.pos += 1
+
+        kind = VbaTokenKind.FLOAT if is_float else VbaTokenKind.INTEGER
+        return VbaToken(kind, src[start:self.pos], start)
+
+    def _read_identifier_or_keyword(self) -&gt; VbaToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c.isalnum() or c == &#39;_&#39;:
+                self.pos += 1
+            else:
+                break
+        word = src[start:self.pos]
+        suffix = &#39;&#39;
+        if self.pos &lt; length and src[self.pos] in &#39;%&amp;!#@$&#39;:
+            c_suffix = src[self.pos]
+            consume = True
+            if c_suffix == &#39;&amp;&#39; and not (
+                self.pos + 1 &gt;= length
+                or src[self.pos + 1] in &#39; \t\r\n)],;:\x00(.!&#39;
+            ):
+                consume = False
+            elif c_suffix == &#39;!&#39; and (
+                self.pos + 1 &lt; length
+                and (src[self.pos + 1].isalpha() or src[self.pos + 1] in &#39;_[&#39;)
+            ):
+                consume = False
+            if consume:
+                suffix = c_suffix
+                self.pos += 1
+        kw = _KEYWORDS.get(word.lower())
+        if kw is not None and not suffix:
+            return VbaToken(kw, word, start)
+        return VbaToken(VbaTokenKind.IDENTIFIER, word + suffix, start)
+
+    def _read_bracket_identifier(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;]&#39;:
+                self.pos += 1
+                return src[start:self.pos]
+            if c in &#39;\r\n&#39;:
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+            self.pos += 1
+        return src[start:self.pos]
+
+    def tokenize(self) -&gt; Generator[VbaToken, None, None]:
+        src = self.source
+        length = len(src)
+        last_was_newline = True
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield VbaToken(VbaTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+
+            if c == &#39;_&#39;:
+                p = self.pos + 1
+                while p &lt; length and src[p] in &#39; \t&#39;:
+                    p += 1
+                if p &gt;= length or src[p] in &#39;\r\n&#39;:
+                    self.pos = p
+                    if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+                        self.pos += 1
+                    if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                        self.pos += 1
+                    continue
+
+            if c == &#39;\r&#39; or c == &#39;\n&#39;:
+                if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                    self.pos += 2
+                else:
+                    self.pos += 1
+                if not last_was_newline:
+                    yield VbaToken(VbaTokenKind.NEWLINE, &#39;\n&#39;, start)
+                    last_was_newline = True
+                continue
+
+            if c == &#34;&#39;&#34;:
+                text = self._read_comment()
+                yield VbaToken(VbaTokenKind.COMMENT, text, start)
+                continue
+
+            if c == &#39;&#34;&#39;:
+                text = self._read_string()
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.STRING, text, start)
+                continue
+
+            if c == &#39;#&#39;:
+                if last_was_newline and self.pos + 1 &lt; length and src[self.pos + 1].isalpha():
+                    peek = self.pos + 1
+                    while peek &lt; length and src[peek].isalpha():
+                        peek += 1
+                    word = src[self.pos + 1:peek].lower()
+                    if word in (&#39;if&#39;, &#39;elseif&#39;, &#39;else&#39;, &#39;end&#39;, &#39;endif&#39;, &#39;const&#39;):
+                        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+                            self.pos += 1
+                        continue
+                if self.pos + 1 &lt; length and not src[self.pos + 1].isspace():
+                    text = self._read_date_literal()
+                    last_was_newline = False
+                    yield VbaToken(VbaTokenKind.DATE_LITERAL, text, start)
+                    continue
+                self.pos += 1
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.IDENTIFIER, &#39;#&#39;, start)
+                continue
+
+            if c == &#39;&amp;&#39; and self.pos + 1 &lt; length and src[self.pos + 1].lower() in &#39;ho&#39;:
+                tok = self._read_number()
+                last_was_newline = False
+                yield tok
+                continue
+
+            if c.isdigit() or (c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()):
+                tok = self._read_number()
+                last_was_newline = False
+                yield tok
+                continue
+
+            if c.isalpha() or c == &#39;_&#39;:
+                tok = self._read_identifier_or_keyword()
+                if tok.kind in (
+                    VbaTokenKind.BOOLEAN_TRUE,
+                    VbaTokenKind.BOOLEAN_FALSE,
+                ):
+                    last_was_newline = False
+                    yield tok
+                    continue
+                if tok.value.lower() == &#39;rem&#39;:
+                    text = self._read_comment()
+                    yield VbaToken(VbaTokenKind.COMMENT, tok.value + text, start)
+                    continue
+                last_was_newline = False
+                yield tok
+                continue
+
+            if c == &#39;[&#39;:
+                text = self._read_bracket_identifier()
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.IDENTIFIER, text, start)
+                continue
+
+            c2 = src[self.pos:self.pos + 2]
+            if c2 == &#39;&lt;&gt;&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.NEQ, &#39;&lt;&gt;&#39;, start)
+                continue
+            if c2 == &#39;&lt;=&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.LTE, &#39;&lt;=&#39;, start)
+                continue
+            if c2 == &#39;&gt;=&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.GTE, &#39;&gt;=&#39;, start)
+                continue
+            if c2 == &#39;:=&#39;:
+                self.pos += 2
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.ASSIGN, &#39;:=&#39;, start)
+                continue
+
+            op_kind = _ONE_CHAR_OPS.get(c)
+            if op_kind is not None:
+                self.pos += 1
+                last_was_newline = False
+                if op_kind == VbaTokenKind.COLON:
+                    yield VbaToken(VbaTokenKind.COLON, &#39;:&#39;, start)
+                else:
+                    yield VbaToken(op_kind, c, start)
+                continue
+
+            self.pos += 1
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.IDENTIFIER, c, start)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.vba.lexer.VbaLexer.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.vba.lexer.VbaLexer.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.vba.lexer.VbaLexer.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/vba/lexer.py#L185-L321" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokenize(self) -&gt; Generator[VbaToken, None, None]:
+    src = self.source
+    length = len(src)
+    last_was_newline = True
+
+    while True:
+        self._skip_whitespace()
+        if self._at_end():
+            yield VbaToken(VbaTokenKind.EOF, &#39;&#39;, self.pos)
+            return
+
+        start = self.pos
+        c = src[self.pos]
+
+        if c == &#39;_&#39;:
+            p = self.pos + 1
+            while p &lt; length and src[p] in &#39; \t&#39;:
+                p += 1
+            if p &gt;= length or src[p] in &#39;\r\n&#39;:
+                self.pos = p
+                if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+                    self.pos += 1
+                if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                    self.pos += 1
+                continue
+
+        if c == &#39;\r&#39; or c == &#39;\n&#39;:
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+            else:
+                self.pos += 1
+            if not last_was_newline:
+                yield VbaToken(VbaTokenKind.NEWLINE, &#39;\n&#39;, start)
+                last_was_newline = True
+            continue
+
+        if c == &#34;&#39;&#34;:
+            text = self._read_comment()
+            yield VbaToken(VbaTokenKind.COMMENT, text, start)
+            continue
+
+        if c == &#39;&#34;&#39;:
+            text = self._read_string()
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.STRING, text, start)
+            continue
+
+        if c == &#39;#&#39;:
+            if last_was_newline and self.pos + 1 &lt; length and src[self.pos + 1].isalpha():
+                peek = self.pos + 1
+                while peek &lt; length and src[peek].isalpha():
+                    peek += 1
+                word = src[self.pos + 1:peek].lower()
+                if word in (&#39;if&#39;, &#39;elseif&#39;, &#39;else&#39;, &#39;end&#39;, &#39;endif&#39;, &#39;const&#39;):
+                    while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+                        self.pos += 1
+                    continue
+            if self.pos + 1 &lt; length and not src[self.pos + 1].isspace():
+                text = self._read_date_literal()
+                last_was_newline = False
+                yield VbaToken(VbaTokenKind.DATE_LITERAL, text, start)
+                continue
+            self.pos += 1
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.IDENTIFIER, &#39;#&#39;, start)
+            continue
+
+        if c == &#39;&amp;&#39; and self.pos + 1 &lt; length and src[self.pos + 1].lower() in &#39;ho&#39;:
+            tok = self._read_number()
+            last_was_newline = False
+            yield tok
+            continue
+
+        if c.isdigit() or (c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()):
+            tok = self._read_number()
+            last_was_newline = False
+            yield tok
+            continue
+
+        if c.isalpha() or c == &#39;_&#39;:
+            tok = self._read_identifier_or_keyword()
+            if tok.kind in (
+                VbaTokenKind.BOOLEAN_TRUE,
+                VbaTokenKind.BOOLEAN_FALSE,
+            ):
+                last_was_newline = False
+                yield tok
+                continue
+            if tok.value.lower() == &#39;rem&#39;:
+                text = self._read_comment()
+                yield VbaToken(VbaTokenKind.COMMENT, tok.value + text, start)
+                continue
+            last_was_newline = False
+            yield tok
+            continue
+
+        if c == &#39;[&#39;:
+            text = self._read_bracket_identifier()
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.IDENTIFIER, text, start)
+            continue
+
+        c2 = src[self.pos:self.pos + 2]
+        if c2 == &#39;&lt;&gt;&#39;:
+            self.pos += 2
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.NEQ, &#39;&lt;&gt;&#39;, start)
+            continue
+        if c2 == &#39;&lt;=&#39;:
+            self.pos += 2
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.LTE, &#39;&lt;=&#39;, start)
+            continue
+        if c2 == &#39;&gt;=&#39;:
+            self.pos += 2
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.GTE, &#39;&gt;=&#39;, start)
+            continue
+        if c2 == &#39;:=&#39;:
+            self.pos += 2
+            last_was_newline = False
+            yield VbaToken(VbaTokenKind.ASSIGN, &#39;:=&#39;, start)
+            continue
+
+        op_kind = _ONE_CHAR_OPS.get(c)
+        if op_kind is not None:
+            self.pos += 1
+            last_was_newline = False
+            if op_kind == VbaTokenKind.COLON:
+                yield VbaToken(VbaTokenKind.COLON, &#39;:&#39;, start)
+            else:
+                yield VbaToken(op_kind, c, start)
+            continue
+
+        self.pos += 1
+        last_was_newline = False
+        yield VbaToken(VbaTokenKind.IDENTIFIER, c, start)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.vba" href="index.html">refinery.lib.scripts.vba</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.vba.lexer.VbaLexer" href="#refinery.lib.scripts.vba.lexer.VbaLexer">VbaLexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.vba.lexer.VbaLexer.tokenize" href="#refinery.lib.scripts.vba.lexer.VbaLexer.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.outlook documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.outlook</code></h1>
+</header>
+<section id="section-intro">
+<p>Lightweight parser for Outlook MSG files based on olefile.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L1-L344" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Lightweight parser for Outlook MSG files based on olefile.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import codecs
+import re
+import struct
+
+from datetime import datetime, timedelta, timezone
+from email.parser import HeaderParser
+from functools import cached_property
+
+_PSETID_APPOINTMENT = bytes.fromhex(&#39;0220060000000000c000000000000046&#39;)
+_LID_LOCATION = 0x8208
+_FILETIME_EPOCH = datetime(1601, 1, 1, tzinfo=timezone.utc)
+
+_CODEPAGE_OVERRIDES = {
+    20127: &#39;ascii&#39;,
+    20932: &#39;euc-jp&#39;,
+    28591: &#39;iso-8859-1&#39;,
+    28592: &#39;iso-8859-2&#39;,
+    28593: &#39;iso-8859-3&#39;,
+    28594: &#39;iso-8859-4&#39;,
+    28595: &#39;iso-8859-5&#39;,
+    28596: &#39;iso-8859-6&#39;,
+    28597: &#39;iso-8859-7&#39;,
+    28598: &#39;iso-8859-8&#39;,
+    28599: &#39;iso-8859-9&#39;,
+    28603: &#39;iso-8859-13&#39;,
+    28605: &#39;iso-8859-15&#39;,
+    50220: &#39;iso-2022-jp&#39;,
+    50221: &#39;iso-2022-jp&#39;,
+    50225: &#39;iso-2022-kr&#39;,
+    51932: &#39;euc-jp&#39;,
+    51949: &#39;euc-kr&#39;,
+}
+
+
+def _codepage_to_codec(cp: int) -&gt; str:
+    if name := _CODEPAGE_OVERRIDES.get(cp):
+        return name
+    try:
+        return codecs.lookup(F&#39;cp{cp}&#39;).name
+    except LookupError:
+        return &#39;cp1252&#39;
+
+
+def _filetime_to_datetime(filetime: int) -&gt; datetime | None:
+    if filetime &lt;= 0:
+        return None
+    return _FILETIME_EPOCH + timedelta(microseconds=filetime // 10)
+
+
+class MsgAttachment:
+    def __init__(self, ole, prefix: str, parent: MsgFile):
+        self._ole = ole
+        self._prefix = prefix
+        self._parent = parent
+        props_path = F&#39;{prefix}/__properties_version1.0&#39;
+        self._props = parent._parse_properties(props_path, header_size=8)
+
+    def _stream(self, path: str) -&gt; bytes | memoryview | None:
+        full = F&#39;{self._prefix}/{path}&#39;
+        if self._ole.exists(full):
+            return self._ole.openstream(full).read()
+        return None
+
+    def _read_string(self, prop_id: str) -&gt; str | None:
+        for suffix, codec in ((&#39;001F&#39;, &#39;utf-16-le&#39;), (&#39;001E&#39;, self._parent._ansi_codec)):
+            data = self._stream(F&#39;__substg1.0_{prop_id}{suffix}&#39;)
+            if data is not None:
+                return codecs.decode(data, codec).rstrip(&#39;\0&#39;)
+        return None
+
+    @cached_property
+    def attach_method(self) -&gt; int:
+        return self._props.get(&#39;37050003&#39;, 1)
+
+    @cached_property
+    def content_id(self) -&gt; str | None:
+        return self._read_string(&#39;3712&#39;)
+
+    @cached_property
+    def mime_type(self) -&gt; str | None:
+        return self._read_string(&#39;370E&#39;)
+
+    @cached_property
+    def is_embedded_msg(self) -&gt; bool:
+        return self.attach_method == 5
+
+    @cached_property
+    def is_ole_storage(self) -&gt; bool:
+        return self.attach_method == 6
+
+    @cached_property
+    def data(self) -&gt; bytes | memoryview | MsgFile:
+        method = self.attach_method
+        if method == 5:
+            prefix = F&#39;{self._prefix}/__substg1.0_3701000D&#39;
+            if self._ole.exists(prefix):
+                return MsgFile._from_ole(self._ole, prefix)
+        if method == 6:
+            binary = self._stream(&#39;__substg1.0_37010102&#39;)
+            if binary is not None:
+                return binary
+        if method in (2, 3, 4, 7):
+            ref = self._read_string(&#39;3701&#39;) or self.long_filename
+            if ref:
+                return ref.encode(&#39;utf-8&#39;)
+            return b&#39;&#39;
+        raw = self._stream(&#39;__substg1.0_37010102&#39;)
+        return raw if raw is not None else b&#39;&#39;
+
+    @cached_property
+    def long_filename(self) -&gt; str | None:
+        return self._read_string(&#39;3707&#39;)
+
+    @cached_property
+    def short_filename(self) -&gt; str | None:
+        return self._read_string(&#39;3704&#39;)
+
+
+class MsgFile:
+    def __init__(self, data: bytes | bytearray | memoryview):
+        from refinery.lib.ole.file import OleFile
+        from refinery.lib.structures import MemoryFile
+        self._ole = OleFile(MemoryFile(data))
+        self._prefix = &#39;&#39;
+        self._init()
+
+    @classmethod
+    def _from_ole(cls, ole, prefix: str) -&gt; MsgFile:
+        obj = object.__new__(cls)
+        obj._ole = ole
+        obj._prefix = prefix
+        obj._init()
+        return obj
+
+    def _init(self):
+        self._unicode = False
+        p = self._prefix
+        for entry in self._ole.listdir():
+            path = &#39;/&#39;.join(entry)
+            if path.startswith(p) and path.endswith(&#39;001F&#39;):
+                self._unicode = True
+                break
+        props_path = F&#39;{p}/__properties_version1.0&#39; if p else &#39;__properties_version1.0&#39;
+        header_size = 32 if not p else 24
+        self._props = self._parse_properties(props_path, header_size)
+        cp = self._props.get(&#39;3FFD0003&#39;) or self._props.get(&#39;3FDE0003&#39;)
+        self._ansi_codec = _codepage_to_codec(cp) if cp else &#39;cp1252&#39;
+        self._named_props = self._parse_named_properties()
+
+    def _read_stream(self, path: str) -&gt; bytes | memoryview | None:
+        if self._ole.exists(path):
+            return self._ole.openstream(path).read()
+        return None
+
+    def _read_string(self, prop_id: str) -&gt; str | None:
+        p = self._prefix
+        base = F&#39;{p}/__substg1.0_{prop_id}&#39; if p else F&#39;__substg1.0_{prop_id}&#39;
+        for suffix, codec in ((&#39;001F&#39;, &#39;utf-16-le&#39;), (&#39;001E&#39;, self._ansi_codec)):
+            data = self._read_stream(F&#39;{base}{suffix}&#39;)
+            if data is not None:
+                try:
+                    return codecs.decode(data, codec).rstrip(&#39;\0&#39;)
+                except (UnicodeDecodeError, LookupError):
+                    continue
+        return None
+
+    def _read_binary(self, prop_id: str) -&gt; bytes | memoryview | None:
+        p = self._prefix
+        path = F&#39;{p}/__substg1.0_{prop_id}0102&#39; if p else F&#39;__substg1.0_{prop_id}0102&#39;
+        return self._read_stream(path)
+
+    def _parse_named_properties(self) -&gt; dict[tuple[bytes, int], int]:
+        &#34;&#34;&#34;
+        Parse the __nameid_version1.0 streams to build a mapping from (GUID, LID) to the runtime
+        property ID in the 0x8000+ range.
+        &#34;&#34;&#34;
+        result: dict[tuple[bytes, int], int] = {}
+        guid_stream = self._read_stream(&#39;__nameid_version1.0/__substg1.0_00020102&#39;)
+        data_stream = self._read_stream(&#39;__nameid_version1.0/__substg1.0_00030102&#39;)
+        if not guid_stream or not data_stream:
+            return result
+        guids: list[bytes] = []
+        for i in range(0, len(guid_stream), 16):
+            guids.append(bytes(guid_stream[i:i + 16]))
+        for i in range(0, len(data_stream) - 7, 8):
+            lid, info, _idx = struct.unpack_from(&#39;&lt;IHH&#39;, data_stream, i)
+            is_string = info &amp; 1
+            if is_string:
+                continue
+            guid_idx = info &gt;&gt; 1
+            if guid_idx &lt; 3 or guid_idx - 3 &gt;= len(guids):
+                continue
+            guid = guids[guid_idx - 3]
+            result[(guid, lid)] = 0x8000 + i // 8
+        return result
+
+    def _resolve_named_prop(self, guid: bytes, lid: int) -&gt; str | None:
+        prop_id = self._named_props.get((guid, lid))
+        if prop_id is not None:
+            return F&#39;{prop_id:04X}&#39;
+        return None
+
+    def _parse_properties(self, stream_path: str, header_size: int = 32) -&gt; dict:
+        data = self._read_stream(stream_path)
+        if not data or len(data) &lt; header_size + 16:
+            return {}
+        props = {}
+        mv = memoryview(data)
+        for offset in range(header_size, len(data) - 15, 16):
+            record = mv[offset:offset + 16]
+            prop_type = int.from_bytes(record[0:2], &#39;little&#39;)
+            prop_id = int.from_bytes(record[2:4], &#39;little&#39;)
+            tag = F&#39;{prop_id:04X}{prop_type:04X}&#39;
+            if prop_type == 0x0003:
+                props[tag] = int.from_bytes(record[8:12], &#39;little&#39;)
+            elif prop_type == 0x0040:
+                ft = int.from_bytes(record[8:16], &#39;little&#39;)
+                props[tag] = _filetime_to_datetime(ft)
+        return props
+
+    @cached_property
+    def subject(self) -&gt; str | None:
+        return self._read_string(&#39;0037&#39;)
+
+    @cached_property
+    def message_class(self) -&gt; str:
+        return (self._read_string(&#39;001A&#39;) or &#39;IPM.Note&#39;).upper()
+
+    @cached_property
+    def sender(self) -&gt; str | None:
+        return self._read_string(&#39;0C1A&#39;) or self._read_string(&#39;0065&#39;)
+
+    @cached_property
+    def to(self) -&gt; str | None:
+        return self._read_string(&#39;0E04&#39;)
+
+    @cached_property
+    def cc(self) -&gt; str | None:
+        return self._read_string(&#39;0E03&#39;)
+
+    @cached_property
+    def bcc(self) -&gt; str | None:
+        return self._read_string(&#39;0E02&#39;)
+
+    @cached_property
+    def message_id(self) -&gt; str | None:
+        return self._read_string(&#39;1035&#39;)
+
+    @cached_property
+    def date(self) -&gt; datetime | None:
+        return self._props.get(&#39;0E060040&#39;) or self._props.get(&#39;00390040&#39;)
+
+    @cached_property
+    def header(self) -&gt; dict[str, str]:
+        raw = self._read_string(&#39;007D&#39;)
+        if not raw:
+            return {}
+        parsed = HeaderParser().parsestr(raw)
+        return dict(parsed.items())
+
+    @cached_property
+    def body(self) -&gt; str | None:
+        return self._read_string(&#39;1000&#39;)
+
+    @cached_property
+    def html_body(self) -&gt; bytes | None:
+        return self._read_binary(&#39;1013&#39;)
+
+    @cached_property
+    def rtf_body(self) -&gt; bytes | None:
+        data = self._read_binary(&#39;1009&#39;)
+        if data is None:
+            return None
+        from refinery.lib.rtfc import decompress
+        return decompress(data)
+
+    @cached_property
+    def attachments(self) -&gt; list[MsgAttachment]:
+        result = []
+        p = self._prefix
+        prefix_parts = p.split(&#39;/&#39;) if p else []
+        depth = len(prefix_parts)
+        seen = set()
+        for entry in self._ole.listdir():
+            if entry[:depth] != prefix_parts:
+                continue
+            if len(entry) &lt;= depth:
+                continue
+            dirname = entry[depth]
+            if not re.match(
+                r&#39;__attach_version1\.0_#[0-9A-F]{8}\Z&#39;, dirname, re.IGNORECASE
+            ):
+                continue
+            full = &#39;/&#39;.join(prefix_parts + [dirname]) if p else dirname
+            if full not in seen:
+                seen.add(full)
+                result.append(MsgAttachment(self._ole, full, self))
+        return result
+
+    # Contact properties (IPM.Contact)
+
+    @cached_property
+    def display_name(self) -&gt; str | None:
+        return self._read_string(&#39;3001&#39;)
+
+    @cached_property
+    def company(self) -&gt; str | None:
+        return self._read_string(&#39;3A16&#39;)
+
+    @cached_property
+    def job_title(self) -&gt; str | None:
+        return self._read_string(&#39;3A17&#39;)
+
+    @cached_property
+    def business_phone(self) -&gt; str | None:
+        return self._read_string(&#39;3A08&#39;)
+
+    @cached_property
+    def home_phone(self) -&gt; str | None:
+        return self._read_string(&#39;3A09&#39;)
+
+    @cached_property
+    def mobile_phone(self) -&gt; str | None:
+        return self._read_string(&#39;3A1C&#39;)
+
+    @cached_property
+    def start_time(self) -&gt; datetime | None:
+        return self._props.get(&#39;00600040&#39;)
+
+    @cached_property
+    def end_time(self) -&gt; datetime | None:
+        return self._props.get(&#39;00610040&#39;)
+
+    @cached_property
+    def location(self) -&gt; str | None:
+        prop_id = self._resolve_named_prop(_PSETID_APPOINTMENT, _LID_LOCATION)
+        if prop_id:
+            return self._read_string(prop_id)
+        return None</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.outlook.MsgAttachment"><code class="flex name class">
+<span>class <span class="ident">MsgAttachment</span></span>
+<span>(</span><span>ole, prefix, parent)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L55-L121" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MsgAttachment:
+    def __init__(self, ole, prefix: str, parent: MsgFile):
+        self._ole = ole
+        self._prefix = prefix
+        self._parent = parent
+        props_path = F&#39;{prefix}/__properties_version1.0&#39;
+        self._props = parent._parse_properties(props_path, header_size=8)
+
+    def _stream(self, path: str) -&gt; bytes | memoryview | None:
+        full = F&#39;{self._prefix}/{path}&#39;
+        if self._ole.exists(full):
+            return self._ole.openstream(full).read()
+        return None
+
+    def _read_string(self, prop_id: str) -&gt; str | None:
+        for suffix, codec in ((&#39;001F&#39;, &#39;utf-16-le&#39;), (&#39;001E&#39;, self._parent._ansi_codec)):
+            data = self._stream(F&#39;__substg1.0_{prop_id}{suffix}&#39;)
+            if data is not None:
+                return codecs.decode(data, codec).rstrip(&#39;\0&#39;)
+        return None
+
+    @cached_property
+    def attach_method(self) -&gt; int:
+        return self._props.get(&#39;37050003&#39;, 1)
+
+    @cached_property
+    def content_id(self) -&gt; str | None:
+        return self._read_string(&#39;3712&#39;)
+
+    @cached_property
+    def mime_type(self) -&gt; str | None:
+        return self._read_string(&#39;370E&#39;)
+
+    @cached_property
+    def is_embedded_msg(self) -&gt; bool:
+        return self.attach_method == 5
+
+    @cached_property
+    def is_ole_storage(self) -&gt; bool:
+        return self.attach_method == 6
+
+    @cached_property
+    def data(self) -&gt; bytes | memoryview | MsgFile:
+        method = self.attach_method
+        if method == 5:
+            prefix = F&#39;{self._prefix}/__substg1.0_3701000D&#39;
+            if self._ole.exists(prefix):
+                return MsgFile._from_ole(self._ole, prefix)
+        if method == 6:
+            binary = self._stream(&#39;__substg1.0_37010102&#39;)
+            if binary is not None:
+                return binary
+        if method in (2, 3, 4, 7):
+            ref = self._read_string(&#39;3701&#39;) or self.long_filename
+            if ref:
+                return ref.encode(&#39;utf-8&#39;)
+            return b&#39;&#39;
+        raw = self._stream(&#39;__substg1.0_37010102&#39;)
+        return raw if raw is not None else b&#39;&#39;
+
+    @cached_property
+    def long_filename(self) -&gt; str | None:
+        return self._read_string(&#39;3707&#39;)
+
+    @cached_property
+    def short_filename(self) -&gt; str | None:
+        return self._read_string(&#39;3704&#39;)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.outlook.MsgAttachment.attach_method"><code class="name">var <span class="ident">attach_method</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L76-L78" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def attach_method(self) -&gt; int:
+    return self._props.get(&#39;37050003&#39;, 1)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.content_id"><code class="name">var <span class="ident">content_id</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L80-L82" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def content_id(self) -&gt; str | None:
+    return self._read_string(&#39;3712&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.mime_type"><code class="name">var <span class="ident">mime_type</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L84-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def mime_type(self) -&gt; str | None:
+    return self._read_string(&#39;370E&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.is_embedded_msg"><code class="name">var <span class="ident">is_embedded_msg</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L88-L90" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def is_embedded_msg(self) -&gt; bool:
+    return self.attach_method == 5</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.is_ole_storage"><code class="name">var <span class="ident">is_ole_storage</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L92-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def is_ole_storage(self) -&gt; bool:
+    return self.attach_method == 6</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.data"><code class="name">var <span class="ident">data</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L96-L113" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def data(self) -&gt; bytes | memoryview | MsgFile:
+    method = self.attach_method
+    if method == 5:
+        prefix = F&#39;{self._prefix}/__substg1.0_3701000D&#39;
+        if self._ole.exists(prefix):
+            return MsgFile._from_ole(self._ole, prefix)
+    if method == 6:
+        binary = self._stream(&#39;__substg1.0_37010102&#39;)
+        if binary is not None:
+            return binary
+    if method in (2, 3, 4, 7):
+        ref = self._read_string(&#39;3701&#39;) or self.long_filename
+        if ref:
+            return ref.encode(&#39;utf-8&#39;)
+        return b&#39;&#39;
+    raw = self._stream(&#39;__substg1.0_37010102&#39;)
+    return raw if raw is not None else b&#39;&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.long_filename"><code class="name">var <span class="ident">long_filename</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L115-L117" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def long_filename(self) -&gt; str | None:
+    return self._read_string(&#39;3707&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgAttachment.short_filename"><code class="name">var <span class="ident">short_filename</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L119-L121" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def short_filename(self) -&gt; str | None:
+    return self._read_string(&#39;3704&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile"><code class="flex name class">
+<span>class <span class="ident">MsgFile</span></span>
+<span>(</span><span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L124-L344" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class MsgFile:
+    def __init__(self, data: bytes | bytearray | memoryview):
+        from refinery.lib.ole.file import OleFile
+        from refinery.lib.structures import MemoryFile
+        self._ole = OleFile(MemoryFile(data))
+        self._prefix = &#39;&#39;
+        self._init()
+
+    @classmethod
+    def _from_ole(cls, ole, prefix: str) -&gt; MsgFile:
+        obj = object.__new__(cls)
+        obj._ole = ole
+        obj._prefix = prefix
+        obj._init()
+        return obj
+
+    def _init(self):
+        self._unicode = False
+        p = self._prefix
+        for entry in self._ole.listdir():
+            path = &#39;/&#39;.join(entry)
+            if path.startswith(p) and path.endswith(&#39;001F&#39;):
+                self._unicode = True
+                break
+        props_path = F&#39;{p}/__properties_version1.0&#39; if p else &#39;__properties_version1.0&#39;
+        header_size = 32 if not p else 24
+        self._props = self._parse_properties(props_path, header_size)
+        cp = self._props.get(&#39;3FFD0003&#39;) or self._props.get(&#39;3FDE0003&#39;)
+        self._ansi_codec = _codepage_to_codec(cp) if cp else &#39;cp1252&#39;
+        self._named_props = self._parse_named_properties()
+
+    def _read_stream(self, path: str) -&gt; bytes | memoryview | None:
+        if self._ole.exists(path):
+            return self._ole.openstream(path).read()
+        return None
+
+    def _read_string(self, prop_id: str) -&gt; str | None:
+        p = self._prefix
+        base = F&#39;{p}/__substg1.0_{prop_id}&#39; if p else F&#39;__substg1.0_{prop_id}&#39;
+        for suffix, codec in ((&#39;001F&#39;, &#39;utf-16-le&#39;), (&#39;001E&#39;, self._ansi_codec)):
+            data = self._read_stream(F&#39;{base}{suffix}&#39;)
+            if data is not None:
+                try:
+                    return codecs.decode(data, codec).rstrip(&#39;\0&#39;)
+                except (UnicodeDecodeError, LookupError):
+                    continue
+        return None
+
+    def _read_binary(self, prop_id: str) -&gt; bytes | memoryview | None:
+        p = self._prefix
+        path = F&#39;{p}/__substg1.0_{prop_id}0102&#39; if p else F&#39;__substg1.0_{prop_id}0102&#39;
+        return self._read_stream(path)
+
+    def _parse_named_properties(self) -&gt; dict[tuple[bytes, int], int]:
+        &#34;&#34;&#34;
+        Parse the __nameid_version1.0 streams to build a mapping from (GUID, LID) to the runtime
+        property ID in the 0x8000+ range.
+        &#34;&#34;&#34;
+        result: dict[tuple[bytes, int], int] = {}
+        guid_stream = self._read_stream(&#39;__nameid_version1.0/__substg1.0_00020102&#39;)
+        data_stream = self._read_stream(&#39;__nameid_version1.0/__substg1.0_00030102&#39;)
+        if not guid_stream or not data_stream:
+            return result
+        guids: list[bytes] = []
+        for i in range(0, len(guid_stream), 16):
+            guids.append(bytes(guid_stream[i:i + 16]))
+        for i in range(0, len(data_stream) - 7, 8):
+            lid, info, _idx = struct.unpack_from(&#39;&lt;IHH&#39;, data_stream, i)
+            is_string = info &amp; 1
+            if is_string:
+                continue
+            guid_idx = info &gt;&gt; 1
+            if guid_idx &lt; 3 or guid_idx - 3 &gt;= len(guids):
+                continue
+            guid = guids[guid_idx - 3]
+            result[(guid, lid)] = 0x8000 + i // 8
+        return result
+
+    def _resolve_named_prop(self, guid: bytes, lid: int) -&gt; str | None:
+        prop_id = self._named_props.get((guid, lid))
+        if prop_id is not None:
+            return F&#39;{prop_id:04X}&#39;
+        return None
+
+    def _parse_properties(self, stream_path: str, header_size: int = 32) -&gt; dict:
+        data = self._read_stream(stream_path)
+        if not data or len(data) &lt; header_size + 16:
+            return {}
+        props = {}
+        mv = memoryview(data)
+        for offset in range(header_size, len(data) - 15, 16):
+            record = mv[offset:offset + 16]
+            prop_type = int.from_bytes(record[0:2], &#39;little&#39;)
+            prop_id = int.from_bytes(record[2:4], &#39;little&#39;)
+            tag = F&#39;{prop_id:04X}{prop_type:04X}&#39;
+            if prop_type == 0x0003:
+                props[tag] = int.from_bytes(record[8:12], &#39;little&#39;)
+            elif prop_type == 0x0040:
+                ft = int.from_bytes(record[8:16], &#39;little&#39;)
+                props[tag] = _filetime_to_datetime(ft)
+        return props
+
+    @cached_property
+    def subject(self) -&gt; str | None:
+        return self._read_string(&#39;0037&#39;)
+
+    @cached_property
+    def message_class(self) -&gt; str:
+        return (self._read_string(&#39;001A&#39;) or &#39;IPM.Note&#39;).upper()
+
+    @cached_property
+    def sender(self) -&gt; str | None:
+        return self._read_string(&#39;0C1A&#39;) or self._read_string(&#39;0065&#39;)
+
+    @cached_property
+    def to(self) -&gt; str | None:
+        return self._read_string(&#39;0E04&#39;)
+
+    @cached_property
+    def cc(self) -&gt; str | None:
+        return self._read_string(&#39;0E03&#39;)
+
+    @cached_property
+    def bcc(self) -&gt; str | None:
+        return self._read_string(&#39;0E02&#39;)
+
+    @cached_property
+    def message_id(self) -&gt; str | None:
+        return self._read_string(&#39;1035&#39;)
+
+    @cached_property
+    def date(self) -&gt; datetime | None:
+        return self._props.get(&#39;0E060040&#39;) or self._props.get(&#39;00390040&#39;)
+
+    @cached_property
+    def header(self) -&gt; dict[str, str]:
+        raw = self._read_string(&#39;007D&#39;)
+        if not raw:
+            return {}
+        parsed = HeaderParser().parsestr(raw)
+        return dict(parsed.items())
+
+    @cached_property
+    def body(self) -&gt; str | None:
+        return self._read_string(&#39;1000&#39;)
+
+    @cached_property
+    def html_body(self) -&gt; bytes | None:
+        return self._read_binary(&#39;1013&#39;)
+
+    @cached_property
+    def rtf_body(self) -&gt; bytes | None:
+        data = self._read_binary(&#39;1009&#39;)
+        if data is None:
+            return None
+        from refinery.lib.rtfc import decompress
+        return decompress(data)
+
+    @cached_property
+    def attachments(self) -&gt; list[MsgAttachment]:
+        result = []
+        p = self._prefix
+        prefix_parts = p.split(&#39;/&#39;) if p else []
+        depth = len(prefix_parts)
+        seen = set()
+        for entry in self._ole.listdir():
+            if entry[:depth] != prefix_parts:
+                continue
+            if len(entry) &lt;= depth:
+                continue
+            dirname = entry[depth]
+            if not re.match(
+                r&#39;__attach_version1\.0_#[0-9A-F]{8}\Z&#39;, dirname, re.IGNORECASE
+            ):
+                continue
+            full = &#39;/&#39;.join(prefix_parts + [dirname]) if p else dirname
+            if full not in seen:
+                seen.add(full)
+                result.append(MsgAttachment(self._ole, full, self))
+        return result
+
+    # Contact properties (IPM.Contact)
+
+    @cached_property
+    def display_name(self) -&gt; str | None:
+        return self._read_string(&#39;3001&#39;)
+
+    @cached_property
+    def company(self) -&gt; str | None:
+        return self._read_string(&#39;3A16&#39;)
+
+    @cached_property
+    def job_title(self) -&gt; str | None:
+        return self._read_string(&#39;3A17&#39;)
+
+    @cached_property
+    def business_phone(self) -&gt; str | None:
+        return self._read_string(&#39;3A08&#39;)
+
+    @cached_property
+    def home_phone(self) -&gt; str | None:
+        return self._read_string(&#39;3A09&#39;)
+
+    @cached_property
+    def mobile_phone(self) -&gt; str | None:
+        return self._read_string(&#39;3A1C&#39;)
+
+    @cached_property
+    def start_time(self) -&gt; datetime | None:
+        return self._props.get(&#39;00600040&#39;)
+
+    @cached_property
+    def end_time(self) -&gt; datetime | None:
+        return self._props.get(&#39;00610040&#39;)
+
+    @cached_property
+    def location(self) -&gt; str | None:
+        prop_id = self._resolve_named_prop(_PSETID_APPOINTMENT, _LID_LOCATION)
+        if prop_id:
+            return self._read_string(prop_id)
+        return None</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.outlook.MsgFile.subject"><code class="name">var <span class="ident">subject</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L226-L228" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def subject(self) -&gt; str | None:
+    return self._read_string(&#39;0037&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.message_class"><code class="name">var <span class="ident">message_class</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L230-L232" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def message_class(self) -&gt; str:
+    return (self._read_string(&#39;001A&#39;) or &#39;IPM.Note&#39;).upper()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.sender"><code class="name">var <span class="ident">sender</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L234-L236" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def sender(self) -&gt; str | None:
+    return self._read_string(&#39;0C1A&#39;) or self._read_string(&#39;0065&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.to"><code class="name">var <span class="ident">to</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L238-L240" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def to(self) -&gt; str | None:
+    return self._read_string(&#39;0E04&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.cc"><code class="name">var <span class="ident">cc</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L242-L244" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def cc(self) -&gt; str | None:
+    return self._read_string(&#39;0E03&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.bcc"><code class="name">var <span class="ident">bcc</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L246-L248" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def bcc(self) -&gt; str | None:
+    return self._read_string(&#39;0E02&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.message_id"><code class="name">var <span class="ident">message_id</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L250-L252" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def message_id(self) -&gt; str | None:
+    return self._read_string(&#39;1035&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.date"><code class="name">var <span class="ident">date</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L254-L256" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def date(self) -&gt; datetime | None:
+    return self._props.get(&#39;0E060040&#39;) or self._props.get(&#39;00390040&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.header"><code class="name">var <span class="ident">header</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L258-L264" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def header(self) -&gt; dict[str, str]:
+    raw = self._read_string(&#39;007D&#39;)
+    if not raw:
+        return {}
+    parsed = HeaderParser().parsestr(raw)
+    return dict(parsed.items())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.body"><code class="name">var <span class="ident">body</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L266-L268" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def body(self) -&gt; str | None:
+    return self._read_string(&#39;1000&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.html_body"><code class="name">var <span class="ident">html_body</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L270-L272" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def html_body(self) -&gt; bytes | None:
+    return self._read_binary(&#39;1013&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.rtf_body"><code class="name">var <span class="ident">rtf_body</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L274-L280" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def rtf_body(self) -&gt; bytes | None:
+    data = self._read_binary(&#39;1009&#39;)
+    if data is None:
+        return None
+    from refinery.lib.rtfc import decompress
+    return decompress(data)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.attachments"><code class="name">var <span class="ident">attachments</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L282-L303" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def attachments(self) -&gt; list[MsgAttachment]:
+    result = []
+    p = self._prefix
+    prefix_parts = p.split(&#39;/&#39;) if p else []
+    depth = len(prefix_parts)
+    seen = set()
+    for entry in self._ole.listdir():
+        if entry[:depth] != prefix_parts:
+            continue
+        if len(entry) &lt;= depth:
+            continue
+        dirname = entry[depth]
+        if not re.match(
+            r&#39;__attach_version1\.0_#[0-9A-F]{8}\Z&#39;, dirname, re.IGNORECASE
+        ):
+            continue
+        full = &#39;/&#39;.join(prefix_parts + [dirname]) if p else dirname
+        if full not in seen:
+            seen.add(full)
+            result.append(MsgAttachment(self._ole, full, self))
+    return result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.display_name"><code class="name">var <span class="ident">display_name</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L307-L309" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def display_name(self) -&gt; str | None:
+    return self._read_string(&#39;3001&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.company"><code class="name">var <span class="ident">company</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L311-L313" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def company(self) -&gt; str | None:
+    return self._read_string(&#39;3A16&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.job_title"><code class="name">var <span class="ident">job_title</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L315-L317" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def job_title(self) -&gt; str | None:
+    return self._read_string(&#39;3A17&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.business_phone"><code class="name">var <span class="ident">business_phone</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L319-L321" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def business_phone(self) -&gt; str | None:
+    return self._read_string(&#39;3A08&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.home_phone"><code class="name">var <span class="ident">home_phone</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L323-L325" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def home_phone(self) -&gt; str | None:
+    return self._read_string(&#39;3A09&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.mobile_phone"><code class="name">var <span class="ident">mobile_phone</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L327-L329" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def mobile_phone(self) -&gt; str | None:
+    return self._read_string(&#39;3A1C&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.start_time"><code class="name">var <span class="ident">start_time</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L331-L333" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def start_time(self) -&gt; datetime | None:
+    return self._props.get(&#39;00600040&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.end_time"><code class="name">var <span class="ident">end_time</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L335-L337" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def end_time(self) -&gt; datetime | None:
+    return self._props.get(&#39;00610040&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.outlook.MsgFile.location"><code class="name">var <span class="ident">location</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/outlook.py#L339-L344" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@cached_property
+def location(self) -&gt; str | None:
+    prop_id = self._resolve_named_prop(_PSETID_APPOINTMENT, _LID_LOCATION)
+    if prop_id:
+        return self._read_string(prop_id)
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.outlook.MsgAttachment" href="#refinery.lib.outlook.MsgAttachment">MsgAttachment</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.outlook.MsgFile" href="#refinery.lib.outlook.MsgFile">MsgFile</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.scripting.cmdarg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.scripting.cmdarg</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/units/scripting/cmdarg.py#L1-L304" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import base64
+import codecs
+import io
+import os
+import re
+
+from refinery.units import Unit
+
+
+def _split_argv(cmdline: str) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Split a command line into argv using MSVC CRT rules.
+
+    The algorithm follows the MSVC C runtime documentation:
+    - Whitespace outside quotes separates arguments.
+    - A double quote toggles quote state.
+    - Backslashes are literal unless immediately preceding a double quote.
+    - 2N   backslashes before a quote produce N backslashes and the quote toggles state.
+    - 2N+1 backslashes before a quote produce N backslashes and a literal quote.
+    &#34;&#34;&#34;
+    args: list[str] = []
+    buf = io.StringIO()
+    i = 0
+    n = len(cmdline)
+    quoted = False
+
+    while i &lt; n:
+        c = cmdline[i]
+        if c == &#39;\\&#39;:
+            bs = 0
+            while i &lt; n and cmdline[i] == &#39;\\&#39;:
+                bs += 1
+                i += 1
+            if i &lt; n and cmdline[i] == &#39;&#34;&#39;:
+                buf.write(&#39;\\&#39; * (bs // 2))
+                if bs % 2 == 1:
+                    buf.write(&#39;&#34;&#39;)
+                else:
+                    quoted = not quoted
+                i += 1
+            else:
+                buf.write(&#39;\\&#39; * bs)
+        elif c == &#39;&#34;&#39;:
+            quoted = not quoted
+            i += 1
+        elif c in (&#39; &#39;, &#39;\t&#39;) and not quoted:
+            if b := buf.getvalue():
+                args.append(b)
+                buf.seek(0)
+                buf.truncate(0)
+            i += 1
+        else:
+            buf.write(c)
+            i += 1
+    if b := buf.getvalue():
+        args.append(b)
+    return args
+
+
+_PS_EXECUTABLE_NAMES = frozenset({
+    &#39;powershell&#39;,
+    &#39;powershell.exe&#39;,
+    &#39;pwsh&#39;,
+    &#39;pwsh.exe&#39;,
+})
+
+_WMIC_EXECUTABLE_NAMES = frozenset({
+    &#39;wmic&#39;,
+    &#39;wmic.exe&#39;,
+})
+
+_CMD_EXECUTABLE_NAMES = frozenset({
+    &#39;%comspec%&#39;,
+    &#39;cmd&#39;,
+    &#39;cmd.exe&#39;,
+})
+
+_START_EXECUTABLE_NAMES = frozenset({
+    &#39;start&#39;,
+})
+
+_START_SWITCHES_WITH_ARG = frozenset({
+    &#39;d&#39;,
+    &#39;node&#39;,
+    &#39;affinity&#39;,
+})
+
+_PARAM_WITH_NEXT_ARG = {
+    &#39;executionpolicy&#39;,
+    &#39;ep&#39;,
+    &#39;windowstyle&#39;,
+    &#39;configurationname&#39;,
+    &#39;custompipename&#39;,
+    &#39;settingsfile&#39;,
+    &#39;workingdirectory&#39;,
+    &#39;encodedarguments&#39;,
+    &#39;encodedargument&#39;,
+    &#39;outputformat&#39;,
+    &#39;inputformat&#39;,
+}
+
+_KNOWN_SWITCHES = {
+    &#39;command&#39;           : &#39;c&#39;,
+    &#39;encodedcommand&#39;    : &#39;e&#39;,
+    &#39;file&#39;              : &#39;f&#39;,
+    &#39;executionpolicy&#39;   : &#39;ex&#39;,
+    &#39;ep&#39;                : &#39;ep&#39;,
+    &#39;windowstyle&#39;       : &#39;w&#39;,
+    &#39;noprofile&#39;         : &#39;nop&#39;,
+    &#39;noninteractive&#39;    : &#39;noni&#39;,
+    &#39;nologo&#39;            : &#39;nol&#39;,
+    &#39;noexit&#39;            : &#39;noe&#39;,
+    &#39;sta&#39;               : &#39;s&#39;,
+    &#39;mta&#39;               : &#39;m&#39;,
+    &#39;outputformat&#39;      : &#39;o&#39;,
+    &#39;inputformat&#39;       : &#39;inp&#39;,
+    &#39;configurationname&#39; : &#39;con&#39;,
+    &#39;custompipename&#39;    : &#39;cu&#39;,
+    &#39;settingsfile&#39;      : &#39;se&#39;,
+    &#39;workingdirectory&#39;  : &#39;wo&#39;,
+    &#39;encodedarguments&#39;  : &#39;encodeda&#39;,
+    &#39;encodedargument&#39;   : &#39;encodeda&#39;,
+    &#39;version&#39;           : &#39;v&#39;,
+    &#39;login&#39;             : &#39;l&#39;,
+    &#39;help&#39;              : &#39;h&#39;,
+}
+
+
+def _match_switch(key: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    Match a PowerShell command-line switch using prefix matching. Strips the leading dash or
+    slash, then does a case-insensitive prefix match against known parameters, respecting the
+    minimum unique prefix length.
+    &#34;&#34;&#34;
+    key = key.lstrip(&#39;-/&#39;)
+    if key.startswith(&#39;-&#39;):
+        key = key[1:]
+    key = key.lower()
+    if not key:
+        return None
+    for param, min_prefix in _KNOWN_SWITCHES.items():
+        if param.startswith(key) and len(key) &gt;= len(min_prefix):
+            return param
+    return None
+
+
+def _executable_name(token: str) -&gt; str:
+    return os.path.basename(token.strip(&#34;&#39;&#34;)).lower()
+
+
+def _strip_outer_quotes(text: str) -&gt; str:
+    text = text.strip()
+    if len(text) &lt; 2 or text[0] != &#39;&#34;&#39;:
+        return text
+    k = len(text) - 1
+    if text[k] != &#39;&#34;&#39;:
+        return text
+    bs = 0
+    j = k - 1
+    while j &gt;= 0 and text[j] == &#39;\\&#39;:
+        bs += 1
+        j -= 1
+    if bs % 2 == 0:
+        return text[1:k]
+    return text
+
+
+_RE_WMIC_CREATE = re.compile(r&#34;&#34;&#34;(?ix)
+    (?:\S+[\\/])?
+       (?P&lt;quote0&gt;[&#34;&#39;]?) wmic(?:\.exe)? (?P=quote0)\s+
+    (?:/\S+\s+)*
+    (?:(?P&lt;quote1&gt;[&#34;&#39;]?) path           (?P=quote1)\s+)?
+       (?P&lt;quote2&gt;[&#34;&#39;]?) process        (?P=quote2)\s+
+       (?P&lt;quote3&gt;[&#34;&#39;]?) call           (?P=quote3)\s+
+       (?P&lt;quote4&gt;[&#34;&#39;]?) create         (?P=quote4)\s*
+&#34;&#34;&#34;)
+
+_RE_CMD_RUN = re.compile(r&#34;&#34;&#34;(?ix)
+    (?:%comspec%|(?:\S+[\\/])?
+       cmd(?:\.exe)?)\s*
+    (?:/[a-z](?::\w+)?\s*)*?
+       /[ck](?=[\s&#34;])[\s]*
+&#34;&#34;&#34;)
+
+
+class cmdarg(Unit):
+    &#34;&#34;&#34;
+    Extracts and unescapes arguments passed to wmic, cmd, start, or powershell commands.
+
+    The following types of command invocations are currently supported:
+
+    - `wmic process call create &#34;COMMAND&#34;`
+    - `cmd /c &#34;COMMAND&#34;`
+    - `cmd /k &#34;COMMAND&#34;`
+    - `start [/b] [/min] [/max] [/wait] COMMAND`
+    - `powershell -EncodedCommand COMMAND`
+    - `powershell -Command COMMAND`
+
+    Layers are peeled until the innermost recognizable payload is reached. This is useful
+    for extracting PowerShell code from obfuscated batch files and WMI-based launchers.
+    &#34;&#34;&#34;
+
+    def process(self, data: bytearray):
+        text = codecs.decode(data, self.codec, errors=&#39;surrogateescape&#39;)
+        for _ in range(10):
+            text = text.strip()
+            if not text:
+                raise ValueError(&#39;empty command line&#39;)
+            if result := self._dispatch(text):
+                text = result
+                self.log_info(F&#39;unwrapped a layer, continuing with: {result}&#39;, clip=True)
+                continue
+            return codecs.encode(text, self.codec, errors=&#39;surrogateescape&#39;)
+        raise ValueError(&#39;command chain exceeds maximum nesting depth&#39;)
+
+    def _dispatch(self, text: str) -&gt; str | None:
+        first = text.split()[0]
+        name = _executable_name(first)
+        if name in _PS_EXECUTABLE_NAMES or re.fullmatch(
+            r&#39;(?i)(?:.*[\\/])?(?:powershell|pwsh)(?:\.exe)?&#39;, first
+        ):
+            return self._extract_powershell(_split_argv(text), skip_executable=True)
+        if name in _WMIC_EXECUTABLE_NAMES or re.fullmatch(
+            r&#39;(?i)(?:.*[\\/])?wmic(?:\.exe)?&#39;, first
+        ):
+            return self._extract_wmic(text)
+        if name in _CMD_EXECUTABLE_NAMES or re.fullmatch(
+            r&#39;(?i)(?:.*[\\/])?cmd(?:\.exe)?&#39;, first
+        ):
+            return self._extract_cmd(text)
+        if name in _START_EXECUTABLE_NAMES:
+            return self._extract_start(_split_argv(text))
+        if first.startswith((&#39;-&#39;, &#39;/&#39;)):
+            return self._extract_powershell(_split_argv(text), skip_executable=False)
+        return None
+
+    def _extract_powershell(self, argv: list[str], skip_executable: bool) -&gt; str:
+        i = 1 if skip_executable else 0
+        command_args: list[str] = []
+        while i &lt; len(argv):
+            arg = argv[i]
+            if command_args or not arg.startswith((&#39;-&#39;, &#39;/&#39;)):
+                command_args.append(arg)
+                i += 1
+                continue
+            switch = _match_switch(arg)
+            self.log_info(switch)
+            if switch == &#39;command&#39;:
+                return &#39; &#39;.join(argv[i + 1:])
+            if switch == &#39;encodedcommand&#39;:
+                i += 1
+                if i &gt;= len(argv):
+                    raise ValueError(&#39;-EncodedCommand requires an argument&#39;)
+                blob = argv[i]
+                blob += &#39;=&#39; * (-len(blob) % 4)
+                raw = base64.b64decode(blob)
+                return codecs.decode(raw, &#39;utf-16-le&#39;)
+            if switch == &#39;file&#39;:
+                raise ValueError(
+                    &#39;-File parameter found; code is in a file, not in the command line&#39;)
+            if switch is not None and switch in _PARAM_WITH_NEXT_ARG:
+                i += 2
+                continue
+            if switch is not None:
+                i += 1
+                continue
+            command_args.append(arg)
+            i += 1
+        if command_args:
+            return &#39; &#39;.join(command_args)
+        raise ValueError(&#39;no PowerShell code found in command line&#39;)
+
+    def _extract_wmic(self, text: str) -&gt; str:
+        match = _RE_WMIC_CREATE.match(text)
+        if not match:
+            raise ValueError(&#39;not a recognized WMIC process create command&#39;)
+        return _strip_outer_quotes(text[match.end():])
+
+    def _extract_cmd(self, text: str) -&gt; str:
+        match = _RE_CMD_RUN.match(text)
+        if not match:
+            raise ValueError(&#39;CMD command line missing /c or /k switch&#39;)
+        return _strip_outer_quotes(text[match.end():])
+
+    def _extract_start(self, argv: list[str]) -&gt; str:
+        i = 1
+        while i &lt; len(argv):
+            arg = argv[i]
+            if not arg:
+                i += 1
+                continue
+            if arg.startswith(&#39;/&#39;):
+                if arg[1:].lower() in _START_SWITCHES_WITH_ARG:
+                    i += 2
+                    continue
+                i += 1
+                continue
+            if &#39; &#39; in arg:
+                i += 1
+                continue
+            return &#39; &#39;.join(argv[i:])
+        raise ValueError(&#39;no command found after start&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.scripting.cmdarg.cmdarg"><code class="flex name class">
+<span>class <span class="ident">cmdarg</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Extracts and unescapes arguments passed to wmic, cmd, start, or powershell commands.</p>
+<p>The following types of command invocations are currently supported:</p>
+<ul>
+<li><code>wmic process call create "COMMAND"</code></li>
+<li><code>cmd /c "COMMAND"</code></li>
+<li><code>cmd /k "COMMAND"</code></li>
+<li><code>start [/b] [/min] [/max] [/wait] COMMAND</code></li>
+<li><code>powershell -EncodedCommand COMMAND</code></li>
+<li><code>powershell -Command COMMAND</code></li>
+</ul>
+<p>Layers are peeled until the innermost recognizable payload is reached. This is useful
+for extracting PowerShell code from obfuscated batch files and WMI-based launchers.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/units/scripting/cmdarg.py#L188-L304" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class cmdarg(Unit):
+    &#34;&#34;&#34;
+    Extracts and unescapes arguments passed to wmic, cmd, start, or powershell commands.
+
+    The following types of command invocations are currently supported:
+
+    - `wmic process call create &#34;COMMAND&#34;`
+    - `cmd /c &#34;COMMAND&#34;`
+    - `cmd /k &#34;COMMAND&#34;`
+    - `start [/b] [/min] [/max] [/wait] COMMAND`
+    - `powershell -EncodedCommand COMMAND`
+    - `powershell -Command COMMAND`
+
+    Layers are peeled until the innermost recognizable payload is reached. This is useful
+    for extracting PowerShell code from obfuscated batch files and WMI-based launchers.
+    &#34;&#34;&#34;
+
+    def process(self, data: bytearray):
+        text = codecs.decode(data, self.codec, errors=&#39;surrogateescape&#39;)
+        for _ in range(10):
+            text = text.strip()
+            if not text:
+                raise ValueError(&#39;empty command line&#39;)
+            if result := self._dispatch(text):
+                text = result
+                self.log_info(F&#39;unwrapped a layer, continuing with: {result}&#39;, clip=True)
+                continue
+            return codecs.encode(text, self.codec, errors=&#39;surrogateescape&#39;)
+        raise ValueError(&#39;command chain exceeds maximum nesting depth&#39;)
+
+    def _dispatch(self, text: str) -&gt; str | None:
+        first = text.split()[0]
+        name = _executable_name(first)
+        if name in _PS_EXECUTABLE_NAMES or re.fullmatch(
+            r&#39;(?i)(?:.*[\\/])?(?:powershell|pwsh)(?:\.exe)?&#39;, first
+        ):
+            return self._extract_powershell(_split_argv(text), skip_executable=True)
+        if name in _WMIC_EXECUTABLE_NAMES or re.fullmatch(
+            r&#39;(?i)(?:.*[\\/])?wmic(?:\.exe)?&#39;, first
+        ):
+            return self._extract_wmic(text)
+        if name in _CMD_EXECUTABLE_NAMES or re.fullmatch(
+            r&#39;(?i)(?:.*[\\/])?cmd(?:\.exe)?&#39;, first
+        ):
+            return self._extract_cmd(text)
+        if name in _START_EXECUTABLE_NAMES:
+            return self._extract_start(_split_argv(text))
+        if first.startswith((&#39;-&#39;, &#39;/&#39;)):
+            return self._extract_powershell(_split_argv(text), skip_executable=False)
+        return None
+
+    def _extract_powershell(self, argv: list[str], skip_executable: bool) -&gt; str:
+        i = 1 if skip_executable else 0
+        command_args: list[str] = []
+        while i &lt; len(argv):
+            arg = argv[i]
+            if command_args or not arg.startswith((&#39;-&#39;, &#39;/&#39;)):
+                command_args.append(arg)
+                i += 1
+                continue
+            switch = _match_switch(arg)
+            self.log_info(switch)
+            if switch == &#39;command&#39;:
+                return &#39; &#39;.join(argv[i + 1:])
+            if switch == &#39;encodedcommand&#39;:
+                i += 1
+                if i &gt;= len(argv):
+                    raise ValueError(&#39;-EncodedCommand requires an argument&#39;)
+                blob = argv[i]
+                blob += &#39;=&#39; * (-len(blob) % 4)
+                raw = base64.b64decode(blob)
+                return codecs.decode(raw, &#39;utf-16-le&#39;)
+            if switch == &#39;file&#39;:
+                raise ValueError(
+                    &#39;-File parameter found; code is in a file, not in the command line&#39;)
+            if switch is not None and switch in _PARAM_WITH_NEXT_ARG:
+                i += 2
+                continue
+            if switch is not None:
+                i += 1
+                continue
+            command_args.append(arg)
+            i += 1
+        if command_args:
+            return &#39; &#39;.join(command_args)
+        raise ValueError(&#39;no PowerShell code found in command line&#39;)
+
+    def _extract_wmic(self, text: str) -&gt; str:
+        match = _RE_WMIC_CREATE.match(text)
+        if not match:
+            raise ValueError(&#39;not a recognized WMIC process create command&#39;)
+        return _strip_outer_quotes(text[match.end():])
+
+    def _extract_cmd(self, text: str) -&gt; str:
+        match = _RE_CMD_RUN.match(text)
+        if not match:
+            raise ValueError(&#39;CMD command line missing /c or /k switch&#39;)
+        return _strip_outer_quotes(text[match.end():])
+
+    def _extract_start(self, argv: list[str]) -&gt; str:
+        i = 1
+        while i &lt; len(argv):
+            arg = argv[i]
+            if not arg:
+                i += 1
+                continue
+            if arg.startswith(&#39;/&#39;):
+                if arg[1:].lower() in _START_SWITCHES_WITH_ARG:
+                    i += 2
+                    continue
+                i += 1
+                continue
+            if &#39; &#39; in arg:
+                i += 1
+                continue
+            return &#39; &#39;.join(argv[i:])
+        raise ValueError(&#39;no command found after start&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.scripting.cmdarg.cmdarg" href="#refinery.units.scripting.cmdarg.cmdarg">cmdarg</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.units.scripting.cmdarg.cmdarg.reverse"><code class="name">var <span class="ident">reverse</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.scripting" href="index.html">refinery.units.scripting</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.scripting.cmdarg.cmdarg" href="#refinery.units.scripting.cmdarg.cmdarg">cmdarg</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

@@ -1,0 +1,1880 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L1-L786" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import re
+
+from dataclasses import dataclass, field
+from typing import Generator
+
+from refinery.lib.scripts.ps1.token import _KEYWORDS, Ps1Token, Ps1TokenKind
+
+
+class Ps1LexerMode(enum.Enum):
+    EXPRESSION = &#39;expression&#39;
+    ARGUMENT = &#39;argument&#39;
+
+
+BACKTICK_ESCAPE = {
+    &#39;0&#39; : &#39;\0&#39;,
+    &#39;a&#39; : &#39;\a&#39;,
+    &#39;b&#39; : &#39;\b&#39;,
+    &#39;e&#39; : &#39;\x1b&#39;,
+    &#39;f&#39; : &#39;\f&#39;,
+    &#39;n&#39; : &#39;\n&#39;,
+    &#39;r&#39; : &#39;\r&#39;,
+    &#39;t&#39; : &#39;\t&#39;,
+    &#39;v&#39; : &#39;\v&#39;,
+}
+
+SINGLE_QUOTES = frozenset(&#34;&#39;\u2018\u2019\u201A\u201B&#34;)
+DOUBLE_QUOTES = frozenset(&#39;&#34;\u201C\u201D\u201E&#39;)
+DASHES = frozenset(&#39;-\u2013\u2014\u2015&#39;)
+WHITESPACE = frozenset(&#39; \t\u00A0\u0085&#39;)
+
+NORMALIZE_QUOTES = str.maketrans({
+    &#39;\u2018&#39;: &#34;&#39;&#34;,
+    &#39;\u2019&#39;: &#34;&#39;&#34;,
+    &#39;\u201A&#39;: &#34;&#39;&#34;,
+    &#39;\u201B&#39;: &#34;&#39;&#34;,
+    &#39;\u201C&#39;: &#39;&#34;&#39;,
+    &#39;\u201D&#39;: &#39;&#34;&#39;,
+    &#39;\u201E&#39;: &#39;&#34;&#39;,
+})
+
+_TWO_CHAR_OPS: dict[str, Ps1TokenKind] = {
+    &#39;+=&#39; : Ps1TokenKind.PLUS_ASSIGN,
+    &#39;-=&#39; : Ps1TokenKind.DASH_ASSIGN,
+    &#39;*=&#39; : Ps1TokenKind.STAR_ASSIGN,
+    &#39;/=&#39; : Ps1TokenKind.SLASH_ASSIGN,
+    &#39;%=&#39; : Ps1TokenKind.PERCENT_ASSIGN,
+    &#39;++&#39; : Ps1TokenKind.INCREMENT,
+    &#39;--&#39; : Ps1TokenKind.DECREMENT,
+    &#39;..&#39; : Ps1TokenKind.DOTDOT,
+    &#39;::&#39; : Ps1TokenKind.DOUBLE_COLON,
+    &#39;&amp;&amp;&#39; : Ps1TokenKind.DOUBLE_AMPERSAND,
+    &#39;||&#39; : Ps1TokenKind.DOUBLE_PIPE,
+    &#39;@(&#39; : Ps1TokenKind.AT_LPAREN,
+    &#39;@{&#39; : Ps1TokenKind.AT_LBRACE,
+    &#39;$(&#39; : Ps1TokenKind.DOLLAR_LPAREN,
+}
+
+_ONE_CHAR_OPS: dict[str, Ps1TokenKind] = {
+    &#39;+&#39; : Ps1TokenKind.PLUS,
+    &#39;-&#39; : Ps1TokenKind.DASH,
+    &#39;*&#39; : Ps1TokenKind.STAR,
+    &#39;/&#39; : Ps1TokenKind.SLASH,
+    &#39;%&#39; : Ps1TokenKind.PERCENT,
+    &#39;.&#39; : Ps1TokenKind.DOT,
+    &#39;,&#39; : Ps1TokenKind.COMMA,
+    &#39;;&#39; : Ps1TokenKind.SEMICOLON,
+    &#39;!&#39; : Ps1TokenKind.EXCLAIM,
+    &#39;(&#39; : Ps1TokenKind.LPAREN,
+    &#39;)&#39; : Ps1TokenKind.RPAREN,
+    &#39;{&#39; : Ps1TokenKind.LBRACE,
+    &#39;}&#39; : Ps1TokenKind.RBRACE,
+    &#39;[&#39; : Ps1TokenKind.LBRACKET,
+    &#39;]&#39; : Ps1TokenKind.RBRACKET,
+    &#39;|&#39; : Ps1TokenKind.PIPE,
+    &#39;&amp;&#39; : Ps1TokenKind.AMPERSAND,
+    &#39;=&#39; : Ps1TokenKind.EQUALS,
+}
+
+_DASH_OPERATORS: dict[str, str] = {
+    _name: F&#39;-{_name}&#39; for _name in (
+        &#39;and&#39;,
+        &#39;as&#39;,
+        &#39;band&#39;,
+        &#39;bnot&#39;,
+        &#39;bor&#39;,
+        &#39;bxor&#39;,
+        &#39;ccontains&#39;,
+        &#39;ceq&#39;,
+        &#39;cge&#39;,
+        &#39;cgt&#39;,
+        &#39;cin&#39;,
+        &#39;cle&#39;,
+        &#39;clike&#39;,
+        &#39;clt&#39;,
+        &#39;cmatch&#39;,
+        &#39;cne&#39;,
+        &#39;cnotcontains&#39;,
+        &#39;cnotin&#39;,
+        &#39;cnotlike&#39;,
+        &#39;cnotmatch&#39;,
+        &#39;contains&#39;,
+        &#39;creplace&#39;,
+        &#39;csplit&#39;,
+        &#39;eq&#39;,
+        &#39;f&#39;,
+        &#39;ge&#39;,
+        &#39;gt&#39;,
+        &#39;icontains&#39;,
+        &#39;ieq&#39;,
+        &#39;ige&#39;,
+        &#39;igt&#39;,
+        &#39;iin&#39;,
+        &#39;ile&#39;,
+        &#39;ilike&#39;,
+        &#39;ilt&#39;,
+        &#39;imatch&#39;,
+        &#39;in&#39;,
+        &#39;ine&#39;,
+        &#39;inotcontains&#39;,
+        &#39;inotin&#39;,
+        &#39;inotlike&#39;,
+        &#39;inotmatch&#39;,
+        &#39;ireplace&#39;,
+        &#39;is&#39;,
+        &#39;isnot&#39;,
+        &#39;isplit&#39;,
+        &#39;join&#39;,
+        &#39;le&#39;,
+        &#39;like&#39;,
+        &#39;lt&#39;,
+        &#39;match&#39;,
+        &#39;ne&#39;,
+        &#39;not&#39;,
+        &#39;notcontains&#39;,
+        &#39;notin&#39;,
+        &#39;notlike&#39;,
+        &#39;notmatch&#39;,
+        &#39;or&#39;,
+        &#39;replace&#39;,
+        &#39;shl&#39;,
+        &#39;shr&#39;,
+        &#39;split&#39;,
+        &#39;xor&#39;,
+    )
+}
+
+_FORCE_START_NEW_TOKEN = frozenset(&#39; \t\r\n|&amp;;,{}()&#39;)
+_FORCE_NEW_TOKEN_AFTER_NUMBER = frozenset(&#39;!#%*+-./&lt;=&gt;]&#39;)
+
+_VARIABLE_STOPS_NO_RESCAN = frozenset(&#39;.[=&#39;)
+
+_REDIRECTION_PATTERN = re.compile(
+    r&#39;[1-6*](?:&gt;&gt;|&gt;&amp;[12]|&gt;)&#39;  # explicit stream: 2&gt;&amp;1, 2&gt;&gt;, 2&gt;
+    r&#39;|&gt;&gt;|&gt;&amp;1|&gt;&#39;              # bare: &gt;&gt;, &gt;&amp;1, &gt;
+    r&#39;|&lt;&#39;,                    # input
+)
+
+_INTEGER_PATTERN = re.compile(
+    r&#39;0[xX][0-9a-fA-F][0-9a-fA-F_]*(?:l|L)?&#39;
+    r&#39;|0[bB][01][01_]*(?:l|L)?&#39;
+    r&#39;|[0-9][0-9_]*(?:l|L)?&#39;,
+)
+
+_REAL_PATTERN = re.compile(
+    r&#39;(?:&#39;
+    r&#39;(?:[0-9]*\.[0-9]+|[0-9]+\.)(?:[eE][+-]?[0-9]+)?&#39;
+    r&#39;|[0-9]+[eE][+-]?[0-9]+&#39;
+    r&#39;)(?:[dD]|[kKmMgGtTpP][bB])?&#39;
+    r&#39;|[0-9]+(?:\.[0-9]+)?(?:[dD]|[kKmMgGtTpP][bB])&#39;,
+)
+
+_VARIABLE_PATTERN = re.compile(
+    r&#39;(?:[a-zA-Z0-9_]+:(?!:))?&#39;
+    r&#39;(?:\{[^}]+\}|[a-zA-Z0-9_][a-zA-Z0-9_?]*)&#39;
+    r&#39;|[$?^]&#39;,
+    re.IGNORECASE,
+)
+
+_PARAMETER_TERMINATORS = frozenset(&#39; \t\r\n{}();,|&amp;.[&#39;)
+
+
+@dataclass
+class Ps1Lexer:
+    source: str
+    pos: int = 0
+    mode_stack: list[Ps1LexerMode] = field(default_factory=lambda: [Ps1LexerMode.EXPRESSION])
+
+    @property
+    def mode(self) -&gt; Ps1LexerMode:
+        return self.mode_stack[-1]
+
+    @mode.setter
+    def mode(self, value: Ps1LexerMode):
+        self.mode_stack[-1] = value
+
+    def push_mode(self, mode: Ps1LexerMode):
+        self.mode_stack.append(mode)
+
+    def pop_mode(self):
+        if len(self.mode_stack) &gt; 1:
+            self.mode_stack.pop()
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in WHITESPACE:
+                self.pos += 1
+            elif c == &#39;`&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+            elif c == &#39;`&#39; and self.pos + 2 &lt; length and src[self.pos + 1:self.pos + 3] == &#39;\r\n&#39;:
+                self.pos += 3
+            else:
+                break
+        return self.pos &gt; start
+
+    def _read_line_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] != &#39;\n&#39;:
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_block_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;#&#39; and src[self.pos + 1] == &#39;&gt;&#39;:
+                self.pos += 2
+                return src[start:self.pos]
+            self.pos += 1
+        self.pos = length
+        return src[start:self.pos]
+
+    def _read_verbatim_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in SINGLE_QUOTES:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] in SINGLE_QUOTES:
+                    self.pos += 1
+                    continue
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _skip_subexpression_content(self):
+        src = self.source
+        length = len(src)
+        depth = 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;(&#39;:
+                depth += 1
+                self.pos += 1
+                continue
+            if c == &#39;)&#39;:
+                depth -= 1
+                self.pos += 1
+                if depth == 0:
+                    return
+                continue
+            if c == &#39;@&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if (nc in SINGLE_QUOTES or nc in DOUBLE_QUOTES) and self.pos + 2 &lt; length and src[self.pos + 2] in &#39;\r\n&#39;:
+                    quote_set = SINGLE_QUOTES if nc in SINGLE_QUOTES else DOUBLE_QUOTES
+                    self.pos += 2
+                    if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+                        self.pos += 1
+                    if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                        self.pos += 1
+                    while self.pos &lt; length:
+                        if src[self.pos] in &#39;\r\n&#39;:
+                            if src[self.pos] == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                                self.pos += 2
+                            else:
+                                self.pos += 1
+                            if self.pos + 1 &lt; length and src[self.pos] in quote_set and src[self.pos + 1] == &#39;@&#39;:
+                                self.pos += 2
+                                break
+                        else:
+                            self.pos += 1
+                    continue
+            if c in SINGLE_QUOTES:
+                self.pos += 1
+                while self.pos &lt; length:
+                    if src[self.pos] in SINGLE_QUOTES:
+                        self.pos += 1
+                        if self.pos &lt; length and src[self.pos] in SINGLE_QUOTES:
+                            self.pos += 1
+                            continue
+                        break
+                    self.pos += 1
+                continue
+            if c in DOUBLE_QUOTES:
+                self.pos += 1
+                while self.pos &lt; length:
+                    sc = src[self.pos]
+                    if sc == &#39;`&#39; and self.pos + 1 &lt; length:
+                        self.pos += 2
+                        continue
+                    if sc == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;(&#39;:
+                        self.pos += 2
+                        self._skip_subexpression_content()
+                        continue
+                    if sc in DOUBLE_QUOTES:
+                        self.pos += 1
+                        if self.pos &lt; length and src[self.pos] in DOUBLE_QUOTES:
+                            self.pos += 1
+                            continue
+                        break
+                    self.pos += 1
+                continue
+            self.pos += 1
+
+    def _read_expandable_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;(&#39;:
+                self.pos += 2
+                self._skip_subexpression_content()
+                continue
+            if c in DOUBLE_QUOTES:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] in DOUBLE_QUOTES:
+                    self.pos += 1
+                    continue
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_verbatim_here_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+            self.pos += 1
+        if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+            self.pos += 1
+        while self.pos &lt; length:
+            if src[self.pos] in &#39;\r\n&#39;:
+                if src[self.pos] == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                    nl_end = self.pos + 2
+                else:
+                    nl_end = self.pos + 1
+                if nl_end + 1 &lt; length and src[nl_end] in SINGLE_QUOTES and src[nl_end + 1] == &#39;@&#39;:
+                    self.pos = nl_end + 2
+                    return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_expandable_here_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+            self.pos += 1
+        if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+            self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in &#39;\r\n&#39;:
+                if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                    nl_end = self.pos + 2
+                else:
+                    nl_end = self.pos + 1
+                if nl_end + 1 &lt; length and src[nl_end] in DOUBLE_QUOTES and src[nl_end + 1] == &#39;@&#39;:
+                    self.pos = nl_end + 2
+                    return src[start:self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;(&#39;:
+                self.pos += 2
+                self._skip_subexpression_content()
+                continue
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_variable(self, prefix: str) -&gt; Ps1Token:
+        start = self.pos
+        self.pos += len(prefix)
+        m = _VARIABLE_PATTERN.match(self.source, self.pos)
+        if m:
+            self.pos = m.end()
+        kind = Ps1TokenKind.SPLAT_VARIABLE if prefix == &#39;@&#39; else Ps1TokenKind.VARIABLE
+        return Ps1Token(kind, self.source[start:self.pos], start)
+
+    def _read_number(self) -&gt; Ps1Token | None:
+        src = self.source
+        m = _REAL_PATTERN.match(src, self.pos)
+        if m:
+            text = m.group()
+            end = m.end()
+            if text.endswith(&#39;.&#39;) and end &lt; len(src):
+                nc = src[end]
+                if nc == &#39;.&#39; or nc.isalpha() or nc in &#39;_$@{&#39;:
+                    text = text[:-1]
+                    end -= 1
+                    if text and text.replace(&#39;_&#39;, &#39;&#39;).isdigit():
+                        start = self.pos
+                        self.pos = end
+                        return Ps1Token(Ps1TokenKind.INTEGER, text, start)
+            start = self.pos
+            self.pos = end
+            return Ps1Token(Ps1TokenKind.REAL, text, start)
+        m = _INTEGER_PATTERN.match(src, self.pos)
+        if m:
+            start = self.pos
+            self.pos = m.end()
+            if (
+                self.pos + 1 &lt; len(src)
+                and src[self.pos].lower() in &#39;kmgtp&#39;
+                and src[self.pos + 1].lower() == &#39;b&#39;
+            ):
+                text = src[start:self.pos + 2]
+                self.pos += 2
+                return Ps1Token(Ps1TokenKind.REAL, text, start)
+            return Ps1Token(Ps1TokenKind.INTEGER, m.group(), start)
+        return None
+
+    def _try_dash_operator(self) -&gt; Ps1Token | None:
+        src = self.source
+        start = self.pos
+        self.pos += 1
+        m = re.match(r&#39;[a-zA-Z]+&#39;, src[self.pos:])
+        if not m:
+            self.pos = start
+            return None
+        word = m.group().lower()
+        if word in _DASH_OPERATORS:
+            self.pos += m.end()
+            return Ps1Token(Ps1TokenKind.OPERATOR, _DASH_OPERATORS[word], start)
+        self.pos = start
+        return None
+
+    def _try_parameter(self) -&gt; Ps1Token | None:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        if self.pos &gt;= length:
+            self.pos = start
+            return None
+        c = src[self.pos]
+        if not (c.isalpha() or c == &#39;_&#39; or c == &#39;?&#39;):
+            self.pos = start
+            return None
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in _PARAMETER_TERMINATORS or c.isspace():
+                break
+            if c in SINGLE_QUOTES or c in DOUBLE_QUOTES:
+                self.pos = start
+                return self._read_generic_token()
+            if c == &#39;:&#39;:
+                self.pos += 1
+                break
+            self.pos += 1
+        return Ps1Token(Ps1TokenKind.PARAMETER, src[start:self.pos], start)
+
+    def _try_redirection(self) -&gt; Ps1Token | None:
+        m = _REDIRECTION_PATTERN.match(self.source, self.pos)
+        if m:
+            start = self.pos
+            self.pos = m.end()
+            return Ps1Token(Ps1TokenKind.REDIRECTION, m.group(), start)
+        return None
+
+    def _read_generic_token(self) -&gt; Ps1Token:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        has_expansion = False
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c in SINGLE_QUOTES:
+                self._read_verbatim_string()
+                continue
+            if c in DOUBLE_QUOTES:
+                self._read_expandable_string()
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if nc == &#39;(&#39;:
+                    has_expansion = True
+                    self.pos += 2
+                    self._skip_subexpression_content()
+                    continue
+                if nc.isalnum() or nc in &#39;_?{$^&#39;:
+                    m = _VARIABLE_PATTERN.match(src, self.pos + 1)
+                    if m:
+                        has_expansion = True
+                        self.pos = m.end()
+                        continue
+                self.pos += 1
+                continue
+            if c in _FORCE_START_NEW_TOKEN:
+                break
+            self.pos += 1
+        kind = Ps1TokenKind.GENERIC_EXPAND if has_expansion else Ps1TokenKind.GENERIC_TOKEN
+        return Ps1Token(kind, src[start:self.pos], start)
+
+    def tokenize(self) -&gt; Generator[Ps1Token, Ps1LexerMode | None, None]:
+        src = self.source
+        length = len(src)
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield Ps1Token(Ps1TokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+            if len(c2) == 2:
+                d0 = &#39;-&#39; if c2[0] in DASHES else c2[0]
+                d1 = &#39;-&#39; if c2[1] in DASHES else c2[1]
+                c2 = d0 + d1
+
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+                mode_hint = yield Ps1Token(Ps1TokenKind.NEWLINE, &#39;\r\n&#39;, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+            if c == &#39;\n&#39;:
+                self.pos += 1
+                mode_hint = yield Ps1Token(Ps1TokenKind.NEWLINE, &#39;\n&#39;, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c2 == &#39;&lt;#&#39;:
+                self._read_block_comment()
+                continue
+            if c == &#39;#&#39;:
+                self._read_line_comment()
+                continue
+
+            if c == &#39;@&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if nc in SINGLE_QUOTES:
+                    text = self._read_verbatim_here_string()
+                    mode_hint = yield Ps1Token(Ps1TokenKind.HSTRING_VERBATIM, text, start)
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+                if nc in DOUBLE_QUOTES:
+                    text = self._read_expandable_here_string()
+                    mode_hint = yield Ps1Token(Ps1TokenKind.HSTRING_EXPAND, text, start)
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            if c2 in (&#39;..&#39;, &#39;--&#39;, &#39;++&#39;, &#39;::&#39;, &#39;+=&#39;, &#39;-=&#39;, &#39;*=&#39;, &#39;/=&#39;, &#39;%=&#39;) and self.mode == Ps1LexerMode.ARGUMENT:
+                after = self.pos + 2
+                if after &lt; length and src[after] not in &#39; \t\r\n|&amp;;,{}()&#39;:
+                    token = self._read_generic_token()
+                    if token.value:
+                        mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                kind = _TWO_CHAR_OPS[c2]
+                mode_hint = yield Ps1Token(kind, c2, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c == &#39;:&#39; and self.pos + 1 &lt; length and (src[self.pos + 1].isalpha() or src[self.pos + 1] == &#39;_&#39;):
+                self.pos += 1
+                while self.pos &lt; length and (src[self.pos].isalnum() or src[self.pos] == &#39;_&#39;):
+                    self.pos += 1
+                mode_hint = yield Ps1Token(Ps1TokenKind.LABEL, src[start:self.pos], start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c == &#39;$&#39; or (c == &#39;@&#39; and self.pos + 1 &lt; length and src[self.pos + 1] not in &#39;({&#39;):
+                nc = src[self.pos + 1] if self.pos + 1 &lt; length else &#39;&#39;
+                if c == &#39;$&#39; and nc == &#39;(&#39;:
+                    pass
+                elif nc and (nc.isalnum() or nc in &#39;_?{$^&#39;):
+                    token = self._read_variable(c)
+                    if self.mode == Ps1LexerMode.ARGUMENT and self.pos &lt; length:
+                        fc = src[self.pos]
+                        if fc not in _FORCE_START_NEW_TOKEN and fc not in _VARIABLE_STOPS_NO_RESCAN:
+                            self.pos = start
+                            token = self._read_generic_token()
+                    mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            if c in SINGLE_QUOTES:
+                text = self._read_verbatim_string()
+                mode_hint = yield Ps1Token(Ps1TokenKind.STRING_VERBATIM, text, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+            if c in DOUBLE_QUOTES:
+                text = self._read_expandable_string()
+                mode_hint = yield Ps1Token(Ps1TokenKind.STRING_EXPAND, text, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c in &#39;123456&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;&gt;&#39;:
+                if self.mode != Ps1LexerMode.EXPRESSION:
+                    redir = self._try_redirection()
+                    if redir:
+                        mode_hint = yield redir
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c.isdigit() or (c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()):
+                token = self._read_number()
+                if token:
+                    nc = src[self.pos] if self.pos &lt; length else None
+                    if nc is not None and nc not in _FORCE_START_NEW_TOKEN and not nc.isspace():
+                        if self.mode == Ps1LexerMode.ARGUMENT or (
+                            nc not in _FORCE_NEW_TOKEN_AFTER_NUMBER
+                        ):
+                            self.pos = start
+                            token = self._read_generic_token()
+                    mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            if c in DASHES:
+                if self.mode == Ps1LexerMode.EXPRESSION:
+                    op = self._try_dash_operator()
+                    if op:
+                        mode_hint = yield op
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+                elif self.mode == Ps1LexerMode.ARGUMENT:
+                    param = self._try_parameter()
+                    if param:
+                        mode_hint = yield param
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            redir = self._try_redirection()
+            if redir:
+                mode_hint = yield redir
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if self.mode == Ps1LexerMode.ARGUMENT:
+                if c == &#39;.&#39; and self.pos + 1 &lt; length:
+                    nc = src[self.pos + 1]
+                    if nc not in &#39; \t\r\n|&amp;;,{}()$&#39; and nc not in SINGLE_QUOTES and nc not in DOUBLE_QUOTES:
+                        token = self._read_generic_token()
+                        if token.value:
+                            mode_hint = yield token
+                            if mode_hint is not None:
+                                self.mode = mode_hint
+                            continue
+
+            if self.mode == Ps1LexerMode.ARGUMENT and c in &#39;*/%=!+&#39;:
+                if self.pos + 1 &lt; length and src[self.pos + 1] not in &#39; \t\r\n|&amp;;,{}()&#39;:
+                    token = self._read_generic_token()
+                    if token.value:
+                        mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c in _ONE_CHAR_OPS or c in DASHES:
+                self.pos += 1
+                kind = _ONE_CHAR_OPS.get(c) or Ps1TokenKind.DASH
+                mode_hint = yield Ps1Token(kind, c, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if self.mode == Ps1LexerMode.ARGUMENT:
+                if c.isalpha() or c == &#39;_&#39; or c == &#39;\\&#39; or c == &#39;`&#39;:
+                    token = self._read_generic_token()
+                    if token.value:
+                        word = token.value.lower()
+                        kw = _KEYWORDS.get(word)
+                        if kw is not None:
+                            mode_hint = yield Ps1Token(kw, token.value, token.offset)
+                        else:
+                            mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c.isalpha() or c == &#39;_&#39; or c == &#39;`&#39;:
+                word = []
+                if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                    self.pos += 1
+                    word.append(src[self.pos])
+                    self.pos += 1
+                else:
+                    word.append(c)
+                    self.pos += 1
+                while self.pos &lt; length:
+                    ch = src[self.pos]
+                    if ch == &#39;`&#39; and self.pos + 1 &lt; length:
+                        self.pos += 1
+                        word.append(src[self.pos])
+                        self.pos += 1
+                    elif ch.isalnum() or ch == &#39;_&#39;:
+                        word.append(ch)
+                        self.pos += 1
+                    elif ch in DASHES and self.mode != Ps1LexerMode.EXPRESSION:
+                        word.append(ch)
+                        self.pos += 1
+                    else:
+                        break
+                if self.pos &lt; length and src[self.pos] not in _FORCE_START_NEW_TOKEN:
+                    if self.mode == Ps1LexerMode.ARGUMENT or (
+                        src[self.pos] in SINGLE_QUOTES
+                        or src[self.pos] in DOUBLE_QUOTES
+                        or src[self.pos] == &#39;$&#39;
+                    ):
+                        self.pos = start
+                        token = self._read_generic_token()
+                        if token.value:
+                            mode_hint = yield token
+                            if mode_hint is not None:
+                                self.mode = mode_hint
+                            continue
+                identifier = &#39;&#39;.join(word)
+                if identifier:
+                    kw = _KEYWORDS.get(identifier.lower())
+                    if kw is not None:
+                        mode_hint = yield Ps1Token(kw, identifier, start)
+                    else:
+                        mode_hint = yield Ps1Token(Ps1TokenKind.GENERIC_TOKEN, identifier, start)
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            self.pos += 1
+            mode_hint = yield Ps1Token(Ps1TokenKind.GENERIC_TOKEN, c, start)
+            if mode_hint is not None:
+                self.mode = mode_hint</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1LexerMode"><code class="flex name class">
+<span>class <span class="ident">Ps1LexerMode</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Create a collection of name/value pairs.</p>
+<p>Example enumeration:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+</code></pre>
+<p>Access them by:</p>
+<ul>
+<li>attribute access:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color.RED
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>value lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color(1)
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>name lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color['RED']
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Enumerations can be iterated over, and know how many members they have:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; len(Color)
+3
+</code></pre>
+<pre><code class="language-python-repl">&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+</code></pre>
+<p>Methods can be added to enumerations, and members can have their own
+attributes &ndash; see the documentation for details.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L12-L14" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1LexerMode(enum.Enum):
+    EXPRESSION = &#39;expression&#39;
+    ARGUMENT = &#39;argument&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1LexerMode.EXPRESSION"><code class="name">var <span class="ident">EXPRESSION</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1LexerMode.ARGUMENT"><code class="name">var <span class="ident">ARGUMENT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer"><code class="flex name class">
+<span>class <span class="ident">Ps1Lexer</span></span>
+<span>(</span><span>source, pos=0, mode_stack=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Ps1Lexer(source: 'str', pos: 'int' = 0, mode_stack: 'list[Ps1LexerMode]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L185-L786" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class Ps1Lexer:
+    source: str
+    pos: int = 0
+    mode_stack: list[Ps1LexerMode] = field(default_factory=lambda: [Ps1LexerMode.EXPRESSION])
+
+    @property
+    def mode(self) -&gt; Ps1LexerMode:
+        return self.mode_stack[-1]
+
+    @mode.setter
+    def mode(self, value: Ps1LexerMode):
+        self.mode_stack[-1] = value
+
+    def push_mode(self, mode: Ps1LexerMode):
+        self.mode_stack.append(mode)
+
+    def pop_mode(self):
+        if len(self.mode_stack) &gt; 1:
+            self.mode_stack.pop()
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in WHITESPACE:
+                self.pos += 1
+            elif c == &#39;`&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+            elif c == &#39;`&#39; and self.pos + 2 &lt; length and src[self.pos + 1:self.pos + 3] == &#39;\r\n&#39;:
+                self.pos += 3
+            else:
+                break
+        return self.pos &gt; start
+
+    def _read_line_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] != &#39;\n&#39;:
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_block_comment(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;#&#39; and src[self.pos + 1] == &#39;&gt;&#39;:
+                self.pos += 2
+                return src[start:self.pos]
+            self.pos += 1
+        self.pos = length
+        return src[start:self.pos]
+
+    def _read_verbatim_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in SINGLE_QUOTES:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] in SINGLE_QUOTES:
+                    self.pos += 1
+                    continue
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _skip_subexpression_content(self):
+        src = self.source
+        length = len(src)
+        depth = 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;(&#39;:
+                depth += 1
+                self.pos += 1
+                continue
+            if c == &#39;)&#39;:
+                depth -= 1
+                self.pos += 1
+                if depth == 0:
+                    return
+                continue
+            if c == &#39;@&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if (nc in SINGLE_QUOTES or nc in DOUBLE_QUOTES) and self.pos + 2 &lt; length and src[self.pos + 2] in &#39;\r\n&#39;:
+                    quote_set = SINGLE_QUOTES if nc in SINGLE_QUOTES else DOUBLE_QUOTES
+                    self.pos += 2
+                    if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+                        self.pos += 1
+                    if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                        self.pos += 1
+                    while self.pos &lt; length:
+                        if src[self.pos] in &#39;\r\n&#39;:
+                            if src[self.pos] == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                                self.pos += 2
+                            else:
+                                self.pos += 1
+                            if self.pos + 1 &lt; length and src[self.pos] in quote_set and src[self.pos + 1] == &#39;@&#39;:
+                                self.pos += 2
+                                break
+                        else:
+                            self.pos += 1
+                    continue
+            if c in SINGLE_QUOTES:
+                self.pos += 1
+                while self.pos &lt; length:
+                    if src[self.pos] in SINGLE_QUOTES:
+                        self.pos += 1
+                        if self.pos &lt; length and src[self.pos] in SINGLE_QUOTES:
+                            self.pos += 1
+                            continue
+                        break
+                    self.pos += 1
+                continue
+            if c in DOUBLE_QUOTES:
+                self.pos += 1
+                while self.pos &lt; length:
+                    sc = src[self.pos]
+                    if sc == &#39;`&#39; and self.pos + 1 &lt; length:
+                        self.pos += 2
+                        continue
+                    if sc == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;(&#39;:
+                        self.pos += 2
+                        self._skip_subexpression_content()
+                        continue
+                    if sc in DOUBLE_QUOTES:
+                        self.pos += 1
+                        if self.pos &lt; length and src[self.pos] in DOUBLE_QUOTES:
+                            self.pos += 1
+                            continue
+                        break
+                    self.pos += 1
+                continue
+            self.pos += 1
+
+    def _read_expandable_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;(&#39;:
+                self.pos += 2
+                self._skip_subexpression_content()
+                continue
+            if c in DOUBLE_QUOTES:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] in DOUBLE_QUOTES:
+                    self.pos += 1
+                    continue
+                return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_verbatim_here_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+            self.pos += 1
+        if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+            self.pos += 1
+        while self.pos &lt; length:
+            if src[self.pos] in &#39;\r\n&#39;:
+                if src[self.pos] == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                    nl_end = self.pos + 2
+                else:
+                    nl_end = self.pos + 1
+                if nl_end + 1 &lt; length and src[nl_end] in SINGLE_QUOTES and src[nl_end + 1] == &#39;@&#39;:
+                    self.pos = nl_end + 2
+                    return src[start:self.pos]
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_expandable_here_string(self) -&gt; str:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        if self.pos &lt; length and src[self.pos] == &#39;\r&#39;:
+            self.pos += 1
+        if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+            self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in &#39;\r\n&#39;:
+                if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                    nl_end = self.pos + 2
+                else:
+                    nl_end = self.pos + 1
+                if nl_end + 1 &lt; length and src[nl_end] in DOUBLE_QUOTES and src[nl_end + 1] == &#39;@&#39;:
+                    self.pos = nl_end + 2
+                    return src[start:self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;(&#39;:
+                self.pos += 2
+                self._skip_subexpression_content()
+                continue
+            self.pos += 1
+        return src[start:self.pos]
+
+    def _read_variable(self, prefix: str) -&gt; Ps1Token:
+        start = self.pos
+        self.pos += len(prefix)
+        m = _VARIABLE_PATTERN.match(self.source, self.pos)
+        if m:
+            self.pos = m.end()
+        kind = Ps1TokenKind.SPLAT_VARIABLE if prefix == &#39;@&#39; else Ps1TokenKind.VARIABLE
+        return Ps1Token(kind, self.source[start:self.pos], start)
+
+    def _read_number(self) -&gt; Ps1Token | None:
+        src = self.source
+        m = _REAL_PATTERN.match(src, self.pos)
+        if m:
+            text = m.group()
+            end = m.end()
+            if text.endswith(&#39;.&#39;) and end &lt; len(src):
+                nc = src[end]
+                if nc == &#39;.&#39; or nc.isalpha() or nc in &#39;_$@{&#39;:
+                    text = text[:-1]
+                    end -= 1
+                    if text and text.replace(&#39;_&#39;, &#39;&#39;).isdigit():
+                        start = self.pos
+                        self.pos = end
+                        return Ps1Token(Ps1TokenKind.INTEGER, text, start)
+            start = self.pos
+            self.pos = end
+            return Ps1Token(Ps1TokenKind.REAL, text, start)
+        m = _INTEGER_PATTERN.match(src, self.pos)
+        if m:
+            start = self.pos
+            self.pos = m.end()
+            if (
+                self.pos + 1 &lt; len(src)
+                and src[self.pos].lower() in &#39;kmgtp&#39;
+                and src[self.pos + 1].lower() == &#39;b&#39;
+            ):
+                text = src[start:self.pos + 2]
+                self.pos += 2
+                return Ps1Token(Ps1TokenKind.REAL, text, start)
+            return Ps1Token(Ps1TokenKind.INTEGER, m.group(), start)
+        return None
+
+    def _try_dash_operator(self) -&gt; Ps1Token | None:
+        src = self.source
+        start = self.pos
+        self.pos += 1
+        m = re.match(r&#39;[a-zA-Z]+&#39;, src[self.pos:])
+        if not m:
+            self.pos = start
+            return None
+        word = m.group().lower()
+        if word in _DASH_OPERATORS:
+            self.pos += m.end()
+            return Ps1Token(Ps1TokenKind.OPERATOR, _DASH_OPERATORS[word], start)
+        self.pos = start
+        return None
+
+    def _try_parameter(self) -&gt; Ps1Token | None:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        if self.pos &gt;= length:
+            self.pos = start
+            return None
+        c = src[self.pos]
+        if not (c.isalpha() or c == &#39;_&#39; or c == &#39;?&#39;):
+            self.pos = start
+            return None
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in _PARAMETER_TERMINATORS or c.isspace():
+                break
+            if c in SINGLE_QUOTES or c in DOUBLE_QUOTES:
+                self.pos = start
+                return self._read_generic_token()
+            if c == &#39;:&#39;:
+                self.pos += 1
+                break
+            self.pos += 1
+        return Ps1Token(Ps1TokenKind.PARAMETER, src[start:self.pos], start)
+
+    def _try_redirection(self) -&gt; Ps1Token | None:
+        m = _REDIRECTION_PATTERN.match(self.source, self.pos)
+        if m:
+            start = self.pos
+            self.pos = m.end()
+            return Ps1Token(Ps1TokenKind.REDIRECTION, m.group(), start)
+        return None
+
+    def _read_generic_token(self) -&gt; Ps1Token:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        has_expansion = False
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 2
+                continue
+            if c in SINGLE_QUOTES:
+                self._read_verbatim_string()
+                continue
+            if c in DOUBLE_QUOTES:
+                self._read_expandable_string()
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if nc == &#39;(&#39;:
+                    has_expansion = True
+                    self.pos += 2
+                    self._skip_subexpression_content()
+                    continue
+                if nc.isalnum() or nc in &#39;_?{$^&#39;:
+                    m = _VARIABLE_PATTERN.match(src, self.pos + 1)
+                    if m:
+                        has_expansion = True
+                        self.pos = m.end()
+                        continue
+                self.pos += 1
+                continue
+            if c in _FORCE_START_NEW_TOKEN:
+                break
+            self.pos += 1
+        kind = Ps1TokenKind.GENERIC_EXPAND if has_expansion else Ps1TokenKind.GENERIC_TOKEN
+        return Ps1Token(kind, src[start:self.pos], start)
+
+    def tokenize(self) -&gt; Generator[Ps1Token, Ps1LexerMode | None, None]:
+        src = self.source
+        length = len(src)
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield Ps1Token(Ps1TokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+            if len(c2) == 2:
+                d0 = &#39;-&#39; if c2[0] in DASHES else c2[0]
+                d1 = &#39;-&#39; if c2[1] in DASHES else c2[1]
+                c2 = d0 + d1
+
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+                mode_hint = yield Ps1Token(Ps1TokenKind.NEWLINE, &#39;\r\n&#39;, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+            if c == &#39;\n&#39;:
+                self.pos += 1
+                mode_hint = yield Ps1Token(Ps1TokenKind.NEWLINE, &#39;\n&#39;, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c2 == &#39;&lt;#&#39;:
+                self._read_block_comment()
+                continue
+            if c == &#39;#&#39;:
+                self._read_line_comment()
+                continue
+
+            if c == &#39;@&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if nc in SINGLE_QUOTES:
+                    text = self._read_verbatim_here_string()
+                    mode_hint = yield Ps1Token(Ps1TokenKind.HSTRING_VERBATIM, text, start)
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+                if nc in DOUBLE_QUOTES:
+                    text = self._read_expandable_here_string()
+                    mode_hint = yield Ps1Token(Ps1TokenKind.HSTRING_EXPAND, text, start)
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            if c2 in (&#39;..&#39;, &#39;--&#39;, &#39;++&#39;, &#39;::&#39;, &#39;+=&#39;, &#39;-=&#39;, &#39;*=&#39;, &#39;/=&#39;, &#39;%=&#39;) and self.mode == Ps1LexerMode.ARGUMENT:
+                after = self.pos + 2
+                if after &lt; length and src[after] not in &#39; \t\r\n|&amp;;,{}()&#39;:
+                    token = self._read_generic_token()
+                    if token.value:
+                        mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                kind = _TWO_CHAR_OPS[c2]
+                mode_hint = yield Ps1Token(kind, c2, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c == &#39;:&#39; and self.pos + 1 &lt; length and (src[self.pos + 1].isalpha() or src[self.pos + 1] == &#39;_&#39;):
+                self.pos += 1
+                while self.pos &lt; length and (src[self.pos].isalnum() or src[self.pos] == &#39;_&#39;):
+                    self.pos += 1
+                mode_hint = yield Ps1Token(Ps1TokenKind.LABEL, src[start:self.pos], start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c == &#39;$&#39; or (c == &#39;@&#39; and self.pos + 1 &lt; length and src[self.pos + 1] not in &#39;({&#39;):
+                nc = src[self.pos + 1] if self.pos + 1 &lt; length else &#39;&#39;
+                if c == &#39;$&#39; and nc == &#39;(&#39;:
+                    pass
+                elif nc and (nc.isalnum() or nc in &#39;_?{$^&#39;):
+                    token = self._read_variable(c)
+                    if self.mode == Ps1LexerMode.ARGUMENT and self.pos &lt; length:
+                        fc = src[self.pos]
+                        if fc not in _FORCE_START_NEW_TOKEN and fc not in _VARIABLE_STOPS_NO_RESCAN:
+                            self.pos = start
+                            token = self._read_generic_token()
+                    mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            if c in SINGLE_QUOTES:
+                text = self._read_verbatim_string()
+                mode_hint = yield Ps1Token(Ps1TokenKind.STRING_VERBATIM, text, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+            if c in DOUBLE_QUOTES:
+                text = self._read_expandable_string()
+                mode_hint = yield Ps1Token(Ps1TokenKind.STRING_EXPAND, text, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if c in &#39;123456&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;&gt;&#39;:
+                if self.mode != Ps1LexerMode.EXPRESSION:
+                    redir = self._try_redirection()
+                    if redir:
+                        mode_hint = yield redir
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c.isdigit() or (c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()):
+                token = self._read_number()
+                if token:
+                    nc = src[self.pos] if self.pos &lt; length else None
+                    if nc is not None and nc not in _FORCE_START_NEW_TOKEN and not nc.isspace():
+                        if self.mode == Ps1LexerMode.ARGUMENT or (
+                            nc not in _FORCE_NEW_TOKEN_AFTER_NUMBER
+                        ):
+                            self.pos = start
+                            token = self._read_generic_token()
+                    mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            if c in DASHES:
+                if self.mode == Ps1LexerMode.EXPRESSION:
+                    op = self._try_dash_operator()
+                    if op:
+                        mode_hint = yield op
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+                elif self.mode == Ps1LexerMode.ARGUMENT:
+                    param = self._try_parameter()
+                    if param:
+                        mode_hint = yield param
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            redir = self._try_redirection()
+            if redir:
+                mode_hint = yield redir
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if self.mode == Ps1LexerMode.ARGUMENT:
+                if c == &#39;.&#39; and self.pos + 1 &lt; length:
+                    nc = src[self.pos + 1]
+                    if nc not in &#39; \t\r\n|&amp;;,{}()$&#39; and nc not in SINGLE_QUOTES and nc not in DOUBLE_QUOTES:
+                        token = self._read_generic_token()
+                        if token.value:
+                            mode_hint = yield token
+                            if mode_hint is not None:
+                                self.mode = mode_hint
+                            continue
+
+            if self.mode == Ps1LexerMode.ARGUMENT and c in &#39;*/%=!+&#39;:
+                if self.pos + 1 &lt; length and src[self.pos + 1] not in &#39; \t\r\n|&amp;;,{}()&#39;:
+                    token = self._read_generic_token()
+                    if token.value:
+                        mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c in _ONE_CHAR_OPS or c in DASHES:
+                self.pos += 1
+                kind = _ONE_CHAR_OPS.get(c) or Ps1TokenKind.DASH
+                mode_hint = yield Ps1Token(kind, c, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+            if self.mode == Ps1LexerMode.ARGUMENT:
+                if c.isalpha() or c == &#39;_&#39; or c == &#39;\\&#39; or c == &#39;`&#39;:
+                    token = self._read_generic_token()
+                    if token.value:
+                        word = token.value.lower()
+                        kw = _KEYWORDS.get(word)
+                        if kw is not None:
+                            mode_hint = yield Ps1Token(kw, token.value, token.offset)
+                        else:
+                            mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+            if c.isalpha() or c == &#39;_&#39; or c == &#39;`&#39;:
+                word = []
+                if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                    self.pos += 1
+                    word.append(src[self.pos])
+                    self.pos += 1
+                else:
+                    word.append(c)
+                    self.pos += 1
+                while self.pos &lt; length:
+                    ch = src[self.pos]
+                    if ch == &#39;`&#39; and self.pos + 1 &lt; length:
+                        self.pos += 1
+                        word.append(src[self.pos])
+                        self.pos += 1
+                    elif ch.isalnum() or ch == &#39;_&#39;:
+                        word.append(ch)
+                        self.pos += 1
+                    elif ch in DASHES and self.mode != Ps1LexerMode.EXPRESSION:
+                        word.append(ch)
+                        self.pos += 1
+                    else:
+                        break
+                if self.pos &lt; length and src[self.pos] not in _FORCE_START_NEW_TOKEN:
+                    if self.mode == Ps1LexerMode.ARGUMENT or (
+                        src[self.pos] in SINGLE_QUOTES
+                        or src[self.pos] in DOUBLE_QUOTES
+                        or src[self.pos] == &#39;$&#39;
+                    ):
+                        self.pos = start
+                        token = self._read_generic_token()
+                        if token.value:
+                            mode_hint = yield token
+                            if mode_hint is not None:
+                                self.mode = mode_hint
+                            continue
+                identifier = &#39;&#39;.join(word)
+                if identifier:
+                    kw = _KEYWORDS.get(identifier.lower())
+                    if kw is not None:
+                        mode_hint = yield Ps1Token(kw, identifier, start)
+                    else:
+                        mode_hint = yield Ps1Token(Ps1TokenKind.GENERIC_TOKEN, identifier, start)
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+            self.pos += 1
+            mode_hint = yield Ps1Token(Ps1TokenKind.GENERIC_TOKEN, c, start)
+            if mode_hint is not None:
+                self.mode = mode_hint</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.mode_stack"><code class="name">var <span class="ident">mode_stack</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.mode"><code class="name">var <span class="ident">mode</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L191-L193" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def mode(self) -&gt; Ps1LexerMode:
+    return self.mode_stack[-1]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.push_mode"><code class="name flex">
+<span>def <span class="ident">push_mode</span></span>(<span>self, mode)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L199-L200" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def push_mode(self, mode: Ps1LexerMode):
+    self.mode_stack.append(mode)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.pop_mode"><code class="name flex">
+<span>def <span class="ident">pop_mode</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L202-L204" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pop_mode(self):
+    if len(self.mode_stack) &gt; 1:
+        self.mode_stack.pop()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.lexer.Ps1Lexer.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/54f476d60a27c36824aa569b0686f794ce429652/refinery/lib/scripts/ps1/lexer.py#L538-L786" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokenize(self) -&gt; Generator[Ps1Token, Ps1LexerMode | None, None]:
+    src = self.source
+    length = len(src)
+
+    while True:
+        self._skip_whitespace()
+        if self._at_end():
+            yield Ps1Token(Ps1TokenKind.EOF, &#39;&#39;, self.pos)
+            return
+
+        start = self.pos
+        c = src[self.pos]
+        c2 = src[self.pos:self.pos + 2]
+        if len(c2) == 2:
+            d0 = &#39;-&#39; if c2[0] in DASHES else c2[0]
+            d1 = &#39;-&#39; if c2[1] in DASHES else c2[1]
+            c2 = d0 + d1
+
+        if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+            self.pos += 2
+            mode_hint = yield Ps1Token(Ps1TokenKind.NEWLINE, &#39;\r\n&#39;, start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+        if c == &#39;\n&#39;:
+            self.pos += 1
+            mode_hint = yield Ps1Token(Ps1TokenKind.NEWLINE, &#39;\n&#39;, start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+
+        if c2 == &#39;&lt;#&#39;:
+            self._read_block_comment()
+            continue
+        if c == &#39;#&#39;:
+            self._read_line_comment()
+            continue
+
+        if c == &#39;@&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in SINGLE_QUOTES:
+                text = self._read_verbatim_here_string()
+                mode_hint = yield Ps1Token(Ps1TokenKind.HSTRING_VERBATIM, text, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+            if nc in DOUBLE_QUOTES:
+                text = self._read_expandable_here_string()
+                mode_hint = yield Ps1Token(Ps1TokenKind.HSTRING_EXPAND, text, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+        if c2 in (&#39;..&#39;, &#39;--&#39;, &#39;++&#39;, &#39;::&#39;, &#39;+=&#39;, &#39;-=&#39;, &#39;*=&#39;, &#39;/=&#39;, &#39;%=&#39;) and self.mode == Ps1LexerMode.ARGUMENT:
+            after = self.pos + 2
+            if after &lt; length and src[after] not in &#39; \t\r\n|&amp;;,{}()&#39;:
+                token = self._read_generic_token()
+                if token.value:
+                    mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+        if c2 in _TWO_CHAR_OPS:
+            self.pos += 2
+            kind = _TWO_CHAR_OPS[c2]
+            mode_hint = yield Ps1Token(kind, c2, start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+
+        if c == &#39;:&#39; and self.pos + 1 &lt; length and (src[self.pos + 1].isalpha() or src[self.pos + 1] == &#39;_&#39;):
+            self.pos += 1
+            while self.pos &lt; length and (src[self.pos].isalnum() or src[self.pos] == &#39;_&#39;):
+                self.pos += 1
+            mode_hint = yield Ps1Token(Ps1TokenKind.LABEL, src[start:self.pos], start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+
+        if c == &#39;$&#39; or (c == &#39;@&#39; and self.pos + 1 &lt; length and src[self.pos + 1] not in &#39;({&#39;):
+            nc = src[self.pos + 1] if self.pos + 1 &lt; length else &#39;&#39;
+            if c == &#39;$&#39; and nc == &#39;(&#39;:
+                pass
+            elif nc and (nc.isalnum() or nc in &#39;_?{$^&#39;):
+                token = self._read_variable(c)
+                if self.mode == Ps1LexerMode.ARGUMENT and self.pos &lt; length:
+                    fc = src[self.pos]
+                    if fc not in _FORCE_START_NEW_TOKEN and fc not in _VARIABLE_STOPS_NO_RESCAN:
+                        self.pos = start
+                        token = self._read_generic_token()
+                mode_hint = yield token
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+        if c in SINGLE_QUOTES:
+            text = self._read_verbatim_string()
+            mode_hint = yield Ps1Token(Ps1TokenKind.STRING_VERBATIM, text, start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+        if c in DOUBLE_QUOTES:
+            text = self._read_expandable_string()
+            mode_hint = yield Ps1Token(Ps1TokenKind.STRING_EXPAND, text, start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+
+        if c in &#39;123456&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;&gt;&#39;:
+            if self.mode != Ps1LexerMode.EXPRESSION:
+                redir = self._try_redirection()
+                if redir:
+                    mode_hint = yield redir
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+        if c.isdigit() or (c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()):
+            token = self._read_number()
+            if token:
+                nc = src[self.pos] if self.pos &lt; length else None
+                if nc is not None and nc not in _FORCE_START_NEW_TOKEN and not nc.isspace():
+                    if self.mode == Ps1LexerMode.ARGUMENT or (
+                        nc not in _FORCE_NEW_TOKEN_AFTER_NUMBER
+                    ):
+                        self.pos = start
+                        token = self._read_generic_token()
+                mode_hint = yield token
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+        if c in DASHES:
+            if self.mode == Ps1LexerMode.EXPRESSION:
+                op = self._try_dash_operator()
+                if op:
+                    mode_hint = yield op
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+            elif self.mode == Ps1LexerMode.ARGUMENT:
+                param = self._try_parameter()
+                if param:
+                    mode_hint = yield param
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+        redir = self._try_redirection()
+        if redir:
+            mode_hint = yield redir
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+
+        if self.mode == Ps1LexerMode.ARGUMENT:
+            if c == &#39;.&#39; and self.pos + 1 &lt; length:
+                nc = src[self.pos + 1]
+                if nc not in &#39; \t\r\n|&amp;;,{}()$&#39; and nc not in SINGLE_QUOTES and nc not in DOUBLE_QUOTES:
+                    token = self._read_generic_token()
+                    if token.value:
+                        mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+
+        if self.mode == Ps1LexerMode.ARGUMENT and c in &#39;*/%=!+&#39;:
+            if self.pos + 1 &lt; length and src[self.pos + 1] not in &#39; \t\r\n|&amp;;,{}()&#39;:
+                token = self._read_generic_token()
+                if token.value:
+                    mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+        if c in _ONE_CHAR_OPS or c in DASHES:
+            self.pos += 1
+            kind = _ONE_CHAR_OPS.get(c) or Ps1TokenKind.DASH
+            mode_hint = yield Ps1Token(kind, c, start)
+            if mode_hint is not None:
+                self.mode = mode_hint
+            continue
+
+        if self.mode == Ps1LexerMode.ARGUMENT:
+            if c.isalpha() or c == &#39;_&#39; or c == &#39;\\&#39; or c == &#39;`&#39;:
+                token = self._read_generic_token()
+                if token.value:
+                    word = token.value.lower()
+                    kw = _KEYWORDS.get(word)
+                    if kw is not None:
+                        mode_hint = yield Ps1Token(kw, token.value, token.offset)
+                    else:
+                        mode_hint = yield token
+                    if mode_hint is not None:
+                        self.mode = mode_hint
+                    continue
+
+        if c.isalpha() or c == &#39;_&#39; or c == &#39;`&#39;:
+            word = []
+            if c == &#39;`&#39; and self.pos + 1 &lt; length:
+                self.pos += 1
+                word.append(src[self.pos])
+                self.pos += 1
+            else:
+                word.append(c)
+                self.pos += 1
+            while self.pos &lt; length:
+                ch = src[self.pos]
+                if ch == &#39;`&#39; and self.pos + 1 &lt; length:
+                    self.pos += 1
+                    word.append(src[self.pos])
+                    self.pos += 1
+                elif ch.isalnum() or ch == &#39;_&#39;:
+                    word.append(ch)
+                    self.pos += 1
+                elif ch in DASHES and self.mode != Ps1LexerMode.EXPRESSION:
+                    word.append(ch)
+                    self.pos += 1
+                else:
+                    break
+            if self.pos &lt; length and src[self.pos] not in _FORCE_START_NEW_TOKEN:
+                if self.mode == Ps1LexerMode.ARGUMENT or (
+                    src[self.pos] in SINGLE_QUOTES
+                    or src[self.pos] in DOUBLE_QUOTES
+                    or src[self.pos] == &#39;$&#39;
+                ):
+                    self.pos = start
+                    token = self._read_generic_token()
+                    if token.value:
+                        mode_hint = yield token
+                        if mode_hint is not None:
+                            self.mode = mode_hint
+                        continue
+            identifier = &#39;&#39;.join(word)
+            if identifier:
+                kw = _KEYWORDS.get(identifier.lower())
+                if kw is not None:
+                    mode_hint = yield Ps1Token(kw, identifier, start)
+                else:
+                    mode_hint = yield Ps1Token(Ps1TokenKind.GENERIC_TOKEN, identifier, start)
+                if mode_hint is not None:
+                    self.mode = mode_hint
+                continue
+
+        self.pos += 1
+        mode_hint = yield Ps1Token(Ps1TokenKind.GENERIC_TOKEN, c, start)
+        if mode_hint is not None:
+            self.mode = mode_hint</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1" href="index.html">refinery.lib.scripts.ps1</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.lexer.Ps1LexerMode" href="#refinery.lib.scripts.ps1.lexer.Ps1LexerMode">Ps1LexerMode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.lexer.Ps1Lexer" href="#refinery.lib.scripts.ps1.lexer.Ps1Lexer">Ps1Lexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.lexer.Ps1Lexer.push_mode" href="#refinery.lib.scripts.ps1.lexer.Ps1Lexer.push_mode">push_mode</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.lexer.Ps1Lexer.pop_mode" href="#refinery.lib.scripts.ps1.lexer.Ps1Lexer.pop_mode">pop_mode</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.lexer.Ps1Lexer.tokenize" href="#refinery.lib.scripts.ps1.lexer.Ps1Lexer.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
