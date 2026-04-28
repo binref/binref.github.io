@@ -1,0 +1,1768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.stringarray documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.stringarray</code></h1>
+</header>
+<section id="section-intro">
+<p>Resolve the string-array rotation pattern produced by popular JavaScript obfuscators.</p>
+<p>The obfuscator extracts all string literals into a single array, wraps access through an accessor
+function and scrambles the array via a rotation IIFE that push/shifts until a checksum computed
+from parseInt of the array's own elements matches a target constant. This transformer detects that
+three-part pattern, simulates the rotation in Python, resolves every accessor call to its string
+literal, and removes the dead definitions.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L1-L992" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Resolve the string-array rotation pattern produced by popular JavaScript obfuscators.
+
+The obfuscator extracts all string literals into a single array, wraps access through an accessor
+function and scrambles the array via a rotation IIFE that push/shifts until a checksum computed
+from parseInt of the array&#39;s own elements matches a target constant. This transformer detects that
+three-part pattern, simulates the rotation in Python, resolves every accessor call to its string
+literal, and removes the dead definitions.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import base64
+import enum
+import functools
+
+from refinery.lib.scripts import (
+    Node,
+    Transformer,
+    _remove_from_parent,
+    _replace_in_parent,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    BINARY_OPS,
+    js_parse_int,
+    make_string_literal,
+    property_key,
+    remove_declarator,
+    string_value,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsAssignmentExpression,
+    JsBinaryExpression,
+    JsCallExpression,
+    JsExpressionStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsIfStatement,
+    JsMemberExpression,
+    JsNumericLiteral,
+    JsObjectExpression,
+    JsParenthesizedExpression,
+    JsProperty,
+    JsReturnStatement,
+    JsScript,
+    JsStringLiteral,
+    JsUnaryExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+    JsWhileStatement,
+)
+
+from typing import NamedTuple, Sequence
+
+
+class Encoding(enum.Enum):
+    NONE = &#39;none&#39;
+    B64 = &#39;base64&#39;
+    RC4 = &#39;rc4&#39;
+
+
+class ArrayFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the array-holder function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    strings: list[str]
+
+
+class AccessorFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the accessor function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    base_offset: int
+
+
+class RotationIIFE(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the rotation IIFE pattern.
+    &#34;&#34;&#34;
+    node: JsExpressionStatement
+    target: int
+    body: Sequence[Node]
+
+
+class ChecksumInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Result of extracting the checksum expression from the rotation IIFE.
+    &#34;&#34;&#34;
+    node: Node
+    local_accessors: frozenset[str]
+    wrappers: dict[str, &#39;AccessorWrapperInfo&#39;]
+    prop_maps: dict[str, dict[str, int | str]]
+
+
+def _find_array_function(body: Sequence[Node]) -&gt; ArrayFunction | None:
+    &#34;&#34;&#34;
+    Detect the array-holder function pattern:
+
+        function NAME() {
+          var x = [&#39;str0&#39;, &#39;str1&#39;, ...];
+          NAME = function() { return x; };
+          return NAME();
+        }
+
+    Returns (node, function_name, initial_string_list) or None.
+    &#34;&#34;&#34;
+    for statement in body:
+        if not isinstance(statement, JsFunctionDeclaration):
+            continue
+        if statement.id is None or statement.body is None:
+            continue
+        name = statement.id.name
+        statements = statement.body.body
+        if len(statements) &lt; 2:
+            continue
+        array_literal: list[str] | None = None
+        has_self_reassignment = False
+        for s in statements:
+            if isinstance(s, JsVariableDeclaration):
+                for decl in s.declarations:
+                    if (
+                        isinstance(decl, JsVariableDeclarator)
+                        and isinstance(decl.init, JsArrayExpression)
+                    ):
+                        elements = []
+                        for element in decl.init.elements:
+                            if (sv := string_value(element)) is None:
+                                break
+                            elements.append(sv)
+                        else:
+                            if elements:
+                                array_literal = elements
+            elif (
+                isinstance(s, JsExpressionStatement)
+                and isinstance(assign := s.expression, JsAssignmentExpression)
+                and isinstance(assign.left, JsIdentifier)
+                and assign.left.name == name
+            ):
+                has_self_reassignment = True
+        if array_literal is not None and has_self_reassignment:
+            return ArrayFunction(statement, name, array_literal)
+    return None
+
+
+def _find_accessor_function(
+    body: Sequence[Node],
+    array_fn_name: str,
+) -&gt; AccessorFunction | None:
+    &#34;&#34;&#34;
+    Detect the accessor function pattern:
+
+        function NAME(param, _unused) {
+          param = param - BASE_OFFSET;
+          var v = ARRAY_FN();
+          var r = v[param];
+          return r;
+        }
+
+    Returns (node, function_name, base_offset) or None.
+    &#34;&#34;&#34;
+    for stmt in body:
+        if not isinstance(stmt, JsFunctionDeclaration):
+            continue
+        if stmt.id is None or stmt.body is None:
+            continue
+        if len(stmt.params) != 2:
+            continue
+        fn_name = stmt.id.name
+        first_param = stmt.params[0]
+        if not isinstance(first_param, JsIdentifier):
+            continue
+        param_name = first_param.name
+        base_offset: int | None = None
+        calls_array_fn = False
+        for s in stmt.body.body:
+            if isinstance(s, JsExpressionStatement) and isinstance(s.expression, JsAssignmentExpression):
+                assign = s.expression
+                if (
+                    isinstance(assign.left, JsIdentifier)
+                    and assign.left.name == param_name
+                    and isinstance(assign.right, JsBinaryExpression)
+                    and assign.right.operator == &#39;-&#39;
+                    and isinstance(assign.right.left, JsIdentifier)
+                    and assign.right.left.name == param_name
+                    and assign.right.right is not None
+                ):
+                    try:
+                        base_offset = int(_eval_arithmetic(assign.right.right))
+                    except _EvalError:
+                        pass
+            elif isinstance(s, JsVariableDeclaration):
+                for decl in s.declarations:
+                    if isinstance(decl, JsVariableDeclarator) and isinstance(decl.init, JsCallExpression):
+                        if isinstance(decl.init.callee, JsIdentifier) and decl.init.callee.name == array_fn_name:
+                            calls_array_fn = True
+        if base_offset is not None and calls_array_fn:
+            return AccessorFunction(stmt, fn_name, base_offset)
+    return None
+
+
+def _find_rotation_iife(
+    body: Sequence[Node],
+    array_fn_name: str,
+) -&gt; RotationIIFE | None:
+    &#34;&#34;&#34;
+    Detect the rotation IIFE pattern:
+
+        (function(getArray, target) {
+          var arr = getArray();
+          while (true) { try { ... parseInt ... push(shift) } catch { push(shift) } }
+        })(ARRAY_FN, TARGET_NUMBER);
+
+    Returns (statement_node, target_checksum, iife_body_statements) or None.
+    &#34;&#34;&#34;
+    for stmt in body:
+        if not isinstance(stmt, JsExpressionStatement):
+            continue
+        expr = stmt.expression
+        if isinstance(expr, JsParenthesizedExpression):
+            expr = expr.expression
+        call = expr
+        if not isinstance(call, JsCallExpression):
+            continue
+        if not isinstance(call.callee, JsFunctionExpression):
+            continue
+        if len(call.arguments) != 2:
+            continue
+        first_arg = call.arguments[0]
+        second_arg = call.arguments[1]
+        if not (isinstance(first_arg, JsIdentifier) and first_arg.name == array_fn_name):
+            continue
+        try:
+            target = int(_eval_arithmetic(second_arg))
+        except _EvalError:
+            continue
+        fn_body = call.callee.body
+        if fn_body is None:
+            continue
+        has_while = False
+        for s in fn_body.body:
+            if isinstance(s, JsWhileStatement):
+                has_while = True
+                break
+        if has_while:
+            return RotationIIFE(stmt, target, fn_body.body)
+    return None
+
+
+class _EvalError(Exception):
+    pass
+
+
+class AccessorWrapperInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+    accessor with reordered arguments and an additional offset subtraction.
+    &#34;&#34;&#34;
+    target: str
+    offset: int
+    idx_param_pos: int
+    key_param_pos: int
+
+
+def _resolve_member_access(
+    node: JsMemberExpression,
+    prop_maps: dict[str, dict[str, int | str]],
+) -&gt; int | str | None:
+    &#34;&#34;&#34;
+    Resolve a member expression `OBJ.KEY` against a set of known property maps collected from
+    object literals in the IIFE body. Returns the resolved value or None.
+    &#34;&#34;&#34;
+    if not isinstance(node.object, JsIdentifier):
+        return None
+    obj_name = node.object.name
+    if obj_name not in prop_maps:
+        return None
+    prop = node.property
+    if isinstance(prop, JsIdentifier):
+        key = prop.name
+    elif isinstance(prop, JsStringLiteral):
+        key = prop.value
+    else:
+        return None
+    return prop_maps[obj_name].get(key)
+
+
+def _resolve_constant(
+    node: Node,
+    prop_maps: dict[str, dict[str, int | str]],
+) -&gt; int | None:
+    &#34;&#34;&#34;
+    Resolve a node to an integer constant, handling numeric literals, member accesses against known
+    property maps, unary negation, and parenthesized expressions. Returns None on failure.
+    &#34;&#34;&#34;
+    if isinstance(node, JsNumericLiteral):
+        return int(node.value)
+    if isinstance(node, JsParenthesizedExpression) and node.expression:
+        return _resolve_constant(node.expression, prop_maps)
+    if isinstance(node, JsMemberExpression):
+        resolved = _resolve_member_access(node, prop_maps)
+        return resolved if isinstance(resolved, int) else None
+    if isinstance(node, JsUnaryExpression) and node.operator == &#39;-&#39; and node.operand:
+        inner = _resolve_constant(node.operand, prop_maps)
+        return -inner if inner is not None else None
+    try:
+        return int(_eval_arithmetic(node))
+    except _EvalError:
+        return None
+
+
+def _extract_wrapper_offset(
+    idx_arg: Node,
+    prop_maps: dict[str, dict[str, int | str]],
+) -&gt; tuple[str, int] | None:
+    &#34;&#34;&#34;
+    Analyze the index argument of a wrapper&#39;s forwarding call and extract `(param_name, offset)`
+    where offset is the constant subtracted from the call-site argument. The effective accessor
+    index is `call_arg - offset`. Handles these patterns:
+
+        param             =&gt; (param, 0)
+        param -   CONST   =&gt; (param, CONST)
+        param -  -CONST   =&gt; (param, -CONST)
+        param - (-CONST)  =&gt; (param, -CONST)
+        param +   CONST   =&gt; (param, -CONST)
+    &#34;&#34;&#34;
+    if isinstance(idx_arg, JsIdentifier):
+        return idx_arg.name, 0
+    if isinstance(idx_arg, JsBinaryExpression) and isinstance(idx_arg.left, JsIdentifier):
+        right_val = _resolve_constant(idx_arg.right, prop_maps)
+        if right_val is None:
+            return None
+        if idx_arg.operator == &#39;-&#39;:
+            return idx_arg.left.name, right_val
+        if idx_arg.operator == &#39;+&#39;:
+            return idx_arg.left.name, -right_val
+    return None
+
+
+def _parse_object_props(
+    obj: JsObjectExpression,
+    allow_strings: bool = False,
+) -&gt; dict[str, int | str]:
+    &#34;&#34;&#34;
+    Extract `{key: value}` pairs from an object expression. Keys are identifier names or string
+    literal values. Values are integers (via `_eval_arithmetic`) and optionally strings (via
+    `string_value`) when `allow_strings` is True.
+    &#34;&#34;&#34;
+    props: dict[str, int | str] = {}
+    for prop in obj.properties:
+        if not isinstance(prop, JsProperty) or prop.value is None:
+            continue
+        key = property_key(prop)
+        if key is None:
+            continue
+        if allow_strings:
+            sv = string_value(prop.value)
+            if sv is not None:
+                props[key] = sv
+                continue
+        try:
+            props[key] = int(_eval_arithmetic(prop.value))
+        except _EvalError:
+            pass
+    return props
+
+
+def _collect_local_prop_maps(
+    body: Sequence[Node],
+) -&gt; dict[str, dict[str, int | str]]:
+    &#34;&#34;&#34;
+    Scan the leading variable declarations in a function body for object literals and return a
+    mapping from variable name to its `{key: int}` property map. Stops at the first non-variable
+    declaration statement.
+    &#34;&#34;&#34;
+    local_props: dict[str, dict[str, int | str]] = {}
+    for s in body:
+        if not isinstance(s, JsVariableDeclaration):
+            break
+        for decl in s.declarations:
+            if (
+                isinstance(decl, JsVariableDeclarator)
+                and isinstance(decl.id, JsIdentifier)
+                and isinstance(decl.init, JsObjectExpression)
+                and (lp := _parse_object_props(decl.init))
+            ):
+                local_props[decl.id.name] = lp
+    return local_props
+
+
+def _match_wrapper(
+    fn: JsFunctionDeclaration,
+    accessor_name: str,
+    prop_maps: dict[str, dict[str, int | str]],
+) -&gt; AccessorWrapperInfo | None:
+    &#34;&#34;&#34;
+    Check whether a function declaration is a wrapper that forwards to *accessor_name* with
+    reordered arguments and a constant offset. Returns a `AccessorWrapperInfo` on match, else None.
+    &#34;&#34;&#34;
+    if fn.id is None or fn.body is None:
+        return None
+    if len(fn.body.body) &lt; 1 or len(fn.params) &lt; 2:
+        return None
+    ret = fn.body.body[-1]
+    if not isinstance(ret, JsReturnStatement) or ret.argument is None:
+        return None
+    call = ret.argument
+    if not isinstance(call, JsCallExpression) or not isinstance(call.callee, JsIdentifier):
+        return None
+    if call.callee.name != accessor_name:
+        return None
+    if len(call.arguments) != 2:
+        return None
+    local_props = dict(prop_maps)
+    local_props.update(_collect_local_prop_maps(fn.body.body[:-1]))
+    idx_arg = call.arguments[0]
+    key_arg = call.arguments[1]
+    if not isinstance(key_arg, JsIdentifier):
+        return None
+    offset = _extract_wrapper_offset(idx_arg, local_props)
+    if offset is None:
+        return None
+    idx_param_name, offset_value = offset
+    param_names = [p.name for p in fn.params if isinstance(p, JsIdentifier)]
+    if idx_param_name not in param_names or key_arg.name not in param_names:
+        return None
+    return AccessorWrapperInfo(
+        target=accessor_name,
+        offset=offset_value,
+        idx_param_pos=param_names.index(idx_param_name),
+        key_param_pos=param_names.index(key_arg.name),
+    )
+
+
+def _collect_iife_wrappers(
+    iife_body: Sequence[Node],
+    accessor_name: str,
+) -&gt; tuple[dict[str, AccessorWrapperInfo], dict[str, dict[str, int | str]]]:
+    &#34;&#34;&#34;
+    Scan the rotation IIFE body for inner wrapper functions and their associated offset objects.
+    Returns `(wrappers, prop_maps)` where `wrappers` maps wrapper function names to their
+    `refinery.lib.scripts.js.deobfuscation.AccessorWrapperInfo` and `prop_maps` maps object
+    variable names to their `{key: value}` dicts.
+
+    Inner wrappers follow the pattern::
+
+        var a = { p: 0x4 };
+        function f(x, y) {
+          return g(y - a.p, x);
+        }
+
+    The wrapper swaps argument order and subtracts a constant offset from the index parameter.
+    &#34;&#34;&#34;
+    prop_maps: dict[str, dict[str, int | str]] = {}
+    wrappers: dict[str, AccessorWrapperInfo] = {}
+    for s in iife_body:
+        if isinstance(s, JsVariableDeclaration):
+            for decl in s.declarations:
+                if (
+                    isinstance(decl, JsVariableDeclarator)
+                    and isinstance(decl.id, JsIdentifier)
+                    and isinstance(decl.init, JsObjectExpression)
+                ):
+                    props = _parse_object_props(decl.init, allow_strings=True)
+                    if props:
+                        prop_maps[decl.id.name] = props
+        if isinstance(s, JsFunctionDeclaration):
+            info = _match_wrapper(s, accessor_name, prop_maps)
+            if info is not None and s.id is not None:
+                wrappers[s.id.name] = info
+    return wrappers, prop_maps
+
+
+def _collect_all_wrappers(
+    root: Node,
+    accessor_name: str,
+) -&gt; dict[str, AccessorWrapperInfo]:
+    &#34;&#34;&#34;
+    Walk the entire AST to find all function declarations that forward to the accessor with a
+    constant offset. Unlike `_collect_iife_wrappers`, this finds wrappers at any nesting level
+    and handles local offset objects declared inside the wrapper body.
+    &#34;&#34;&#34;
+    wrappers: dict[str, AccessorWrapperInfo] = {}
+    for s in root.walk():
+        if isinstance(s, JsFunctionDeclaration):
+            info = _match_wrapper(s, accessor_name, {})
+            if info is not None and s.id is not None:
+                wrappers[s.id.name] = info
+    return wrappers
+
+
+def _extract_checksum_expression(
+    iife_body: Sequence[Node],
+    accessor_name: str,
+) -&gt; ChecksumInfo | None:
+    &#34;&#34;&#34;
+    Extract the checksum expression AST node, local accessor aliases, and inner wrapper resolution
+    data from the rotation IIFE body. The wrapper and property-map data allows `_eval_checksum` to
+    evaluate wrapper calls on the fly without mutating the AST.
+    &#34;&#34;&#34;
+    local_accessors: set[str] = {accessor_name}
+    for s in iife_body:
+        if isinstance(s, JsVariableDeclaration):
+            for decl in s.declarations:
+                if (
+                    isinstance(decl, JsVariableDeclarator)
+                    and isinstance(decl.id, JsIdentifier)
+                    and isinstance(decl.init, JsIdentifier)
+                    and decl.init.name == accessor_name
+                ):
+                    local_accessors.add(decl.id.name)
+    checksum_node: Node | None = None
+    for s in iife_body:
+        if isinstance(s, JsWhileStatement) and s.body is not None:
+            for ws in s.walk():
+                if isinstance(ws, JsVariableDeclaration):
+                    for decl in ws.declarations:
+                        if isinstance(decl, JsVariableDeclarator) and decl.init is not None:
+                            checksum_node = decl.init
+                            break
+                    if checksum_node is not None:
+                        break
+            break
+    if checksum_node is None:
+        return None
+    wrappers, prop_maps = _collect_iife_wrappers(iife_body, accessor_name)
+    return ChecksumInfo(
+        checksum_node,
+        frozenset(local_accessors),
+        wrappers,
+        prop_maps,
+    )
+
+
+def _decode_string(raw: str, encoding: Encoding, key: str | None = None) -&gt; str:
+    &#34;&#34;&#34;
+    Decode a raw string from the array according to the encoding mode. For RC4, a key must be
+    supplied. Raises _EvalError when decoding is not possible.
+    &#34;&#34;&#34;
+    if encoding == Encoding.NONE:
+        return raw
+    try:
+        if encoding == Encoding.B64:
+            return _decode_base64(raw)
+        if encoding == Encoding.RC4:
+            if key is None:
+                raise _EvalError
+            return _decrypt_rc4(raw, key)
+    except _EvalError:
+        raise
+    except (UnicodeDecodeError, ValueError):
+        raise _EvalError
+    raise _EvalError
+
+
+def _eval_arithmetic(node: Node) -&gt; float:
+    &#34;&#34;&#34;
+    Evaluate a pure arithmetic expression AST to a float. Handles numeric literals, unary `+`/`-`,
+    binary operators, and parenthesized expressions. Raises `_EvalError` on any node that is not
+    statically computable.
+    &#34;&#34;&#34;
+    if isinstance(node, JsNumericLiteral):
+        return float(node.value)
+    if isinstance(node, JsParenthesizedExpression) and node.expression:
+        return _eval_arithmetic(node.expression)
+    if isinstance(node, JsUnaryExpression) and node.operand:
+        if node.operator == &#39;-&#39;:
+            return -_eval_arithmetic(node.operand)
+        if node.operator == &#39;+&#39;:
+            return _eval_arithmetic(node.operand)
+    if isinstance(node, JsBinaryExpression) and node.left and node.right:
+        left = _eval_arithmetic(node.left)
+        right = _eval_arithmetic(node.right)
+        fn = BINARY_OPS.get(node.operator)
+        if fn is not None:
+            if node.operator == &#39;/&#39; and right == 0:
+                raise _EvalError
+            return fn(left, right)
+    raise _EvalError
+
+
+def _eval_checksum(
+    node: Node,
+    local_accessors: frozenset[str],
+    strings: list[str],
+    base_offset: int,
+    encoding: Encoding = Encoding.NONE,
+    wrappers: dict[str, AccessorWrapperInfo] | None = None,
+    prop_maps: dict[str, dict[str, int | str]] | None = None,
+) -&gt; float:
+    &#34;&#34;&#34;
+    Evaluate a checksum expression against the current array state. Handles the arithmetic
+    operators (`+`, `-`, `*`, `/`), unary negation, parentheses, `parseInt` calls on accessor
+    lookups, and numeric literals. When inner wrapper functions are present, wrapper calls are
+    resolved to direct accessor calls on the fly without modifying the AST.
+
+    Raises `refinery.lib.scripts.js.deobfuscation.stringarray._EvalError` on any unrecognized
+    pattern.
+    &#34;&#34;&#34;
+    recurse = functools.partial(
+        _eval_checksum,
+        local_accessors=local_accessors,
+        strings=strings,
+        base_offset=base_offset,
+        encoding=encoding,
+        wrappers=wrappers,
+        prop_maps=prop_maps,
+    )
+    if isinstance(node, JsNumericLiteral):
+        return float(node.value)
+    if isinstance(node, JsParenthesizedExpression) and node.expression:
+        return recurse(node.expression)
+    if isinstance(node, JsUnaryExpression) and node.operand:
+        if node.operator == &#39;-&#39;:
+            return -recurse(node.operand)
+        if node.operator == &#39;+&#39;:
+            return recurse(node.operand)
+    if isinstance(node, JsBinaryExpression) and node.left and node.right:
+        lhs = recurse(node.left)
+        rhs = recurse(node.right)
+        fn = BINARY_OPS.get(node.operator)
+        if fn is not None:
+            if node.operator == &#39;/&#39; and rhs == 0:
+                raise _EvalError
+            return fn(lhs, rhs)
+    if isinstance(node, JsCallExpression) and isinstance(node.callee, JsIdentifier):
+        if node.callee.name == &#39;parseInt&#39; and len(node.arguments) &gt;= 1:
+            inner = node.arguments[0]
+            if isinstance(inner, JsStringLiteral):
+                result = js_parse_int(inner.value)
+                if result is None:
+                    raise _EvalError
+                return float(result)
+            if isinstance(inner, JsCallExpression) and isinstance(inner.callee, JsIdentifier):
+                idx, key = _resolve_accessor_call(
+                    inner, local_accessors, wrappers, prop_maps,
+                )
+                if 0 &lt;= (i := idx - base_offset) &lt; len(strings):
+                    raw = strings[i]
+                    decoded = _decode_string(raw, encoding, key)
+                    if (result := js_parse_int(decoded)) is None:
+                        raise _EvalError
+                    return float(result)
+            raise _EvalError
+    raise _EvalError
+
+
+def _resolve_accessor_call(
+    call: JsCallExpression,
+    local_accessors: frozenset[str],
+    wrappers: dict[str, AccessorWrapperInfo] | None,
+    prop_maps: dict[str, dict[str, int | str]] | None,
+) -&gt; tuple[int, str | None]:
+    &#34;&#34;&#34;
+    Resolve an accessor or wrapper call to `(index, rc4_key)`. Handles both direct accessor calls
+    (`accessor(idx, key)`) and inner wrapper calls (`wrapper(obj.key, obj.idx)`). Raises
+    `refinery.lib.scripts.js.deobfuscation.stringarray._EvalError` when the call cannot be resolved.
+    &#34;&#34;&#34;
+    callee_name = call.callee.name if isinstance(call.callee, JsIdentifier) else None
+    if callee_name is not None and callee_name in local_accessors and len(call.arguments) &gt;= 1:
+        idx = int(_eval_arithmetic(call.arguments[0]))
+        key: str | None = None
+        if len(call.arguments) &gt;= 2 and isinstance(call.arguments[1], JsStringLiteral):
+            key = call.arguments[1].value
+        return idx, key
+    if wrappers and callee_name is not None:
+        wrapper = wrappers.get(callee_name)
+        if wrapper is not None:
+            n_args = max(wrapper.idx_param_pos, wrapper.key_param_pos) + 1
+            if len(call.arguments) &gt;= n_args:
+                raw_idx = call.arguments[wrapper.idx_param_pos]
+                raw_key = call.arguments[wrapper.key_param_pos]
+                pm = prop_maps or {}
+                idx_value = _resolve_constant(raw_idx, pm)
+                if idx_value is None:
+                    raise _EvalError
+                idx_value -= wrapper.offset
+                key_value = _resolve_string_arg(raw_key, pm)
+                return idx_value, key_value
+    raise _EvalError
+
+
+def _resolve_string_arg(
+    node: Node,
+    prop_maps: dict[str, dict[str, int | str]],
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    Resolve an argument node to a string, handling member access against known property maps.
+    Returns None when the argument is not a string (non-RC4 case).
+    &#34;&#34;&#34;
+    if isinstance(node, JsStringLiteral):
+        return node.value
+    if isinstance(node, JsMemberExpression):
+        resolved = _resolve_member_access(node, prop_maps)
+        if isinstance(resolved, str):
+            return resolved
+    return None
+
+
+def _simulate_rotation(
+    strings: list[str],
+    base_offset: int,
+    checksum_node: Node,
+    local_accessors: frozenset[str],
+    target: int,
+    encoding: Encoding = Encoding.NONE,
+    wrappers: dict[str, AccessorWrapperInfo] | None = None,
+    prop_maps: dict[str, dict[str, int | str]] | None = None,
+) -&gt; list[str] | None:
+    &#34;&#34;&#34;
+    Simulate the array rotation loop. For each rotation position, evaluate the checksum
+    expression against the current array state. Stop when the checksum matches the target,
+    or bail after len(strings) attempts.
+    &#34;&#34;&#34;
+    array = list(strings)
+    n = len(array)
+    for _ in range(n):
+        try:
+            if int(_eval_checksum(
+                checksum_node, local_accessors, array, base_offset, encoding, wrappers, prop_maps,
+            )) == target:
+                return array
+        except _EvalError:
+            pass
+        array.append(array.pop(0))
+    return None
+
+
+def _collect_accessor_aliases(body: Sequence[Node], accessor_name: str) -&gt; set[str]:
+    &#34;&#34;&#34;
+    Collect all variable names that are directly assigned the accessor function identifier,
+    walking the entire AST. These aliases are used at the top level (e.g. var _0xcbb5cc = _0x4914)
+    and inside function bodies (e.g. var _0x4bad70 = _0x4914).
+    &#34;&#34;&#34;
+    aliases: set[str] = set()
+    for stmt in body:
+        for node in stmt.walk():
+            if (
+                isinstance(node, JsVariableDeclarator)
+                and isinstance(node.id, JsIdentifier)
+                and isinstance(node.init, JsIdentifier)
+                and node.init.name == accessor_name
+            ):
+                aliases.add(node.id.name)
+    return aliases
+
+
+_B64_ALPHABET = &#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=&#39;
+_B64_STANDARD = &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&#39;
+_B64_TRANSLATE = str.maketrans(_B64_ALPHABET, _B64_STANDARD)
+
+
+def _detect_encoding(accessor_node: JsFunctionDeclaration) -&gt; Encoding:
+    &#34;&#34;&#34;
+    Detect the string encoding mode by inspecting the accessor function body. The base64 and RC4
+    variants inject an `if (NAME[&#39;...&#39;] === undefined)` init guard that contains the base64
+    alphabet string and one (base64) or two (RC4) inner function definitions.
+    &#34;&#34;&#34;
+    if accessor_node.body is None:
+        return Encoding.NONE
+    for stmt in accessor_node.body.body:
+        if not isinstance(stmt, JsIfStatement):
+            continue
+        inner_functions = 0
+        has_alphabet = False
+        for child in stmt.walk():
+            if isinstance(child, JsStringLiteral) and child.value == _B64_ALPHABET:
+                has_alphabet = True
+            if (
+                isinstance(child, JsVariableDeclarator)
+                and isinstance(child.init, JsFunctionExpression)
+            ):
+                inner_functions += 1
+        if has_alphabet:
+            return Encoding.RC4 if inner_functions &gt;= 2 else Encoding.B64
+    return Encoding.NONE
+
+
+def _custom_b64decode(s: str) -&gt; bytes:
+    &#34;&#34;&#34;
+    Decode a string using the obfuscator&#39;s custom base64 alphabet (lowercase letters first)
+    and tolerate missing padding.
+    &#34;&#34;&#34;
+    translated = s.translate(_B64_TRANSLATE)
+    pad = len(translated) % 4
+    if pad:
+        translated += &#39;=&#39; * (4 - pad)
+    return base64.b64decode(translated)
+
+
+def _decode_base64(s: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode a base64-encoded string as produced by the obfuscator.
+    &#34;&#34;&#34;
+    return _custom_b64decode(s).decode(&#39;utf-8&#39;)
+
+
+def _decrypt_rc4(s: str, key: str) -&gt; str:
+    &#34;&#34;&#34;
+    Base64-decode, UTF-8-decode, then RC4-decrypt a string using the given key. The obfuscator&#39;s
+    RC4 operates on Unicode character codes (after UTF-8 decode), not raw bytes, because its
+    inline atob uses `decodeURIComponent` which interprets the base64 output as UTF-8.
+    &#34;&#34;&#34;
+    data = _decode_base64(s)
+    sbox = list(range(256))
+    j = 0
+    for i in range(256):
+        j = (j + sbox[i] + ord(key[i % len(key)])) % 256
+        sbox[i], sbox[j] = sbox[j], sbox[i]
+    i = j = 0
+    out: list[str] = []
+    for ch in data:
+        i = (i + 1) % 256
+        j = (j + sbox[i]) % 256
+        sbox[i], sbox[j] = sbox[j], sbox[i]
+        out.append(chr(ord(ch) ^ sbox[(sbox[i] + sbox[j]) % 256]))
+    return &#39;&#39;.join(out)
+
+
+def _replace_accessor_calls(
+    root: Node,
+    aliases: set[str],
+    raw_lookup: dict[int, str],
+    encoding: Encoding,
+    wrappers: dict[str, AccessorWrapperInfo] | None = None,
+    prop_maps: dict[str, dict[str, int | str]] | None = None,
+) -&gt; int:
+    &#34;&#34;&#34;
+    Walk the entire AST and replace accessor calls with decoded string literals. Handles direct
+    accessor calls where the first argument is a pure arithmetic expression, and also wrapper calls
+    that forward to the accessor with reordered arguments and an offset subtraction. For RC4, the
+    decryption key is taken from the second argument (or resolved from the wrapper&#39;s key parameter).
+    Returns the number of replaced calls.
+    &#34;&#34;&#34;
+    count = 0
+    local_accessors = frozenset(aliases)
+    wrapper_names = set(wrappers) if wrappers else set()
+    for node in list(root.walk()):
+        if not isinstance(node, JsCallExpression):
+            continue
+        if not isinstance(node.callee, JsIdentifier):
+            continue
+        if node.callee.name not in aliases and node.callee.name not in wrapper_names:
+            continue
+        try:
+            idx, key = _resolve_accessor_call(node, local_accessors, wrappers, prop_maps)
+        except _EvalError:
+            continue
+        raw = raw_lookup.get(idx)
+        if raw is None:
+            continue
+        try:
+            value = _decode_string(raw, encoding, key)
+        except _EvalError:
+            continue
+        _replace_in_parent(node, make_string_literal(value))
+        count += 1
+    return count
+
+
+def _find_remaining_calls(
+    root: JsScript,
+    aliases: set[str],
+    wrapper_names: set[str],
+) -&gt; tuple[bool, set[int]]:
+    &#34;&#34;&#34;
+    Determine whether unresolved accessor or wrapper calls remain in the AST, excluding calls that
+    are inside dead wrapper function bodies (which will be removed). Returns `(has_remaining,
+    dead_node_ids)` so the dead-node set can be reused during cleanup.
+    &#34;&#34;&#34;
+    dead_nodes: set[int] = set()
+    for n in root.walk():
+        if isinstance(n, JsFunctionDeclaration) and n.id is not None and n.id.name in wrapper_names:
+            dead_nodes.add(id(n))
+        elif (
+            isinstance(n, JsCallExpression)
+            and isinstance(n.callee, JsIdentifier)
+            and (n.callee.name in aliases or n.callee.name in wrapper_names)
+        ):
+            p = n.parent
+            while p is not None:
+                if id(p) in dead_nodes:
+                    break
+                p = p.parent
+            else:
+                return True, dead_nodes
+    return False, dead_nodes
+
+
+def _cleanup_infrastructure(
+    root: JsScript,
+    body: Sequence[Node],
+    array: ArrayFunction,
+    accessor: AccessorFunction,
+    dead_nodes: set[int],
+    aliases: set[str],
+) -&gt; None:
+    &#34;&#34;&#34;
+    Remove the string-array infrastructure (array function, accessor function, rotation IIFE, dead
+    wrapper declarations, and accessor alias declarators) once all calls have been resolved.
+    &#34;&#34;&#34;
+    _remove_from_parent(array.node)
+    _remove_from_parent(accessor.node)
+    rotation = _find_rotation_iife(body, array.name)
+    if rotation is not None:
+        _remove_from_parent(rotation.node)
+    for n in list(root.walk()):
+        if id(n) in dead_nodes:
+            _remove_from_parent(n)
+        elif (
+            isinstance(n, JsVariableDeclarator)
+            and isinstance(n.id, JsIdentifier)
+            and n.id.name in aliases
+            and isinstance(n.init, JsIdentifier)
+            and n.init.name in aliases
+        ):
+            remove_declarator(n)
+
+
+class _CachedResolution(NamedTuple):
+    &#34;&#34;&#34;
+    Cached result of a successful array rotation simulation, stored on the JsScript node to survive
+    across pipeline iterations. This prevents re-simulation failures when the simplifier modifies the
+    checksum expression in the rotation IIFE between string array passes.
+    &#34;&#34;&#34;
+    resolved: list[str]
+    base_offset: int
+    encoding: Encoding
+
+
+_CACHE_ATTR = &#39;_stringarray_cache&#39;
+
+
+class JsStringArrayResolver(Transformer):
+
+    def visit_JsScript(self, node: JsScript):
+        body = node.body
+        array = _find_array_function(body)
+        if array is None:
+            return None
+        accessor = _find_accessor_function(body, array.name)
+        if accessor is None:
+            return None
+        encoding = _detect_encoding(accessor.node)
+        cache: _CachedResolution | None = getattr(node, _CACHE_ATTR, None)
+        if (
+            cache is not None
+            and cache.base_offset == accessor.base_offset
+            and cache.encoding == encoding
+        ):
+            resolved = cache.resolved
+        else:
+            rotation = _find_rotation_iife(body, array.name)
+            if rotation is None:
+                return None
+            checksum = _extract_checksum_expression(rotation.body, accessor.name)
+            if checksum is None:
+                return None
+            resolved = _simulate_rotation(
+                array.strings,
+                accessor.base_offset,
+                checksum.node,
+                checksum.local_accessors,
+                rotation.target,
+                encoding,
+                checksum.wrappers or None,
+                checksum.prop_maps or None,
+            )
+            if resolved is None:
+                return None
+            setattr(node, _CACHE_ATTR, _CachedResolution(resolved, accessor.base_offset, encoding))
+        aliases = _collect_accessor_aliases(body, accessor.name)
+        aliases.add(accessor.name)
+        raw_lookup = {i + accessor.base_offset: s for i, s in enumerate(resolved)}
+        all_wrappers = _collect_all_wrappers(node, accessor.name)
+        if _replace_accessor_calls(
+            node, aliases, raw_lookup, encoding, all_wrappers,
+        ) == 0:
+            return None
+        wrapper_names = set(all_wrappers)
+        has_remaining, dead_nodes = _find_remaining_calls(node, aliases, wrapper_names)
+        if not has_remaining:
+            _cleanup_infrastructure(node, body, array, accessor, dead_nodes, aliases)
+        self.mark_changed()
+        return None
+
+    def generic_visit(self, node: Node):
+        pass</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.Encoding"><code class="flex name class">
+<span>class <span class="ident">Encoding</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Create a collection of name/value pairs.</p>
+<p>Example enumeration:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+</code></pre>
+<p>Access them by:</p>
+<ul>
+<li>attribute access:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color.RED
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>value lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color(1)
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>name lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color['RED']
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Enumerations can be iterated over, and know how many members they have:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; len(Color)
+3
+</code></pre>
+<pre><code class="language-python-repl">&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+</code></pre>
+<p>Methods can be added to enumerations, and members can have their own
+attributes &ndash; see the documentation for details.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L57-L60" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Encoding(enum.Enum):
+    NONE = &#39;none&#39;
+    B64 = &#39;base64&#39;
+    RC4 = &#39;rc4&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.Encoding.NONE"><code class="name">var <span class="ident">NONE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.Encoding.B64"><code class="name">var <span class="ident">B64</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.Encoding.RC4"><code class="name">var <span class="ident">RC4</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ArrayFunction"><code class="flex name class">
+<span>class <span class="ident">ArrayFunction</span></span>
+<span>(</span><span>node, name, strings)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Result of detecting the array-holder function pattern.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L63-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ArrayFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the array-holder function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    strings: list[str]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ArrayFunction.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L63-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ArrayFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the array-holder function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    strings: list[str]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ArrayFunction.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L63-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ArrayFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the array-holder function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    strings: list[str]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ArrayFunction.strings"><code class="name">var <span class="ident">strings</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L63-L69" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ArrayFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the array-holder function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    strings: list[str]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorFunction"><code class="flex name class">
+<span>class <span class="ident">AccessorFunction</span></span>
+<span>(</span><span>node, name, base_offset)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Result of detecting the accessor function pattern.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L72-L78" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the accessor function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    base_offset: int</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorFunction.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L72-L78" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the accessor function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    base_offset: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorFunction.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L72-L78" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the accessor function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    base_offset: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorFunction.base_offset"><code class="name">var <span class="ident">base_offset</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L72-L78" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorFunction(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the accessor function pattern.
+    &#34;&#34;&#34;
+    node: JsFunctionDeclaration
+    name: str
+    base_offset: int</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.RotationIIFE"><code class="flex name class">
+<span>class <span class="ident">RotationIIFE</span></span>
+<span>(</span><span>node, target, body)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Result of detecting the rotation IIFE pattern.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L81-L87" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RotationIIFE(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the rotation IIFE pattern.
+    &#34;&#34;&#34;
+    node: JsExpressionStatement
+    target: int
+    body: Sequence[Node]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.RotationIIFE.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L81-L87" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RotationIIFE(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the rotation IIFE pattern.
+    &#34;&#34;&#34;
+    node: JsExpressionStatement
+    target: int
+    body: Sequence[Node]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.RotationIIFE.target"><code class="name">var <span class="ident">target</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L81-L87" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RotationIIFE(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the rotation IIFE pattern.
+    &#34;&#34;&#34;
+    node: JsExpressionStatement
+    target: int
+    body: Sequence[Node]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.RotationIIFE.body"><code class="name">var <span class="ident">body</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L81-L87" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RotationIIFE(NamedTuple):
+    &#34;&#34;&#34;
+    Result of detecting the rotation IIFE pattern.
+    &#34;&#34;&#34;
+    node: JsExpressionStatement
+    target: int
+    body: Sequence[Node]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo"><code class="flex name class">
+<span>class <span class="ident">ChecksumInfo</span></span>
+<span>(</span><span>node, local_accessors, wrappers, prop_maps)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Result of extracting the checksum expression from the rotation IIFE.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L90-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ChecksumInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Result of extracting the checksum expression from the rotation IIFE.
+    &#34;&#34;&#34;
+    node: Node
+    local_accessors: frozenset[str]
+    wrappers: dict[str, &#39;AccessorWrapperInfo&#39;]
+    prop_maps: dict[str, dict[str, int | str]]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L90-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ChecksumInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Result of extracting the checksum expression from the rotation IIFE.
+    &#34;&#34;&#34;
+    node: Node
+    local_accessors: frozenset[str]
+    wrappers: dict[str, &#39;AccessorWrapperInfo&#39;]
+    prop_maps: dict[str, dict[str, int | str]]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo.local_accessors"><code class="name">var <span class="ident">local_accessors</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L90-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ChecksumInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Result of extracting the checksum expression from the rotation IIFE.
+    &#34;&#34;&#34;
+    node: Node
+    local_accessors: frozenset[str]
+    wrappers: dict[str, &#39;AccessorWrapperInfo&#39;]
+    prop_maps: dict[str, dict[str, int | str]]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo.wrappers"><code class="name">var <span class="ident">wrappers</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L90-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ChecksumInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Result of extracting the checksum expression from the rotation IIFE.
+    &#34;&#34;&#34;
+    node: Node
+    local_accessors: frozenset[str]
+    wrappers: dict[str, &#39;AccessorWrapperInfo&#39;]
+    prop_maps: dict[str, dict[str, int | str]]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo.prop_maps"><code class="name">var <span class="ident">prop_maps</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 3</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L90-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ChecksumInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Result of extracting the checksum expression from the rotation IIFE.
+    &#34;&#34;&#34;
+    node: Node
+    local_accessors: frozenset[str]
+    wrappers: dict[str, &#39;AccessorWrapperInfo&#39;]
+    prop_maps: dict[str, dict[str, int | str]]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo"><code class="flex name class">
+<span>class <span class="ident">AccessorWrapperInfo</span></span>
+<span>(</span><span>target, offset, idx_param_pos, key_param_pos)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+accessor with reordered arguments and an additional offset subtraction.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L258-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorWrapperInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+    accessor with reordered arguments and an additional offset subtraction.
+    &#34;&#34;&#34;
+    target: str
+    offset: int
+    idx_param_pos: int
+    key_param_pos: int</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo.target"><code class="name">var <span class="ident">target</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L258-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorWrapperInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+    accessor with reordered arguments and an additional offset subtraction.
+    &#34;&#34;&#34;
+    target: str
+    offset: int
+    idx_param_pos: int
+    key_param_pos: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo.offset"><code class="name">var <span class="ident">offset</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L258-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorWrapperInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+    accessor with reordered arguments and an additional offset subtraction.
+    &#34;&#34;&#34;
+    target: str
+    offset: int
+    idx_param_pos: int
+    key_param_pos: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo.idx_param_pos"><code class="name">var <span class="ident">idx_param_pos</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L258-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorWrapperInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+    accessor with reordered arguments and an additional offset subtraction.
+    &#34;&#34;&#34;
+    target: str
+    offset: int
+    idx_param_pos: int
+    key_param_pos: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo.key_param_pos"><code class="name">var <span class="ident">key_param_pos</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 3</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L258-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class AccessorWrapperInfo(NamedTuple):
+    &#34;&#34;&#34;
+    Describes an inner wrapper function inside the rotation IIFE that forwards to the main
+    accessor with reordered arguments and an additional offset subtraction.
+    &#34;&#34;&#34;
+    target: str
+    offset: int
+    idx_param_pos: int
+    key_param_pos: int</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver"><code class="flex name class">
+<span>class <span class="ident">JsStringArrayResolver</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>In-place tree rewriter. Each visit method may return a replacement node
+or <code>None</code> to keep the original. Tracks whether any transformation was applied
+via the <code>changed</code> flag.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L938-L992" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsStringArrayResolver(Transformer):
+
+    def visit_JsScript(self, node: JsScript):
+        body = node.body
+        array = _find_array_function(body)
+        if array is None:
+            return None
+        accessor = _find_accessor_function(body, array.name)
+        if accessor is None:
+            return None
+        encoding = _detect_encoding(accessor.node)
+        cache: _CachedResolution | None = getattr(node, _CACHE_ATTR, None)
+        if (
+            cache is not None
+            and cache.base_offset == accessor.base_offset
+            and cache.encoding == encoding
+        ):
+            resolved = cache.resolved
+        else:
+            rotation = _find_rotation_iife(body, array.name)
+            if rotation is None:
+                return None
+            checksum = _extract_checksum_expression(rotation.body, accessor.name)
+            if checksum is None:
+                return None
+            resolved = _simulate_rotation(
+                array.strings,
+                accessor.base_offset,
+                checksum.node,
+                checksum.local_accessors,
+                rotation.target,
+                encoding,
+                checksum.wrappers or None,
+                checksum.prop_maps or None,
+            )
+            if resolved is None:
+                return None
+            setattr(node, _CACHE_ATTR, _CachedResolution(resolved, accessor.base_offset, encoding))
+        aliases = _collect_accessor_aliases(body, accessor.name)
+        aliases.add(accessor.name)
+        raw_lookup = {i + accessor.base_offset: s for i, s in enumerate(resolved)}
+        all_wrappers = _collect_all_wrappers(node, accessor.name)
+        if _replace_accessor_calls(
+            node, aliases, raw_lookup, encoding, all_wrappers,
+        ) == 0:
+            return None
+        wrapper_names = set(all_wrappers)
+        has_remaining, dead_nodes = _find_remaining_calls(node, aliases, wrapper_names)
+        if not has_remaining:
+            _cleanup_infrastructure(node, body, array, accessor, dead_nodes, aliases)
+        self.mark_changed()
+        return None
+
+    def generic_visit(self, node: Node):
+        pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver.visit_JsScript"><code class="name flex">
+<span>def <span class="ident">visit_JsScript</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L940-L989" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_JsScript(self, node: JsScript):
+    body = node.body
+    array = _find_array_function(body)
+    if array is None:
+        return None
+    accessor = _find_accessor_function(body, array.name)
+    if accessor is None:
+        return None
+    encoding = _detect_encoding(accessor.node)
+    cache: _CachedResolution | None = getattr(node, _CACHE_ATTR, None)
+    if (
+        cache is not None
+        and cache.base_offset == accessor.base_offset
+        and cache.encoding == encoding
+    ):
+        resolved = cache.resolved
+    else:
+        rotation = _find_rotation_iife(body, array.name)
+        if rotation is None:
+            return None
+        checksum = _extract_checksum_expression(rotation.body, accessor.name)
+        if checksum is None:
+            return None
+        resolved = _simulate_rotation(
+            array.strings,
+            accessor.base_offset,
+            checksum.node,
+            checksum.local_accessors,
+            rotation.target,
+            encoding,
+            checksum.wrappers or None,
+            checksum.prop_maps or None,
+        )
+        if resolved is None:
+            return None
+        setattr(node, _CACHE_ATTR, _CachedResolution(resolved, accessor.base_offset, encoding))
+    aliases = _collect_accessor_aliases(body, accessor.name)
+    aliases.add(accessor.name)
+    raw_lookup = {i + accessor.base_offset: s for i, s in enumerate(resolved)}
+    all_wrappers = _collect_all_wrappers(node, accessor.name)
+    if _replace_accessor_calls(
+        node, aliases, raw_lookup, encoding, all_wrappers,
+    ) == 0:
+        return None
+    wrapper_names = set(all_wrappers)
+    has_remaining, dead_nodes = _find_remaining_calls(node, aliases, wrapper_names)
+    if not has_remaining:
+        _cleanup_infrastructure(node, body, array, accessor, dead_nodes, aliases)
+    self.mark_changed()
+    return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver.generic_visit"><code class="name flex">
+<span>def <span class="ident">generic_visit</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/deobfuscation/stringarray.py#L991-L992" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def generic_visit(self, node: Node):
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.Encoding" href="#refinery.lib.scripts.js.deobfuscation.stringarray.Encoding">Encoding</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.ArrayFunction" href="#refinery.lib.scripts.js.deobfuscation.stringarray.ArrayFunction">ArrayFunction</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorFunction" href="#refinery.lib.scripts.js.deobfuscation.stringarray.AccessorFunction">AccessorFunction</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.RotationIIFE" href="#refinery.lib.scripts.js.deobfuscation.stringarray.RotationIIFE">RotationIIFE</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo" href="#refinery.lib.scripts.js.deobfuscation.stringarray.ChecksumInfo">ChecksumInfo</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo" href="#refinery.lib.scripts.js.deobfuscation.stringarray.AccessorWrapperInfo">AccessorWrapperInfo</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver" href="#refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver">JsStringArrayResolver</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver.visit_JsScript" href="#refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver.visit_JsScript">visit_JsScript</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver.generic_visit" href="#refinery.lib.scripts.js.deobfuscation.stringarray.JsStringArrayResolver.generic_visit">generic_visit</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

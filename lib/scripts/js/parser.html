@@ -1,0 +1,3083 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.parser documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.parser</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/parser.py#L1-L1554" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+from contextlib import contextmanager
+
+from refinery.lib.scripts.js.lexer import JsLexer, decode_js_string_body
+from refinery.lib.scripts.js.model import (
+    Expression,
+    JsArrayExpression,
+    JsArrayPattern,
+    JsArrowFunctionExpression,
+    JsAssignmentExpression,
+    JsAssignmentPattern,
+    JsAwaitExpression,
+    JsBigIntLiteral,
+    JsBinaryExpression,
+    JsBlockStatement,
+    JsBooleanLiteral,
+    JsBreakStatement,
+    JsCallExpression,
+    JsCatchClause,
+    JsClassBody,
+    JsClassDeclaration,
+    JsClassExpression,
+    JsConditionalExpression,
+    JsContinueStatement,
+    JsDebuggerStatement,
+    JsDoWhileStatement,
+    JsEmptyStatement,
+    JsErrorNode,
+    JsExportAllDeclaration,
+    JsExportDefaultDeclaration,
+    JsExportNamedDeclaration,
+    JsExportSpecifier,
+    JsExpressionStatement,
+    JsForInStatement,
+    JsForOfStatement,
+    JsForStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsIfStatement,
+    JsImportDeclaration,
+    JsImportDefaultSpecifier,
+    JsImportNamespaceSpecifier,
+    JsImportSpecifier,
+    JsLabeledStatement,
+    JsLogicalExpression,
+    JsMemberExpression,
+    JsMethodDefinition,
+    JsMethodKind,
+    JsNewExpression,
+    JsNullLiteral,
+    JsNumericLiteral,
+    JsObjectExpression,
+    JsObjectPattern,
+    JsParenthesizedExpression,
+    JsProperty,
+    JsPropertyDefinition,
+    JsPropertyKind,
+    JsRegExpLiteral,
+    JsRestElement,
+    JsReturnStatement,
+    JsScript,
+    JsSequenceExpression,
+    JsSpreadElement,
+    JsStringLiteral,
+    JsSwitchCase,
+    JsSwitchStatement,
+    JsTaggedTemplateExpression,
+    JsTemplateElement,
+    JsTemplateLiteral,
+    JsThisExpression,
+    JsThrowStatement,
+    JsTryStatement,
+    JsUnaryExpression,
+    JsUpdateExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+    JsVarKind,
+    JsWhileStatement,
+    JsWithStatement,
+    JsYieldExpression,
+    Statement,
+)
+from refinery.lib.scripts.js.token import JsToken, JsTokenKind
+
+_PREC_EXPONENTIATION = 15
+
+_BINARY_PREC: dict[JsTokenKind, tuple[int, bool]] = {
+    JsTokenKind.QQ:         ( 4, True),   # noqa
+    JsTokenKind.OR:         ( 5, True),   # noqa
+    JsTokenKind.AND:        ( 6, True),   # noqa
+    JsTokenKind.PIPE:       ( 7, False),  # noqa
+    JsTokenKind.CARET:      ( 8, False),  # noqa
+    JsTokenKind.AMP:        ( 9, False),  # noqa
+    JsTokenKind.EQ2:        (10, False),  # noqa
+    JsTokenKind.BANG_EQ:    (10, False),  # noqa
+    JsTokenKind.EQ3:        (10, False),  # noqa
+    JsTokenKind.BANG_EQ2:   (10, False),  # noqa
+    JsTokenKind.LT:         (11, False),  # noqa
+    JsTokenKind.GT:         (11, False),  # noqa
+    JsTokenKind.LT_EQ:      (11, False),  # noqa
+    JsTokenKind.GT_EQ:      (11, False),  # noqa
+    JsTokenKind.INSTANCEOF: (11, False),  # noqa
+    JsTokenKind.IN:         (11, False),  # noqa
+    JsTokenKind.LT2:        (12, False),  # noqa
+    JsTokenKind.GT2:        (12, False),  # noqa
+    JsTokenKind.GT3:        (12, False),  # noqa
+    JsTokenKind.PLUS:       (13, False),  # noqa
+    JsTokenKind.MINUS:      (13, False),  # noqa
+    JsTokenKind.STAR:       (14, False),  # noqa
+    JsTokenKind.SLASH:      (14, False),  # noqa
+    JsTokenKind.PERCENT:    (14, False),  # noqa
+    JsTokenKind.STAR2:      (_PREC_EXPONENTIATION, False), # noqa
+}
+
+_VAR_KIND_MAP: dict[JsTokenKind, JsVarKind] = {
+    JsTokenKind.VAR:   JsVarKind.VAR,    # noqa
+    JsTokenKind.LET:   JsVarKind.LET,    # noqa
+    JsTokenKind.CONST: JsVarKind.CONST,  # noqa
+}
+
+_PROP_KIND_MAP: dict[str, JsPropertyKind] = {
+    &#39;get&#39;: JsPropertyKind.GET,
+    &#39;set&#39;: JsPropertyKind.SET,
+}
+
+
+class JsParser:
+
+    @staticmethod
+    def _parse_int_text(text: str) -&gt; int:
+        if text.startswith((&#39;0x&#39;, &#39;0X&#39;)):
+            return int(text, 16)
+        if text.startswith((&#39;0o&#39;, &#39;0O&#39;)):
+            return int(text, 8)
+        if text.startswith((&#39;0b&#39;, &#39;0B&#39;)):
+            return int(text, 2)
+        return int(text)
+
+    def __init__(self, source: str):
+        self._lexer = JsLexer(source)
+        self._source = source
+        self._tokens = self._lexer.tokenize()
+        self._current: JsToken = JsToken(JsTokenKind.EOF, &#39;&#39;, 0)
+        self._preceded_by_newline: bool = False
+        self._no_in: bool = False
+        self._pending_comments: list[str] = []
+        self._advance()
+
+    def _advance(self) -&gt; JsToken:
+        prev = self._current
+        had_newline = False
+        while True:
+            tok = next(self._tokens, JsToken(JsTokenKind.EOF, &#39;&#39;, len(self._source)))
+            if tok.kind == JsTokenKind.NEWLINE:
+                had_newline = True
+                continue
+            if tok.kind == JsTokenKind.COMMENT:
+                self._pending_comments.append(tok.value)
+                continue
+            break
+        self._current = tok
+        self._preceded_by_newline = had_newline
+        return prev
+
+    def _drain_comments(self, node):
+        if self._pending_comments:
+            node.leading_comments.extend(self._pending_comments)
+            self._pending_comments.clear()
+
+    def _peek(self) -&gt; JsToken:
+        return self._current
+
+    def _at(self, *kinds: JsTokenKind) -&gt; bool:
+        return self._current.kind in kinds
+
+    def _eat(self, kind: JsTokenKind) -&gt; JsToken | None:
+        if self._current.kind == kind:
+            return self._advance()
+        return None
+
+    def _expect(self, kind: JsTokenKind) -&gt; JsToken:
+        if self._current.kind == kind:
+            return self._advance()
+        tok = self._current
+        self._advance()
+        return JsToken(kind, tok.value, tok.offset)
+
+    def _eat_semicolon(self) -&gt; bool:
+        if self._eat(JsTokenKind.SEMICOLON):
+            return True
+        if self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            return True
+        if self._preceded_by_newline:
+            return True
+        return False
+
+    @contextmanager
+    def _with_no_in(self, value: bool):
+        saved = self._no_in
+        self._no_in = value
+        try:
+            yield
+        finally:
+            self._no_in = saved
+
+    def parse(self) -&gt; JsScript:
+        return self._parse_program()
+
+    def _parse_statement_list(self, *stop: JsTokenKind) -&gt; list[Statement]:
+        body: list[Statement] = []
+        while not self._at(*stop):
+            mark = self._current.offset
+            comments = list(self._pending_comments)
+            self._pending_comments.clear()
+            try:
+                stmt = self._parse_statement()
+            except Exception:
+                stmt = None
+            if stmt is not None:
+                stmt.leading_comments.extend(comments)
+                body.append(stmt)
+            elif self._current.offset == mark:
+                tok = self._advance()
+                error = JsExpressionStatement(
+                    offset=tok.offset,
+                    expression=JsErrorNode(offset=tok.offset, text=tok.value),
+                )
+                error.leading_comments.extend(comments)
+                body.append(error)
+        return body
+
+    def _parse_program(self) -&gt; JsScript:
+        offset = self._current.offset
+        body = self._parse_statement_list(JsTokenKind.EOF)
+        return JsScript(body=body, offset=offset)
+
+    def _parse_statement(self) -&gt; Statement | None:
+        offset = self._current.offset
+        kind = self._current.kind
+
+        if kind == JsTokenKind.LBRACE:
+            return self._parse_block_statement()
+        if kind == JsTokenKind.SEMICOLON:
+            self._advance()
+            return JsEmptyStatement(offset=offset)
+        if kind in (JsTokenKind.VAR, JsTokenKind.LET, JsTokenKind.CONST):
+            return self._parse_variable_declaration()
+        if kind == JsTokenKind.IF:
+            return self._parse_if_statement()
+        if kind == JsTokenKind.WHILE:
+            return self._parse_while_statement()
+        if kind == JsTokenKind.DO:
+            return self._parse_do_while_statement()
+        if kind == JsTokenKind.FOR:
+            return self._parse_for_statement()
+        if kind == JsTokenKind.SWITCH:
+            return self._parse_switch_statement()
+        if kind == JsTokenKind.TRY:
+            return self._parse_try_statement()
+        if kind == JsTokenKind.WITH:
+            return self._parse_with_statement()
+        if kind == JsTokenKind.RETURN:
+            return self._parse_return_statement()
+        if kind == JsTokenKind.THROW:
+            return self._parse_throw_statement()
+        if kind == JsTokenKind.BREAK:
+            return self._parse_break_statement()
+        if kind == JsTokenKind.CONTINUE:
+            return self._parse_continue_statement()
+        if kind == JsTokenKind.FUNCTION:
+            return self._parse_function_declaration()
+        if kind == JsTokenKind.CLASS:
+            return self._parse_class_declaration()
+        if kind == JsTokenKind.DEBUGGER:
+            self._advance()
+            self._eat_semicolon()
+            return JsDebuggerStatement(offset=offset)
+        if kind == JsTokenKind.IMPORT:
+            return self._parse_import_declaration()
+        if kind == JsTokenKind.EXPORT:
+            return self._parse_export_declaration()
+        if kind == JsTokenKind.ASYNC:
+            return self._parse_async_statement()
+
+        expr = self._parse_expression()
+
+        if (
+            isinstance(expr, JsIdentifier)
+            and self._eat(JsTokenKind.COLON)
+        ):
+            body = self._parse_statement()
+            return JsLabeledStatement(label=expr, body=body, offset=offset)
+
+        self._eat_semicolon()
+        return JsExpressionStatement(expression=expr, offset=offset)
+
+    def _parse_block_statement(self) -&gt; JsBlockStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACE)
+        body = self._parse_statement_list(JsTokenKind.RBRACE, JsTokenKind.EOF)
+        self._expect(JsTokenKind.RBRACE)
+        return JsBlockStatement(body=body, offset=offset)
+
+    def _parse_variable_declaration(self) -&gt; JsVariableDeclaration:
+        offset = self._current.offset
+        kind_tok = self._advance()
+        kind = _VAR_KIND_MAP[kind_tok.kind]
+        declarations: list[JsVariableDeclarator] = []
+        declarations.append(self._parse_variable_declarator())
+        while self._eat(JsTokenKind.COMMA):
+            declarations.append(self._parse_variable_declarator())
+        self._eat_semicolon()
+        return JsVariableDeclaration(declarations=declarations, kind=kind, offset=offset)
+
+    def _parse_variable_declarator(self) -&gt; JsVariableDeclarator:
+        offset = self._current.offset
+        id_node = self._parse_binding_pattern()
+        init = None
+        if self._eat(JsTokenKind.EQUALS):
+            init = self._parse_assignment_expression()
+        return JsVariableDeclarator(id=id_node, init=init, offset=offset)
+
+    def _parse_binding_pattern(self) -&gt; Expression:
+        if self._at(JsTokenKind.LBRACKET):
+            return self._parse_array_pattern()
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_object_pattern()
+        return self._parse_binding_identifier()
+
+    def _parse_binding_identifier(self) -&gt; Expression:
+        offset = self._current.offset
+        tok = self._expect(JsTokenKind.IDENTIFIER)
+        return JsIdentifier(name=tok.value, offset=offset)
+
+    def _parse_array_pattern(self) -&gt; JsArrayPattern:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACKET)
+        elements: list[Expression | None] = []
+        while not self._at(JsTokenKind.RBRACKET, JsTokenKind.EOF):
+            if self._at(JsTokenKind.COMMA):
+                elements.append(None)
+                self._advance()
+                continue
+            if self._at(JsTokenKind.ELLIPSIS):
+                elements.append(self._parse_rest_element())
+                break
+            elem = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                right = self._parse_assignment_expression()
+                elem = JsAssignmentPattern(left=elem, right=right, offset=elem.offset)
+            elements.append(elem)
+            if not self._at(JsTokenKind.RBRACKET):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACKET)
+        return JsArrayPattern(elements=elements, offset=offset)
+
+    def _parse_object_pattern(self) -&gt; JsObjectPattern:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACE)
+        properties: list[JsProperty | JsRestElement] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            if self._at(JsTokenKind.ELLIPSIS):
+                properties.append(self._parse_rest_element())
+                break
+            prop = self._parse_object_pattern_property()
+            properties.append(prop)
+            if not self._at(JsTokenKind.RBRACE):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACE)
+        return JsObjectPattern(properties=properties, offset=offset)
+
+    def _parse_object_pattern_property(self) -&gt; JsProperty:
+        offset = self._current.offset
+        if self._at(JsTokenKind.LBRACKET):
+            self._advance()
+            key = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RBRACKET)
+            self._expect(JsTokenKind.COLON)
+            value = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                right = self._parse_assignment_expression()
+                value = JsAssignmentPattern(left=value, right=right, offset=value.offset)
+            return JsProperty(
+                key=key, value=value, computed=True, shorthand=False, offset=offset)
+
+        key = self._parse_property_name()
+        if self._eat(JsTokenKind.COLON):
+            value = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                right = self._parse_assignment_expression()
+                value = JsAssignmentPattern(left=value, right=right, offset=value.offset)
+            return JsProperty(
+                key=key, value=value, computed=False, shorthand=False, offset=offset)
+
+        value = key
+        if self._eat(JsTokenKind.EQUALS):
+            right = self._parse_assignment_expression()
+            value = JsAssignmentPattern(left=key, right=right, offset=key.offset)
+        return JsProperty(key=key, value=value, computed=False, shorthand=True, offset=offset)
+
+    def _parse_rest_element(self) -&gt; JsRestElement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.ELLIPSIS)
+        argument = self._parse_binding_pattern()
+        return JsRestElement(argument=argument, offset=offset)
+
+    def _parse_if_statement(self) -&gt; JsIfStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.IF)
+        self._expect(JsTokenKind.LPAREN)
+        test = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        consequent = self._parse_statement()
+        alternate = None
+        if self._eat(JsTokenKind.ELSE):
+            alternate = self._parse_statement()
+        return JsIfStatement(
+            test=test, consequent=consequent, alternate=alternate, offset=offset)
+
+    def _parse_while_statement(self) -&gt; JsWhileStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.WHILE)
+        self._expect(JsTokenKind.LPAREN)
+        test = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        body = self._parse_statement()
+        return JsWhileStatement(test=test, body=body, offset=offset)
+
+    def _parse_do_while_statement(self) -&gt; JsDoWhileStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.DO)
+        body = self._parse_statement()
+        self._expect(JsTokenKind.WHILE)
+        self._expect(JsTokenKind.LPAREN)
+        test = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        self._eat_semicolon()
+        return JsDoWhileStatement(test=test, body=body, offset=offset)
+
+    def _parse_for_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.FOR)
+
+        is_await = False
+        if self._eat(JsTokenKind.AWAIT):
+            is_await = True
+
+        self._expect(JsTokenKind.LPAREN)
+
+        if self._at(JsTokenKind.SEMICOLON):
+            self._advance()
+            return self._parse_for_rest(None, offset)
+
+        if self._at(JsTokenKind.VAR, JsTokenKind.LET, JsTokenKind.CONST):
+            decl_offset = self._current.offset
+            kind_tok = self._advance()
+            kind = _VAR_KIND_MAP[kind_tok.kind]
+            declarator = self._parse_variable_declarator()
+            decl = JsVariableDeclaration(
+                declarations=[declarator], kind=kind, offset=decl_offset)
+            result = self._parse_for_in_or_of(decl, is_await, offset)
+            if result is not None:
+                return result
+            while self._eat(JsTokenKind.COMMA):
+                decl.declarations.append(self._parse_variable_declarator())
+            self._expect(JsTokenKind.SEMICOLON)
+            return self._parse_for_rest(decl, offset)
+
+        with self._with_no_in(True):
+            init_expr = self._parse_expression()
+        result = self._parse_for_in_or_of(init_expr, is_await, offset)
+        if result is not None:
+            return result
+        self._expect(JsTokenKind.SEMICOLON)
+        return self._parse_for_rest(init_expr, offset)
+
+    def _parse_for_in_or_of(
+        self,
+        left: Expression | Statement,
+        is_await: bool,
+        offset: int,
+    ) -&gt; JsForInStatement | JsForOfStatement | None:
+        if self._eat(JsTokenKind.IN):
+            right = self._parse_expression()
+            self._expect(JsTokenKind.RPAREN)
+            body = self._parse_statement()
+            return JsForInStatement(left=left, right=right, body=body, offset=offset)
+        if self._at(JsTokenKind.OF):
+            self._advance()
+            right = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RPAREN)
+            body = self._parse_statement()
+            return JsForOfStatement(
+                left=left, right=right, body=body, is_await=is_await, offset=offset)
+        return None
+
+    def _parse_for_rest(
+        self,
+        init: Expression | Statement | None,
+        offset: int,
+    ) -&gt; JsForStatement:
+        test = None
+        if not self._at(JsTokenKind.SEMICOLON):
+            test = self._parse_expression()
+        self._expect(JsTokenKind.SEMICOLON)
+        update = None
+        if not self._at(JsTokenKind.RPAREN):
+            update = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        body = self._parse_statement()
+        return JsForStatement(
+            init=init, test=test, update=update, body=body, offset=offset)
+
+    def _parse_switch_statement(self) -&gt; JsSwitchStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.SWITCH)
+        self._expect(JsTokenKind.LPAREN)
+        discriminant = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        self._expect(JsTokenKind.LBRACE)
+        cases: list[JsSwitchCase] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            cases.append(self._parse_switch_case())
+        self._expect(JsTokenKind.RBRACE)
+        return JsSwitchStatement(
+            discriminant=discriminant, cases=cases, offset=offset)
+
+    def _parse_switch_case(self) -&gt; JsSwitchCase:
+        offset = self._current.offset
+        test = None
+        if self._eat(JsTokenKind.CASE):
+            test = self._parse_expression()
+            self._expect(JsTokenKind.COLON)
+        elif self._eat(JsTokenKind.DEFAULT):
+            self._expect(JsTokenKind.COLON)
+        else:
+            self._advance()
+        consequent: list[Statement] = []
+        while not self._at(
+            JsTokenKind.CASE, JsTokenKind.DEFAULT, JsTokenKind.RBRACE, JsTokenKind.EOF,
+        ):
+            stmt = self._parse_statement()
+            if stmt is not None:
+                consequent.append(stmt)
+        return JsSwitchCase(test=test, consequent=consequent, offset=offset)
+
+    def _parse_try_statement(self) -&gt; JsTryStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.TRY)
+        block = self._parse_block_statement()
+        handler = None
+        finalizer = None
+        if self._eat(JsTokenKind.CATCH):
+            handler = self._parse_catch_clause()
+        if self._eat(JsTokenKind.FINALLY):
+            finalizer = self._parse_block_statement()
+        return JsTryStatement(
+            block=block, handler=handler, finalizer=finalizer, offset=offset)
+
+    def _parse_catch_clause(self) -&gt; JsCatchClause:
+        offset = self._current.offset
+        param = None
+        if self._eat(JsTokenKind.LPAREN):
+            param = self._parse_binding_pattern()
+            self._expect(JsTokenKind.RPAREN)
+        body = self._parse_block_statement()
+        return JsCatchClause(param=param, body=body, offset=offset)
+
+    def _parse_with_statement(self) -&gt; JsWithStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.WITH)
+        self._expect(JsTokenKind.LPAREN)
+        obj = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        body = self._parse_statement()
+        return JsWithStatement(object=obj, body=body, offset=offset)
+
+    def _parse_return_statement(self) -&gt; JsReturnStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.RETURN)
+        argument = None
+        if not self._preceded_by_newline and not self._at(
+            JsTokenKind.SEMICOLON, JsTokenKind.RBRACE, JsTokenKind.EOF,
+        ):
+            argument = self._parse_expression()
+        self._eat_semicolon()
+        return JsReturnStatement(argument=argument, offset=offset)
+
+    def _parse_throw_statement(self) -&gt; JsThrowStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.THROW)
+        argument = None
+        if not self._preceded_by_newline:
+            argument = self._parse_expression()
+        self._eat_semicolon()
+        return JsThrowStatement(argument=argument, offset=offset)
+
+    def _parse_break_statement(self) -&gt; JsBreakStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.BREAK)
+        label = None
+        if not self._preceded_by_newline and self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            label = JsIdentifier(name=tok.value, offset=tok.offset)
+        self._eat_semicolon()
+        return JsBreakStatement(label=label, offset=offset)
+
+    def _parse_continue_statement(self) -&gt; JsContinueStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.CONTINUE)
+        label = None
+        if not self._preceded_by_newline and self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            label = JsIdentifier(name=tok.value, offset=tok.offset)
+        self._eat_semicolon()
+        return JsContinueStatement(label=label, offset=offset)
+
+    def _parse_function_impl(
+        self,
+        *,
+        as_expression: bool,
+        is_async: bool = False,
+    ) -&gt; JsFunctionDeclaration | JsFunctionExpression:
+        offset = self._current.offset
+        self._expect(JsTokenKind.FUNCTION)
+        generator = bool(self._eat(JsTokenKind.STAR))
+        id_node = None
+        if self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            id_node = JsIdentifier(name=tok.value, offset=tok.offset)
+        params = self._parse_formal_parameters()
+        body = self._parse_block_statement()
+        if as_expression:
+            return JsFunctionExpression(
+                id=id_node, params=params, body=body,
+                generator=generator, is_async=is_async, offset=offset)
+        return JsFunctionDeclaration(
+            id=id_node, params=params, body=body,
+            generator=generator, is_async=is_async, offset=offset)
+
+    def _parse_function_declaration(
+        self,
+        is_async: bool = False,
+    ) -&gt; JsFunctionDeclaration:
+        return self._parse_function_impl(as_expression=False, is_async=is_async)
+
+    def _parse_formal_parameters(self) -&gt; list[Expression]:
+        self._expect(JsTokenKind.LPAREN)
+        params: list[Expression] = []
+        while not self._at(JsTokenKind.RPAREN, JsTokenKind.EOF):
+            if self._at(JsTokenKind.ELLIPSIS):
+                params.append(self._parse_rest_element())
+                break
+            param = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                default = self._parse_assignment_expression()
+                param = JsAssignmentPattern(
+                    left=param, right=default, offset=param.offset)
+            params.append(param)
+            if not self._at(JsTokenKind.RPAREN):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RPAREN)
+        return params
+
+    def _parse_class_impl(
+        self,
+        *,
+        as_expression: bool,
+    ) -&gt; JsClassDeclaration | JsClassExpression:
+        offset = self._current.offset
+        self._expect(JsTokenKind.CLASS)
+        id_node = None
+        if self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            id_node = JsIdentifier(name=tok.value, offset=tok.offset)
+        super_class = None
+        if self._eat(JsTokenKind.EXTENDS):
+            super_class = self._parse_assignment_expression()
+        body = self._parse_class_body()
+        if as_expression:
+            return JsClassExpression(
+                id=id_node, super_class=super_class, body=body, offset=offset)
+        return JsClassDeclaration(
+            id=id_node, super_class=super_class, body=body, offset=offset)
+
+    def _parse_class_declaration(self) -&gt; JsClassDeclaration:
+        return self._parse_class_impl(as_expression=False)
+
+    def _parse_class_body(self) -&gt; JsClassBody:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACE)
+        members: list[JsMethodDefinition | JsPropertyDefinition] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            if self._eat(JsTokenKind.SEMICOLON):
+                continue
+            members.append(self._parse_class_member())
+        self._expect(JsTokenKind.RBRACE)
+        return JsClassBody(body=members, offset=offset)
+
+    def _parse_class_member(self) -&gt; JsMethodDefinition | JsPropertyDefinition:
+        offset = self._current.offset
+        is_static = False
+        if (
+            self._at(JsTokenKind.IDENTIFIER) and self._current.value == &#39;static&#39;
+        ):
+            saved_pos = self._current
+            self._advance()
+            if self._at(
+                JsTokenKind.LBRACE, JsTokenKind.RBRACE, JsTokenKind.EOF,
+                JsTokenKind.SEMICOLON,
+            ):
+                key = JsIdentifier(name=&#39;static&#39;, offset=saved_pos.offset)
+                return self._finish_class_member(key, False, False, offset)
+            is_static = True
+
+        kind = JsMethodKind.METHOD
+        is_generator = False
+
+        if self._eat(JsTokenKind.STAR):
+            is_generator = True
+
+        if self._at(JsTokenKind.IDENTIFIER) and self._current.value == &#39;get&#39;:
+            saved = self._current
+            self._advance()
+            if self._at(JsTokenKind.LPAREN):
+                key = JsIdentifier(name=&#39;get&#39;, offset=saved.offset)
+                return self._finish_class_member(key, is_static, is_generator, offset)
+            kind = JsMethodKind.GET
+        elif self._at(JsTokenKind.IDENTIFIER) and self._current.value == &#39;set&#39;:
+            saved = self._current
+            self._advance()
+            if self._at(JsTokenKind.LPAREN):
+                key = JsIdentifier(name=&#39;set&#39;, offset=saved.offset)
+                return self._finish_class_member(key, is_static, is_generator, offset)
+            kind = JsMethodKind.SET
+        elif self._at(JsTokenKind.ASYNC):
+            saved = self._current
+            self._advance()
+            if self._at(JsTokenKind.LPAREN):
+                key = JsIdentifier(name=&#39;async&#39;, offset=saved.offset)
+                return self._finish_class_member(key, is_static, is_generator, offset)
+
+        computed = False
+        if self._at(JsTokenKind.LBRACKET):
+            computed = True
+            self._advance()
+            key = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RBRACKET)
+        else:
+            key = self._parse_property_name()
+
+        if kind == JsMethodKind.METHOD and not is_generator and not self._at(JsTokenKind.LPAREN):
+            value = None
+            if self._eat(JsTokenKind.EQUALS):
+                value = self._parse_assignment_expression()
+            self._eat_semicolon()
+            return JsPropertyDefinition(
+                key=key,
+                value=value,
+                computed=computed,
+                is_static=is_static,
+                offset=offset,
+            )
+
+        return self._finish_class_member(key, is_static, is_generator, offset, kind, computed)
+
+    def _finish_class_member(
+        self,
+        key: Expression,
+        is_static: bool,
+        is_generator: bool,
+        offset: int,
+        kind: JsMethodKind = JsMethodKind.METHOD,
+        computed: bool = False,
+    ) -&gt; JsMethodDefinition:
+        func_offset = self._current.offset
+        params = self._parse_formal_parameters()
+        body = self._parse_block_statement()
+        value = JsFunctionExpression(
+            params=params,
+            body=body,
+            generator=is_generator,
+            offset=func_offset,
+        )
+        if isinstance(key, JsIdentifier) and key.name == &#39;constructor&#39; and kind == JsMethodKind.METHOD:
+            kind = JsMethodKind.CONSTRUCTOR
+        return JsMethodDefinition(
+            key=key,
+            value=value,
+            kind=kind,
+            computed=computed,
+            is_static=is_static,
+            offset=offset,
+        )
+
+    def _parse_import_declaration(self) -&gt; JsImportDeclaration:
+        offset = self._current.offset
+        self._expect(JsTokenKind.IMPORT)
+
+        if self._at(JsTokenKind.STRING_SINGLE, JsTokenKind.STRING_DOUBLE):
+            source = self._parse_string_literal()
+            self._eat_semicolon()
+            return JsImportDeclaration(source=source, offset=offset)
+
+        specifiers: list[
+            JsImportSpecifier | JsImportDefaultSpecifier | JsImportNamespaceSpecifier
+        ] = []
+
+        if self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            specifiers.append(JsImportDefaultSpecifier(
+                local=JsIdentifier(name=tok.value, offset=tok.offset),
+                offset=tok.offset,
+            ))
+            if self._eat(JsTokenKind.COMMA):
+                if self._at(JsTokenKind.STAR):
+                    specifiers.append(self._parse_namespace_import())
+                elif self._at(JsTokenKind.LBRACE):
+                    specifiers.extend(self._parse_named_imports())
+
+        elif self._at(JsTokenKind.STAR):
+            specifiers.append(self._parse_namespace_import())
+
+        elif self._at(JsTokenKind.LBRACE):
+            specifiers.extend(self._parse_named_imports())
+
+        self._expect_contextual(&#39;from&#39;)
+        source = self._parse_string_literal()
+        self._eat_semicolon()
+        return JsImportDeclaration(
+            specifiers=specifiers, source=source, offset=offset)
+
+    def _parse_namespace_import(self) -&gt; JsImportNamespaceSpecifier:
+        offset = self._current.offset
+        self._expect(JsTokenKind.STAR)
+        self._expect_contextual(&#39;as&#39;)
+        tok = self._expect(JsTokenKind.IDENTIFIER)
+        return JsImportNamespaceSpecifier(
+            local=JsIdentifier(name=tok.value, offset=tok.offset),
+            offset=offset,
+        )
+
+    def _parse_named_imports(self) -&gt; list[JsImportSpecifier]:
+        self._expect(JsTokenKind.LBRACE)
+        specs: list[JsImportSpecifier] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            spec_offset = self._current.offset
+            tok = self._advance()
+            imported = JsIdentifier(name=tok.value, offset=tok.offset)
+            local = imported
+            if self._at(JsTokenKind.AS):
+                self._advance()
+                ltok = self._expect(JsTokenKind.IDENTIFIER)
+                local = JsIdentifier(name=ltok.value, offset=ltok.offset)
+            specs.append(JsImportSpecifier(
+                imported=imported, local=local, offset=spec_offset))
+            if not self._at(JsTokenKind.RBRACE):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACE)
+        return specs
+
+    def _parse_export_declaration(self) -&gt; Statement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.EXPORT)
+
+        if self._eat(JsTokenKind.DEFAULT):
+            if self._at(JsTokenKind.FUNCTION):
+                decl = self._parse_function_declaration()
+                return JsExportDefaultDeclaration(declaration=decl, offset=offset)
+            if self._at(JsTokenKind.CLASS):
+                decl = self._parse_class_declaration()
+                return JsExportDefaultDeclaration(declaration=decl, offset=offset)
+            if self._at(JsTokenKind.ASYNC):
+                decl = self._parse_async_statement()
+                return JsExportDefaultDeclaration(declaration=decl, offset=offset)
+            expr = self._parse_assignment_expression()
+            self._eat_semicolon()
+            return JsExportDefaultDeclaration(declaration=expr, offset=offset)
+
+        if self._at(JsTokenKind.STAR):
+            self._advance()
+            exported = None
+            if self._at(JsTokenKind.AS):
+                self._advance()
+                tok = self._expect(JsTokenKind.IDENTIFIER)
+                exported = JsIdentifier(name=tok.value, offset=tok.offset)
+            self._expect_contextual(&#39;from&#39;)
+            source = self._parse_string_literal()
+            self._eat_semicolon()
+            return JsExportAllDeclaration(
+                source=source, exported=exported, offset=offset)
+
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_export_named(offset)
+
+        if self._at(JsTokenKind.VAR, JsTokenKind.LET, JsTokenKind.CONST):
+            decl = self._parse_variable_declaration()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+        if self._at(JsTokenKind.FUNCTION):
+            decl = self._parse_function_declaration()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+        if self._at(JsTokenKind.CLASS):
+            decl = self._parse_class_declaration()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+        if self._at(JsTokenKind.ASYNC):
+            decl = self._parse_async_statement()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+
+        self._advance()
+        return JsExportNamedDeclaration(offset=offset)
+
+    def _parse_export_named(self, offset: int) -&gt; JsExportNamedDeclaration:
+        self._expect(JsTokenKind.LBRACE)
+        specifiers: list[JsExportSpecifier] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            spec_offset = self._current.offset
+            tok = self._advance()
+            local = JsIdentifier(name=tok.value, offset=tok.offset)
+            exported = local
+            if self._at(JsTokenKind.AS):
+                self._advance()
+                etok = self._advance()
+                exported = JsIdentifier(name=etok.value, offset=etok.offset)
+            specifiers.append(JsExportSpecifier(
+                local=local, exported=exported, offset=spec_offset))
+            if not self._at(JsTokenKind.RBRACE):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACE)
+        source = None
+        if self._at(JsTokenKind.FROM):
+            self._advance()
+            source = self._parse_string_literal()
+        self._eat_semicolon()
+        return JsExportNamedDeclaration(
+            specifiers=specifiers, source=source, offset=offset)
+
+    def _parse_async_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.ASYNC)
+        if self._at(JsTokenKind.FUNCTION) and not self._preceded_by_newline:
+            return self._parse_function_declaration(is_async=True)
+        expr = self._parse_expression_starting_with_async(offset)
+        self._eat_semicolon()
+        return JsExpressionStatement(expression=expr, offset=offset)
+
+    def _expect_contextual(self, keyword: str):
+        if self._at(JsTokenKind.FROM) and keyword == &#39;from&#39;:
+            self._advance()
+            return
+        if self._at(JsTokenKind.AS) and keyword == &#39;as&#39;:
+            self._advance()
+            return
+        if self._at(JsTokenKind.IDENTIFIER) and self._current.value == keyword:
+            self._advance()
+            return
+        self._advance()
+
+    def _parse_expression(self) -&gt; Expression:
+        expr = self._parse_assignment_expression()
+        if self._at(JsTokenKind.COMMA):
+            exprs = [expr]
+            while self._eat(JsTokenKind.COMMA):
+                exprs.append(self._parse_assignment_expression())
+            return JsSequenceExpression(expressions=exprs, offset=expr.offset)
+        return expr
+
+    def _parse_assignment_expression(self) -&gt; Expression:
+        left = self._parse_conditional_expression()
+        if self._current.kind.is_assignment:
+            op = self._advance().value
+            right = self._parse_assignment_expression()
+            left = self._to_param(left) if op == &#39;=&#39; else left
+            return JsAssignmentExpression(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_conditional_expression(self) -&gt; Expression:
+        expr = self._parse_binary_expression()
+        if self._eat(JsTokenKind.QUESTION):
+            consequent = self._parse_assignment_expression()
+            self._expect(JsTokenKind.COLON)
+            alternate = self._parse_assignment_expression()
+            return JsConditionalExpression(
+                test=expr,
+                consequent=consequent,
+                alternate=alternate,
+                offset=expr.offset,
+            )
+        return expr
+
+    def _parse_binary_expression(self, min_prec: int = 0) -&gt; Expression:
+        left = self._parse_unary_expression()
+        while True:
+            entry = _BINARY_PREC.get(self._current.kind)
+            if entry is None:
+                break
+            prec, logical = entry
+            if prec &lt; min_prec:
+                break
+            if self._no_in and self._at(JsTokenKind.IN):
+                break
+            op = self._advance().value
+            next_prec = prec if prec == _PREC_EXPONENTIATION else prec + 1
+            right = self._parse_binary_expression(next_prec)
+            node_type = JsLogicalExpression if logical else JsBinaryExpression
+            left = node_type(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_unary_expression(self) -&gt; Expression:
+        if self._at(
+            JsTokenKind.BANG,
+            JsTokenKind.TILDE,
+            JsTokenKind.TYPEOF,
+            JsTokenKind.VOID,
+            JsTokenKind.DELETE,
+        ):
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsUnaryExpression(
+                operator=tok.value, operand=operand, prefix=True, offset=tok.offset)
+        if self._at(JsTokenKind.PLUS) and not self._preceded_by_newline:
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsUnaryExpression(
+                operator=&#39;+&#39;, operand=operand, prefix=True, offset=tok.offset)
+        if self._at(JsTokenKind.MINUS) and not self._preceded_by_newline:
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsUnaryExpression(
+                operator=&#39;-&#39;, operand=operand, prefix=True, offset=tok.offset)
+        if self._at(JsTokenKind.AWAIT):
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsAwaitExpression(argument=operand, offset=tok.offset)
+        return self._parse_update_expression()
+
+    def _parse_update_expression(self) -&gt; Expression:
+        if self._at(JsTokenKind.INC, JsTokenKind.DEC):
+            tok = self._advance()
+            argument = self._parse_call_expression()
+            return JsUpdateExpression(
+                operator=tok.value, argument=argument, prefix=True, offset=tok.offset)
+        expr = self._parse_call_expression()
+        if not self._preceded_by_newline and self._at(
+            JsTokenKind.INC, JsTokenKind.DEC,
+        ):
+            tok = self._advance()
+            return JsUpdateExpression(
+                operator=tok.value, argument=expr, prefix=False, offset=expr.offset)
+        return expr
+
+    def _parse_call_expression(self) -&gt; Expression:
+        expr = self._parse_new_expression()
+        while True:
+            if self._at(JsTokenKind.LPAREN):
+                expr = self._parse_call_arguments(expr, optional=False)
+            elif self._eat(JsTokenKind.DOT):
+                prop_tok = self._advance()
+                prop = JsIdentifier(name=prop_tok.value, offset=prop_tok.offset)
+                expr = JsMemberExpression(
+                    object=expr, property=prop, computed=False, optional=False, offset=expr.offset)
+            elif self._at(JsTokenKind.LBRACKET):
+                self._advance()
+                prop = self._parse_expression()
+                self._expect(JsTokenKind.RBRACKET)
+                expr = JsMemberExpression(
+                    object=expr, property=prop, computed=True, optional=False, offset=expr.offset)
+            elif self._eat(JsTokenKind.QUESTION_DOT):
+                if self._at(JsTokenKind.LPAREN):
+                    expr = self._parse_call_arguments(expr, optional=True)
+                elif self._at(JsTokenKind.LBRACKET):
+                    self._advance()
+                    prop = self._parse_expression()
+                    self._expect(JsTokenKind.RBRACKET)
+                    expr = JsMemberExpression(
+                        object=expr, property=prop, computed=True, optional=True, offset=expr.offset)
+                else:
+                    prop_tok = self._advance()
+                    prop = JsIdentifier(name=prop_tok.value, offset=prop_tok.offset)
+                    expr = JsMemberExpression(
+                        object=expr, property=prop, computed=False, optional=True, offset=expr.offset)
+            elif self._at(
+                JsTokenKind.TEMPLATE_FULL, JsTokenKind.TEMPLATE_HEAD,
+            ):
+                quasi = self._parse_template_literal()
+                expr = JsTaggedTemplateExpression(
+                    tag=expr, quasi=quasi, offset=expr.offset)
+            else:
+                break
+        return expr
+
+    def _parse_argument_list(self) -&gt; list[Expression]:
+        args: list[Expression] = []
+        while not self._at(JsTokenKind.RPAREN, JsTokenKind.EOF):
+            if self._at(JsTokenKind.ELLIPSIS):
+                offset = self._current.offset
+                self._advance()
+                arg = self._parse_assignment_expression()
+                args.append(JsSpreadElement(argument=arg, offset=offset))
+            else:
+                args.append(self._parse_assignment_expression())
+            if not self._at(JsTokenKind.RPAREN):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RPAREN)
+        return args
+
+    def _parse_call_arguments(
+        self,
+        callee: Expression,
+        optional: bool,
+    ) -&gt; JsCallExpression:
+        with self._with_no_in(False):
+            self._expect(JsTokenKind.LPAREN)
+            args = self._parse_argument_list()
+        return JsCallExpression(
+            callee=callee, arguments=args, optional=optional, offset=callee.offset)
+
+    def _parse_new_expression(self) -&gt; Expression:
+        if self._at(JsTokenKind.NEW):
+            offset = self._current.offset
+            self._advance()
+            if self._at(JsTokenKind.DOT):
+                self._advance()
+                tok = self._advance()
+                return JsMemberExpression(
+                    object=JsIdentifier(name=&#39;new&#39;, offset=offset),
+                    property=JsIdentifier(name=tok.value, offset=tok.offset),
+                    computed=False,
+                    offset=offset,
+                )
+            callee = self._parse_new_expression()
+            args: list[Expression] = []
+            if self._at(JsTokenKind.LPAREN):
+                self._advance()
+                args = self._parse_argument_list()
+            return JsNewExpression(callee=callee, arguments=args, offset=offset)
+        return self._parse_primary_expression()
+
+    def _parse_primary_expression(self) -&gt; Expression:
+        tok = self._current
+        offset = tok.offset
+
+        if self._at(JsTokenKind.IDENTIFIER):
+            self._advance()
+            if self._at(JsTokenKind.ARROW) and not self._preceded_by_newline:
+                self._advance()
+                param = JsIdentifier(name=tok.value, offset=offset)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(
+                    params=[param], body=body, offset=offset)
+            return JsIdentifier(name=tok.value, offset=offset)
+
+        if self._at(JsTokenKind.INTEGER):
+            self._advance()
+            raw = tok.value
+            value = self._parse_int_text(raw.replace(&#39;_&#39;, &#39;&#39;))
+            return JsNumericLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.FLOAT):
+            self._advance()
+            raw = tok.value
+            value = float(raw.replace(&#39;_&#39;, &#39;&#39;))
+            return JsNumericLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.BIGINT):
+            self._advance()
+            raw = tok.value
+            value = self._parse_int_text(raw.replace(&#39;_&#39;, &#39;&#39;).rstrip(&#39;n&#39;))
+            return JsBigIntLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.STRING_SINGLE, JsTokenKind.STRING_DOUBLE):
+            return self._parse_string_literal()
+
+        if self._at(JsTokenKind.REGEXP):
+            self._advance()
+            raw = tok.value
+            last_slash = raw.rfind(&#39;/&#39;)
+            pattern = raw[1:last_slash]
+            flags = raw[last_slash + 1:]
+            return JsRegExpLiteral(
+                pattern=pattern, flags=flags, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.TEMPLATE_FULL, JsTokenKind.TEMPLATE_HEAD):
+            return self._parse_template_literal()
+
+        if self._at(JsTokenKind.TRUE):
+            self._advance()
+            return JsBooleanLiteral(value=True, offset=offset)
+        if self._at(JsTokenKind.FALSE):
+            self._advance()
+            return JsBooleanLiteral(value=False, offset=offset)
+        if self._at(JsTokenKind.NULL):
+            self._advance()
+            return JsNullLiteral(offset=offset)
+        if self._at(JsTokenKind.THIS):
+            self._advance()
+            return JsThisExpression(offset=offset)
+        if self._at(JsTokenKind.SUPER):
+            self._advance()
+            return JsIdentifier(name=&#39;super&#39;, offset=offset)
+
+        if self._at(JsTokenKind.LBRACKET):
+            return self._parse_array_literal()
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_object_literal()
+
+        if self._at(JsTokenKind.LPAREN):
+            return self._parse_paren_or_arrow()
+
+        if self._at(JsTokenKind.FUNCTION):
+            return self._parse_function_expression()
+        if self._at(JsTokenKind.CLASS):
+            return self._parse_class_expression()
+
+        if self._at(JsTokenKind.ASYNC):
+            return self._parse_async_expression()
+
+        if self._at(JsTokenKind.YIELD):
+            return self._parse_yield_expression()
+
+        self._advance()
+        return JsErrorNode(text=tok.value, message=&#39;unexpected token&#39;, offset=offset)
+
+    def _parse_string_literal(self) -&gt; JsStringLiteral:
+        tok = self._advance()
+        raw = tok.value
+        if len(raw) &gt;= 2:
+            value = decode_js_string_body(raw[1:-1])
+        else:
+            value = raw
+        return JsStringLiteral(value=value, raw=raw, offset=tok.offset)
+
+    def _parse_template_literal(self) -&gt; JsTemplateLiteral:
+        offset = self._current.offset
+        quasis: list[JsTemplateElement] = []
+        expressions: list[Expression] = []
+
+        if self._at(JsTokenKind.TEMPLATE_FULL):
+            tok = self._advance()
+            raw = tok.value
+            value = raw[1:-1]
+            quasis.append(JsTemplateElement(
+                value=value, raw=raw, tail=True, offset=tok.offset))
+            return JsTemplateLiteral(
+                quasis=quasis, expressions=expressions, offset=offset)
+
+        tok = self._advance()
+        raw = tok.value
+        value = raw[1:-2]
+        quasis.append(JsTemplateElement(
+            value=value, raw=raw, tail=False, offset=tok.offset))
+
+        while True:
+            expr = self._parse_expression()
+            expressions.append(expr)
+            if self._at(JsTokenKind.TEMPLATE_TAIL):
+                tok = self._advance()
+                raw = tok.value
+                value = raw[1:-1]
+                quasis.append(JsTemplateElement(
+                    value=value, raw=raw, tail=True, offset=tok.offset))
+                break
+            elif self._at(JsTokenKind.TEMPLATE_MIDDLE):
+                tok = self._advance()
+                raw = tok.value
+                value = raw[1:-2]
+                quasis.append(JsTemplateElement(
+                    value=value, raw=raw, tail=False, offset=tok.offset))
+            else:
+                quasis.append(JsTemplateElement(
+                    value=&#39;&#39;, raw=&#39;&#39;, tail=True, offset=self._current.offset))
+                break
+
+        return JsTemplateLiteral(
+            quasis=quasis, expressions=expressions, offset=offset)
+
+    def _parse_array_literal(self) -&gt; JsArrayExpression:
+        with self._with_no_in(False):
+            offset = self._current.offset
+            self._expect(JsTokenKind.LBRACKET)
+            elements: list[Expression | None] = []
+            while not self._at(JsTokenKind.RBRACKET, JsTokenKind.EOF):
+                if self._at(JsTokenKind.COMMA):
+                    elements.append(None)
+                    self._advance()
+                    continue
+                if self._at(JsTokenKind.ELLIPSIS):
+                    so = self._current.offset
+                    self._advance()
+                    arg = self._parse_assignment_expression()
+                    elements.append(JsSpreadElement(argument=arg, offset=so))
+                else:
+                    elements.append(self._parse_assignment_expression())
+                if not self._at(JsTokenKind.RBRACKET):
+                    self._eat(JsTokenKind.COMMA)
+            self._expect(JsTokenKind.RBRACKET)
+        return JsArrayExpression(elements=elements, offset=offset)
+
+    def _parse_object_literal(self) -&gt; JsObjectExpression:
+        with self._with_no_in(False):
+            offset = self._current.offset
+            self._expect(JsTokenKind.LBRACE)
+            properties: list[JsProperty | JsSpreadElement] = []
+            while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+                if self._at(JsTokenKind.ELLIPSIS):
+                    so = self._current.offset
+                    self._advance()
+                    arg = self._parse_assignment_expression()
+                    properties.append(JsSpreadElement(argument=arg, offset=so))
+                else:
+                    properties.append(self._parse_object_property())
+                if not self._at(JsTokenKind.RBRACE):
+                    self._eat(JsTokenKind.COMMA)
+            self._expect(JsTokenKind.RBRACE)
+        return JsObjectExpression(properties=properties, offset=offset)
+
+    def _parse_object_property(self) -&gt; JsProperty:
+        offset = self._current.offset
+        is_generator = bool(self._eat(JsTokenKind.STAR))
+
+        if self._at(JsTokenKind.IDENTIFIER) and self._current.value in (&#39;get&#39;, &#39;set&#39;):
+            kind_val = _PROP_KIND_MAP[self._current.value]
+            saved = self._current
+            self._advance()
+            if self._at(
+                JsTokenKind.LPAREN,
+                JsTokenKind.COLON,
+                JsTokenKind.COMMA,
+                JsTokenKind.RBRACE,
+                JsTokenKind.EQUALS,
+            ):
+                key = JsIdentifier(name=saved.value, offset=saved.offset)
+                return self._finish_property_value(key, False, offset)
+            key = self._parse_property_name()
+            return self._make_method_property(key, kind_val, False, offset)
+
+        if self._at(JsTokenKind.ASYNC) and not is_generator:
+            saved = self._current
+            self._advance()
+            if self._preceded_by_newline or self._at(
+                JsTokenKind.COLON,
+                JsTokenKind.COMMA,
+                JsTokenKind.RBRACE,
+                JsTokenKind.EQUALS,
+                JsTokenKind.LPAREN,
+            ):
+                if self._at(JsTokenKind.LPAREN):
+                    key = JsIdentifier(name=&#39;async&#39;, offset=saved.offset)
+                    return self._make_method_property(key, JsPropertyKind.INIT, False, offset)
+                key = JsIdentifier(name=&#39;async&#39;, offset=saved.offset)
+                return self._finish_property_value(key, False, offset)
+            gen = bool(self._eat(JsTokenKind.STAR))
+            key = self._parse_property_name()
+            return self._make_method_property(key, JsPropertyKind.INIT, gen, offset, is_async=True)
+
+        computed = False
+        if self._at(JsTokenKind.LBRACKET):
+            computed = True
+            self._advance()
+            key = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RBRACKET)
+        else:
+            key = self._parse_property_name()
+
+        if is_generator or self._at(JsTokenKind.LPAREN):
+            return self._make_method_property(key, JsPropertyKind.INIT, is_generator, offset, computed=computed)
+
+        return self._finish_property_value(key, computed, offset)
+
+    def _finish_property_value(
+        self,
+        key: Expression,
+        computed: bool,
+        offset: int,
+    ) -&gt; JsProperty:
+        if self._eat(JsTokenKind.COLON):
+            value = self._parse_assignment_expression()
+            return JsProperty(
+                key=key, value=value, computed=computed,
+                shorthand=False, offset=offset)
+        return JsProperty(
+            key=key, value=key, computed=computed,
+            shorthand=True, offset=offset)
+
+    def _make_method_property(
+        self,
+        key: Expression,
+        kind: JsPropertyKind,
+        is_generator: bool,
+        offset: int,
+        computed: bool = False,
+        is_async: bool = False,
+    ) -&gt; JsProperty:
+        func_offset = self._current.offset
+        params = self._parse_formal_parameters()
+        body = self._parse_block_statement()
+        value = JsFunctionExpression(
+            params=params, body=body, generator=is_generator,
+            is_async=is_async, offset=func_offset)
+        return JsProperty(
+            key=key, value=value, computed=computed,
+            shorthand=False, method=True, kind=kind, offset=offset)
+
+    def _parse_property_name(self) -&gt; Expression:
+        tok = self._current
+        if self._at(JsTokenKind.INTEGER, JsTokenKind.FLOAT):
+            self._advance()
+            raw = tok.value
+            text = raw.replace(&#39;_&#39;, &#39;&#39;)
+            return JsNumericLiteral(
+                value=float(text) if tok.kind == JsTokenKind.FLOAT else self._parse_int_text(text),
+                raw=raw,
+                offset=tok.offset,
+            )
+        if self._at(JsTokenKind.STRING_SINGLE, JsTokenKind.STRING_DOUBLE):
+            return self._parse_string_literal()
+        self._advance()
+        return JsIdentifier(name=tok.value, offset=tok.offset)
+
+    def _parse_paren_or_arrow(self) -&gt; Expression:
+        with self._with_no_in(False):
+            offset = self._current.offset
+            self._expect(JsTokenKind.LPAREN)
+
+            if self._at(JsTokenKind.RPAREN):
+                self._advance()
+                self._expect(JsTokenKind.ARROW)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(params=[], body=body, offset=offset)
+
+            if self._at(JsTokenKind.ELLIPSIS):
+                params = self._parse_arrow_params_rest()
+                self._expect(JsTokenKind.RPAREN)
+                self._expect(JsTokenKind.ARROW)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(params=params, body=body, offset=offset)
+
+            expr = self._parse_expression()
+
+            if self._at(JsTokenKind.RPAREN):
+                self._advance()
+                if self._at(JsTokenKind.ARROW) and not self._preceded_by_newline:
+                    self._advance()
+                    params = self._expr_to_params(expr)
+                    body = self._parse_arrow_body()
+                    return JsArrowFunctionExpression(
+                        params=params, body=body, offset=offset)
+                return JsParenthesizedExpression(expression=expr, offset=offset)
+
+            self._expect(JsTokenKind.RPAREN)
+            return JsParenthesizedExpression(expression=expr, offset=offset)
+
+    def _parse_arrow_params_rest(self) -&gt; list[Expression]:
+        params: list[Expression] = []
+        while self._at(JsTokenKind.ELLIPSIS):
+            params.append(self._parse_rest_element())
+            if self._at(JsTokenKind.COMMA):
+                self._advance()
+        return params
+
+    def _parse_arrow_body(self) -&gt; Expression | JsBlockStatement:
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_block_statement()
+        return self._parse_assignment_expression()
+
+    def _expr_to_params(self, expr: Expression) -&gt; list[Expression]:
+        if isinstance(expr, JsSequenceExpression):
+            return [self._to_param(e) for e in expr.expressions]
+        return [self._to_param(expr)]
+
+    def _to_param(self, expr: Expression) -&gt; Expression:
+        if isinstance(expr, JsIdentifier):
+            return expr
+        if isinstance(expr, JsAssignmentExpression) and expr.operator == &#39;=&#39;:
+            return JsAssignmentPattern(
+                left=self._to_param(expr.left),
+                right=expr.right,
+                offset=expr.offset,
+            )
+        if isinstance(expr, JsSpreadElement):
+            return JsRestElement(argument=self._to_param(expr.argument), offset=expr.offset)
+        if isinstance(expr, JsArrayExpression):
+            elements = [
+                self._to_param(e) if e is not None else None
+                for e in expr.elements
+            ]
+            return JsArrayPattern(elements=elements, offset=expr.offset)
+        if isinstance(expr, JsObjectExpression):
+            props: list[JsProperty | JsRestElement] = []
+            for p in expr.properties:
+                if isinstance(p, JsSpreadElement):
+                    props.append(JsRestElement(
+                        argument=self._to_param(p.argument), offset=p.offset))
+                else:
+                    props.append(p)
+            return JsObjectPattern(properties=props, offset=expr.offset)
+        return expr
+
+    def _parse_function_expression(self) -&gt; JsFunctionExpression:
+        return self._parse_function_impl(as_expression=True)
+
+    def _parse_class_expression(self) -&gt; JsClassExpression:
+        return self._parse_class_impl(as_expression=True)
+
+    def _parse_async_expression(self) -&gt; Expression:
+        offset = self._current.offset
+        self._advance()
+        return self._parse_expression_starting_with_async(offset)
+
+    def _parse_expression_starting_with_async(self, offset: int) -&gt; Expression:
+        if self._at(JsTokenKind.FUNCTION) and not self._preceded_by_newline:
+            return self._parse_function_impl(as_expression=True, is_async=True)
+
+        if self._at(JsTokenKind.IDENTIFIER) and not self._preceded_by_newline:
+            tok = self._advance()
+            if self._at(JsTokenKind.ARROW) and not self._preceded_by_newline:
+                self._advance()
+                param = JsIdentifier(name=tok.value, offset=tok.offset)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(
+                    params=[param], body=body, is_async=True, offset=offset)
+            return JsIdentifier(name=tok.value, offset=tok.offset)
+
+        if self._at(JsTokenKind.LPAREN) and not self._preceded_by_newline:
+            paren_result = self._parse_paren_or_arrow()
+            if isinstance(paren_result, JsArrowFunctionExpression):
+                paren_result.is_async = True
+                paren_result.offset = offset
+            return paren_result
+
+        return JsIdentifier(name=&#39;async&#39;, offset=offset)
+
+    def _parse_yield_expression(self) -&gt; JsYieldExpression:
+        offset = self._current.offset
+        self._advance()
+        delegate = False
+        if self._eat(JsTokenKind.STAR):
+            delegate = True
+        argument = None
+        if not self._preceded_by_newline and not self._at(
+            JsTokenKind.SEMICOLON,
+            JsTokenKind.RBRACE,
+            JsTokenKind.RPAREN,
+            JsTokenKind.RBRACKET,
+            JsTokenKind.COMMA,
+            JsTokenKind.COLON,
+            JsTokenKind.EOF,
+        ):
+            argument = self._parse_assignment_expression()
+        return JsYieldExpression(
+            argument=argument, delegate=delegate, offset=offset)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.parser.JsParser"><code class="flex name class">
+<span>class <span class="ident">JsParser</span></span>
+<span>(</span><span>source)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/parser.py#L129-L1554" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsParser:
+
+    @staticmethod
+    def _parse_int_text(text: str) -&gt; int:
+        if text.startswith((&#39;0x&#39;, &#39;0X&#39;)):
+            return int(text, 16)
+        if text.startswith((&#39;0o&#39;, &#39;0O&#39;)):
+            return int(text, 8)
+        if text.startswith((&#39;0b&#39;, &#39;0B&#39;)):
+            return int(text, 2)
+        return int(text)
+
+    def __init__(self, source: str):
+        self._lexer = JsLexer(source)
+        self._source = source
+        self._tokens = self._lexer.tokenize()
+        self._current: JsToken = JsToken(JsTokenKind.EOF, &#39;&#39;, 0)
+        self._preceded_by_newline: bool = False
+        self._no_in: bool = False
+        self._pending_comments: list[str] = []
+        self._advance()
+
+    def _advance(self) -&gt; JsToken:
+        prev = self._current
+        had_newline = False
+        while True:
+            tok = next(self._tokens, JsToken(JsTokenKind.EOF, &#39;&#39;, len(self._source)))
+            if tok.kind == JsTokenKind.NEWLINE:
+                had_newline = True
+                continue
+            if tok.kind == JsTokenKind.COMMENT:
+                self._pending_comments.append(tok.value)
+                continue
+            break
+        self._current = tok
+        self._preceded_by_newline = had_newline
+        return prev
+
+    def _drain_comments(self, node):
+        if self._pending_comments:
+            node.leading_comments.extend(self._pending_comments)
+            self._pending_comments.clear()
+
+    def _peek(self) -&gt; JsToken:
+        return self._current
+
+    def _at(self, *kinds: JsTokenKind) -&gt; bool:
+        return self._current.kind in kinds
+
+    def _eat(self, kind: JsTokenKind) -&gt; JsToken | None:
+        if self._current.kind == kind:
+            return self._advance()
+        return None
+
+    def _expect(self, kind: JsTokenKind) -&gt; JsToken:
+        if self._current.kind == kind:
+            return self._advance()
+        tok = self._current
+        self._advance()
+        return JsToken(kind, tok.value, tok.offset)
+
+    def _eat_semicolon(self) -&gt; bool:
+        if self._eat(JsTokenKind.SEMICOLON):
+            return True
+        if self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            return True
+        if self._preceded_by_newline:
+            return True
+        return False
+
+    @contextmanager
+    def _with_no_in(self, value: bool):
+        saved = self._no_in
+        self._no_in = value
+        try:
+            yield
+        finally:
+            self._no_in = saved
+
+    def parse(self) -&gt; JsScript:
+        return self._parse_program()
+
+    def _parse_statement_list(self, *stop: JsTokenKind) -&gt; list[Statement]:
+        body: list[Statement] = []
+        while not self._at(*stop):
+            mark = self._current.offset
+            comments = list(self._pending_comments)
+            self._pending_comments.clear()
+            try:
+                stmt = self._parse_statement()
+            except Exception:
+                stmt = None
+            if stmt is not None:
+                stmt.leading_comments.extend(comments)
+                body.append(stmt)
+            elif self._current.offset == mark:
+                tok = self._advance()
+                error = JsExpressionStatement(
+                    offset=tok.offset,
+                    expression=JsErrorNode(offset=tok.offset, text=tok.value),
+                )
+                error.leading_comments.extend(comments)
+                body.append(error)
+        return body
+
+    def _parse_program(self) -&gt; JsScript:
+        offset = self._current.offset
+        body = self._parse_statement_list(JsTokenKind.EOF)
+        return JsScript(body=body, offset=offset)
+
+    def _parse_statement(self) -&gt; Statement | None:
+        offset = self._current.offset
+        kind = self._current.kind
+
+        if kind == JsTokenKind.LBRACE:
+            return self._parse_block_statement()
+        if kind == JsTokenKind.SEMICOLON:
+            self._advance()
+            return JsEmptyStatement(offset=offset)
+        if kind in (JsTokenKind.VAR, JsTokenKind.LET, JsTokenKind.CONST):
+            return self._parse_variable_declaration()
+        if kind == JsTokenKind.IF:
+            return self._parse_if_statement()
+        if kind == JsTokenKind.WHILE:
+            return self._parse_while_statement()
+        if kind == JsTokenKind.DO:
+            return self._parse_do_while_statement()
+        if kind == JsTokenKind.FOR:
+            return self._parse_for_statement()
+        if kind == JsTokenKind.SWITCH:
+            return self._parse_switch_statement()
+        if kind == JsTokenKind.TRY:
+            return self._parse_try_statement()
+        if kind == JsTokenKind.WITH:
+            return self._parse_with_statement()
+        if kind == JsTokenKind.RETURN:
+            return self._parse_return_statement()
+        if kind == JsTokenKind.THROW:
+            return self._parse_throw_statement()
+        if kind == JsTokenKind.BREAK:
+            return self._parse_break_statement()
+        if kind == JsTokenKind.CONTINUE:
+            return self._parse_continue_statement()
+        if kind == JsTokenKind.FUNCTION:
+            return self._parse_function_declaration()
+        if kind == JsTokenKind.CLASS:
+            return self._parse_class_declaration()
+        if kind == JsTokenKind.DEBUGGER:
+            self._advance()
+            self._eat_semicolon()
+            return JsDebuggerStatement(offset=offset)
+        if kind == JsTokenKind.IMPORT:
+            return self._parse_import_declaration()
+        if kind == JsTokenKind.EXPORT:
+            return self._parse_export_declaration()
+        if kind == JsTokenKind.ASYNC:
+            return self._parse_async_statement()
+
+        expr = self._parse_expression()
+
+        if (
+            isinstance(expr, JsIdentifier)
+            and self._eat(JsTokenKind.COLON)
+        ):
+            body = self._parse_statement()
+            return JsLabeledStatement(label=expr, body=body, offset=offset)
+
+        self._eat_semicolon()
+        return JsExpressionStatement(expression=expr, offset=offset)
+
+    def _parse_block_statement(self) -&gt; JsBlockStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACE)
+        body = self._parse_statement_list(JsTokenKind.RBRACE, JsTokenKind.EOF)
+        self._expect(JsTokenKind.RBRACE)
+        return JsBlockStatement(body=body, offset=offset)
+
+    def _parse_variable_declaration(self) -&gt; JsVariableDeclaration:
+        offset = self._current.offset
+        kind_tok = self._advance()
+        kind = _VAR_KIND_MAP[kind_tok.kind]
+        declarations: list[JsVariableDeclarator] = []
+        declarations.append(self._parse_variable_declarator())
+        while self._eat(JsTokenKind.COMMA):
+            declarations.append(self._parse_variable_declarator())
+        self._eat_semicolon()
+        return JsVariableDeclaration(declarations=declarations, kind=kind, offset=offset)
+
+    def _parse_variable_declarator(self) -&gt; JsVariableDeclarator:
+        offset = self._current.offset
+        id_node = self._parse_binding_pattern()
+        init = None
+        if self._eat(JsTokenKind.EQUALS):
+            init = self._parse_assignment_expression()
+        return JsVariableDeclarator(id=id_node, init=init, offset=offset)
+
+    def _parse_binding_pattern(self) -&gt; Expression:
+        if self._at(JsTokenKind.LBRACKET):
+            return self._parse_array_pattern()
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_object_pattern()
+        return self._parse_binding_identifier()
+
+    def _parse_binding_identifier(self) -&gt; Expression:
+        offset = self._current.offset
+        tok = self._expect(JsTokenKind.IDENTIFIER)
+        return JsIdentifier(name=tok.value, offset=offset)
+
+    def _parse_array_pattern(self) -&gt; JsArrayPattern:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACKET)
+        elements: list[Expression | None] = []
+        while not self._at(JsTokenKind.RBRACKET, JsTokenKind.EOF):
+            if self._at(JsTokenKind.COMMA):
+                elements.append(None)
+                self._advance()
+                continue
+            if self._at(JsTokenKind.ELLIPSIS):
+                elements.append(self._parse_rest_element())
+                break
+            elem = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                right = self._parse_assignment_expression()
+                elem = JsAssignmentPattern(left=elem, right=right, offset=elem.offset)
+            elements.append(elem)
+            if not self._at(JsTokenKind.RBRACKET):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACKET)
+        return JsArrayPattern(elements=elements, offset=offset)
+
+    def _parse_object_pattern(self) -&gt; JsObjectPattern:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACE)
+        properties: list[JsProperty | JsRestElement] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            if self._at(JsTokenKind.ELLIPSIS):
+                properties.append(self._parse_rest_element())
+                break
+            prop = self._parse_object_pattern_property()
+            properties.append(prop)
+            if not self._at(JsTokenKind.RBRACE):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACE)
+        return JsObjectPattern(properties=properties, offset=offset)
+
+    def _parse_object_pattern_property(self) -&gt; JsProperty:
+        offset = self._current.offset
+        if self._at(JsTokenKind.LBRACKET):
+            self._advance()
+            key = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RBRACKET)
+            self._expect(JsTokenKind.COLON)
+            value = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                right = self._parse_assignment_expression()
+                value = JsAssignmentPattern(left=value, right=right, offset=value.offset)
+            return JsProperty(
+                key=key, value=value, computed=True, shorthand=False, offset=offset)
+
+        key = self._parse_property_name()
+        if self._eat(JsTokenKind.COLON):
+            value = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                right = self._parse_assignment_expression()
+                value = JsAssignmentPattern(left=value, right=right, offset=value.offset)
+            return JsProperty(
+                key=key, value=value, computed=False, shorthand=False, offset=offset)
+
+        value = key
+        if self._eat(JsTokenKind.EQUALS):
+            right = self._parse_assignment_expression()
+            value = JsAssignmentPattern(left=key, right=right, offset=key.offset)
+        return JsProperty(key=key, value=value, computed=False, shorthand=True, offset=offset)
+
+    def _parse_rest_element(self) -&gt; JsRestElement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.ELLIPSIS)
+        argument = self._parse_binding_pattern()
+        return JsRestElement(argument=argument, offset=offset)
+
+    def _parse_if_statement(self) -&gt; JsIfStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.IF)
+        self._expect(JsTokenKind.LPAREN)
+        test = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        consequent = self._parse_statement()
+        alternate = None
+        if self._eat(JsTokenKind.ELSE):
+            alternate = self._parse_statement()
+        return JsIfStatement(
+            test=test, consequent=consequent, alternate=alternate, offset=offset)
+
+    def _parse_while_statement(self) -&gt; JsWhileStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.WHILE)
+        self._expect(JsTokenKind.LPAREN)
+        test = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        body = self._parse_statement()
+        return JsWhileStatement(test=test, body=body, offset=offset)
+
+    def _parse_do_while_statement(self) -&gt; JsDoWhileStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.DO)
+        body = self._parse_statement()
+        self._expect(JsTokenKind.WHILE)
+        self._expect(JsTokenKind.LPAREN)
+        test = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        self._eat_semicolon()
+        return JsDoWhileStatement(test=test, body=body, offset=offset)
+
+    def _parse_for_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.FOR)
+
+        is_await = False
+        if self._eat(JsTokenKind.AWAIT):
+            is_await = True
+
+        self._expect(JsTokenKind.LPAREN)
+
+        if self._at(JsTokenKind.SEMICOLON):
+            self._advance()
+            return self._parse_for_rest(None, offset)
+
+        if self._at(JsTokenKind.VAR, JsTokenKind.LET, JsTokenKind.CONST):
+            decl_offset = self._current.offset
+            kind_tok = self._advance()
+            kind = _VAR_KIND_MAP[kind_tok.kind]
+            declarator = self._parse_variable_declarator()
+            decl = JsVariableDeclaration(
+                declarations=[declarator], kind=kind, offset=decl_offset)
+            result = self._parse_for_in_or_of(decl, is_await, offset)
+            if result is not None:
+                return result
+            while self._eat(JsTokenKind.COMMA):
+                decl.declarations.append(self._parse_variable_declarator())
+            self._expect(JsTokenKind.SEMICOLON)
+            return self._parse_for_rest(decl, offset)
+
+        with self._with_no_in(True):
+            init_expr = self._parse_expression()
+        result = self._parse_for_in_or_of(init_expr, is_await, offset)
+        if result is not None:
+            return result
+        self._expect(JsTokenKind.SEMICOLON)
+        return self._parse_for_rest(init_expr, offset)
+
+    def _parse_for_in_or_of(
+        self,
+        left: Expression | Statement,
+        is_await: bool,
+        offset: int,
+    ) -&gt; JsForInStatement | JsForOfStatement | None:
+        if self._eat(JsTokenKind.IN):
+            right = self._parse_expression()
+            self._expect(JsTokenKind.RPAREN)
+            body = self._parse_statement()
+            return JsForInStatement(left=left, right=right, body=body, offset=offset)
+        if self._at(JsTokenKind.OF):
+            self._advance()
+            right = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RPAREN)
+            body = self._parse_statement()
+            return JsForOfStatement(
+                left=left, right=right, body=body, is_await=is_await, offset=offset)
+        return None
+
+    def _parse_for_rest(
+        self,
+        init: Expression | Statement | None,
+        offset: int,
+    ) -&gt; JsForStatement:
+        test = None
+        if not self._at(JsTokenKind.SEMICOLON):
+            test = self._parse_expression()
+        self._expect(JsTokenKind.SEMICOLON)
+        update = None
+        if not self._at(JsTokenKind.RPAREN):
+            update = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        body = self._parse_statement()
+        return JsForStatement(
+            init=init, test=test, update=update, body=body, offset=offset)
+
+    def _parse_switch_statement(self) -&gt; JsSwitchStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.SWITCH)
+        self._expect(JsTokenKind.LPAREN)
+        discriminant = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        self._expect(JsTokenKind.LBRACE)
+        cases: list[JsSwitchCase] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            cases.append(self._parse_switch_case())
+        self._expect(JsTokenKind.RBRACE)
+        return JsSwitchStatement(
+            discriminant=discriminant, cases=cases, offset=offset)
+
+    def _parse_switch_case(self) -&gt; JsSwitchCase:
+        offset = self._current.offset
+        test = None
+        if self._eat(JsTokenKind.CASE):
+            test = self._parse_expression()
+            self._expect(JsTokenKind.COLON)
+        elif self._eat(JsTokenKind.DEFAULT):
+            self._expect(JsTokenKind.COLON)
+        else:
+            self._advance()
+        consequent: list[Statement] = []
+        while not self._at(
+            JsTokenKind.CASE, JsTokenKind.DEFAULT, JsTokenKind.RBRACE, JsTokenKind.EOF,
+        ):
+            stmt = self._parse_statement()
+            if stmt is not None:
+                consequent.append(stmt)
+        return JsSwitchCase(test=test, consequent=consequent, offset=offset)
+
+    def _parse_try_statement(self) -&gt; JsTryStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.TRY)
+        block = self._parse_block_statement()
+        handler = None
+        finalizer = None
+        if self._eat(JsTokenKind.CATCH):
+            handler = self._parse_catch_clause()
+        if self._eat(JsTokenKind.FINALLY):
+            finalizer = self._parse_block_statement()
+        return JsTryStatement(
+            block=block, handler=handler, finalizer=finalizer, offset=offset)
+
+    def _parse_catch_clause(self) -&gt; JsCatchClause:
+        offset = self._current.offset
+        param = None
+        if self._eat(JsTokenKind.LPAREN):
+            param = self._parse_binding_pattern()
+            self._expect(JsTokenKind.RPAREN)
+        body = self._parse_block_statement()
+        return JsCatchClause(param=param, body=body, offset=offset)
+
+    def _parse_with_statement(self) -&gt; JsWithStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.WITH)
+        self._expect(JsTokenKind.LPAREN)
+        obj = self._parse_expression()
+        self._expect(JsTokenKind.RPAREN)
+        body = self._parse_statement()
+        return JsWithStatement(object=obj, body=body, offset=offset)
+
+    def _parse_return_statement(self) -&gt; JsReturnStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.RETURN)
+        argument = None
+        if not self._preceded_by_newline and not self._at(
+            JsTokenKind.SEMICOLON, JsTokenKind.RBRACE, JsTokenKind.EOF,
+        ):
+            argument = self._parse_expression()
+        self._eat_semicolon()
+        return JsReturnStatement(argument=argument, offset=offset)
+
+    def _parse_throw_statement(self) -&gt; JsThrowStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.THROW)
+        argument = None
+        if not self._preceded_by_newline:
+            argument = self._parse_expression()
+        self._eat_semicolon()
+        return JsThrowStatement(argument=argument, offset=offset)
+
+    def _parse_break_statement(self) -&gt; JsBreakStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.BREAK)
+        label = None
+        if not self._preceded_by_newline and self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            label = JsIdentifier(name=tok.value, offset=tok.offset)
+        self._eat_semicolon()
+        return JsBreakStatement(label=label, offset=offset)
+
+    def _parse_continue_statement(self) -&gt; JsContinueStatement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.CONTINUE)
+        label = None
+        if not self._preceded_by_newline and self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            label = JsIdentifier(name=tok.value, offset=tok.offset)
+        self._eat_semicolon()
+        return JsContinueStatement(label=label, offset=offset)
+
+    def _parse_function_impl(
+        self,
+        *,
+        as_expression: bool,
+        is_async: bool = False,
+    ) -&gt; JsFunctionDeclaration | JsFunctionExpression:
+        offset = self._current.offset
+        self._expect(JsTokenKind.FUNCTION)
+        generator = bool(self._eat(JsTokenKind.STAR))
+        id_node = None
+        if self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            id_node = JsIdentifier(name=tok.value, offset=tok.offset)
+        params = self._parse_formal_parameters()
+        body = self._parse_block_statement()
+        if as_expression:
+            return JsFunctionExpression(
+                id=id_node, params=params, body=body,
+                generator=generator, is_async=is_async, offset=offset)
+        return JsFunctionDeclaration(
+            id=id_node, params=params, body=body,
+            generator=generator, is_async=is_async, offset=offset)
+
+    def _parse_function_declaration(
+        self,
+        is_async: bool = False,
+    ) -&gt; JsFunctionDeclaration:
+        return self._parse_function_impl(as_expression=False, is_async=is_async)
+
+    def _parse_formal_parameters(self) -&gt; list[Expression]:
+        self._expect(JsTokenKind.LPAREN)
+        params: list[Expression] = []
+        while not self._at(JsTokenKind.RPAREN, JsTokenKind.EOF):
+            if self._at(JsTokenKind.ELLIPSIS):
+                params.append(self._parse_rest_element())
+                break
+            param = self._parse_binding_pattern()
+            if self._eat(JsTokenKind.EQUALS):
+                default = self._parse_assignment_expression()
+                param = JsAssignmentPattern(
+                    left=param, right=default, offset=param.offset)
+            params.append(param)
+            if not self._at(JsTokenKind.RPAREN):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RPAREN)
+        return params
+
+    def _parse_class_impl(
+        self,
+        *,
+        as_expression: bool,
+    ) -&gt; JsClassDeclaration | JsClassExpression:
+        offset = self._current.offset
+        self._expect(JsTokenKind.CLASS)
+        id_node = None
+        if self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            id_node = JsIdentifier(name=tok.value, offset=tok.offset)
+        super_class = None
+        if self._eat(JsTokenKind.EXTENDS):
+            super_class = self._parse_assignment_expression()
+        body = self._parse_class_body()
+        if as_expression:
+            return JsClassExpression(
+                id=id_node, super_class=super_class, body=body, offset=offset)
+        return JsClassDeclaration(
+            id=id_node, super_class=super_class, body=body, offset=offset)
+
+    def _parse_class_declaration(self) -&gt; JsClassDeclaration:
+        return self._parse_class_impl(as_expression=False)
+
+    def _parse_class_body(self) -&gt; JsClassBody:
+        offset = self._current.offset
+        self._expect(JsTokenKind.LBRACE)
+        members: list[JsMethodDefinition | JsPropertyDefinition] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            if self._eat(JsTokenKind.SEMICOLON):
+                continue
+            members.append(self._parse_class_member())
+        self._expect(JsTokenKind.RBRACE)
+        return JsClassBody(body=members, offset=offset)
+
+    def _parse_class_member(self) -&gt; JsMethodDefinition | JsPropertyDefinition:
+        offset = self._current.offset
+        is_static = False
+        if (
+            self._at(JsTokenKind.IDENTIFIER) and self._current.value == &#39;static&#39;
+        ):
+            saved_pos = self._current
+            self._advance()
+            if self._at(
+                JsTokenKind.LBRACE, JsTokenKind.RBRACE, JsTokenKind.EOF,
+                JsTokenKind.SEMICOLON,
+            ):
+                key = JsIdentifier(name=&#39;static&#39;, offset=saved_pos.offset)
+                return self._finish_class_member(key, False, False, offset)
+            is_static = True
+
+        kind = JsMethodKind.METHOD
+        is_generator = False
+
+        if self._eat(JsTokenKind.STAR):
+            is_generator = True
+
+        if self._at(JsTokenKind.IDENTIFIER) and self._current.value == &#39;get&#39;:
+            saved = self._current
+            self._advance()
+            if self._at(JsTokenKind.LPAREN):
+                key = JsIdentifier(name=&#39;get&#39;, offset=saved.offset)
+                return self._finish_class_member(key, is_static, is_generator, offset)
+            kind = JsMethodKind.GET
+        elif self._at(JsTokenKind.IDENTIFIER) and self._current.value == &#39;set&#39;:
+            saved = self._current
+            self._advance()
+            if self._at(JsTokenKind.LPAREN):
+                key = JsIdentifier(name=&#39;set&#39;, offset=saved.offset)
+                return self._finish_class_member(key, is_static, is_generator, offset)
+            kind = JsMethodKind.SET
+        elif self._at(JsTokenKind.ASYNC):
+            saved = self._current
+            self._advance()
+            if self._at(JsTokenKind.LPAREN):
+                key = JsIdentifier(name=&#39;async&#39;, offset=saved.offset)
+                return self._finish_class_member(key, is_static, is_generator, offset)
+
+        computed = False
+        if self._at(JsTokenKind.LBRACKET):
+            computed = True
+            self._advance()
+            key = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RBRACKET)
+        else:
+            key = self._parse_property_name()
+
+        if kind == JsMethodKind.METHOD and not is_generator and not self._at(JsTokenKind.LPAREN):
+            value = None
+            if self._eat(JsTokenKind.EQUALS):
+                value = self._parse_assignment_expression()
+            self._eat_semicolon()
+            return JsPropertyDefinition(
+                key=key,
+                value=value,
+                computed=computed,
+                is_static=is_static,
+                offset=offset,
+            )
+
+        return self._finish_class_member(key, is_static, is_generator, offset, kind, computed)
+
+    def _finish_class_member(
+        self,
+        key: Expression,
+        is_static: bool,
+        is_generator: bool,
+        offset: int,
+        kind: JsMethodKind = JsMethodKind.METHOD,
+        computed: bool = False,
+    ) -&gt; JsMethodDefinition:
+        func_offset = self._current.offset
+        params = self._parse_formal_parameters()
+        body = self._parse_block_statement()
+        value = JsFunctionExpression(
+            params=params,
+            body=body,
+            generator=is_generator,
+            offset=func_offset,
+        )
+        if isinstance(key, JsIdentifier) and key.name == &#39;constructor&#39; and kind == JsMethodKind.METHOD:
+            kind = JsMethodKind.CONSTRUCTOR
+        return JsMethodDefinition(
+            key=key,
+            value=value,
+            kind=kind,
+            computed=computed,
+            is_static=is_static,
+            offset=offset,
+        )
+
+    def _parse_import_declaration(self) -&gt; JsImportDeclaration:
+        offset = self._current.offset
+        self._expect(JsTokenKind.IMPORT)
+
+        if self._at(JsTokenKind.STRING_SINGLE, JsTokenKind.STRING_DOUBLE):
+            source = self._parse_string_literal()
+            self._eat_semicolon()
+            return JsImportDeclaration(source=source, offset=offset)
+
+        specifiers: list[
+            JsImportSpecifier | JsImportDefaultSpecifier | JsImportNamespaceSpecifier
+        ] = []
+
+        if self._at(JsTokenKind.IDENTIFIER):
+            tok = self._advance()
+            specifiers.append(JsImportDefaultSpecifier(
+                local=JsIdentifier(name=tok.value, offset=tok.offset),
+                offset=tok.offset,
+            ))
+            if self._eat(JsTokenKind.COMMA):
+                if self._at(JsTokenKind.STAR):
+                    specifiers.append(self._parse_namespace_import())
+                elif self._at(JsTokenKind.LBRACE):
+                    specifiers.extend(self._parse_named_imports())
+
+        elif self._at(JsTokenKind.STAR):
+            specifiers.append(self._parse_namespace_import())
+
+        elif self._at(JsTokenKind.LBRACE):
+            specifiers.extend(self._parse_named_imports())
+
+        self._expect_contextual(&#39;from&#39;)
+        source = self._parse_string_literal()
+        self._eat_semicolon()
+        return JsImportDeclaration(
+            specifiers=specifiers, source=source, offset=offset)
+
+    def _parse_namespace_import(self) -&gt; JsImportNamespaceSpecifier:
+        offset = self._current.offset
+        self._expect(JsTokenKind.STAR)
+        self._expect_contextual(&#39;as&#39;)
+        tok = self._expect(JsTokenKind.IDENTIFIER)
+        return JsImportNamespaceSpecifier(
+            local=JsIdentifier(name=tok.value, offset=tok.offset),
+            offset=offset,
+        )
+
+    def _parse_named_imports(self) -&gt; list[JsImportSpecifier]:
+        self._expect(JsTokenKind.LBRACE)
+        specs: list[JsImportSpecifier] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            spec_offset = self._current.offset
+            tok = self._advance()
+            imported = JsIdentifier(name=tok.value, offset=tok.offset)
+            local = imported
+            if self._at(JsTokenKind.AS):
+                self._advance()
+                ltok = self._expect(JsTokenKind.IDENTIFIER)
+                local = JsIdentifier(name=ltok.value, offset=ltok.offset)
+            specs.append(JsImportSpecifier(
+                imported=imported, local=local, offset=spec_offset))
+            if not self._at(JsTokenKind.RBRACE):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACE)
+        return specs
+
+    def _parse_export_declaration(self) -&gt; Statement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.EXPORT)
+
+        if self._eat(JsTokenKind.DEFAULT):
+            if self._at(JsTokenKind.FUNCTION):
+                decl = self._parse_function_declaration()
+                return JsExportDefaultDeclaration(declaration=decl, offset=offset)
+            if self._at(JsTokenKind.CLASS):
+                decl = self._parse_class_declaration()
+                return JsExportDefaultDeclaration(declaration=decl, offset=offset)
+            if self._at(JsTokenKind.ASYNC):
+                decl = self._parse_async_statement()
+                return JsExportDefaultDeclaration(declaration=decl, offset=offset)
+            expr = self._parse_assignment_expression()
+            self._eat_semicolon()
+            return JsExportDefaultDeclaration(declaration=expr, offset=offset)
+
+        if self._at(JsTokenKind.STAR):
+            self._advance()
+            exported = None
+            if self._at(JsTokenKind.AS):
+                self._advance()
+                tok = self._expect(JsTokenKind.IDENTIFIER)
+                exported = JsIdentifier(name=tok.value, offset=tok.offset)
+            self._expect_contextual(&#39;from&#39;)
+            source = self._parse_string_literal()
+            self._eat_semicolon()
+            return JsExportAllDeclaration(
+                source=source, exported=exported, offset=offset)
+
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_export_named(offset)
+
+        if self._at(JsTokenKind.VAR, JsTokenKind.LET, JsTokenKind.CONST):
+            decl = self._parse_variable_declaration()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+        if self._at(JsTokenKind.FUNCTION):
+            decl = self._parse_function_declaration()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+        if self._at(JsTokenKind.CLASS):
+            decl = self._parse_class_declaration()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+        if self._at(JsTokenKind.ASYNC):
+            decl = self._parse_async_statement()
+            return JsExportNamedDeclaration(declaration=decl, offset=offset)
+
+        self._advance()
+        return JsExportNamedDeclaration(offset=offset)
+
+    def _parse_export_named(self, offset: int) -&gt; JsExportNamedDeclaration:
+        self._expect(JsTokenKind.LBRACE)
+        specifiers: list[JsExportSpecifier] = []
+        while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+            spec_offset = self._current.offset
+            tok = self._advance()
+            local = JsIdentifier(name=tok.value, offset=tok.offset)
+            exported = local
+            if self._at(JsTokenKind.AS):
+                self._advance()
+                etok = self._advance()
+                exported = JsIdentifier(name=etok.value, offset=etok.offset)
+            specifiers.append(JsExportSpecifier(
+                local=local, exported=exported, offset=spec_offset))
+            if not self._at(JsTokenKind.RBRACE):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RBRACE)
+        source = None
+        if self._at(JsTokenKind.FROM):
+            self._advance()
+            source = self._parse_string_literal()
+        self._eat_semicolon()
+        return JsExportNamedDeclaration(
+            specifiers=specifiers, source=source, offset=offset)
+
+    def _parse_async_statement(self) -&gt; Statement:
+        offset = self._current.offset
+        self._expect(JsTokenKind.ASYNC)
+        if self._at(JsTokenKind.FUNCTION) and not self._preceded_by_newline:
+            return self._parse_function_declaration(is_async=True)
+        expr = self._parse_expression_starting_with_async(offset)
+        self._eat_semicolon()
+        return JsExpressionStatement(expression=expr, offset=offset)
+
+    def _expect_contextual(self, keyword: str):
+        if self._at(JsTokenKind.FROM) and keyword == &#39;from&#39;:
+            self._advance()
+            return
+        if self._at(JsTokenKind.AS) and keyword == &#39;as&#39;:
+            self._advance()
+            return
+        if self._at(JsTokenKind.IDENTIFIER) and self._current.value == keyword:
+            self._advance()
+            return
+        self._advance()
+
+    def _parse_expression(self) -&gt; Expression:
+        expr = self._parse_assignment_expression()
+        if self._at(JsTokenKind.COMMA):
+            exprs = [expr]
+            while self._eat(JsTokenKind.COMMA):
+                exprs.append(self._parse_assignment_expression())
+            return JsSequenceExpression(expressions=exprs, offset=expr.offset)
+        return expr
+
+    def _parse_assignment_expression(self) -&gt; Expression:
+        left = self._parse_conditional_expression()
+        if self._current.kind.is_assignment:
+            op = self._advance().value
+            right = self._parse_assignment_expression()
+            left = self._to_param(left) if op == &#39;=&#39; else left
+            return JsAssignmentExpression(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_conditional_expression(self) -&gt; Expression:
+        expr = self._parse_binary_expression()
+        if self._eat(JsTokenKind.QUESTION):
+            consequent = self._parse_assignment_expression()
+            self._expect(JsTokenKind.COLON)
+            alternate = self._parse_assignment_expression()
+            return JsConditionalExpression(
+                test=expr,
+                consequent=consequent,
+                alternate=alternate,
+                offset=expr.offset,
+            )
+        return expr
+
+    def _parse_binary_expression(self, min_prec: int = 0) -&gt; Expression:
+        left = self._parse_unary_expression()
+        while True:
+            entry = _BINARY_PREC.get(self._current.kind)
+            if entry is None:
+                break
+            prec, logical = entry
+            if prec &lt; min_prec:
+                break
+            if self._no_in and self._at(JsTokenKind.IN):
+                break
+            op = self._advance().value
+            next_prec = prec if prec == _PREC_EXPONENTIATION else prec + 1
+            right = self._parse_binary_expression(next_prec)
+            node_type = JsLogicalExpression if logical else JsBinaryExpression
+            left = node_type(
+                left=left, operator=op, right=right, offset=left.offset)
+        return left
+
+    def _parse_unary_expression(self) -&gt; Expression:
+        if self._at(
+            JsTokenKind.BANG,
+            JsTokenKind.TILDE,
+            JsTokenKind.TYPEOF,
+            JsTokenKind.VOID,
+            JsTokenKind.DELETE,
+        ):
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsUnaryExpression(
+                operator=tok.value, operand=operand, prefix=True, offset=tok.offset)
+        if self._at(JsTokenKind.PLUS) and not self._preceded_by_newline:
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsUnaryExpression(
+                operator=&#39;+&#39;, operand=operand, prefix=True, offset=tok.offset)
+        if self._at(JsTokenKind.MINUS) and not self._preceded_by_newline:
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsUnaryExpression(
+                operator=&#39;-&#39;, operand=operand, prefix=True, offset=tok.offset)
+        if self._at(JsTokenKind.AWAIT):
+            tok = self._advance()
+            operand = self._parse_unary_expression()
+            return JsAwaitExpression(argument=operand, offset=tok.offset)
+        return self._parse_update_expression()
+
+    def _parse_update_expression(self) -&gt; Expression:
+        if self._at(JsTokenKind.INC, JsTokenKind.DEC):
+            tok = self._advance()
+            argument = self._parse_call_expression()
+            return JsUpdateExpression(
+                operator=tok.value, argument=argument, prefix=True, offset=tok.offset)
+        expr = self._parse_call_expression()
+        if not self._preceded_by_newline and self._at(
+            JsTokenKind.INC, JsTokenKind.DEC,
+        ):
+            tok = self._advance()
+            return JsUpdateExpression(
+                operator=tok.value, argument=expr, prefix=False, offset=expr.offset)
+        return expr
+
+    def _parse_call_expression(self) -&gt; Expression:
+        expr = self._parse_new_expression()
+        while True:
+            if self._at(JsTokenKind.LPAREN):
+                expr = self._parse_call_arguments(expr, optional=False)
+            elif self._eat(JsTokenKind.DOT):
+                prop_tok = self._advance()
+                prop = JsIdentifier(name=prop_tok.value, offset=prop_tok.offset)
+                expr = JsMemberExpression(
+                    object=expr, property=prop, computed=False, optional=False, offset=expr.offset)
+            elif self._at(JsTokenKind.LBRACKET):
+                self._advance()
+                prop = self._parse_expression()
+                self._expect(JsTokenKind.RBRACKET)
+                expr = JsMemberExpression(
+                    object=expr, property=prop, computed=True, optional=False, offset=expr.offset)
+            elif self._eat(JsTokenKind.QUESTION_DOT):
+                if self._at(JsTokenKind.LPAREN):
+                    expr = self._parse_call_arguments(expr, optional=True)
+                elif self._at(JsTokenKind.LBRACKET):
+                    self._advance()
+                    prop = self._parse_expression()
+                    self._expect(JsTokenKind.RBRACKET)
+                    expr = JsMemberExpression(
+                        object=expr, property=prop, computed=True, optional=True, offset=expr.offset)
+                else:
+                    prop_tok = self._advance()
+                    prop = JsIdentifier(name=prop_tok.value, offset=prop_tok.offset)
+                    expr = JsMemberExpression(
+                        object=expr, property=prop, computed=False, optional=True, offset=expr.offset)
+            elif self._at(
+                JsTokenKind.TEMPLATE_FULL, JsTokenKind.TEMPLATE_HEAD,
+            ):
+                quasi = self._parse_template_literal()
+                expr = JsTaggedTemplateExpression(
+                    tag=expr, quasi=quasi, offset=expr.offset)
+            else:
+                break
+        return expr
+
+    def _parse_argument_list(self) -&gt; list[Expression]:
+        args: list[Expression] = []
+        while not self._at(JsTokenKind.RPAREN, JsTokenKind.EOF):
+            if self._at(JsTokenKind.ELLIPSIS):
+                offset = self._current.offset
+                self._advance()
+                arg = self._parse_assignment_expression()
+                args.append(JsSpreadElement(argument=arg, offset=offset))
+            else:
+                args.append(self._parse_assignment_expression())
+            if not self._at(JsTokenKind.RPAREN):
+                self._expect(JsTokenKind.COMMA)
+        self._expect(JsTokenKind.RPAREN)
+        return args
+
+    def _parse_call_arguments(
+        self,
+        callee: Expression,
+        optional: bool,
+    ) -&gt; JsCallExpression:
+        with self._with_no_in(False):
+            self._expect(JsTokenKind.LPAREN)
+            args = self._parse_argument_list()
+        return JsCallExpression(
+            callee=callee, arguments=args, optional=optional, offset=callee.offset)
+
+    def _parse_new_expression(self) -&gt; Expression:
+        if self._at(JsTokenKind.NEW):
+            offset = self._current.offset
+            self._advance()
+            if self._at(JsTokenKind.DOT):
+                self._advance()
+                tok = self._advance()
+                return JsMemberExpression(
+                    object=JsIdentifier(name=&#39;new&#39;, offset=offset),
+                    property=JsIdentifier(name=tok.value, offset=tok.offset),
+                    computed=False,
+                    offset=offset,
+                )
+            callee = self._parse_new_expression()
+            args: list[Expression] = []
+            if self._at(JsTokenKind.LPAREN):
+                self._advance()
+                args = self._parse_argument_list()
+            return JsNewExpression(callee=callee, arguments=args, offset=offset)
+        return self._parse_primary_expression()
+
+    def _parse_primary_expression(self) -&gt; Expression:
+        tok = self._current
+        offset = tok.offset
+
+        if self._at(JsTokenKind.IDENTIFIER):
+            self._advance()
+            if self._at(JsTokenKind.ARROW) and not self._preceded_by_newline:
+                self._advance()
+                param = JsIdentifier(name=tok.value, offset=offset)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(
+                    params=[param], body=body, offset=offset)
+            return JsIdentifier(name=tok.value, offset=offset)
+
+        if self._at(JsTokenKind.INTEGER):
+            self._advance()
+            raw = tok.value
+            value = self._parse_int_text(raw.replace(&#39;_&#39;, &#39;&#39;))
+            return JsNumericLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.FLOAT):
+            self._advance()
+            raw = tok.value
+            value = float(raw.replace(&#39;_&#39;, &#39;&#39;))
+            return JsNumericLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.BIGINT):
+            self._advance()
+            raw = tok.value
+            value = self._parse_int_text(raw.replace(&#39;_&#39;, &#39;&#39;).rstrip(&#39;n&#39;))
+            return JsBigIntLiteral(value=value, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.STRING_SINGLE, JsTokenKind.STRING_DOUBLE):
+            return self._parse_string_literal()
+
+        if self._at(JsTokenKind.REGEXP):
+            self._advance()
+            raw = tok.value
+            last_slash = raw.rfind(&#39;/&#39;)
+            pattern = raw[1:last_slash]
+            flags = raw[last_slash + 1:]
+            return JsRegExpLiteral(
+                pattern=pattern, flags=flags, raw=raw, offset=offset)
+
+        if self._at(JsTokenKind.TEMPLATE_FULL, JsTokenKind.TEMPLATE_HEAD):
+            return self._parse_template_literal()
+
+        if self._at(JsTokenKind.TRUE):
+            self._advance()
+            return JsBooleanLiteral(value=True, offset=offset)
+        if self._at(JsTokenKind.FALSE):
+            self._advance()
+            return JsBooleanLiteral(value=False, offset=offset)
+        if self._at(JsTokenKind.NULL):
+            self._advance()
+            return JsNullLiteral(offset=offset)
+        if self._at(JsTokenKind.THIS):
+            self._advance()
+            return JsThisExpression(offset=offset)
+        if self._at(JsTokenKind.SUPER):
+            self._advance()
+            return JsIdentifier(name=&#39;super&#39;, offset=offset)
+
+        if self._at(JsTokenKind.LBRACKET):
+            return self._parse_array_literal()
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_object_literal()
+
+        if self._at(JsTokenKind.LPAREN):
+            return self._parse_paren_or_arrow()
+
+        if self._at(JsTokenKind.FUNCTION):
+            return self._parse_function_expression()
+        if self._at(JsTokenKind.CLASS):
+            return self._parse_class_expression()
+
+        if self._at(JsTokenKind.ASYNC):
+            return self._parse_async_expression()
+
+        if self._at(JsTokenKind.YIELD):
+            return self._parse_yield_expression()
+
+        self._advance()
+        return JsErrorNode(text=tok.value, message=&#39;unexpected token&#39;, offset=offset)
+
+    def _parse_string_literal(self) -&gt; JsStringLiteral:
+        tok = self._advance()
+        raw = tok.value
+        if len(raw) &gt;= 2:
+            value = decode_js_string_body(raw[1:-1])
+        else:
+            value = raw
+        return JsStringLiteral(value=value, raw=raw, offset=tok.offset)
+
+    def _parse_template_literal(self) -&gt; JsTemplateLiteral:
+        offset = self._current.offset
+        quasis: list[JsTemplateElement] = []
+        expressions: list[Expression] = []
+
+        if self._at(JsTokenKind.TEMPLATE_FULL):
+            tok = self._advance()
+            raw = tok.value
+            value = raw[1:-1]
+            quasis.append(JsTemplateElement(
+                value=value, raw=raw, tail=True, offset=tok.offset))
+            return JsTemplateLiteral(
+                quasis=quasis, expressions=expressions, offset=offset)
+
+        tok = self._advance()
+        raw = tok.value
+        value = raw[1:-2]
+        quasis.append(JsTemplateElement(
+            value=value, raw=raw, tail=False, offset=tok.offset))
+
+        while True:
+            expr = self._parse_expression()
+            expressions.append(expr)
+            if self._at(JsTokenKind.TEMPLATE_TAIL):
+                tok = self._advance()
+                raw = tok.value
+                value = raw[1:-1]
+                quasis.append(JsTemplateElement(
+                    value=value, raw=raw, tail=True, offset=tok.offset))
+                break
+            elif self._at(JsTokenKind.TEMPLATE_MIDDLE):
+                tok = self._advance()
+                raw = tok.value
+                value = raw[1:-2]
+                quasis.append(JsTemplateElement(
+                    value=value, raw=raw, tail=False, offset=tok.offset))
+            else:
+                quasis.append(JsTemplateElement(
+                    value=&#39;&#39;, raw=&#39;&#39;, tail=True, offset=self._current.offset))
+                break
+
+        return JsTemplateLiteral(
+            quasis=quasis, expressions=expressions, offset=offset)
+
+    def _parse_array_literal(self) -&gt; JsArrayExpression:
+        with self._with_no_in(False):
+            offset = self._current.offset
+            self._expect(JsTokenKind.LBRACKET)
+            elements: list[Expression | None] = []
+            while not self._at(JsTokenKind.RBRACKET, JsTokenKind.EOF):
+                if self._at(JsTokenKind.COMMA):
+                    elements.append(None)
+                    self._advance()
+                    continue
+                if self._at(JsTokenKind.ELLIPSIS):
+                    so = self._current.offset
+                    self._advance()
+                    arg = self._parse_assignment_expression()
+                    elements.append(JsSpreadElement(argument=arg, offset=so))
+                else:
+                    elements.append(self._parse_assignment_expression())
+                if not self._at(JsTokenKind.RBRACKET):
+                    self._eat(JsTokenKind.COMMA)
+            self._expect(JsTokenKind.RBRACKET)
+        return JsArrayExpression(elements=elements, offset=offset)
+
+    def _parse_object_literal(self) -&gt; JsObjectExpression:
+        with self._with_no_in(False):
+            offset = self._current.offset
+            self._expect(JsTokenKind.LBRACE)
+            properties: list[JsProperty | JsSpreadElement] = []
+            while not self._at(JsTokenKind.RBRACE, JsTokenKind.EOF):
+                if self._at(JsTokenKind.ELLIPSIS):
+                    so = self._current.offset
+                    self._advance()
+                    arg = self._parse_assignment_expression()
+                    properties.append(JsSpreadElement(argument=arg, offset=so))
+                else:
+                    properties.append(self._parse_object_property())
+                if not self._at(JsTokenKind.RBRACE):
+                    self._eat(JsTokenKind.COMMA)
+            self._expect(JsTokenKind.RBRACE)
+        return JsObjectExpression(properties=properties, offset=offset)
+
+    def _parse_object_property(self) -&gt; JsProperty:
+        offset = self._current.offset
+        is_generator = bool(self._eat(JsTokenKind.STAR))
+
+        if self._at(JsTokenKind.IDENTIFIER) and self._current.value in (&#39;get&#39;, &#39;set&#39;):
+            kind_val = _PROP_KIND_MAP[self._current.value]
+            saved = self._current
+            self._advance()
+            if self._at(
+                JsTokenKind.LPAREN,
+                JsTokenKind.COLON,
+                JsTokenKind.COMMA,
+                JsTokenKind.RBRACE,
+                JsTokenKind.EQUALS,
+            ):
+                key = JsIdentifier(name=saved.value, offset=saved.offset)
+                return self._finish_property_value(key, False, offset)
+            key = self._parse_property_name()
+            return self._make_method_property(key, kind_val, False, offset)
+
+        if self._at(JsTokenKind.ASYNC) and not is_generator:
+            saved = self._current
+            self._advance()
+            if self._preceded_by_newline or self._at(
+                JsTokenKind.COLON,
+                JsTokenKind.COMMA,
+                JsTokenKind.RBRACE,
+                JsTokenKind.EQUALS,
+                JsTokenKind.LPAREN,
+            ):
+                if self._at(JsTokenKind.LPAREN):
+                    key = JsIdentifier(name=&#39;async&#39;, offset=saved.offset)
+                    return self._make_method_property(key, JsPropertyKind.INIT, False, offset)
+                key = JsIdentifier(name=&#39;async&#39;, offset=saved.offset)
+                return self._finish_property_value(key, False, offset)
+            gen = bool(self._eat(JsTokenKind.STAR))
+            key = self._parse_property_name()
+            return self._make_method_property(key, JsPropertyKind.INIT, gen, offset, is_async=True)
+
+        computed = False
+        if self._at(JsTokenKind.LBRACKET):
+            computed = True
+            self._advance()
+            key = self._parse_assignment_expression()
+            self._expect(JsTokenKind.RBRACKET)
+        else:
+            key = self._parse_property_name()
+
+        if is_generator or self._at(JsTokenKind.LPAREN):
+            return self._make_method_property(key, JsPropertyKind.INIT, is_generator, offset, computed=computed)
+
+        return self._finish_property_value(key, computed, offset)
+
+    def _finish_property_value(
+        self,
+        key: Expression,
+        computed: bool,
+        offset: int,
+    ) -&gt; JsProperty:
+        if self._eat(JsTokenKind.COLON):
+            value = self._parse_assignment_expression()
+            return JsProperty(
+                key=key, value=value, computed=computed,
+                shorthand=False, offset=offset)
+        return JsProperty(
+            key=key, value=key, computed=computed,
+            shorthand=True, offset=offset)
+
+    def _make_method_property(
+        self,
+        key: Expression,
+        kind: JsPropertyKind,
+        is_generator: bool,
+        offset: int,
+        computed: bool = False,
+        is_async: bool = False,
+    ) -&gt; JsProperty:
+        func_offset = self._current.offset
+        params = self._parse_formal_parameters()
+        body = self._parse_block_statement()
+        value = JsFunctionExpression(
+            params=params, body=body, generator=is_generator,
+            is_async=is_async, offset=func_offset)
+        return JsProperty(
+            key=key, value=value, computed=computed,
+            shorthand=False, method=True, kind=kind, offset=offset)
+
+    def _parse_property_name(self) -&gt; Expression:
+        tok = self._current
+        if self._at(JsTokenKind.INTEGER, JsTokenKind.FLOAT):
+            self._advance()
+            raw = tok.value
+            text = raw.replace(&#39;_&#39;, &#39;&#39;)
+            return JsNumericLiteral(
+                value=float(text) if tok.kind == JsTokenKind.FLOAT else self._parse_int_text(text),
+                raw=raw,
+                offset=tok.offset,
+            )
+        if self._at(JsTokenKind.STRING_SINGLE, JsTokenKind.STRING_DOUBLE):
+            return self._parse_string_literal()
+        self._advance()
+        return JsIdentifier(name=tok.value, offset=tok.offset)
+
+    def _parse_paren_or_arrow(self) -&gt; Expression:
+        with self._with_no_in(False):
+            offset = self._current.offset
+            self._expect(JsTokenKind.LPAREN)
+
+            if self._at(JsTokenKind.RPAREN):
+                self._advance()
+                self._expect(JsTokenKind.ARROW)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(params=[], body=body, offset=offset)
+
+            if self._at(JsTokenKind.ELLIPSIS):
+                params = self._parse_arrow_params_rest()
+                self._expect(JsTokenKind.RPAREN)
+                self._expect(JsTokenKind.ARROW)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(params=params, body=body, offset=offset)
+
+            expr = self._parse_expression()
+
+            if self._at(JsTokenKind.RPAREN):
+                self._advance()
+                if self._at(JsTokenKind.ARROW) and not self._preceded_by_newline:
+                    self._advance()
+                    params = self._expr_to_params(expr)
+                    body = self._parse_arrow_body()
+                    return JsArrowFunctionExpression(
+                        params=params, body=body, offset=offset)
+                return JsParenthesizedExpression(expression=expr, offset=offset)
+
+            self._expect(JsTokenKind.RPAREN)
+            return JsParenthesizedExpression(expression=expr, offset=offset)
+
+    def _parse_arrow_params_rest(self) -&gt; list[Expression]:
+        params: list[Expression] = []
+        while self._at(JsTokenKind.ELLIPSIS):
+            params.append(self._parse_rest_element())
+            if self._at(JsTokenKind.COMMA):
+                self._advance()
+        return params
+
+    def _parse_arrow_body(self) -&gt; Expression | JsBlockStatement:
+        if self._at(JsTokenKind.LBRACE):
+            return self._parse_block_statement()
+        return self._parse_assignment_expression()
+
+    def _expr_to_params(self, expr: Expression) -&gt; list[Expression]:
+        if isinstance(expr, JsSequenceExpression):
+            return [self._to_param(e) for e in expr.expressions]
+        return [self._to_param(expr)]
+
+    def _to_param(self, expr: Expression) -&gt; Expression:
+        if isinstance(expr, JsIdentifier):
+            return expr
+        if isinstance(expr, JsAssignmentExpression) and expr.operator == &#39;=&#39;:
+            return JsAssignmentPattern(
+                left=self._to_param(expr.left),
+                right=expr.right,
+                offset=expr.offset,
+            )
+        if isinstance(expr, JsSpreadElement):
+            return JsRestElement(argument=self._to_param(expr.argument), offset=expr.offset)
+        if isinstance(expr, JsArrayExpression):
+            elements = [
+                self._to_param(e) if e is not None else None
+                for e in expr.elements
+            ]
+            return JsArrayPattern(elements=elements, offset=expr.offset)
+        if isinstance(expr, JsObjectExpression):
+            props: list[JsProperty | JsRestElement] = []
+            for p in expr.properties:
+                if isinstance(p, JsSpreadElement):
+                    props.append(JsRestElement(
+                        argument=self._to_param(p.argument), offset=p.offset))
+                else:
+                    props.append(p)
+            return JsObjectPattern(properties=props, offset=expr.offset)
+        return expr
+
+    def _parse_function_expression(self) -&gt; JsFunctionExpression:
+        return self._parse_function_impl(as_expression=True)
+
+    def _parse_class_expression(self) -&gt; JsClassExpression:
+        return self._parse_class_impl(as_expression=True)
+
+    def _parse_async_expression(self) -&gt; Expression:
+        offset = self._current.offset
+        self._advance()
+        return self._parse_expression_starting_with_async(offset)
+
+    def _parse_expression_starting_with_async(self, offset: int) -&gt; Expression:
+        if self._at(JsTokenKind.FUNCTION) and not self._preceded_by_newline:
+            return self._parse_function_impl(as_expression=True, is_async=True)
+
+        if self._at(JsTokenKind.IDENTIFIER) and not self._preceded_by_newline:
+            tok = self._advance()
+            if self._at(JsTokenKind.ARROW) and not self._preceded_by_newline:
+                self._advance()
+                param = JsIdentifier(name=tok.value, offset=tok.offset)
+                body = self._parse_arrow_body()
+                return JsArrowFunctionExpression(
+                    params=[param], body=body, is_async=True, offset=offset)
+            return JsIdentifier(name=tok.value, offset=tok.offset)
+
+        if self._at(JsTokenKind.LPAREN) and not self._preceded_by_newline:
+            paren_result = self._parse_paren_or_arrow()
+            if isinstance(paren_result, JsArrowFunctionExpression):
+                paren_result.is_async = True
+                paren_result.offset = offset
+            return paren_result
+
+        return JsIdentifier(name=&#39;async&#39;, offset=offset)
+
+    def _parse_yield_expression(self) -&gt; JsYieldExpression:
+        offset = self._current.offset
+        self._advance()
+        delegate = False
+        if self._eat(JsTokenKind.STAR):
+            delegate = True
+        argument = None
+        if not self._preceded_by_newline and not self._at(
+            JsTokenKind.SEMICOLON,
+            JsTokenKind.RBRACE,
+            JsTokenKind.RPAREN,
+            JsTokenKind.RBRACKET,
+            JsTokenKind.COMMA,
+            JsTokenKind.COLON,
+            JsTokenKind.EOF,
+        ):
+            argument = self._parse_assignment_expression()
+        return JsYieldExpression(
+            argument=argument, delegate=delegate, offset=offset)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.parser.JsParser.parse"><code class="name flex">
+<span>def <span class="ident">parse</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/scripts/js/parser.py#L208-L209" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse(self) -&gt; JsScript:
+    return self._parse_program()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js" href="index.html">refinery.lib.scripts.js</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.parser.JsParser" href="#refinery.lib.scripts.js.parser.JsParser">JsParser</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.parser.JsParser.parse" href="#refinery.lib.scripts.js.parser.JsParser.parse">parse</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

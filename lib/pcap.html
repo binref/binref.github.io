@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.pcap documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.pcap</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L1-L377" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import ipaddress
+import logging
+
+from enum import IntEnum, IntFlag
+from typing import NamedTuple
+
+from refinery.lib.structures import EOF, Struct, StructReader
+
+logger = logging.getLogger(__name__)
+
+
+class LinkType(IntEnum):
+    NULL = 0
+    ETHERNET = 1
+    LINUX_SLL = 113
+    RAW_IP = 228
+
+
+class EtherType(IntEnum):
+    IPv4 = 0x0800
+    IPv6 = 0x86DD
+    VLAN = 0x8100
+
+
+class IPProtocol(IntEnum):
+    TCP = 6
+    UDP = 17
+
+
+class TcpFlag(IntFlag):
+    FIN = 0x01
+    SYN = 0x02
+    RST = 0x04
+    PSH = 0x08
+    ACK = 0x10
+    URG = 0x20
+
+
+class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int
+
+
+class TcpSegment(NamedTuple):
+    seq: int
+    data: bytes
+    packet_index: int
+
+
+class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int
+
+
+def _read_pcap_global_header(reader: StructReader) -&gt; LinkType:
+    if (magic := reader.u32()) in (0xA1B2C3D4, 0xA1B23C4D):
+        reader.bigendian = False
+    elif magic in (0xD4C3B2A1, 0x4D3CB2A1):
+        reader.bigendian = True
+    else:
+        raise ValueError(F&#39;invalid PCAP magic: 0x{magic:08X}&#39;)
+    reader.u16()  # version_major
+    reader.u16()  # version_minor
+    reader.i32()  # thiszone
+    reader.u32()  # sigfigs
+    reader.u32()  # snaplen
+    link_type = LinkType(reader.u32())
+    return link_type
+
+
+def _iter_pcap_classic(reader: StructReader):
+    link_type = _read_pcap_global_header(reader)
+    while not reader.eof:
+        try:
+            reader.u32()  # ts_sec
+            reader.u32()  # ts_usec
+            incl_len = reader.u32()
+            reader.u32()  # orig_len
+        except EOF:
+            break
+        try:
+            packet_data = reader.read_exactly(incl_len)
+        except EOF:
+            break
+        yield link_type, memoryview(packet_data)
+
+
+def _iter_pcap_ng(reader: StructReader):
+    interfaces: list[LinkType] = []
+
+    while not reader.eof:
+        try:
+            block_start = reader.tell()
+            block_type = reader.u32()
+            block_length = reader.u32()
+        except EOF:
+            break
+        body_length = block_length - 12
+        if body_length &lt; 0:
+            break
+
+        if block_type == 0x0A0D0D0A:
+            bom = reader.u32()
+            if bom == 0x1A2B3C4D:
+                needs_swap = reader.bigendian
+                reader.bigendian = False
+            elif bom == 0x4D3C2B1A:
+                needs_swap = not reader.bigendian
+                reader.bigendian = True
+            else:
+                raise ValueError(F&#39;invalid PCAP-NG byte order magic: 0x{bom:08X}&#39;)
+            if needs_swap:
+                block_length = int.from_bytes(
+                    block_length.to_bytes(4, &#39;big&#39;), &#39;little&#39;)
+            body_length = block_length - 12
+            reader.u16()  # version_major
+            reader.u16()  # version_minor
+            reader.u64()  # section_length
+            remaining = body_length - (reader.tell() - block_start - 8)
+            if remaining &gt; 0:
+                reader.read_exactly(remaining)
+        elif block_type == 0x00000001:
+            lt = LinkType(reader.u16())
+            reader.u16()  # reserved
+            reader.u32()  # snap_len
+            interfaces.append(lt)
+            remaining = body_length - 8
+            if remaining &gt; 0:
+                reader.read_exactly(remaining)
+        elif block_type == 0x00000006:
+            iface_id = reader.u32()
+            reader.u32()  # timestamp_high
+            reader.u32()  # timestamp_low
+            captured_len = reader.u32()
+            reader.u32()  # original_len
+            if iface_id &lt; len(interfaces):
+                lt = interfaces[iface_id]
+            else:
+                lt = LinkType.ETHERNET
+            try:
+                packet_data = reader.read_exactly(captured_len)
+            except EOF:
+                break
+            yield lt, memoryview(packet_data)
+            padded = (captured_len + 3) &amp; ~3
+            skip = padded - captured_len
+            remaining = body_length - 20 - padded
+            if skip &gt; 0:
+                reader.read_exactly(skip)
+            if remaining &gt; 0:
+                reader.read_exactly(remaining)
+        else:
+            try:
+                reader.read_exactly(body_length)
+            except EOF:
+                break
+
+        try:
+            reader.u32()  # trailing block length
+        except EOF:
+            break
+
+
+def _parse_link_layer(
+    link_type: LinkType, frame: memoryview
+) -&gt; tuple[EtherType, memoryview] | None:
+    if link_type == LinkType.ETHERNET:
+        if len(frame) &lt; 14:
+            return None
+        etype = int.from_bytes(frame[12:14], &#39;big&#39;)
+        payload = frame[14:]
+        while etype == EtherType.VLAN:
+            if len(payload) &lt; 4:
+                return None
+            etype = int.from_bytes(payload[2:4], &#39;big&#39;)
+            payload = payload[4:]
+        try:
+            et = EtherType(etype)
+        except ValueError:
+            return None
+        if et not in (EtherType.IPv4, EtherType.IPv6):
+            return None
+        return et, payload
+    elif link_type == LinkType.NULL:
+        if len(frame) &lt; 4:
+            return None
+        family = int.from_bytes(frame[:4], &#39;little&#39;)
+        if family == 2:
+            return EtherType.IPv4, frame[4:]
+        elif family in (24, 28, 30):
+            return EtherType.IPv6, frame[4:]
+        return None
+    elif link_type == LinkType.LINUX_SLL:
+        if len(frame) &lt; 16:
+            return None
+        etype = int.from_bytes(frame[14:16], &#39;big&#39;)
+        try:
+            et = EtherType(etype)
+        except ValueError:
+            return None
+        if et not in (EtherType.IPv4, EtherType.IPv6):
+            return None
+        return et, frame[16:]
+    elif link_type == LinkType.RAW_IP:
+        if len(frame) &lt; 1:
+            return None
+        version = frame[0] &gt;&gt; 4
+        if version == 4:
+            return EtherType.IPv4, frame
+        elif version == 6:
+            return EtherType.IPv6, frame
+        return None
+    return None
+
+
+class _IPv4Header(Struct[memoryview]):
+    def __init__(self, reader: StructReader[memoryview]):
+        reader.bigendian = True
+        ihl = (reader.u8() &amp; 0x0F) * 4
+        if ihl &lt; 20:
+            raise ValueError
+        self.dscp_ecn = reader.u8()
+        total_length = reader.u16()
+        self.identification = reader.u16()
+        frag_offset = reader.u16() &amp; 0x1FFF
+        if frag_offset != 0:
+            raise ValueError
+        self.ttl = reader.u8()
+        self.protocol = IPProtocol(reader.u8())
+        self.header_checksum = reader.u16()
+        self.src = str(ipaddress.IPv4Address(reader.read_bytes(4)))
+        self.dst = str(ipaddress.IPv4Address(reader.read_bytes(4)))
+        if ihl &gt; 20:
+            reader.read_exactly(ihl - 20)
+        remaining = total_length - ihl
+        if remaining &gt; reader.remaining_bytes:
+            remaining = reader.remaining_bytes
+        self.payload = reader.read_exactly(max(remaining, 0))
+
+
+class _IPv6Header(Struct[memoryview]):
+    def __init__(self, reader: StructReader[memoryview]):
+        reader.bigendian = True
+        self.version_traffic_flow = reader.u32()
+        payload_length = reader.u16()
+        next_header = reader.u8()
+        self.hop_limit = reader.u8()
+        self.src = str(ipaddress.IPv6Address(reader.read_bytes(16)))
+        self.dst = str(ipaddress.IPv6Address(reader.read_bytes(16)))
+        payload_size = min(payload_length, reader.remaining_bytes)
+        payload_start = reader.tell()
+        extension_headers = {0, 43, 44, 50, 51, 60, 135, 139, 140}
+        while next_header in extension_headers:
+            if next_header == 44:
+                raise ValueError
+            ext_next = reader.u8()
+            ext_len = (reader.u8() + 1) * 8
+            if ext_len &gt; 2:
+                reader.read_exactly(ext_len - 2)
+            next_header = ext_next
+        self.protocol = IPProtocol(next_header)
+        consumed = reader.tell() - payload_start
+        remaining = max(payload_size - consumed, 0)
+        self.payload = reader.read_exactly(remaining)
+
+
+class _TcpHeader(Struct[memoryview]):
+    def __init__(self, reader: StructReader[memoryview]):
+        reader.bigendian = True
+        self.src_port = reader.u16()
+        self.dst_port = reader.u16()
+        self.seq = reader.u32()
+        self.ack = reader.u32()
+        data_offset = ((reader.u8() &gt;&gt; 4) &amp; 0x0F) * 4
+        if data_offset &lt; 20:
+            raise ValueError
+        self.flags = TcpFlag(reader.u8())
+        self.window_size = reader.u16()
+        self.checksum = reader.u16()
+        self.urgent_pointer = reader.u16()
+        if data_offset &gt; 20:
+            reader.read_exactly(data_offset - 20)
+        self.payload = reader.read_exactly(reader.remaining_bytes)
+
+
+class _TcpStream:
+    def __init__(self):
+        self.segments: list[TcpSegment] = []
+
+    def add(self, seq: int, data: bytes, packet_index: int):
+        if data:
+            self.segments.append(TcpSegment(seq, data, packet_index))
+
+    def reassemble(self) -&gt; bytearray:
+        if not self.segments:
+            return bytearray()
+        self.segments.sort(key=lambda s: (s.seq, s.packet_index))
+        result = bytearray()
+        next_seq = self.segments[0].seq
+        for seg in self.segments:
+            if seg.seq + len(seg.data) &lt;= next_seq:
+                continue
+            if seg.seq &lt; next_seq:
+                trimmed = seg.data[next_seq - seg.seq:]
+            else:
+                trimmed = seg.data
+            result.extend(trimmed)
+            next_seq = seg.seq + len(seg.data)
+        return result
+
+
+def reassemble_tcp_streams(data: bytes | bytearray | memoryview) -&gt; list[TcpDatagram]:
+    view = memoryview(data)
+    reader = StructReader(view)
+    magic = bytes(view[:4])
+    reader.bigendian = False
+
+    if magic == b&#39;\x0A\x0D\x0D\x0A&#39;:
+        packet_iter = _iter_pcap_ng(reader)
+    else:
+        packet_iter = _iter_pcap_classic(reader)
+
+    flows: dict[FlowKey, _TcpStream] = {}
+    flow_first_packet: dict[FlowKey, int] = {}
+    packet_index = 0
+
+    for link_type, frame in packet_iter:
+        packet_index += 1
+        try:
+            result = _parse_link_layer(link_type, frame)
+            if result is None:
+                continue
+            ether_type, ip_data = result
+            if ether_type == EtherType.IPv4:
+                ip = _IPv4Header.Parse(ip_data)
+            elif ether_type == EtherType.IPv6:
+                ip = _IPv6Header.Parse(ip_data)
+            else:
+                continue
+            if ip.protocol != IPProtocol.TCP:
+                continue
+            tcp = _TcpHeader.Parse(ip.payload)
+            key = FlowKey(
+                ip.src, tcp.src_port, ip.dst, tcp.dst_port, tcp.ack)
+            if key not in flow_first_packet:
+                flow_first_packet[key] = packet_index
+            payload_bytes = bytes(tcp.payload)
+            if payload_bytes:
+                if key not in flows:
+                    flows[key] = _TcpStream()
+                flows[key].add(tcp.seq, payload_bytes, packet_index)
+        except Exception:
+            logger.debug(&#39;failed to parse packet %d&#39;, packet_index, exc_info=True)
+            continue
+
+    datagrams: list[TcpDatagram] = []
+    for key, stream in flows.items():
+        payload = stream.reassemble()
+        if payload:
+            first_idx = flow_first_packet.get(
+                key, min(s.packet_index for s in stream.segments))
+            datagrams.append(TcpDatagram(
+                key.src_addr, key.dst_addr, key.src_port, key.dst_port,
+                payload, first_idx,
+            ))
+
+    datagrams.sort(key=lambda d: d.first_packet_index)
+    return datagrams</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.pcap.reassemble_tcp_streams"><code class="name flex">
+<span>def <span class="ident">reassemble_tcp_streams</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L321-L377" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reassemble_tcp_streams(data: bytes | bytearray | memoryview) -&gt; list[TcpDatagram]:
+    view = memoryview(data)
+    reader = StructReader(view)
+    magic = bytes(view[:4])
+    reader.bigendian = False
+
+    if magic == b&#39;\x0A\x0D\x0D\x0A&#39;:
+        packet_iter = _iter_pcap_ng(reader)
+    else:
+        packet_iter = _iter_pcap_classic(reader)
+
+    flows: dict[FlowKey, _TcpStream] = {}
+    flow_first_packet: dict[FlowKey, int] = {}
+    packet_index = 0
+
+    for link_type, frame in packet_iter:
+        packet_index += 1
+        try:
+            result = _parse_link_layer(link_type, frame)
+            if result is None:
+                continue
+            ether_type, ip_data = result
+            if ether_type == EtherType.IPv4:
+                ip = _IPv4Header.Parse(ip_data)
+            elif ether_type == EtherType.IPv6:
+                ip = _IPv6Header.Parse(ip_data)
+            else:
+                continue
+            if ip.protocol != IPProtocol.TCP:
+                continue
+            tcp = _TcpHeader.Parse(ip.payload)
+            key = FlowKey(
+                ip.src, tcp.src_port, ip.dst, tcp.dst_port, tcp.ack)
+            if key not in flow_first_packet:
+                flow_first_packet[key] = packet_index
+            payload_bytes = bytes(tcp.payload)
+            if payload_bytes:
+                if key not in flows:
+                    flows[key] = _TcpStream()
+                flows[key].add(tcp.seq, payload_bytes, packet_index)
+        except Exception:
+            logger.debug(&#39;failed to parse packet %d&#39;, packet_index, exc_info=True)
+            continue
+
+    datagrams: list[TcpDatagram] = []
+    for key, stream in flows.items():
+        payload = stream.reassemble()
+        if payload:
+            first_idx = flow_first_packet.get(
+                key, min(s.packet_index for s in stream.segments))
+            datagrams.append(TcpDatagram(
+                key.src_addr, key.dst_addr, key.src_port, key.dst_port,
+                payload, first_idx,
+            ))
+
+    datagrams.sort(key=lambda d: d.first_packet_index)
+    return datagrams</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.pcap.LinkType"><code class="flex name class">
+<span>class <span class="ident">LinkType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L14-L18" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LinkType(IntEnum):
+    NULL = 0
+    ETHERNET = 1
+    LINUX_SLL = 113
+    RAW_IP = 228</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.LinkType.NULL"><code class="name">var <span class="ident">NULL</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.LinkType.ETHERNET"><code class="name">var <span class="ident">ETHERNET</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.LinkType.LINUX_SLL"><code class="name">var <span class="ident">LINUX_SLL</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.LinkType.RAW_IP"><code class="name">var <span class="ident">RAW_IP</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.pcap.EtherType"><code class="flex name class">
+<span>class <span class="ident">EtherType</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L21-L24" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class EtherType(IntEnum):
+    IPv4 = 0x0800
+    IPv6 = 0x86DD
+    VLAN = 0x8100</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.EtherType.IPv4"><code class="name">var <span class="ident">IPv4</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.EtherType.IPv6"><code class="name">var <span class="ident">IPv6</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.EtherType.VLAN"><code class="name">var <span class="ident">VLAN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.pcap.IPProtocol"><code class="flex name class">
+<span>class <span class="ident">IPProtocol</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Enum where members are also (and must be) ints</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L27-L29" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class IPProtocol(IntEnum):
+    TCP = 6
+    UDP = 17</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.IPProtocol.TCP"><code class="name">var <span class="ident">TCP</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.IPProtocol.UDP"><code class="name">var <span class="ident">UDP</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.pcap.TcpFlag"><code class="flex name class">
+<span>class <span class="ident">TcpFlag</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Support for integer-based Flags</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L32-L38" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpFlag(IntFlag):
+    FIN = 0x01
+    SYN = 0x02
+    RST = 0x04
+    PSH = 0x08
+    ACK = 0x10
+    URG = 0x20</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntFlag</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Flag</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.TcpFlag.FIN"><code class="name">var <span class="ident">FIN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.TcpFlag.SYN"><code class="name">var <span class="ident">SYN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.TcpFlag.RST"><code class="name">var <span class="ident">RST</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.TcpFlag.PSH"><code class="name">var <span class="ident">PSH</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.TcpFlag.ACK"><code class="name">var <span class="ident">ACK</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.pcap.TcpFlag.URG"><code class="name">var <span class="ident">URG</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.pcap.FlowKey"><code class="flex name class">
+<span>class <span class="ident">FlowKey</span></span>
+<span>(</span><span>src_addr, src_port, dst_addr, dst_port, ack)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>FlowKey(src_addr, src_port, dst_addr, dst_port, ack)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L41-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.FlowKey.src_addr"><code class="name">var <span class="ident">src_addr</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L41-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.FlowKey.src_port"><code class="name">var <span class="ident">src_port</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L41-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.FlowKey.dst_addr"><code class="name">var <span class="ident">dst_addr</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L41-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.FlowKey.dst_port"><code class="name">var <span class="ident">dst_port</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 3</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L41-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.FlowKey.ack"><code class="name">var <span class="ident">ack</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 4</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L41-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class FlowKey(NamedTuple):
+    src_addr: str
+    src_port: int
+    dst_addr: str
+    dst_port: int
+    ack: int</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.pcap.TcpSegment"><code class="flex name class">
+<span>class <span class="ident">TcpSegment</span></span>
+<span>(</span><span>seq, data, packet_index)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>TcpSegment(seq, data, packet_index)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L49-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpSegment(NamedTuple):
+    seq: int
+    data: bytes
+    packet_index: int</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.TcpSegment.seq"><code class="name">var <span class="ident">seq</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L49-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpSegment(NamedTuple):
+    seq: int
+    data: bytes
+    packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpSegment.data"><code class="name">var <span class="ident">data</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L49-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpSegment(NamedTuple):
+    seq: int
+    data: bytes
+    packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpSegment.packet_index"><code class="name">var <span class="ident">packet_index</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L49-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpSegment(NamedTuple):
+    seq: int
+    data: bytes
+    packet_index: int</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.pcap.TcpDatagram"><code class="flex name class">
+<span>class <span class="ident">TcpDatagram</span></span>
+<span>(</span><span>src_addr, dst_addr, src_port, dst_port, payload, first_packet_index)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>TcpDatagram(src_addr, dst_addr, src_port, dst_port, payload, first_packet_index)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.pcap.TcpDatagram.src_addr"><code class="name">var <span class="ident">src_addr</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpDatagram.dst_addr"><code class="name">var <span class="ident">dst_addr</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpDatagram.src_port"><code class="name">var <span class="ident">src_port</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpDatagram.dst_port"><code class="name">var <span class="ident">dst_port</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 3</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpDatagram.payload"><code class="name">var <span class="ident">payload</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 4</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.pcap.TcpDatagram.first_packet_index"><code class="name">var <span class="ident">first_packet_index</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 5</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/pcap.py#L55-L61" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class TcpDatagram(NamedTuple):
+    src_addr: str
+    dst_addr: str
+    src_port: int
+    dst_port: int
+    payload: bytearray
+    first_packet_index: int</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.pcap.reassemble_tcp_streams" href="#refinery.lib.pcap.reassemble_tcp_streams">reassemble_tcp_streams</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.pcap.LinkType" href="#refinery.lib.pcap.LinkType">LinkType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.pcap.EtherType" href="#refinery.lib.pcap.EtherType">EtherType</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.pcap.IPProtocol" href="#refinery.lib.pcap.IPProtocol">IPProtocol</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.pcap.TcpFlag" href="#refinery.lib.pcap.TcpFlag">TcpFlag</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.pcap.FlowKey" href="#refinery.lib.pcap.FlowKey">FlowKey</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.pcap.TcpSegment" href="#refinery.lib.pcap.TcpSegment">TcpSegment</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.pcap.TcpDatagram" href="#refinery.lib.pcap.TcpDatagram">TcpDatagram</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

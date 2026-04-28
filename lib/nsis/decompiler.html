@@ -1,0 +1,4905 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.nsis.decompiler documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.nsis.decompiler</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L1-L2296" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import dataclasses
+import io
+import struct
+
+from typing import Callable
+
+from refinery.lib.nsis.archive import (
+    OP_PARAMETER_COUNT,
+    NSArchive,
+    NSHeader,
+    NSHeaderFlags,
+    NSMethod,
+    NSScriptExtendedInstruction,
+    NSScriptFlags,
+    NSScriptInstruction,
+    NSSection,
+    NSSectionFlags,
+    NSType,
+    Op,
+)
+
+PAGE_LICENSE = 0
+PAGE_SELCOM = 1
+PAGE_DIR = 2
+PAGE_INSTFILES = 3
+PAGE_UNINST = 4
+PAGE_COMPLETED = 5
+PAGE_CUSTOM = 6
+
+PAGE_TYPES = (
+    &#39;license&#39;,
+    &#39;components&#39;,
+    &#39;directory&#39;,
+    &#39;instfiles&#39;,
+    &#39;uninstConfirm&#39;,
+    &#39;COMPLETED&#39;,
+    &#39;custom&#39;,
+)
+
+PAGE_SIZE = 64
+
+PF_CANCEL_ENABLE = 4
+PF_LICENSE_FORCE_SELECTION = 32
+PF_LICENSE_NO_FORCE_SELECTION = 64
+PF_PAGE_EX = 512
+PF_DIR_NO_BTN_DISABLE = 1024
+
+IDD_LICENSE_FSRB = 108
+IDD_LICENSE_FSCB = 109
+
+DEL_DIR = 1
+DEL_RECURSE = 2
+DEL_REBOOT = 4
+
+ON_FUNCS = (
+    &#39;Init&#39;,
+    &#39;InstSuccess&#39;,
+    &#39;InstFailed&#39;,
+    &#39;UserAbort&#39;,
+    &#39;GUIInit&#39;,
+    &#39;GUIEnd&#39;,
+    &#39;MouseOverSection&#39;,
+    &#39;VerifyInstDir&#39;,
+    &#39;SelChange&#39;,
+    &#39;RebootFailed&#39;,
+)
+
+CMD_REF_Goto = 1 &lt;&lt; 0
+CMD_REF_Call = 1 &lt;&lt; 1
+CMD_REF_Pre = 1 &lt;&lt; 2
+CMD_REF_Show = 1 &lt;&lt; 3
+CMD_REF_Leave = 1 &lt;&lt; 4
+CMD_REF_OnFunc = 1 &lt;&lt; 5
+CMD_REF_Section = 1 &lt;&lt; 6
+CMD_REF_InitPluginDir = 1 &lt;&lt; 7
+CMD_REF_OnFunc_NumShifts = 28
+CMD_REF_OnFunc_Mask = 0xF0000000
+CMD_REF_Page_NumShifts = 16
+CMD_REF_Page_Mask = 0x0FFF0000
+
+INITPLUGINDIR_OPCODES = (13, 26, 31, 13, 19, 21, 11, 14, 25, 31, 1, 22, 4, 1)
+
+_MB_BUTTONS = (
+    &#39;OK&#39;,
+    &#39;OKCANCEL&#39;,
+    &#39;ABORTRETRYIGNORE&#39;,
+    &#39;YESNOCANCEL&#39;,
+    &#39;YESNO&#39;,
+    &#39;RETRYCANCEL&#39;,
+    &#39;CANCELTRYCONTINUE&#39;,
+)
+
+_MB_ICONS = (
+    None,
+    &#39;ICONSTOP&#39;,
+    &#39;ICONQUESTION&#39;,
+    &#39;ICONEXCLAMATION&#39;,
+    &#39;ICONINFORMATION&#39;,
+)
+
+_MB_FLAGS = (
+    &#39;HELP&#39;,
+    &#39;NOFOCUS&#39;,
+    &#39;SETFOREGROUND&#39;,
+    &#39;DEFAULT_DESKTOP_ONLY&#39;,
+    &#39;TOPMOST&#39;,
+    &#39;RIGHT&#39;,
+    &#39;RTLREADING&#39;,
+)
+
+_BUTTON_IDS = (
+    &#39;0&#39;,
+    &#39;IDOK&#39;,
+    &#39;IDCANCEL&#39;,
+    &#39;IDABORT&#39;,
+    &#39;IDRETRY&#39;,
+    &#39;IDIGNORE&#39;,
+    &#39;IDYES&#39;,
+    &#39;IDNO&#39;,
+    &#39;IDCLOSE&#39;,
+    &#39;IDHELP&#39;,
+    &#39;IDTRYAGAIN&#39;,
+    &#39;IDCONTINUE&#39;,
+)
+
+_SHOWWINDOW_COMMANDS = (
+    &#39;HIDE&#39;,
+    &#39;SHOWNORMAL&#39;,
+    &#39;SHOWMINIMIZED&#39;,
+    &#39;SHOWMAXIMIZED&#39;,
+    &#39;SHOWNOACTIVATE&#39;,
+    &#39;SHOW&#39;,
+    &#39;MINIMIZE&#39;,
+    &#39;SHOWMINNOACTIVE&#39;,
+    &#39;SHOWNA&#39;,
+    &#39;RESTORE&#39;,
+    &#39;SHOWDEFAULT&#39;,
+    &#39;FORCEMINIMIZE&#39;,
+)
+
+_REG_ROOTS = {
+    0x00000000: &#39;SHCTX&#39;,
+    0x80000000: &#39;HKCR&#39;,
+    0x80000001: &#39;HKCU&#39;,
+    0x80000002: &#39;HKLM&#39;,
+    0x80000003: &#39;HKU&#39;,
+    0x80000004: &#39;HKPD&#39;,
+    0x80000005: &#39;HKCC&#39;,
+    0x80000006: &#39;HKDD&#39;,
+    0x80000050: &#39;HKPT&#39;,
+    0x80000060: &#39;HKPN&#39;,
+}
+
+_EXEC_FLAGS = (
+    &#39;AutoClose&#39;,
+    &#39;ShellVarContext&#39;,
+    &#39;Errors&#39;,
+    &#39;Abort&#39;,
+    &#39;RebootFlag&#39;,
+    &#39;reboot_called&#39;,
+    &#39;cur_insttype&#39;,
+    &#39;plugin_api_version&#39;,
+    &#39;Silent&#39;,
+    &#39;InstDirError&#39;,
+    &#39;rtl&#39;,
+    &#39;ErrorLevel&#39;,
+    &#39;RegView&#39;,
+    &#39;DetailsPrint&#39;,
+)
+
+_FLAG_VALUE_NAMES: dict[int, dict[int, str]] = {
+    0 : {0: &#39;false&#39;, 1: &#39;true&#39;},                              # AutoClose
+    1 : {0: &#39;current&#39;, 1: &#39;all&#39;},                             # ShellVarContext
+    4 : {0: &#39;false&#39;, 1: &#39;true&#39;},                              # RebootFlag
+    8 : {0: &#39;normal&#39;, 1: &#39;silent&#39;},                           # Silent
+    12: {0: &#39;32&#39;, 256: &#39;64&#39;},                                 # RegView
+    13: {0: &#39;both&#39;, 2: &#39;textonly&#39;, 4: &#39;listonly&#39;, 6: &#39;none&#39;}, # DetailsPrint
+}
+
+_SECTION_VARS = (
+    &#39;Text&#39;,
+    &#39;InstTypes&#39;,
+    &#39;Flags&#39;,
+    &#39;Code&#39;,
+    &#39;CodeSize&#39;,
+    &#39;Size&#39;,
+)
+
+_WIN_ATTRIBS = (
+    &#39;READONLY&#39;,
+    &#39;HIDDEN&#39;,
+    &#39;SYSTEM&#39;,
+    None,
+    &#39;DIRECTORY&#39;,
+    &#39;ARCHIVE&#39;,
+    &#39;DEVICE&#39;,
+    &#39;NORMAL&#39;,
+    &#39;TEMPORARY&#39;,
+    &#39;SPARSE_FILE&#39;,
+    &#39;REPARSE_POINT&#39;,
+    &#39;COMPRESSED&#39;,
+    &#39;OFFLINE&#39;,
+    &#39;NOT_CONTENT_INDEXED&#39;,
+    &#39;ENCRYPTED&#39;,
+    None,
+    &#39;VIRTUAL&#39;,
+)
+
+_OVERWRITE_MODES = (
+    &#39;on&#39;,
+    &#39;off&#39;,
+    &#39;try&#39;,
+    &#39;ifnewer&#39;,
+    &#39;ifdiff&#39;,
+)
+
+VK_F1 = 0x70
+
+NSIS_MAX_INST_TYPES = 32
+
+_POST_STRINGS = (
+    &#39;install_directory_auto_append&#39;,
+    &#39;uninstchild&#39;,
+    &#39;uninstcmd&#39;,
+    &#39;wininit&#39;,
+)
+
+
+def _decode_flag_value(flag_id: int, s: str) -&gt; str | None:
+    table = _FLAG_VALUE_NAMES.get(flag_id)
+    if table is None:
+        return None
+    try:
+        v = int(s, 0)
+    except (ValueError, TypeError):
+        return None
+    return table.get(v)
+
+
+def decode_messagebox(param: int) -&gt; str:
+    &#34;&#34;&#34;
+    Decode MB_* flags from a single uint32 into a pipe-delimited string.
+    &#34;&#34;&#34;
+    parts: list[str] = []
+    v = param &amp; 0xF
+    if v &lt; len(_MB_BUTTONS):
+        parts.append(F&#39;MB_{_MB_BUTTONS[v]}&#39;)
+    else:
+        parts.append(F&#39;MB_Buttons_{v}&#39;)
+    icon = (param &gt;&gt; 4) &amp; 0x7
+    if icon != 0:
+        if icon &lt; len(_MB_ICONS) and _MB_ICONS[icon] is not None:
+            parts.append(F&#39;MB_{_MB_ICONS[icon]}&#39;)
+        else:
+            parts.append(F&#39;MB_Icon_{icon}&#39;)
+    if param &amp; 0x80:
+        parts.append(&#39;MB_USERICON&#39;)
+    def_button = (param &gt;&gt; 8) &amp; 0xF
+    if def_button != 0:
+        parts.append(F&#39;MB_DEFBUTTON{def_button + 1}&#39;)
+    modal = (param &gt;&gt; 12) &amp; 0x3
+    if modal == 1:
+        parts.append(&#39;MB_SYSTEMMODAL&#39;)
+    elif modal == 2:
+        parts.append(&#39;MB_TASKMODAL&#39;)
+    elif modal == 3:
+        parts.append(&#39;0x3000&#39;)
+    flags = param &gt;&gt; 14
+    for i, name in enumerate(_MB_FLAGS):
+        if flags &amp; (1 &lt;&lt; i):
+            parts.append(F&#39;MB_{name}&#39;)
+    return &#39;|&#39;.join(parts)
+
+
+def decode_button_id(button_id: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a button ID integer to its name (IDOK, IDCANCEL, ...).
+    &#34;&#34;&#34;
+    if button_id &lt; len(_BUTTON_IDS):
+        return _BUTTON_IDS[button_id]
+    return F&#39;Button_{button_id}&#39;
+
+
+def decode_showwindow(cmd: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a SW_* command index to its name.
+    &#34;&#34;&#34;
+    if cmd &lt; len(_SHOWWINDOW_COMMANDS):
+        return F&#39;SW_{_SHOWWINDOW_COMMANDS[cmd]}&#39;
+    return str(cmd)
+
+
+def decode_reg_root(val: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a registry root value to its name.
+    &#34;&#34;&#34;
+    name = _REG_ROOTS.get(val)
+    if name is not None:
+        return name
+    return F&#39;0x{val:08X}&#39;
+
+
+def decode_exec_flags(flags_type: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map an exec flag type index to its name.
+    &#34;&#34;&#34;
+    if flags_type &lt; len(_EXEC_FLAGS):
+        return _EXEC_FLAGS[flags_type]
+    return F&#39;_{flags_type}&#39;
+
+
+def decode_sect_op(op_type: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a section operation type index to its name.
+    &#34;&#34;&#34;
+    if op_type &lt; len(_SECTION_VARS):
+        return _SECTION_VARS[op_type]
+    return F&#39;_{op_type}&#39;
+
+
+def decode_file_attributes(flags: int) -&gt; str:
+    &#34;&#34;&#34;
+    Decode a file attribute bitmask into a pipe-delimited string.
+    &#34;&#34;&#34;
+    parts: list[str] = []
+    remaining = flags
+    for i, name in enumerate(_WIN_ATTRIBS):
+        bit = 1 &lt;&lt; i
+        if remaining &amp; bit:
+            if name is not None:
+                parts.append(name)
+                remaining &amp;= ~bit
+    if remaining:
+        parts.append(F&#39;0x{remaining:X}&#39;)
+    return &#39;|&#39;.join(parts)
+
+
+def decode_setoverwrite(mode: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map an overwrite mode index to its name.
+    &#34;&#34;&#34;
+    if mode &lt; len(_OVERWRITE_MODES):
+        return _OVERWRITE_MODES[mode]
+    return str(mode)
+
+
+def decode_shortcut_hotkey(spec: int) -&gt; str:
+    &#34;&#34;&#34;
+    Decode a CreateShortcut hotkey spec into a human-readable string. The high byte contains
+    modifier flags, the next byte is the virtual key.
+    &#34;&#34;&#34;
+    mod_key = (spec &gt;&gt; 24) &amp; 0xFF
+    key = (spec &gt;&gt; 16) &amp; 0xFF
+    if mod_key == 0 and key == 0:
+        return &#39;&#39;
+    parts: list[str] = []
+    if mod_key &amp; 1:
+        parts.append(&#39;SHIFT&#39;)
+    if mod_key &amp; 2:
+        parts.append(&#39;CONTROL&#39;)
+    if mod_key &amp; 4:
+        parts.append(&#39;ALT&#39;)
+    if mod_key &amp; 8:
+        parts.append(&#39;EXT&#39;)
+    if VK_F1 &lt;= key &lt;= VK_F1 + 23:
+        parts.append(F&#39;F{key - VK_F1 + 1}&#39;)
+    elif (0x41 &lt;= key &lt;= 0x5A) or (0x30 &lt;= key &lt;= 0x39):
+        parts.append(chr(key))
+    else:
+        parts.append(F&#39;Char_{key}&#39;)
+    return &#39;|&#39;.join(parts)
+
+
+class NSScriptWriter:
+    &#34;&#34;&#34;
+    Thin wrapper around an output buffer providing NSIS script formatting helpers.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self._buf = io.StringIO()
+        self._indent = 0
+        self._block_comment = False
+        self._line_start = True
+
+    def _emit_line_prefix(self):
+        if self._line_start and self._block_comment:
+            self._buf.write(&#39;; &#39;)
+        self._line_start = False
+
+    def indent(self):
+        self._indent += 1
+
+    def dedent(self):
+        if self._indent &gt; 0:
+            self._indent -= 1
+
+    def write(self, s: str):
+        self._emit_line_prefix()
+        self._buf.write(s)
+
+    def newline(self):
+        self._buf.write(&#39;\n&#39;)
+        self._line_start = True
+
+    def space(self):
+        self._buf.write(&#39; &#39;)
+
+    def tab(self, commented: bool = False):
+        self._emit_line_prefix()
+        if commented and not self._block_comment:
+            self._buf.write(&#39;    ; &#39;)
+        else:
+            self._buf.write(&#39;  &#39; + &#39;  &#39; * self._indent)
+
+    def big_space_comment(self):
+        self._buf.write(&#39;    ; &#39;)
+
+    def small_space_comment(self):
+        self._buf.write(&#39; ; &#39;)
+
+    def comment(self, s: str):
+        self._emit_line_prefix()
+        self._buf.write(F&#39;; {s}&#39;)
+
+    def separator(self):
+        self.newline()
+        self.comment(F&#39;{&#34;&#34;:-&lt;72}&#39;)
+        self.newline()
+
+    def comment_open(self):
+        self._block_comment = True
+        self._line_start = True
+
+    def comment_close(self):
+        self._block_comment = False
+
+    def add_uint(self, v: int):
+        self._buf.write(str(v))
+
+    def add_hex(self, v: int):
+        self._buf.write(F&#39;0x{v:08X}&#39;)
+
+    def add_color(self, v: int):
+        v = ((v &amp; 0xFF) &lt;&lt; 16) | (v &amp; 0xFF00) | ((v &gt;&gt; 16) &amp; 0xFF)
+        self._buf.write(F&#39;0x{v:06X}&#39;)
+
+    def add_quoted(self, s: str):
+        self._emit_line_prefix()
+        if _is_bare_identifier(s) or _is_numeric(s):
+            self._buf.write(s)
+        else:
+            self._buf.write(F&#39;&#34;{s}&#34;&#39;)
+
+    def space_quoted(self, s: str):
+        self.space()
+        self.add_quoted(s)
+
+    def add_string_lf(self, s: str):
+        self._emit_line_prefix()
+        self._buf.write(s)
+        self.newline()
+
+    def tab_string(self, s: str):
+        self.tab()
+        self._buf.write(s)
+
+    def add_quotes(self):
+        self._buf.write(&#39;&#34;&#34;&#39;)
+
+    def getvalue(self) -&gt; str:
+        return self._buf.getvalue()
+
+
+def nsis_escape(s: str) -&gt; str:
+    &#34;&#34;&#34;
+    Apply NSIS escape sequences to a string for decompiler output.
+    &#34;&#34;&#34;
+    out: list[str] = []
+    for c in s:
+        if c == &#39;\t&#39;:
+            out.append(&#39;$\\t&#39;)
+        elif c == &#39;\n&#39;:
+            out.append(&#39;$\\n&#39;)
+        elif c == &#39;\r&#39;:
+            out.append(&#39;$\\r&#39;)
+        elif c == &#39;&#34;&#39;:
+            out.append(&#39;$\\&#34;&#39;)
+        else:
+            out.append(c)
+    return &#39;&#39;.join(out)
+
+
+def _is_bare_identifier(s: str) -&gt; bool:
+    if len(s) &lt; 2 or s[0] != &#39;$&#39;:
+        return False
+    return all(c.isascii() and (c.isalnum() or c == &#39;_&#39;) for c in s[1:])
+
+
+def _is_numeric(s: str) -&gt; bool:
+    if not s:
+        return False
+    t = s
+    if t[0] in &#39;+-&#39;:
+        t = t[1:]
+    if not t:
+        return False
+    if t.startswith(&#39;0x&#39;) or t.startswith(&#39;0X&#39;):
+        t = t[2:]
+        return len(t) &gt; 0 and all(c in &#39;0123456789abcdefABCDEF&#39; for c in t)
+    return t.isdigit()
+
+
+def format_section_begin(
+    writer: NSScriptWriter,
+    section: NSSection,
+    index: int,
+    read_string: Callable[[int], str | None],
+    is_installer: bool,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Write Section/SectionGroup/SectionGroupEnd header. Returns True if the section is a group
+    marker (no body to close with SectionEnd).
+    &#34;&#34;&#34;
+    flags = NSSectionFlags(section.flags)
+    name = read_string(section.name)
+    if name is None:
+        name = &#39;&#39;
+    if not is_installer and name.lower() != &#39;uninstall&#39;:
+        name = F&#39;un.{name}&#39;
+    if flags &amp; NSSectionFlags.BOLD:
+        name = F&#39;!{name}&#39;
+
+    if flags &amp; NSSectionFlags.SECGRPEND:
+        writer.add_string_lf(&#39;SectionGroupEnd&#39;)
+        return True
+
+    if flags &amp; NSSectionFlags.SECGRP:
+        writer.write(&#39;SectionGroup&#39;)
+        if flags &amp; NSSectionFlags.EXPAND:
+            writer.write(&#39; /e&#39;)
+        writer.space_quoted(name)
+        writer.small_space_comment()
+        writer.write(F&#39;Section_{index}&#39;)
+        writer.newline()
+        return True
+
+    writer.write(&#39;Section&#39;)
+    if not (flags &amp; NSSectionFlags.SELECTED):
+        writer.write(&#39; /o&#39;)
+    if name:
+        writer.space_quoted(name)
+    writer.small_space_comment()
+    writer.write(F&#39;Section_{index}&#39;)
+    writer.newline()
+
+    if section.size_kb != 0:
+        writer.tab()
+        writer.comment(F&#39;AddSize {section.size_kb}&#39;)
+        writer.newline()
+
+    need_section_in = (
+        (section.name != 0 and section.install_types != 0)
+        or (section.name == 0 and section.install_types != 0xFFFFFFFF)
+    )
+    if need_section_in or (flags &amp; NSSectionFlags.RO):
+        writer.tab_string(&#39;SectionIn&#39;)
+        inst_types = section.install_types
+        for i in range(32):
+            if inst_types &amp; (1 &lt;&lt; i):
+                writer.write(F&#39; {i + 1}&#39;)
+        if flags &amp; NSSectionFlags.RO:
+            writer.write(&#39; RO&#39;)
+        writer.newline()
+
+    return False
+
+
+def format_section_end(writer: NSScriptWriter):
+    &#34;&#34;&#34;
+    Write SectionEnd.
+    &#34;&#34;&#34;
+    writer.add_string_lf(&#39;SectionEnd&#39;)
+    writer.newline()
+
+
+def _func_name(labels: list[int], index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Generate a function name string from the label flags at the given index.
+    &#34;&#34;&#34;
+    mask = labels[index]
+    if mask &amp; CMD_REF_OnFunc:
+        func_id = (mask &gt;&gt; CMD_REF_OnFunc_NumShifts) &amp; 0xF
+        if func_id &lt; len(ON_FUNCS):
+            return F&#39;.on{ON_FUNCS[func_id]}&#39;
+        return F&#39;.onFunc_{func_id}&#39;
+    if mask &amp; CMD_REF_InitPluginDir:
+        return &#39;Initialize_____Plugins&#39;
+    return F&#39;func_{index}&#39;
+
+
+def _add_param_func(
+    writer: NSScriptWriter,
+    labels: list[int],
+    index: int,
+):
+    &#34;&#34;&#34;
+    Write a space followed by a function name or empty quotes.
+    &#34;&#34;&#34;
+    writer.space()
+    signed = index if index &lt; 0x80000000 else index - 0x100000000
+    if signed &gt;= 0 and index &lt; len(labels):
+        writer.write(_func_name(labels, index))
+    else:
+        writer.add_quotes()
+
+
+def emit_pages(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    labels: list[int],
+    is_installer: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Emit Page/UninstPage/PageEx blocks from the bh_pages data. Updates the labels array with
+    CMD_REF_Pre/Show/Leave for page callbacks.
+    &#34;&#34;&#34;
+    bh = header.bh_pages
+    if bh.count == 0:
+        return
+
+    writer.separator()
+    writer.comment(F&#39;PAGES: {bh.count}&#39;)
+    writer.newline()
+
+    raw = bytes(header.raw_data)
+    num_instructions = len(labels)
+
+    if (
+        bh.count &gt; (1 &lt;&lt; 12)
+        or bh.offset &gt; len(raw)
+        or bh.count * PAGE_SIZE &gt; len(raw) - bh.offset
+    ):
+        writer.big_space_comment()
+        writer.write(&#39;!!! ERROR: Pages error&#39;)
+        writer.newline()
+        return
+
+    writer.newline()
+
+    for page_index in range(bh.count):
+        base = bh.offset + page_index * PAGE_SIZE
+        p = raw[base:base + PAGE_SIZE]
+        if len(p) &lt; PAGE_SIZE:
+            break
+
+        dlg_id = struct.unpack_from(&#39;&lt;I&#39;, p, 0)[0]
+        wnd_proc_id = struct.unpack_from(&#39;&lt;I&#39;, p, 4)[0]
+        pre_func = struct.unpack_from(&#39;&lt;I&#39;, p, 8)[0]
+        show_func = struct.unpack_from(&#39;&lt;I&#39;, p, 12)[0]
+        leave_func = struct.unpack_from(&#39;&lt;I&#39;, p, 16)[0]
+        flags = struct.unpack_from(&#39;&lt;I&#39;, p, 20)[0]
+        caption = struct.unpack_from(&#39;&lt;I&#39;, p, 24)[0]
+        next_param = struct.unpack_from(&#39;&lt;I&#39;, p, 32)[0]
+        params = [struct.unpack_from(&#39;&lt;I&#39;, p, 44 + 4 * i)[0] for i in range(5)]
+
+        def _set_func_ref(func_index: int, flag: int):
+            signed = func_index if func_index &lt; 0x80000000 else func_index - 0x100000000
+            if signed &gt;= 0 and func_index &lt; num_instructions:
+                labels[func_index] = (
+                    (labels[func_index] &amp; ~CMD_REF_Page_Mask)
+                    | flag
+                    | (page_index &lt;&lt; CMD_REF_Page_NumShifts)
+                )
+
+        _set_func_ref(pre_func, CMD_REF_Pre)
+        _set_func_ref(show_func, CMD_REF_Show)
+        _set_func_ref(leave_func, CMD_REF_Leave)
+
+        if wnd_proc_id == PAGE_COMPLETED:
+            writer.comment_open()
+
+        writer.comment(F&#39;Page {page_index}&#39;)
+        writer.newline()
+
+        if flags &amp; PF_PAGE_EX:
+            writer.write(&#39;PageEx &#39;)
+            if not is_installer:
+                writer.write(&#39;un.&#39;)
+        else:
+            writer.write(&#39;Page &#39; if is_installer else &#39;UninstPage &#39;)
+
+        if wnd_proc_id &lt; len(PAGE_TYPES):
+            writer.write(PAGE_TYPES[wnd_proc_id])
+        else:
+            writer.add_uint(wnd_proc_id)
+
+        pre_signed = pre_func if pre_func &lt; 0x80000000 else pre_func - 0x100000000
+        show_signed = show_func if show_func &lt; 0x80000000 else show_func - 0x100000000
+        leave_signed = leave_func if leave_func &lt; 0x80000000 else leave_func - 0x100000000
+        need_callbacks = pre_signed &gt;= 0 or show_signed &gt;= 0 or leave_signed &gt;= 0
+
+        if flags &amp; PF_PAGE_EX:
+            writer.newline()
+            if need_callbacks:
+                writer.tab_string(&#39;PageCallbacks&#39;)
+
+        if need_callbacks:
+            _add_param_func(writer, labels, pre_func)
+            if wnd_proc_id != PAGE_CUSTOM:
+                _add_param_func(writer, labels, show_func)
+            _add_param_func(writer, labels, leave_func)
+
+        if not (flags &amp; PF_PAGE_EX):
+            if flags &amp; PF_CANCEL_ENABLE:
+                writer.write(&#39; /ENABLECANCEL&#39;)
+            writer.newline()
+        else:
+            writer.newline()
+            if caption != 0:
+                writer.tab_string(&#39;Caption&#39;)
+                writer.space_quoted(header._read_string(caption) or &#39;&#39;)
+                writer.newline()
+
+        if wnd_proc_id == PAGE_LICENSE:
+            _emit_license_page(writer, header, flags, dlg_id, params, next_param)
+        elif wnd_proc_id == PAGE_SELCOM:
+            _emit_page_option(writer, header, params, 3, &#39;ComponentsText&#39;)
+        elif wnd_proc_id == PAGE_DIR:
+            _emit_page_option(writer, header, params, 4, &#39;DirText&#39;)
+            if params[4] != 0:
+                writer.tab_string(&#39;DirVar&#39;)
+                writer.space()
+                writer.write(header._string_code_variable(params[4] - 1))
+                writer.newline()
+            if flags &amp; PF_DIR_NO_BTN_DISABLE:
+                writer.tab_string(&#39;DirVerify leave&#39;)
+                writer.newline()
+        elif wnd_proc_id == PAGE_INSTFILES:
+            if params[2] != 0:
+                writer.tab_string(&#39;CompletedText&#39;)
+                writer.space_quoted(header._read_string(params[2]) or &#39;&#39;)
+                writer.newline()
+            if params[1] != 0:
+                writer.tab_string(&#39;DetailsButtonText&#39;)
+                writer.space_quoted(header._read_string(params[1]) or &#39;&#39;)
+                writer.newline()
+        elif wnd_proc_id == PAGE_UNINST:
+            if params[4] != 0:
+                writer.tab_string(&#39;DirVar&#39;)
+                writer.space()
+                writer.write(header._string_code_variable(params[4] - 1))
+                writer.newline()
+            _emit_page_option(writer, header, params, 2, &#39;UninstallText&#39;)
+
+        if flags &amp; PF_PAGE_EX:
+            writer.write(&#39;PageExEnd&#39;)
+            writer.newline()
+        if wnd_proc_id == PAGE_COMPLETED:
+            writer.comment_close()
+        writer.newline()
+
+
+def _emit_license_page(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    flags: int,
+    dlg_id: int,
+    params: list[int],
+    next_param: int,
+) -&gt; None:
+    if (flags &amp; PF_LICENSE_NO_FORCE_SELECTION) or (flags &amp; PF_LICENSE_FORCE_SELECTION):
+        writer.tab_string(&#39;LicenseForceSelection &#39;)
+        if flags &amp; PF_LICENSE_NO_FORCE_SELECTION:
+            writer.write(&#39;off&#39;)
+        else:
+            if dlg_id == IDD_LICENSE_FSCB:
+                writer.write(&#39;checkbox&#39;)
+            elif dlg_id == IDD_LICENSE_FSRB:
+                writer.write(&#39;radiobuttons&#39;)
+            else:
+                writer.add_uint(dlg_id)
+            for i in range(2, 4):
+                if params[i] != 0:
+                    writer.space_quoted(header._read_string(params[i]) or &#39;&#39;)
+        writer.newline()
+
+    if params[0] != 0 or next_param != 0:
+        writer.tab_string(&#39;LicenseText&#39;)
+        writer.space_quoted(header._read_string(params[0]) or &#39;&#39;)
+        if next_param != 0:
+            writer.space_quoted(header._read_string(next_param) or &#39;&#39;)
+        writer.newline()
+
+    if params[1] != 0:
+        writer.tab_string(&#39;LicenseData&#39;)
+        signed = params[1] if params[1] &lt; 0x80000000 else params[1] - 0x100000000
+        if signed &lt; 0:
+            writer.space_quoted(header._read_string(params[1]) or &#39;&#39;)
+        else:
+            writer.write(F&#39; #{params[1]}&#39;)
+        writer.newline()
+
+
+def _emit_page_option(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    params: list[int],
+    num: int,
+    name: str,
+) -&gt; None:
+    actual_num = num
+    while actual_num &gt; 0 and params[actual_num - 1] == 0:
+        actual_num -= 1
+    if actual_num == 0:
+        return
+    writer.tab_string(name)
+    for i in range(actual_num):
+        writer.space_quoted(header._read_string(params[i]) or &#39;&#39;)
+    writer.newline()
+
+
+def _format_description(header: NSHeader) -&gt; str:
+    &#34;&#34;&#34;
+    Build the NSIS type description string (e.g. &#34;NSIS-3&#34;, &#34;NSIS-Park-1&#34;).
+    &#34;&#34;&#34;
+    if header.type &gt;= NSType.Park1:
+        suffix = &#39;1&#39;
+        if header.type is NSType.Park2:
+            suffix = &#39;2&#39;
+        elif header.type is NSType.Park3:
+            suffix = &#39;3&#39;
+        s = F&#39;NSIS-Park-{suffix}&#39;
+    else:
+        s = &#39;NSIS-2&#39; if header.type is NSType.Nsis2 else &#39;NSIS-3&#39;
+    if header._is_nsis200:
+        s += &#39;.00&#39;
+    elif header._is_nsis225:
+        s += &#39;.25&#39;
+    if header.unicode:
+        s += &#39; Unicode&#39;
+    if header._log_cmd_is_enabled:
+        s += &#39; log&#39;
+    if header._bad_cmd &gt;= 0:
+        s += F&#39; BadCmd={header._bad_cmd}&#39;
+    return s
+
+
+def emit_header_info(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    archive: NSArchive | None,
+    is_installer: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Emit header metadata: NSIS type, compressor, flags, language tables, InstType list,
+    InstallDir, and post-header strings.
+    &#34;&#34;&#34;
+    writer.comment(&#39;NSIS script&#39;)
+    if header.unicode:
+        writer.write(&#39; (UTF-8)&#39;)
+    writer.space()
+    writer.write(_format_description(header))
+    writer.newline()
+
+    writer.comment(&#39;Install&#39; if is_installer else &#39;Uninstall&#39;)
+    writer.newline()
+    writer.newline()
+
+    if header.unicode:
+        writer.add_string_lf(&#39;Unicode true&#39;)
+
+    if archive is not None and archive.method is not NSMethod.Copy:
+        writer.write(&#39;SetCompressor&#39;)
+        if archive.solid:
+            writer.write(&#39; /SOLID&#39;)
+        method_name = {
+            NSMethod.Deflate: &#39;zlib&#39;,
+            NSMethod.NSGzip: &#39;zlib&#39;,
+            NSMethod.BZip2: &#39;bzip2&#39;,
+            NSMethod.LZMA: &#39;lzma&#39;,
+        }.get(archive.method)
+        if method_name:
+            writer.space()
+            writer.write(method_name)
+        writer.newline()
+
+    if archive is not None and archive.method is NSMethod.LZMA and archive.lzma_options is not None:
+        writer.write(&#39;SetCompressorDictSize &#39;)
+        writer.add_uint(archive.lzma_options.dictionary_size &gt;&gt; 20)
+        writer.newline()
+
+    writer.separator()
+
+    writer.comment(F&#39;HEADER SIZE: {header.raw_size}&#39;)
+    writer.newline()
+
+    if header.bh_pages.offset != 0:
+        writer.comment(F&#39;START HEADER SIZE: {header.bh_pages.offset}&#39;)
+        writer.newline()
+
+    bh_sections = header.bh_sections
+    bh_entries = header.bh_entries
+    if bh_sections.count &gt; 0 and bh_entries.offset &gt; bh_sections.offset:
+        section_size = (bh_entries.offset - bh_sections.offset) // bh_sections.count
+        if section_size &gt;= 24:
+            max_string_len = section_size - 24
+            if header.unicode:
+                max_string_len &gt;&gt;= 1
+            if max_string_len == 0:
+                writer.comment(F&#39;SECTION SIZE: {section_size}&#39;)
+            else:
+                writer.comment(F&#39;MAX STRING LENGTH: {max_string_len}&#39;)
+            writer.newline()
+
+    num_string_chars = header.bh_langtbl.offset - header.bh_strings.offset
+    if header.unicode:
+        num_string_chars &gt;&gt;= 1
+    writer.comment(F&#39;STRING CHARS: {num_string_chars}&#39;)
+    writer.newline()
+
+    if header.bh_ctlcolors.offset &gt; header.raw_size:
+        writer.big_space_comment()
+        writer.add_string_lf(&#39;Bad COLORS TABLE&#39;)
+
+    if header.bh_ctlcolors.count != 0:
+        writer.comment(F&#39;COLORS Num: {header.bh_ctlcolors.count}&#39;)
+        writer.newline()
+
+    if header.bh_font.count != 0:
+        writer.comment(F&#39;FONTS Num: {header.bh_font.count}&#39;)
+        writer.newline()
+
+    if header.bh_data.count != 0:
+        writer.comment(F&#39;DATA NUM: {header.bh_data.count}&#39;)
+        writer.newline()
+
+    writer.newline()
+    writer.add_string_lf(&#39;OutFile [NSIS].exe&#39;)
+    writer.add_string_lf(&#39;!include WinMessages.nsh&#39;)
+    writer.newline()
+
+    raw = bytes(header.raw_data)
+    if len(raw) &lt; 4:
+        return
+
+    eh_flags = NSScriptFlags(struct.unpack_from(&#39;&lt;I&#39;, raw, 0)[0])
+    show_details = int(eh_flags) &amp; 3
+    if 1 &lt;= show_details &lt;= 2:
+        writer.write(&#39;ShowInstDetails&#39; if is_installer else &#39;ShowUninstDetails&#39;)
+        writer.add_string_lf(&#39; show&#39; if show_details == 1 else &#39; nevershow&#39;)
+
+    if eh_flags &amp; NSScriptFlags.PROGRESS_COLORED:
+        writer.add_string_lf(&#39;InstProgressFlags colored&#39;)
+    if eh_flags &amp; (NSScriptFlags.SILENT | NSScriptFlags.SILENT_LOG):
+        writer.write(&#39;SilentInstall &#39; if is_installer else &#39;SilentUnInstall &#39;)
+        writer.add_string_lf(&#39;silentlog&#39; if (eh_flags &amp; NSScriptFlags.SILENT_LOG) else &#39;silent&#39;)
+    if eh_flags &amp; NSScriptFlags.AUTO_CLOSE:
+        writer.add_string_lf(&#39;AutoCloseWindow true&#39;)
+    if not (eh_flags &amp; NSScriptFlags.NO_ROOT_DIR):
+        writer.add_string_lf(&#39;AllowRootDirInstall true&#39;)
+    if eh_flags &amp; NSScriptFlags.NO_CUSTOM:
+        writer.add_string_lf(&#39;InstType /NOCUSTOM&#39;)
+    if eh_flags &amp; NSScriptFlags.COMP_ONLY_ON_CUSTOM:
+        writer.add_string_lf(&#39;InstType /COMPONENTSONLYONCUSTOM&#39;)
+
+    bho_size = 12 if header.is64bit else 8
+    params_offset = 4 + bho_size * 8
+    if header.bh_pages.offset == 276:
+        params_offset -= bho_size
+
+    if params_offset + 40 &gt; len(raw):
+        return
+
+    def _get32(off: int) -&gt; int:
+        return struct.unpack_from(&#39;&lt;I&#39;, raw, off)[0]
+
+    p2 = params_offset
+
+    root_key = _get32(p2)
+    sub_key = _get32(p2 + 4)
+    value = _get32(p2 + 8)
+    if (root_key != 0 and root_key != 0xFFFFFFFF) or sub_key != 0 or value != 0:
+        writer.write(&#39;InstallDirRegKey&#39;)
+        writer.space()
+        writer.write(decode_reg_root(root_key))
+        s = header._read_string(sub_key)
+        if s:
+            writer.space_quoted(s)
+        s = header._read_string(value)
+        if s:
+            writer.space_quoted(s)
+        writer.newline()
+
+    bg_color1 = _get32(p2 + 12)
+    bg_color2 = _get32(p2 + 16)
+    bg_textcolor = _get32(p2 + 20)
+    if bg_color1 != 0xFFFFFFFF or bg_color2 != 0xFFFFFFFF or bg_textcolor != 0xFFFFFFFF:
+        writer.write(&#39;BGGradient&#39;)
+        if bg_color1 != 0 or bg_color2 != 0xFF0000 or bg_textcolor != 0xFFFFFFFF:
+            writer.space()
+            writer.add_color(bg_color1)
+            writer.space()
+            writer.add_color(bg_color2)
+            if bg_textcolor != 0xFFFFFFFF:
+                writer.space()
+                writer.add_color(bg_textcolor)
+        writer.newline()
+
+    lb_bg = _get32(p2 + 24)
+    lb_fg = _get32(p2 + 28)
+    if (lb_bg != 0xFFFFFFFF or lb_fg != 0xFFFFFFFF) and (lb_bg != 0 or lb_fg != 0xFF00):
+        writer.write(&#39;InstallColors&#39;)
+        writer.space()
+        writer.add_color(lb_fg)
+        writer.space()
+        writer.add_color(lb_bg)
+        writer.newline()
+
+    license_bg = _get32(p2 + 36)
+    signed_license_bg = license_bg if license_bg &lt; 0x80000000 else license_bg - 0x100000000
+    if license_bg != 0xFFFFFFFF and signed_license_bg != -15:
+        writer.write(&#39;LicenseBkColor&#39;)
+        if signed_license_bg == -5:
+            writer.write(&#39; /windows&#39;)
+        else:
+            writer.space()
+            writer.add_color(license_bg)
+        writer.newline()
+
+    langtable_size = _get32(p2 + 32)
+    bh_langtbl = header.bh_langtbl
+    if bh_langtbl.count &gt; 0 and langtable_size != 0xFFFFFFFF:
+        if langtable_size &gt;= 10:
+            num_strings = (langtable_size - 10) // 4
+        else:
+            num_strings = 0
+
+        writer.newline()
+        writer.separator()
+        writer.comment(F&#39;LANG TABLES: {bh_langtbl.count}&#39;)
+        writer.newline()
+        writer.comment(F&#39;LANG STRINGS: {num_strings}&#39;)
+        writer.newline()
+        writer.newline()
+
+        license_lang_index = -1
+        bh_pages = header.bh_pages
+        if bh_pages.count &gt; 0:
+            for page_i in range(bh_pages.count):
+                page_base = bh_pages.offset + page_i * PAGE_SIZE
+                if page_base + PAGE_SIZE &gt; len(raw):
+                    break
+                wnd_proc_id = struct.unpack_from(&#39;&lt;I&#39;, raw, page_base + 4)[0]
+                param1 = struct.unpack_from(&#39;&lt;I&#39;, raw, page_base + 44 + 4)[0]
+                if wnd_proc_id != PAGE_LICENSE or param1 == 0:
+                    continue
+                signed_param1 = param1 if param1 &lt; 0x80000000 else param1 - 0x100000000
+                if signed_param1 &lt; 0:
+                    license_lang_index = -(signed_param1 + 1)
+
+        if license_lang_index &gt;= 0:
+            for i in range(bh_langtbl.count):
+                lang_base = bh_langtbl.offset + langtable_size * i
+                if lang_base + 10 + (license_lang_index + 1) * 4 &gt; len(raw):
+                    break
+                lang_id = struct.unpack_from(&#39;&lt;H&#39;, raw, lang_base)[0]
+                val = struct.unpack_from(&#39;&lt;I&#39;, raw, lang_base + 10 + license_lang_index * 4)[0]
+                if val != 0:
+                    writer.write(F&#39;LicenseLangString LSTR_{license_lang_index}&#39;)
+                    writer.write(F&#39; {lang_id}&#39;)
+                    s = header._read_string(val)
+                    if s:
+                        writer.space_quoted(nsis_escape(s))
+                    writer.newline()
+            writer.newline()
+
+        branding_text = 0
+        name_val = 0
+        for i in range(bh_langtbl.count):
+            lang_base = bh_langtbl.offset + langtable_size * i
+            if lang_base + 10 + 3 * 4 &gt; len(raw):
+                break
+            lang_id = struct.unpack_from(&#39;&lt;H&#39;, raw, lang_base)[0]
+            v0 = struct.unpack_from(&#39;&lt;I&#39;, raw, lang_base + 10 + 0 * 4)[0]
+            v2 = struct.unpack_from(&#39;&lt;I&#39;, raw, lang_base + 10 + 2 * 4)[0]
+            if v0 != 0 and (lang_id == 1033 or branding_text == 0):
+                branding_text = v0
+            if v2 != 0 and (lang_id == 1033 or name_val == 0):
+                name_val = v2
+
+        if name_val != 0:
+            writer.write(&#39;Name&#39;)
+            s = header._read_string(name_val)
+            if s:
+                writer.space_quoted(s)
+            writer.newline()
+
+        if branding_text != 0:
+            writer.write(&#39;BrandingText&#39;)
+            s = header._read_string(branding_text)
+            if s:
+                writer.space_quoted(s)
+            writer.newline()
+
+        for i in range(bh_langtbl.count):
+            lang_base = bh_langtbl.offset + langtable_size * i
+            if lang_base + 10 &gt; len(raw):
+                break
+            lang_id = struct.unpack_from(&#39;&lt;H&#39;, raw, lang_base)[0]
+            writer.newline()
+            writer.comment(F&#39;LANG: {lang_id}&#39;)
+            writer.newline()
+
+            for j in range(num_strings):
+                str_off = lang_base + 10 + j * 4
+                if str_off + 4 &gt; len(raw):
+                    break
+                val = struct.unpack_from(&#39;&lt;I&#39;, raw, str_off)[0]
+                if val != 0 and j != license_lang_index:
+                    writer.write(F&#39;LangString LSTR_{j} {lang_id}&#39;)
+                    s = header._read_string(val)
+                    if s:
+                        writer.space_quoted(nsis_escape(s))
+                    writer.newline()
+            writer.newline()
+
+    on_func_count = len(ON_FUNCS)
+    if header.bh_pages.offset == 276:
+        on_func_count -= 1
+
+    p2_after = params_offset + 40 + on_func_count * 4
+    writer.newline()
+
+    for i in range(NSIS_MAX_INST_TYPES + 1):
+        off = p2_after + i * 4
+        if off + 4 &gt; len(raw):
+            break
+        inst_type = _get32(off)
+        if inst_type != 0:
+            writer.write(&#39;InstType&#39;)
+            s = &#39;&#39;
+            if not is_installer:
+                s = &#39;un.&#39;
+            resolved = header._read_string(inst_type)
+            if resolved:
+                s += resolved
+            writer.space_quoted(s)
+            writer.newline()
+
+    install_dir_off = p2_after + (NSIS_MAX_INST_TYPES + 1) * 4
+    if install_dir_off + 4 &lt;= len(raw):
+        install_dir = _get32(install_dir_off)
+        if install_dir != 0:
+            writer.write(&#39;InstallDir&#39;)
+            s = header._read_string(install_dir)
+            if s:
+                writer.space_quoted(nsis_escape(s))
+            writer.newline()
+
+    if header.bh_pages.offset &gt;= 288:
+        post_off = install_dir_off + 4
+        for i in range(4):
+            if i != 0 and header.bh_pages.offset &lt; 300:
+                break
+            if post_off + 4 &gt; len(raw):
+                break
+            param = _get32(post_off + 4 * i)
+            if param == 0 or param == 0xFFFFFFFF:
+                continue
+            writer.comment(F&#39;{_POST_STRINGS[i]} =&#39;)
+            s = header._read_string(param)
+            if s:
+                writer.space_quoted(nsis_escape(s))
+            writer.newline()
+
+    writer.newline()
+
+
+SW_HIDE = 0
+SW_SHOWNORMAL = 1
+SW_SHOWMINIMIZED = 2
+SW_SHOWMINNOACTIVE = 7
+SW_SHOWNA = 8
+
+GENERIC_READ = 1 &lt;&lt; 31
+GENERIC_WRITE = 1 &lt;&lt; 30
+GENERIC_EXECUTE = 1 &lt;&lt; 29
+GENERIC_ALL = 1 &lt;&lt; 28
+
+CREATE_NEW = 1
+CREATE_ALWAYS = 2
+OPEN_EXISTING = 3
+OPEN_ALWAYS = 4
+TRUNCATE_EXISTING = 5
+
+TRANSPARENT = 1
+
+COLORS_TEXT = 1
+COLORS_TEXT_SYS = 2
+COLORS_BK = 4
+COLORS_BK_SYS = 8
+COLORS_BKB = 16
+
+CTL_COLORS_SIZE = 24
+
+K_EXEC_FLAGS_ERRORS = 2
+K_EXEC_FLAGS_DETAILS_PRINT = 13
+
+K_INTOP_OPS = &#39;+-*/|&amp;^!|&amp;%&lt;&gt;&#39;
+
+
+def _add_goto_var(writer: NSScriptWriter, header: NSHeader, param: int):
+    writer.space()
+    signed = param if param &lt; 0x80000000 else param - 0x100000000
+    if signed &lt; 0:
+        writer.write(header._string_code_variable(-(signed + 1)))
+    else:
+        writer.write(F&#39;label_{param - 1}&#39;)
+
+
+def _add_goto_var1(writer: NSScriptWriter, header: NSHeader, param: int):
+    if param == 0:
+        writer.write(&#39; 0&#39;)
+    else:
+        _add_goto_var(writer, header, param)
+
+
+def _add_goto_vars2(writer: NSScriptWriter, header: NSHeader, p0: int, p1: int):
+    _add_goto_var1(writer, header, p0)
+    if p1 != 0:
+        _add_goto_var(writer, header, p1)
+
+
+def _add_param(writer: NSScriptWriter, header: NSHeader, param: int):
+    writer.space()
+    s = header._read_string(param)
+    if s is not None:
+        writer.add_quoted(nsis_escape(s))
+    else:
+        writer.add_uint(param)
+
+
+def _add_param_var(writer: NSScriptWriter, header: NSHeader, param: int):
+    writer.space()
+    writer.write(header._string_code_variable(param))
+
+
+def _add_params(writer: NSScriptWriter, header: NSHeader, params: list[int], num: int):
+    for i in range(num):
+        _add_param(writer, header, params[i])
+
+
+def _add_optional_param(writer: NSScriptWriter, header: NSHeader, param: int):
+    if param != 0:
+        _add_param(writer, header, param)
+
+
+def _add_optional_params(
+    writer: NSScriptWriter, header: NSHeader, params: list[int], num: int,
+):
+    actual = num
+    while actual &gt; 0 and params[actual - 1] == 0:
+        actual -= 1
+    _add_params(writer, header, params, actual)
+
+
+def render_opcode(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    instruction: NSScriptInstruction | NSScriptExtendedInstruction,
+    opcode: Op,
+    labels: list[int],
+    raw: bytes,
+    overwrite_state: list[int],
+    address: int,
+    commented: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Render a single NSIS opcode&#39;s arguments to the writer. Handles all opcodes except Ret and
+    INVALID_OPCODE, which require structural context handled by the caller.
+    &#34;&#34;&#34;
+    params = instruction.arguments
+
+    if opcode is Op.Nop:
+        if params[0] == 0:
+            writer.write(&#39;Nop&#39;)
+        else:
+            writer.write(&#39;Goto&#39;)
+            _add_goto_var(writer, header, params[0])
+
+    elif opcode is Op.Abort:
+        writer.write(opcode.name)
+        _add_optional_param(writer, header, params[0])
+
+    elif opcode is Op.Quit:
+        writer.write(opcode.name)
+
+    elif opcode is Op.Call:
+        writer.write(&#39;Call &#39;)
+        signed_p0 = params[0] if params[0] &lt; 0x80000000 else params[0] - 0x100000000
+        if signed_p0 &lt; 0:
+            writer.write(header._string_code_variable(-(signed_p0 + 1)))
+        elif params[0] == 0:
+            writer.write(&#39;0&#39;)
+        else:
+            val = params[0] - 1
+            if params[1] == 1:
+                writer.write(F&#39;:label_{val}&#39;)
+            else:
+                writer.write(_func_name(labels, val))
+
+    elif opcode is Op.DetailPrint or opcode is Op.Sleep:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.BringToFront:
+        writer.write(opcode.name)
+
+    elif opcode is Op.SetDetailsView:
+        writer.write(opcode.name)
+        if params[0] == SW_SHOWNA and params[1] == SW_HIDE:
+            writer.write(&#39; show&#39;)
+        elif params[1] == SW_SHOWNA and params[0] == SW_HIDE:
+            writer.write(&#39; hide&#39;)
+        else:
+            for i in range(2):
+                writer.space()
+                writer.write(decode_showwindow(params[i]))
+
+    elif opcode is Op.SetFileAttributes:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        writer.space()
+        writer.write(decode_file_attributes(params[1]))
+
+    elif opcode is Op.CreateDirectory:
+        is_set_out_path = params[1] != 0
+        writer.write(&#39;SetOutPath&#39; if is_set_out_path else &#39;CreateDirectory&#39;)
+        _add_param(writer, header, params[0])
+        if params[2] != 0:
+            writer.small_space_comment()
+            writer.write(&#39;CreateRestrictedDirectory&#39;)
+
+    elif opcode is Op.IfFileExists:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        _add_goto_vars2(writer, header, params[1], params[2])
+
+    elif opcode is Op.SetFlag:
+        s_val = header._read_string(params[1]) or &#39;&#39;
+        if params[0] == K_EXEC_FLAGS_ERRORS and params[2] == 0:
+            if s_val == &#39;0&#39;:
+                writer.write(&#39;ClearErrors&#39;)
+            else:
+                writer.write(&#39;SetErrors&#39;)
+        else:
+            writer.write(&#39;Set&#39;)
+            writer.write(decode_exec_flags(params[0]))
+            if params[2] != 0:
+                writer.write(&#39; lastused&#39;)
+            else:
+                decoded = _decode_flag_value(params[0], s_val)
+                if decoded is not None:
+                    writer.space()
+                    writer.write(decoded)
+                else:
+                    writer.space_quoted(nsis_escape(s_val))
+
+    elif opcode is Op.IfFlag:
+        writer.write(&#39;If&#39;)
+        writer.write(decode_exec_flags(params[2]))
+        _add_goto_vars2(writer, header, params[0], params[1])
+
+    elif opcode is Op.GetFlag:
+        writer.write(&#39;Get&#39;)
+        writer.write(decode_exec_flags(params[1]))
+        _add_param_var(writer, header, params[0])
+
+    elif opcode is Op.Rename:
+        writer.write(opcode.name)
+        if params[2] != 0:
+            writer.write(&#39; /REBOOTOK&#39;)
+        _add_params(writer, header, params, 2)
+        if params[3] != 0:
+            writer.small_space_comment()
+            _add_param(writer, header, params[3])
+
+    elif opcode is Op.GetFullPathName:
+        writer.write(opcode.name)
+        if params[2] == 0:
+            writer.write(&#39; /SHORT&#39;)
+        _add_param_var(writer, header, params[1])
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.SearchPath or opcode is Op.StrLen:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.GetTempFileName:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        s = header._read_string(params[1])
+        if s and s != &#39;$TEMP&#39;:
+            writer.space_quoted(nsis_escape(s))
+
+    elif opcode is Op.ExtractFile:
+        overwrite = params[0] &amp; 0x7
+        if overwrite != overwrite_state[0]:
+            writer.write(&#39;SetOverwrite &#39;)
+            writer.write(decode_setoverwrite(overwrite))
+            overwrite_state[0] = overwrite
+            writer.newline()
+            writer.tab(commented)
+        writer.write(&#39;File&#39;)
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.Delete:
+        writer.write(opcode.name)
+        flag = params[1]
+        if flag &amp; DEL_REBOOT:
+            writer.write(&#39; /REBOOTOK&#39;)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.MessageBox:
+        writer.write(opcode.name)
+        writer.space()
+        writer.write(decode_messagebox(params[0]))
+        _add_param(writer, header, params[1])
+        button_id = params[0] &gt;&gt; 21
+        if button_id != 0:
+            writer.write(&#39; /SD&#39;)
+            writer.write(decode_button_id(button_id))
+        for i in range(2, 6, 2):
+            if params[i] != 0:
+                writer.space()
+                writer.write(decode_button_id(params[i]))
+                _add_goto_var1(writer, header, params[i + 1])
+
+    elif opcode is Op.RMDir:
+        writer.write(opcode.name)
+        flag = params[1]
+        if flag &amp; DEL_RECURSE:
+            writer.write(&#39; /r&#39;)
+        if flag &amp; DEL_REBOOT:
+            writer.write(&#39; /REBOOTOK&#39;)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.AssignVar:
+        writer.write(&#39;StrCpy&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+        _add_optional_params(writer, header, params[2:4], 2)
+
+    elif opcode is Op.StrCmp:
+        writer.write(&#39;StrCmpS&#39; if params[4] != 0 else &#39;StrCmp&#39;)
+        _add_params(writer, header, params, 2)
+        _add_goto_vars2(writer, header, params[2], params[3])
+
+    elif opcode is Op.ReadEnvStr:
+        writer.write(&#39;ReadEnvStr&#39; if params[2] != 0 else &#39;ExpandEnvStrings&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.IntCmp:
+        writer.write(&#39;IntCmpU&#39; if params[5] != 0 else &#39;IntCmp&#39;)
+        _add_params(writer, header, params, 2)
+        _add_goto_var1(writer, header, params[2])
+        if params[3] != 0 or params[4] != 0:
+            _add_goto_vars2(writer, header, params[3], params[4])
+
+    elif opcode is Op.IntOp:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        op_index = params[3]
+        c = K_INTOP_OPS[op_index] if op_index &lt; 13 else &#39;?&#39;
+        c2 = &#39;&#39; if (op_index &lt; 8 or op_index == 10) else c
+        num_ops = 1 if op_index == 7 else 2
+        _add_param(writer, header, params[1])
+        writer.space()
+        writer.write(c)
+        if num_ops != 1:
+            if c2:
+                writer.write(c2)
+            _add_param(writer, header, params[2])
+
+    elif opcode is Op.IntFmt:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_params(writer, header, params[1:3], 2)
+
+    elif opcode is Op.PushPop:
+        if params[2] != 0:
+            writer.write(&#39;Exch&#39;)
+            if params[2] != 1:
+                writer.write(F&#39; {params[2]}&#39;)
+        elif params[1] != 0:
+            writer.write(&#39;Pop&#39;)
+            _add_param_var(writer, header, params[0])
+        else:
+            writer.write(&#39;Push&#39;)
+            _add_param(writer, header, params[0])
+
+    elif opcode is Op.FindWindow:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+        _add_optional_params(writer, header, params[2:5], 3)
+
+    elif opcode is Op.SendMessage:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[1])
+        _add_param(writer, header, params[2])
+        spec = params[5]
+        for i in range(2):
+            prefix = &#39;STR:&#39; if (spec &amp; (1 &lt;&lt; i)) else &#39;&#39;
+            s = header._read_string(params[3 + i])
+            writer.space_quoted(prefix + nsis_escape(s or &#39;&#39;))
+        signed_p0 = params[0] if params[0] &lt; 0x80000000 else params[0] - 0x100000000
+        if signed_p0 &gt;= 0:
+            _add_param_var(writer, header, params[0])
+        timeout = spec &gt;&gt; 2
+        if timeout != 0:
+            writer.write(F&#39; /TIMEOUT={timeout}&#39;)
+
+    elif opcode is Op.IsWindow:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        _add_goto_vars2(writer, header, params[1], params[2])
+
+    elif opcode is Op.GetDlgItem:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_params(writer, header, params[1:3], 2)
+
+    elif opcode is Op.SetCtlColors:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        offset = params[1]
+        bh_cc = header.bh_ctlcolors
+        if (
+            header.raw_size &lt; bh_cc.offset
+            or header.raw_size - bh_cc.offset &lt; offset
+            or header.raw_size - bh_cc.offset - offset &lt; CTL_COLORS_SIZE
+        ):
+            writer.write(&#39; ; bad offset&#39;)
+        else:
+            p2 = bh_cc.offset + offset
+            cc_text = struct.unpack_from(&#39;&lt;I&#39;, raw, p2)[0]
+            cc_bkc = struct.unpack_from(&#39;&lt;I&#39;, raw, p2 + 4)[0]
+            cc_bkmode = struct.unpack_from(&#39;&lt;i&#39;, raw, p2 + 16)[0]
+            cc_flags = struct.unpack_from(&#39;&lt;i&#39;, raw, p2 + 20)[0]
+            if (cc_flags &amp; COLORS_BK_SYS) or (cc_flags &amp; COLORS_TEXT_SYS):
+                writer.write(&#39; /BRANDING&#39;)
+            bk = &#39;&#39;
+            bkc_print = False
+            if cc_bkmode == TRANSPARENT:
+                bk = &#39; transparent&#39;
+            elif cc_flags &amp; COLORS_BKB:
+                if not (cc_flags &amp; COLORS_BK_SYS) and (cc_flags &amp; COLORS_BK):
+                    bkc_print = True
+            if (cc_flags &amp; COLORS_TEXT) or bk or bkc_print:
+                writer.space()
+                if (cc_flags &amp; COLORS_TEXT_SYS) or not (cc_flags &amp; COLORS_TEXT):
+                    writer.add_quotes()
+                else:
+                    writer.add_color(cc_text)
+            writer.write(bk)
+            if bkc_print:
+                writer.space()
+                writer.add_color(cc_bkc)
+
+    elif opcode is Op.SetBrandingImage:
+        writer.write(opcode.name)
+        writer.write(F&#39; /IMGID={params[1]}&#39;)
+        if params[2] == 1:
+            writer.write(&#39; /RESIZETOFIT&#39;)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.CreateFont:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+        _add_optional_params(writer, header, params[2:4], 2)
+        if params[4] &amp; 1:
+            writer.write(&#39; /ITALIC&#39;)
+        if params[4] &amp; 2:
+            writer.write(&#39; /UNDERLINE&#39;)
+        if params[4] &amp; 4:
+            writer.write(&#39; /STRIKE&#39;)
+
+    elif opcode is Op.ShowWindow:
+        if params[3] != 0:
+            writer.write(&#39;EnableWindow&#39;)
+        else:
+            writer.write(&#39;ShowWindow&#39;)
+        _add_param(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.ExecShell:
+        writer.write(opcode.name)
+        _add_params(writer, header, params, 2)
+        if params[2] != 0 or params[3] != SW_SHOWNORMAL:
+            _add_param(writer, header, params[2])
+            if params[3] != SW_SHOWNORMAL:
+                writer.space()
+                writer.write(decode_showwindow(params[3]))
+        if params[5] != 0:
+            writer.write(&#39;    ;&#39;)
+            _add_param(writer, header, params[5])
+
+    elif opcode is Op.Exec:
+        writer.write(&#39;ExecWait&#39; if params[2] != 0 else &#39;Exec&#39;)
+        _add_param(writer, header, params[0])
+        signed_p1 = params[1] if params[1] &lt; 0x80000000 else params[1] - 0x100000000
+        if params[2] != 0 and signed_p1 &gt;= 0:
+            _add_param_var(writer, header, params[1])
+
+    elif opcode is Op.GetFileTime or opcode is Op.GetDLLVersion:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[2])
+        _add_param_var(writer, header, params[0])
+        _add_param_var(writer, header, params[1])
+
+    elif opcode is Op.RegisterDll:
+        func_str = header._read_string(params[1]) or &#39;&#39;
+        print_func = True
+        if params[2] == 0:
+            writer.write(&#39;CallInstDLL&#39;)
+            _add_param(writer, header, params[0])
+            if params[3] == 1:
+                writer.write(&#39; /NOUNLOAD&#39;)
+        else:
+            if func_str == &#39;DllUnregisterServer&#39;:
+                writer.write(&#39;UnRegDLL&#39;)
+                print_func = False
+            else:
+                writer.write(&#39;RegDLL&#39;)
+                if func_str == &#39;DllRegisterServer&#39;:
+                    print_func = False
+            _add_param(writer, header, params[0])
+        if print_func:
+            writer.space_quoted(nsis_escape(func_str))
+
+    elif opcode is Op.CreateShortCut:
+        writer.write(opcode.name)
+        num_params = 6
+        while num_params &gt; 2 and params[num_params - 1] == 0:
+            num_params -= 1
+        spec = params[4]
+        if spec &amp; 0x8000:
+            writer.write(&#39; /NoWorkingDir&#39;)
+        _add_params(writer, header, params, min(num_params, 4))
+        if num_params &lt;= 4:
+            pass
+        else:
+            icon = spec &amp; 0xFF
+            writer.space()
+            if icon != 0:
+                writer.add_uint(icon)
+            else:
+                writer.add_quotes()
+            sw = (spec &gt;&gt; 8) &amp; 0x7F
+            if (spec &gt;&gt; 8) == 0 and num_params &lt; 6:
+                pass
+            else:
+                if sw == SW_SHOWMINNOACTIVE:
+                    sw = SW_SHOWMINIMIZED
+                writer.space()
+                if sw == 0:
+                    writer.add_quotes()
+                else:
+                    writer.write(decode_showwindow(sw))
+                hotkey = decode_shortcut_hotkey(spec)
+                if hotkey:
+                    writer.space()
+                    writer.write(hotkey)
+                elif num_params &gt;= 6:
+                    writer.space()
+                    writer.add_quotes()
+                _add_optional_param(writer, header, params[5])
+
+    elif opcode is Op.CopyFiles:
+        writer.write(opcode.name)
+        if params[2] &amp; 0x04:
+            writer.write(&#39; /SILENT&#39;)
+        if params[2] &amp; 0x80:
+            writer.write(&#39; /FILESONLY&#39;)
+        _add_params(writer, header, params, 2)
+        if params[3] != 0:
+            writer.write(&#39;    ;&#39;)
+            _add_param(writer, header, params[3])
+
+    elif opcode is Op.Reboot:
+        writer.write(opcode.name)
+        if params[0] != 0xBADF00D:
+            writer.write(&#39; ; Corrupted ???&#39;)
+
+    elif opcode is Op.WriteINI:
+        num_always = 0
+        if params[0] == 0:
+            writer.write(&#39;FlushINI&#39;)
+        elif params[4] != 0:
+            writer.write(&#39;WriteINIStr&#39;)
+            num_always = 3
+        else:
+            writer.write(&#39;DeleteINI&#39;)
+            writer.write(&#39;Sec&#39; if params[1] == 0 else &#39;Str&#39;)
+            num_always = 1
+        _add_param(writer, header, params[3])
+        _add_params(writer, header, params, num_always)
+        _add_optional_params(writer, header, params[num_always:3], 3 - num_always)
+
+    elif opcode is Op.ReadINIStr:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[3])
+        _add_params(writer, header, params[1:3], 2)
+
+    elif opcode is Op.DeleteReg:
+        writer.write(opcode.name)
+        if params[4] == 0:
+            writer.write(&#39;Value&#39;)
+        else:
+            writer.write(&#39;Key&#39;)
+            if params[4] &amp; 2:
+                writer.write(&#39; /ifempty&#39;)
+        writer.space()
+        writer.write(decode_reg_root(params[1]))
+        _add_param(writer, header, params[2])
+        _add_optional_param(writer, header, params[3])
+
+    elif opcode is Op.WriteReg:
+        writer.write(opcode.name)
+        reg_type_name = {1: &#39;Str&#39;, 2: &#39;ExpandStr&#39;, 3: &#39;Bin&#39;, 4: &#39;DWORD&#39;}.get(params[4])
+        if params[4] == 1 and params[5] == 2:
+            reg_type_name = &#39;ExpandStr&#39;
+        if reg_type_name:
+            writer.write(reg_type_name)
+        else:
+            writer.write(F&#39;?{params[4]}&#39;)
+        writer.space()
+        writer.write(decode_reg_root(params[0]))
+        _add_params(writer, header, params[1:3], 2)
+        if params[4] != 3:
+            _add_param(writer, header, params[3])
+        else:
+            writer.write(F&#39; data[{params[3]} ... ]&#39;)
+
+    elif opcode is Op.ReadReg:
+        writer.write(opcode.name)
+        writer.write(&#39;DWORD&#39; if params[4] == 1 else &#39;Str&#39;)
+        _add_param_var(writer, header, params[0])
+        writer.space()
+        writer.write(decode_reg_root(params[1]))
+        _add_params(writer, header, params[2:4], 2)
+
+    elif opcode is Op.EnumReg:
+        writer.write(opcode.name)
+        writer.write(&#39;Key&#39; if params[4] != 0 else &#39;Value&#39;)
+        _add_param_var(writer, header, params[0])
+        writer.space()
+        writer.write(decode_reg_root(params[1]))
+        _add_params(writer, header, params[2:4], 2)
+
+    elif opcode is Op.FileClose or opcode is Op.FindClose:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+
+    elif opcode is Op.FileOpen:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[3])
+        acc = params[1]
+        creat = params[2]
+        if acc != 0 or creat != 0:
+            cc = &#39;&#39;
+            if acc == GENERIC_READ and creat == OPEN_EXISTING:
+                cc = &#39;r&#39;
+            elif creat == CREATE_ALWAYS and acc == GENERIC_WRITE:
+                cc = &#39;w&#39;
+            elif creat == OPEN_ALWAYS and acc == (GENERIC_WRITE | GENERIC_READ):
+                cc = &#39;a&#39;
+            if cc:
+                writer.write(F&#39; {cc}&#39;)
+            else:
+                if acc &amp; GENERIC_READ:
+                    writer.write(&#39; GENERIC_READ&#39;)
+                if acc &amp; GENERIC_WRITE:
+                    writer.write(&#39; GENERIC_WRITE&#39;)
+                if acc &amp; GENERIC_EXECUTE:
+                    writer.write(&#39; GENERIC_EXECUTE&#39;)
+                if acc &amp; GENERIC_ALL:
+                    writer.write(&#39; GENERIC_ALL&#39;)
+                creat_name = {
+                    CREATE_NEW: &#39;CREATE_NEW&#39;,
+                    CREATE_ALWAYS: &#39;CREATE_ALWAYS&#39;,
+                    OPEN_EXISTING: &#39;OPEN_EXISTING&#39;,
+                    OPEN_ALWAYS: &#39;OPEN_ALWAYS&#39;,
+                    TRUNCATE_EXISTING: &#39;TRUNCATE_EXISTING&#39;,
+                }.get(creat)
+                writer.space()
+                writer.write(creat_name or str(creat))
+
+    elif opcode is Op.FileWrite or opcode is Op.FileWriteW:
+        writer.write(&#39;FileWrite&#39;)
+        if opcode is Op.FileWriteW:
+            writer.write(&#39;UTF16LE&#39; if params[2] == 0 else &#39;Word&#39;)
+        elif params[2] != 0:
+            writer.write(&#39;Byte&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.FileRead or opcode is Op.FileReadW:
+        writer.write(&#39;FileRead&#39;)
+        if opcode is Op.FileReadW:
+            writer.write(&#39;UTF16LE&#39; if params[3] == 0 else &#39;Word&#39;)
+        elif params[3] != 0:
+            writer.write(&#39;Byte&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param_var(writer, header, params[1])
+        _add_optional_param(writer, header, params[2])
+
+    elif opcode is Op.FileSeek:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[2])
+        if params[3] == 1:
+            writer.write(&#39; CUR&#39;)
+        if params[3] == 2:
+            writer.write(&#39; END&#39;)
+        signed_p1 = params[1] if params[1] &lt; 0x80000000 else params[1] - 0x100000000
+        if signed_p1 &gt;= 0:
+            if params[3] == 0:
+                writer.write(&#39; SET&#39;)
+            _add_param_var(writer, header, params[1])
+
+    elif opcode is Op.FindNext:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[1])
+        _add_param_var(writer, header, params[0])
+
+    elif opcode is Op.FindFirst:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[1])
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[2])
+
+    elif opcode is Op.WriteUninstaller:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        if params[3] != 0:
+            writer.small_space_comment()
+            _add_param(writer, header, params[3])
+
+    elif opcode is Op.SectionSet:
+        writer.write(&#39;Section&#39;)
+        signed_p2 = params[2] if params[2] &lt; 0x80000000 else params[2] - 0x100000000
+        if signed_p2 &gt;= 0:
+            writer.write(&#39;Get&#39;)
+            writer.write(decode_sect_op(params[2]))
+            _add_param(writer, header, params[0])
+            _add_param_var(writer, header, params[1])
+        else:
+            writer.write(&#39;Set&#39;)
+            t = -(signed_p2) - 1
+            writer.write(decode_sect_op(t))
+            _add_param(writer, header, params[0])
+            _add_param(writer, header, params[4] if t == 0 else params[1])
+
+    elif opcode is Op.InstTypeSet:
+        if params[3] == 0:
+            if params[2] == 0:
+                writer.write(&#39;InstTypeGetText&#39;)
+                _add_param(writer, header, params[0])
+                _add_param_var(writer, header, params[1])
+            else:
+                writer.write(&#39;InstTypeSetText&#39;)
+                _add_params(writer, header, params, 2)
+        else:
+            if params[2] == 0:
+                writer.write(&#39;GetCurInstType&#39;)
+                _add_param_var(writer, header, params[1])
+            else:
+                writer.write(&#39;SetCurInstType&#39;)
+                _add_param(writer, header, params[0])
+
+    elif opcode is Op.LockWindow:
+        writer.write(opcode.name)
+        writer.write(&#39; on&#39; if params[0] == 0 else &#39; off&#39;)
+
+    elif opcode is Op.Log:
+        if params[0] != 0:
+            writer.write(&#39;LogSet &#39;)
+            writer.write(&#39;off&#39; if params[1] == 0 else &#39;on&#39;)
+        else:
+            writer.write(&#39;LogText&#39;)
+            _add_param(writer, header, params[1])
+
+    elif opcode is Op.FindProc:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.GetFontVersion or opcode is Op.GetFontName:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.GetOSInfo:
+        writer.write(opcode.name)
+
+    elif opcode is Op.ReservedOpcode:
+        writer.write(&#39;GetFunctionAddress&#39;)
+
+    else:
+        writer.write(F&#39;Command{int(opcode)}&#39;)
+
+
+def emit_commands(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    label_info: LabelInfo,
+    sections: list[NSSection],
+    is_installer: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Emit the main instruction body: per-opcode decompilation switch, section open/close, function
+    open/close, and label markers. Function bodies are rendered using structural analysis to
+    recover If/Else constructs with indentation.
+    &#34;&#34;&#34;
+    from refinery.lib.nsis.controlflow import (
+        build_cfg,
+        eliminate_dead_code,
+        linearize,
+        reduce_if_else,
+        reduce_loops,
+        render_node,
+    )
+
+    labels = label_info.labels
+    num_instructions = len(header.instructions)
+    num_sections = len(sections)
+
+    overwrite_state = [0]
+    cur_section_index = 0
+    section_is_open = False
+    on_func_is_open = False
+    end_comment_index = 0
+
+    raw = bytes(header.raw_data)
+
+    func_ranges: dict[int, int] = {}
+    k = 0
+    while k &lt; num_instructions:
+        flg = labels[k]
+        if not is_func(flg):
+            k += 1
+            continue
+        func_start = k
+        k += 1
+        while k &lt; num_instructions:
+            insn = header.instructions[k]
+            opcode = header.opcode(insn)
+            if opcode is Op.Ret:
+                if k + 1 &gt;= num_instructions or is_probably_end_of_func(labels[k + 1]):
+                    func_ranges[func_start] = k + 1
+                    k += 1
+                    break
+            k += 1
+        else:
+            func_ranges[func_start] = k
+
+    writer.separator()
+
+    kkk = 0
+    while kkk &lt; num_instructions:
+        instruction = header.instructions[kkk]
+        opcode = header.opcode(instruction)
+
+        is_section_group = False
+        while cur_section_index &lt; num_sections:
+            sect = sections[cur_section_index]
+            if section_is_open:
+                if sect.start_cmd_index + sect.num_commands + 1 != kkk:
+                    break
+                format_section_end(writer)
+                section_is_open = False
+                cur_section_index += 1
+                continue
+            if sect.start_cmd_index != kkk:
+                break
+            if format_section_begin(writer, sect, cur_section_index, header._read_string, is_installer):
+                is_section_group = True
+                cur_section_index += 1
+            else:
+                section_is_open = True
+
+        if labels[kkk] != 0 and labels[kkk] != CMD_REF_Section:
+            flg = labels[kkk]
+            if is_func(flg):
+                if kkk == label_info.init_plugins_dir_start:
+                    writer.comment_open()
+                on_func_is_open = True
+                writer.write(&#39;Function &#39;)
+                writer.write(_func_name(labels, kkk))
+                if is_page_func(flg):
+                    writer.big_space_comment()
+                    writer.write(&#39;Page &#39;)
+                    writer.add_uint((flg &amp; CMD_REF_Page_Mask) &gt;&gt; CMD_REF_Page_NumShifts)
+                    if flg &amp; CMD_REF_Leave:
+                        writer.write(&#39;, Leave&#39;)
+                    if flg &amp; CMD_REF_Pre:
+                        writer.write(&#39;, Pre&#39;)
+                    if flg &amp; CMD_REF_Show:
+                        writer.write(&#39;, Show&#39;)
+                writer.newline()
+
+                if kkk in func_ranges:
+                    func_end = func_ranges[kkk]
+                    body_end = func_end - 1
+                    cfg = build_cfg(header, kkk, body_end)
+                    root = linearize(header, cfg, labels, kkk, body_end)
+                    reduced = reduce_loops(root, header)
+                    reduced = reduce_if_else(reduced, header)
+                    reduced = eliminate_dead_code(reduced)
+                    render_node(
+                        reduced, writer, header, labels, raw,
+                        overwrite_state, end_comment_index,
+                    )
+                    if labels[body_end] &amp; CMD_REF_Goto:
+                        writer.write(F&#39;label_{body_end}:&#39;)
+                        writer.newline()
+                    writer.add_string_lf(&#39;FunctionEnd&#39;)
+                    if func_end == label_info.init_plugins_dir_end:
+                        writer.comment_close()
+                    writer.newline()
+                    on_func_is_open = False
+                    kkk = func_end
+                    continue
+
+            if flg &amp; CMD_REF_Goto:
+                writer.write(F&#39;label_{kkk}:&#39;)
+                writer.newline()
+
+        commented = kkk &lt; end_comment_index
+
+        if opcode is Op.INVALID_OPCODE:
+            writer.tab(commented)
+            writer.write(F&#39;Command{instruction.opcode}&#39;)
+            writer.newline()
+
+        elif opcode is Op.Ret:
+            if on_func_is_open:
+                if kkk == num_instructions - 1 or is_probably_end_of_func(labels[kkk + 1]):
+                    writer.add_string_lf(&#39;FunctionEnd&#39;)
+                    if kkk + 1 == label_info.init_plugins_dir_end:
+                        writer.comment_close()
+                    writer.newline()
+                    on_func_is_open = False
+                    kkk += 1
+                    continue
+            if is_section_group:
+                kkk += 1
+                continue
+            if section_is_open:
+                sect = sections[cur_section_index]
+                if sect.start_cmd_index + sect.num_commands == kkk:
+                    format_section_end(writer)
+                    section_is_open = False
+                    cur_section_index += 1
+                    kkk += 1
+                    continue
+            writer.tab_string(&#39;Return&#39;)
+            writer.newline()
+
+        else:
+            writer.tab(commented)
+            render_opcode(writer, header, instruction, opcode, labels, raw, overwrite_state, kkk, commented)
+            writer.newline()
+
+        kkk += 1
+
+    if section_is_open and cur_section_index &lt; num_sections:
+        sect = sections[cur_section_index]
+        if sect.start_cmd_index + sect.num_commands + 1 == num_instructions:
+            format_section_end(writer)
+            cur_section_index += 1
+
+    while cur_section_index &lt; num_sections:
+        sect = sections[cur_section_index]
+        if section_is_open:
+            if sect.start_cmd_index + sect.num_commands != num_instructions:
+                break
+            format_section_end(writer)
+            section_is_open = False
+            cur_section_index += 1
+            continue
+        if sect.start_cmd_index != num_instructions:
+            break
+        format_section_begin(writer, sect, cur_section_index, header._read_string, is_installer)
+        cur_section_index += 1
+
+
+_GOTO_MASKS: dict[Op, int] = {
+    Op.Nop           : 1 &lt;&lt; 0,
+    Op.IfFileExists  : 3 &lt;&lt; 1,
+    Op.IfFlag        : 3 &lt;&lt; 0,
+    Op.MessageBox    : 5 &lt;&lt; 3,
+    Op.StrCmp        : 3 &lt;&lt; 2,
+    Op.IntCmp        : 7 &lt;&lt; 2,
+    Op.IsWindow      : 3 &lt;&lt; 1,
+}
+
+
+def is_func(flag: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether a label flag indicates a function start.
+    &#34;&#34;&#34;
+    return bool(flag &amp; (CMD_REF_Call | CMD_REF_Pre | CMD_REF_Show | CMD_REF_Leave | CMD_REF_OnFunc))
+
+
+def is_page_func(flag: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether a label flag indicates a page callback function.
+    &#34;&#34;&#34;
+    return bool(flag &amp; (CMD_REF_Pre | CMD_REF_Show | CMD_REF_Leave))
+
+
+def is_probably_end_of_func(flag: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether a label flag likely ends a function body.
+    &#34;&#34;&#34;
+    return flag != 0 and flag != CMD_REF_Goto
+
+
+@dataclasses.dataclass
+class LabelInfo:
+    &#34;&#34;&#34;
+    Result of label analysis pass over NSIS instructions.
+    &#34;&#34;&#34;
+    labels: list[int]
+    init_plugins_dir_start: int = -1
+    init_plugins_dir_end: int = -1
+
+
+def build_labels(header: NSHeader, sections: list[NSSection]) -&gt; LabelInfo:
+    &#34;&#34;&#34;
+    Build the label array from an NSHeader. Each entry is a bitmask indicating whether the
+    instruction at that index is a jump target, call target, function start, section start,
+    onFunc entry, or InitPluginsDir.
+    &#34;&#34;&#34;
+    num_instructions = len(header.instructions)
+    labels = [0] * num_instructions
+    raw = bytes(header.raw_data)
+
+    bho_size = 12 if header.is64bit else 8
+    params_offset = 4 + bho_size * 8
+    if header.bh_pages.offset == 276:
+        params_offset -= bho_size
+    on_func_offset = params_offset + 40
+    num_on_func = len(ON_FUNCS)
+    if header.bh_pages.offset == 276:
+        num_on_func -= 1
+
+    for i in range(num_on_func):
+        off = on_func_offset + 4 * i
+        if off + 4 &lt;= len(raw):
+            func = struct.unpack_from(&#39;&lt;I&#39;, raw, off)[0]
+            if func &lt; num_instructions:
+                labels[func] = (labels[func] &amp; ~CMD_REF_OnFunc_Mask) | (CMD_REF_OnFunc | (i &lt;&lt; CMD_REF_OnFunc_NumShifts))
+
+    for section in sections:
+        if section.start_cmd_index &lt; num_instructions:
+            labels[section.start_cmd_index] |= CMD_REF_Section
+
+    for instruction in header.instructions:
+        opcode = header.opcode(instruction)
+        args = instruction.arguments
+
+        if opcode is Op.Call:
+            if len(args) &gt; 1 and args[1] == 1:
+                param0 = args[0]
+                if 0 &lt; param0 &lt;= num_instructions:
+                    labels[param0 - 1] |= CMD_REF_Goto
+            else:
+                param0 = args[0]
+                if param0 &gt; 0 and param0 &lt;= num_instructions:
+                    labels[param0 - 1] |= CMD_REF_Call
+            continue
+
+        mask = _GOTO_MASKS.get(opcode)
+        if mask is None:
+            continue
+
+        for i in range(6):
+            if not mask:
+                break
+            if mask &amp; 1:
+                param = args[i] if i &lt; len(args) else 0
+                signed = param if param &lt; 0x80000000 else param - 0x100000000
+                if signed &gt; 0 and param &lt;= num_instructions:
+                    labels[param - 1] |= CMD_REF_Goto
+            mask &gt;&gt;= 1
+
+    init_start = -1
+    init_end = -1
+    ipd_len = len(INITPLUGINDIR_OPCODES)
+    for k in range(num_instructions):
+        flg = labels[k]
+        if not is_func(flg):
+            continue
+        if num_instructions - k &lt; ipd_len:
+            continue
+        match = True
+        for j in range(ipd_len):
+            insn = header.instructions[k + j]
+            cmd_id = header.opcode(insn)
+            if cmd_id != INITPLUGINDIR_OPCODES[j]:
+                match = False
+                break
+        if match:
+            init_start = k
+            init_end = k + ipd_len
+            labels[k] |= CMD_REF_InitPluginDir
+            break
+
+    return LabelInfo(
+        labels=labels,
+        init_plugins_dir_start=init_start,
+        init_plugins_dir_end=init_end,
+    )
+
+
+class NSDecompiler:
+    &#34;&#34;&#34;
+    Produces NSIS script output from a parsed NSIS header, combining header info emission, page
+    emission, and per-opcode command emission.
+    &#34;&#34;&#34;
+
+    def __init__(self, header: NSHeader, archive: NSArchive | None = None):
+        self.header = header
+        self.archive = archive
+        self.is_installer = True
+        if archive is not None:
+            self.is_installer = not bool(archive.flags &amp; NSHeaderFlags.Uninstall)
+
+    def decompile(self) -&gt; str:
+        header = self.header
+        writer = NSScriptWriter()
+        sections = header.sections
+        label_info = build_labels(header, sections)
+        emit_header_info(writer, header, self.archive, self.is_installer)
+        emit_pages(writer, header, label_info.labels, self.is_installer)
+        emit_commands(writer, header, label_info, sections, self.is_installer)
+        return writer.getvalue()
+
+
+class NSDisassembler:
+    &#34;&#34;&#34;
+    Produces a flat opcode listing from an NSIS script header.
+    &#34;&#34;&#34;
+
+    def __init__(self, header: NSHeader):
+        self.header = header
+
+    def disassemble(self) -&gt; str:
+        header = self.header
+        script = io.StringIO()
+        name_width = max(len(op.name) for op in Op)
+        addr_width = len(F&#39;{len(header.instructions):X}&#39;)
+        for k, instruction in enumerate(header.instructions):
+            if k &gt; 0:
+                script.write(&#39;\n&#39;)
+            opcode = header.opcode(instruction)
+            if opcode is Op.INVALID_OPCODE:
+                name = F&#39;Command{instruction.opcode}&#39;
+            else:
+                name = opcode.name
+            script.write(F&#39;0x{k:0{addr_width}X}: {name:&lt;{name_width}} &#39;)
+            for j, arg in enumerate(
+                instruction.arguments[:OP_PARAMETER_COUNT.get(opcode, 6)]
+            ):
+                if j &gt; 0:
+                    script.write(&#39;, &#39;)
+                if arg &gt; 20 and header._is_good_string(arg):
+                    script.write(repr(header._read_string(arg)))
+                elif arg &lt; 0x100:
+                    script.write(str(arg))
+                elif arg &lt; 0x10000:
+                    script.write(F&#39;0x{arg:04X}&#39;)
+                else:
+                    script.write(F&#39;0x{arg:08X}&#39;)
+        return script.getvalue()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.nsis.decompiler.decode_messagebox"><code class="name flex">
+<span>def <span class="ident">decode_messagebox</span></span>(<span>param)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode MB_* flags from a single uint32 into a pipe-delimited string.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L242-L274" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_messagebox(param: int) -&gt; str:
+    &#34;&#34;&#34;
+    Decode MB_* flags from a single uint32 into a pipe-delimited string.
+    &#34;&#34;&#34;
+    parts: list[str] = []
+    v = param &amp; 0xF
+    if v &lt; len(_MB_BUTTONS):
+        parts.append(F&#39;MB_{_MB_BUTTONS[v]}&#39;)
+    else:
+        parts.append(F&#39;MB_Buttons_{v}&#39;)
+    icon = (param &gt;&gt; 4) &amp; 0x7
+    if icon != 0:
+        if icon &lt; len(_MB_ICONS) and _MB_ICONS[icon] is not None:
+            parts.append(F&#39;MB_{_MB_ICONS[icon]}&#39;)
+        else:
+            parts.append(F&#39;MB_Icon_{icon}&#39;)
+    if param &amp; 0x80:
+        parts.append(&#39;MB_USERICON&#39;)
+    def_button = (param &gt;&gt; 8) &amp; 0xF
+    if def_button != 0:
+        parts.append(F&#39;MB_DEFBUTTON{def_button + 1}&#39;)
+    modal = (param &gt;&gt; 12) &amp; 0x3
+    if modal == 1:
+        parts.append(&#39;MB_SYSTEMMODAL&#39;)
+    elif modal == 2:
+        parts.append(&#39;MB_TASKMODAL&#39;)
+    elif modal == 3:
+        parts.append(&#39;0x3000&#39;)
+    flags = param &gt;&gt; 14
+    for i, name in enumerate(_MB_FLAGS):
+        if flags &amp; (1 &lt;&lt; i):
+            parts.append(F&#39;MB_{name}&#39;)
+    return &#39;|&#39;.join(parts)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_button_id"><code class="name flex">
+<span>def <span class="ident">decode_button_id</span></span>(<span>button_id)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Map a button ID integer to its name (IDOK, IDCANCEL, &hellip;).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L277-L283" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_button_id(button_id: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a button ID integer to its name (IDOK, IDCANCEL, ...).
+    &#34;&#34;&#34;
+    if button_id &lt; len(_BUTTON_IDS):
+        return _BUTTON_IDS[button_id]
+    return F&#39;Button_{button_id}&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_showwindow"><code class="name flex">
+<span>def <span class="ident">decode_showwindow</span></span>(<span>cmd)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Map a SW_* command index to its name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L286-L292" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_showwindow(cmd: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a SW_* command index to its name.
+    &#34;&#34;&#34;
+    if cmd &lt; len(_SHOWWINDOW_COMMANDS):
+        return F&#39;SW_{_SHOWWINDOW_COMMANDS[cmd]}&#39;
+    return str(cmd)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_reg_root"><code class="name flex">
+<span>def <span class="ident">decode_reg_root</span></span>(<span>val)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Map a registry root value to its name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L295-L302" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_reg_root(val: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a registry root value to its name.
+    &#34;&#34;&#34;
+    name = _REG_ROOTS.get(val)
+    if name is not None:
+        return name
+    return F&#39;0x{val:08X}&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_exec_flags"><code class="name flex">
+<span>def <span class="ident">decode_exec_flags</span></span>(<span>flags_type)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Map an exec flag type index to its name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L305-L311" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_exec_flags(flags_type: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map an exec flag type index to its name.
+    &#34;&#34;&#34;
+    if flags_type &lt; len(_EXEC_FLAGS):
+        return _EXEC_FLAGS[flags_type]
+    return F&#39;_{flags_type}&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_sect_op"><code class="name flex">
+<span>def <span class="ident">decode_sect_op</span></span>(<span>op_type)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Map a section operation type index to its name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L314-L320" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_sect_op(op_type: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map a section operation type index to its name.
+    &#34;&#34;&#34;
+    if op_type &lt; len(_SECTION_VARS):
+        return _SECTION_VARS[op_type]
+    return F&#39;_{op_type}&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_file_attributes"><code class="name flex">
+<span>def <span class="ident">decode_file_attributes</span></span>(<span>flags)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode a file attribute bitmask into a pipe-delimited string.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L323-L337" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_file_attributes(flags: int) -&gt; str:
+    &#34;&#34;&#34;
+    Decode a file attribute bitmask into a pipe-delimited string.
+    &#34;&#34;&#34;
+    parts: list[str] = []
+    remaining = flags
+    for i, name in enumerate(_WIN_ATTRIBS):
+        bit = 1 &lt;&lt; i
+        if remaining &amp; bit:
+            if name is not None:
+                parts.append(name)
+                remaining &amp;= ~bit
+    if remaining:
+        parts.append(F&#39;0x{remaining:X}&#39;)
+    return &#39;|&#39;.join(parts)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_setoverwrite"><code class="name flex">
+<span>def <span class="ident">decode_setoverwrite</span></span>(<span>mode)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Map an overwrite mode index to its name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L340-L346" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_setoverwrite(mode: int) -&gt; str:
+    &#34;&#34;&#34;
+    Map an overwrite mode index to its name.
+    &#34;&#34;&#34;
+    if mode &lt; len(_OVERWRITE_MODES):
+        return _OVERWRITE_MODES[mode]
+    return str(mode)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.decode_shortcut_hotkey"><code class="name flex">
+<span>def <span class="ident">decode_shortcut_hotkey</span></span>(<span>spec)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode a CreateShortcut hotkey spec into a human-readable string. The high byte contains
+modifier flags, the next byte is the virtual key.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L349-L373" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_shortcut_hotkey(spec: int) -&gt; str:
+    &#34;&#34;&#34;
+    Decode a CreateShortcut hotkey spec into a human-readable string. The high byte contains
+    modifier flags, the next byte is the virtual key.
+    &#34;&#34;&#34;
+    mod_key = (spec &gt;&gt; 24) &amp; 0xFF
+    key = (spec &gt;&gt; 16) &amp; 0xFF
+    if mod_key == 0 and key == 0:
+        return &#39;&#39;
+    parts: list[str] = []
+    if mod_key &amp; 1:
+        parts.append(&#39;SHIFT&#39;)
+    if mod_key &amp; 2:
+        parts.append(&#39;CONTROL&#39;)
+    if mod_key &amp; 4:
+        parts.append(&#39;ALT&#39;)
+    if mod_key &amp; 8:
+        parts.append(&#39;EXT&#39;)
+    if VK_F1 &lt;= key &lt;= VK_F1 + 23:
+        parts.append(F&#39;F{key - VK_F1 + 1}&#39;)
+    elif (0x41 &lt;= key &lt;= 0x5A) or (0x30 &lt;= key &lt;= 0x39):
+        parts.append(chr(key))
+    else:
+        parts.append(F&#39;Char_{key}&#39;)
+    return &#39;|&#39;.join(parts)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.nsis_escape"><code class="name flex">
+<span>def <span class="ident">nsis_escape</span></span>(<span>s)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Apply NSIS escape sequences to a string for decompiler output.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L476-L492" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def nsis_escape(s: str) -&gt; str:
+    &#34;&#34;&#34;
+    Apply NSIS escape sequences to a string for decompiler output.
+    &#34;&#34;&#34;
+    out: list[str] = []
+    for c in s:
+        if c == &#39;\t&#39;:
+            out.append(&#39;$\\t&#39;)
+        elif c == &#39;\n&#39;:
+            out.append(&#39;$\\n&#39;)
+        elif c == &#39;\r&#39;:
+            out.append(&#39;$\\r&#39;)
+        elif c == &#39;&#34;&#39;:
+            out.append(&#39;$\\&#34;&#39;)
+        else:
+            out.append(c)
+    return &#39;&#39;.join(out)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.format_section_begin"><code class="name flex">
+<span>def <span class="ident">format_section_begin</span></span>(<span>writer, section, index, read_string, is_installer)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Write Section/SectionGroup/SectionGroupEnd header. Returns True if the section is a group
+marker (no body to close with SectionEnd).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L515-L577" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def format_section_begin(
+    writer: NSScriptWriter,
+    section: NSSection,
+    index: int,
+    read_string: Callable[[int], str | None],
+    is_installer: bool,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Write Section/SectionGroup/SectionGroupEnd header. Returns True if the section is a group
+    marker (no body to close with SectionEnd).
+    &#34;&#34;&#34;
+    flags = NSSectionFlags(section.flags)
+    name = read_string(section.name)
+    if name is None:
+        name = &#39;&#39;
+    if not is_installer and name.lower() != &#39;uninstall&#39;:
+        name = F&#39;un.{name}&#39;
+    if flags &amp; NSSectionFlags.BOLD:
+        name = F&#39;!{name}&#39;
+
+    if flags &amp; NSSectionFlags.SECGRPEND:
+        writer.add_string_lf(&#39;SectionGroupEnd&#39;)
+        return True
+
+    if flags &amp; NSSectionFlags.SECGRP:
+        writer.write(&#39;SectionGroup&#39;)
+        if flags &amp; NSSectionFlags.EXPAND:
+            writer.write(&#39; /e&#39;)
+        writer.space_quoted(name)
+        writer.small_space_comment()
+        writer.write(F&#39;Section_{index}&#39;)
+        writer.newline()
+        return True
+
+    writer.write(&#39;Section&#39;)
+    if not (flags &amp; NSSectionFlags.SELECTED):
+        writer.write(&#39; /o&#39;)
+    if name:
+        writer.space_quoted(name)
+    writer.small_space_comment()
+    writer.write(F&#39;Section_{index}&#39;)
+    writer.newline()
+
+    if section.size_kb != 0:
+        writer.tab()
+        writer.comment(F&#39;AddSize {section.size_kb}&#39;)
+        writer.newline()
+
+    need_section_in = (
+        (section.name != 0 and section.install_types != 0)
+        or (section.name == 0 and section.install_types != 0xFFFFFFFF)
+    )
+    if need_section_in or (flags &amp; NSSectionFlags.RO):
+        writer.tab_string(&#39;SectionIn&#39;)
+        inst_types = section.install_types
+        for i in range(32):
+            if inst_types &amp; (1 &lt;&lt; i):
+                writer.write(F&#39; {i + 1}&#39;)
+        if flags &amp; NSSectionFlags.RO:
+            writer.write(&#39; RO&#39;)
+        writer.newline()
+
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.format_section_end"><code class="name flex">
+<span>def <span class="ident">format_section_end</span></span>(<span>writer)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Write SectionEnd.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L580-L585" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def format_section_end(writer: NSScriptWriter):
+    &#34;&#34;&#34;
+    Write SectionEnd.
+    &#34;&#34;&#34;
+    writer.add_string_lf(&#39;SectionEnd&#39;)
+    writer.newline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.emit_pages"><code class="name flex">
+<span>def <span class="ident">emit_pages</span></span>(<span>writer, header, labels, is_installer)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Emit Page/UninstPage/PageEx blocks from the bh_pages data. Updates the labels array with
+CMD_REF_Pre/Show/Leave for page callbacks.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L619-L762" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emit_pages(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    labels: list[int],
+    is_installer: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Emit Page/UninstPage/PageEx blocks from the bh_pages data. Updates the labels array with
+    CMD_REF_Pre/Show/Leave for page callbacks.
+    &#34;&#34;&#34;
+    bh = header.bh_pages
+    if bh.count == 0:
+        return
+
+    writer.separator()
+    writer.comment(F&#39;PAGES: {bh.count}&#39;)
+    writer.newline()
+
+    raw = bytes(header.raw_data)
+    num_instructions = len(labels)
+
+    if (
+        bh.count &gt; (1 &lt;&lt; 12)
+        or bh.offset &gt; len(raw)
+        or bh.count * PAGE_SIZE &gt; len(raw) - bh.offset
+    ):
+        writer.big_space_comment()
+        writer.write(&#39;!!! ERROR: Pages error&#39;)
+        writer.newline()
+        return
+
+    writer.newline()
+
+    for page_index in range(bh.count):
+        base = bh.offset + page_index * PAGE_SIZE
+        p = raw[base:base + PAGE_SIZE]
+        if len(p) &lt; PAGE_SIZE:
+            break
+
+        dlg_id = struct.unpack_from(&#39;&lt;I&#39;, p, 0)[0]
+        wnd_proc_id = struct.unpack_from(&#39;&lt;I&#39;, p, 4)[0]
+        pre_func = struct.unpack_from(&#39;&lt;I&#39;, p, 8)[0]
+        show_func = struct.unpack_from(&#39;&lt;I&#39;, p, 12)[0]
+        leave_func = struct.unpack_from(&#39;&lt;I&#39;, p, 16)[0]
+        flags = struct.unpack_from(&#39;&lt;I&#39;, p, 20)[0]
+        caption = struct.unpack_from(&#39;&lt;I&#39;, p, 24)[0]
+        next_param = struct.unpack_from(&#39;&lt;I&#39;, p, 32)[0]
+        params = [struct.unpack_from(&#39;&lt;I&#39;, p, 44 + 4 * i)[0] for i in range(5)]
+
+        def _set_func_ref(func_index: int, flag: int):
+            signed = func_index if func_index &lt; 0x80000000 else func_index - 0x100000000
+            if signed &gt;= 0 and func_index &lt; num_instructions:
+                labels[func_index] = (
+                    (labels[func_index] &amp; ~CMD_REF_Page_Mask)
+                    | flag
+                    | (page_index &lt;&lt; CMD_REF_Page_NumShifts)
+                )
+
+        _set_func_ref(pre_func, CMD_REF_Pre)
+        _set_func_ref(show_func, CMD_REF_Show)
+        _set_func_ref(leave_func, CMD_REF_Leave)
+
+        if wnd_proc_id == PAGE_COMPLETED:
+            writer.comment_open()
+
+        writer.comment(F&#39;Page {page_index}&#39;)
+        writer.newline()
+
+        if flags &amp; PF_PAGE_EX:
+            writer.write(&#39;PageEx &#39;)
+            if not is_installer:
+                writer.write(&#39;un.&#39;)
+        else:
+            writer.write(&#39;Page &#39; if is_installer else &#39;UninstPage &#39;)
+
+        if wnd_proc_id &lt; len(PAGE_TYPES):
+            writer.write(PAGE_TYPES[wnd_proc_id])
+        else:
+            writer.add_uint(wnd_proc_id)
+
+        pre_signed = pre_func if pre_func &lt; 0x80000000 else pre_func - 0x100000000
+        show_signed = show_func if show_func &lt; 0x80000000 else show_func - 0x100000000
+        leave_signed = leave_func if leave_func &lt; 0x80000000 else leave_func - 0x100000000
+        need_callbacks = pre_signed &gt;= 0 or show_signed &gt;= 0 or leave_signed &gt;= 0
+
+        if flags &amp; PF_PAGE_EX:
+            writer.newline()
+            if need_callbacks:
+                writer.tab_string(&#39;PageCallbacks&#39;)
+
+        if need_callbacks:
+            _add_param_func(writer, labels, pre_func)
+            if wnd_proc_id != PAGE_CUSTOM:
+                _add_param_func(writer, labels, show_func)
+            _add_param_func(writer, labels, leave_func)
+
+        if not (flags &amp; PF_PAGE_EX):
+            if flags &amp; PF_CANCEL_ENABLE:
+                writer.write(&#39; /ENABLECANCEL&#39;)
+            writer.newline()
+        else:
+            writer.newline()
+            if caption != 0:
+                writer.tab_string(&#39;Caption&#39;)
+                writer.space_quoted(header._read_string(caption) or &#39;&#39;)
+                writer.newline()
+
+        if wnd_proc_id == PAGE_LICENSE:
+            _emit_license_page(writer, header, flags, dlg_id, params, next_param)
+        elif wnd_proc_id == PAGE_SELCOM:
+            _emit_page_option(writer, header, params, 3, &#39;ComponentsText&#39;)
+        elif wnd_proc_id == PAGE_DIR:
+            _emit_page_option(writer, header, params, 4, &#39;DirText&#39;)
+            if params[4] != 0:
+                writer.tab_string(&#39;DirVar&#39;)
+                writer.space()
+                writer.write(header._string_code_variable(params[4] - 1))
+                writer.newline()
+            if flags &amp; PF_DIR_NO_BTN_DISABLE:
+                writer.tab_string(&#39;DirVerify leave&#39;)
+                writer.newline()
+        elif wnd_proc_id == PAGE_INSTFILES:
+            if params[2] != 0:
+                writer.tab_string(&#39;CompletedText&#39;)
+                writer.space_quoted(header._read_string(params[2]) or &#39;&#39;)
+                writer.newline()
+            if params[1] != 0:
+                writer.tab_string(&#39;DetailsButtonText&#39;)
+                writer.space_quoted(header._read_string(params[1]) or &#39;&#39;)
+                writer.newline()
+        elif wnd_proc_id == PAGE_UNINST:
+            if params[4] != 0:
+                writer.tab_string(&#39;DirVar&#39;)
+                writer.space()
+                writer.write(header._string_code_variable(params[4] - 1))
+                writer.newline()
+            _emit_page_option(writer, header, params, 2, &#39;UninstallText&#39;)
+
+        if flags &amp; PF_PAGE_EX:
+            writer.write(&#39;PageExEnd&#39;)
+            writer.newline()
+        if wnd_proc_id == PAGE_COMPLETED:
+            writer.comment_close()
+        writer.newline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.emit_header_info"><code class="name flex">
+<span>def <span class="ident">emit_header_info</span></span>(<span>writer, header, archive, is_installer)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Emit header metadata: NSIS type, compressor, flags, language tables, InstType list,
+InstallDir, and post-header strings.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L850-L1178" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emit_header_info(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    archive: NSArchive | None,
+    is_installer: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Emit header metadata: NSIS type, compressor, flags, language tables, InstType list,
+    InstallDir, and post-header strings.
+    &#34;&#34;&#34;
+    writer.comment(&#39;NSIS script&#39;)
+    if header.unicode:
+        writer.write(&#39; (UTF-8)&#39;)
+    writer.space()
+    writer.write(_format_description(header))
+    writer.newline()
+
+    writer.comment(&#39;Install&#39; if is_installer else &#39;Uninstall&#39;)
+    writer.newline()
+    writer.newline()
+
+    if header.unicode:
+        writer.add_string_lf(&#39;Unicode true&#39;)
+
+    if archive is not None and archive.method is not NSMethod.Copy:
+        writer.write(&#39;SetCompressor&#39;)
+        if archive.solid:
+            writer.write(&#39; /SOLID&#39;)
+        method_name = {
+            NSMethod.Deflate: &#39;zlib&#39;,
+            NSMethod.NSGzip: &#39;zlib&#39;,
+            NSMethod.BZip2: &#39;bzip2&#39;,
+            NSMethod.LZMA: &#39;lzma&#39;,
+        }.get(archive.method)
+        if method_name:
+            writer.space()
+            writer.write(method_name)
+        writer.newline()
+
+    if archive is not None and archive.method is NSMethod.LZMA and archive.lzma_options is not None:
+        writer.write(&#39;SetCompressorDictSize &#39;)
+        writer.add_uint(archive.lzma_options.dictionary_size &gt;&gt; 20)
+        writer.newline()
+
+    writer.separator()
+
+    writer.comment(F&#39;HEADER SIZE: {header.raw_size}&#39;)
+    writer.newline()
+
+    if header.bh_pages.offset != 0:
+        writer.comment(F&#39;START HEADER SIZE: {header.bh_pages.offset}&#39;)
+        writer.newline()
+
+    bh_sections = header.bh_sections
+    bh_entries = header.bh_entries
+    if bh_sections.count &gt; 0 and bh_entries.offset &gt; bh_sections.offset:
+        section_size = (bh_entries.offset - bh_sections.offset) // bh_sections.count
+        if section_size &gt;= 24:
+            max_string_len = section_size - 24
+            if header.unicode:
+                max_string_len &gt;&gt;= 1
+            if max_string_len == 0:
+                writer.comment(F&#39;SECTION SIZE: {section_size}&#39;)
+            else:
+                writer.comment(F&#39;MAX STRING LENGTH: {max_string_len}&#39;)
+            writer.newline()
+
+    num_string_chars = header.bh_langtbl.offset - header.bh_strings.offset
+    if header.unicode:
+        num_string_chars &gt;&gt;= 1
+    writer.comment(F&#39;STRING CHARS: {num_string_chars}&#39;)
+    writer.newline()
+
+    if header.bh_ctlcolors.offset &gt; header.raw_size:
+        writer.big_space_comment()
+        writer.add_string_lf(&#39;Bad COLORS TABLE&#39;)
+
+    if header.bh_ctlcolors.count != 0:
+        writer.comment(F&#39;COLORS Num: {header.bh_ctlcolors.count}&#39;)
+        writer.newline()
+
+    if header.bh_font.count != 0:
+        writer.comment(F&#39;FONTS Num: {header.bh_font.count}&#39;)
+        writer.newline()
+
+    if header.bh_data.count != 0:
+        writer.comment(F&#39;DATA NUM: {header.bh_data.count}&#39;)
+        writer.newline()
+
+    writer.newline()
+    writer.add_string_lf(&#39;OutFile [NSIS].exe&#39;)
+    writer.add_string_lf(&#39;!include WinMessages.nsh&#39;)
+    writer.newline()
+
+    raw = bytes(header.raw_data)
+    if len(raw) &lt; 4:
+        return
+
+    eh_flags = NSScriptFlags(struct.unpack_from(&#39;&lt;I&#39;, raw, 0)[0])
+    show_details = int(eh_flags) &amp; 3
+    if 1 &lt;= show_details &lt;= 2:
+        writer.write(&#39;ShowInstDetails&#39; if is_installer else &#39;ShowUninstDetails&#39;)
+        writer.add_string_lf(&#39; show&#39; if show_details == 1 else &#39; nevershow&#39;)
+
+    if eh_flags &amp; NSScriptFlags.PROGRESS_COLORED:
+        writer.add_string_lf(&#39;InstProgressFlags colored&#39;)
+    if eh_flags &amp; (NSScriptFlags.SILENT | NSScriptFlags.SILENT_LOG):
+        writer.write(&#39;SilentInstall &#39; if is_installer else &#39;SilentUnInstall &#39;)
+        writer.add_string_lf(&#39;silentlog&#39; if (eh_flags &amp; NSScriptFlags.SILENT_LOG) else &#39;silent&#39;)
+    if eh_flags &amp; NSScriptFlags.AUTO_CLOSE:
+        writer.add_string_lf(&#39;AutoCloseWindow true&#39;)
+    if not (eh_flags &amp; NSScriptFlags.NO_ROOT_DIR):
+        writer.add_string_lf(&#39;AllowRootDirInstall true&#39;)
+    if eh_flags &amp; NSScriptFlags.NO_CUSTOM:
+        writer.add_string_lf(&#39;InstType /NOCUSTOM&#39;)
+    if eh_flags &amp; NSScriptFlags.COMP_ONLY_ON_CUSTOM:
+        writer.add_string_lf(&#39;InstType /COMPONENTSONLYONCUSTOM&#39;)
+
+    bho_size = 12 if header.is64bit else 8
+    params_offset = 4 + bho_size * 8
+    if header.bh_pages.offset == 276:
+        params_offset -= bho_size
+
+    if params_offset + 40 &gt; len(raw):
+        return
+
+    def _get32(off: int) -&gt; int:
+        return struct.unpack_from(&#39;&lt;I&#39;, raw, off)[0]
+
+    p2 = params_offset
+
+    root_key = _get32(p2)
+    sub_key = _get32(p2 + 4)
+    value = _get32(p2 + 8)
+    if (root_key != 0 and root_key != 0xFFFFFFFF) or sub_key != 0 or value != 0:
+        writer.write(&#39;InstallDirRegKey&#39;)
+        writer.space()
+        writer.write(decode_reg_root(root_key))
+        s = header._read_string(sub_key)
+        if s:
+            writer.space_quoted(s)
+        s = header._read_string(value)
+        if s:
+            writer.space_quoted(s)
+        writer.newline()
+
+    bg_color1 = _get32(p2 + 12)
+    bg_color2 = _get32(p2 + 16)
+    bg_textcolor = _get32(p2 + 20)
+    if bg_color1 != 0xFFFFFFFF or bg_color2 != 0xFFFFFFFF or bg_textcolor != 0xFFFFFFFF:
+        writer.write(&#39;BGGradient&#39;)
+        if bg_color1 != 0 or bg_color2 != 0xFF0000 or bg_textcolor != 0xFFFFFFFF:
+            writer.space()
+            writer.add_color(bg_color1)
+            writer.space()
+            writer.add_color(bg_color2)
+            if bg_textcolor != 0xFFFFFFFF:
+                writer.space()
+                writer.add_color(bg_textcolor)
+        writer.newline()
+
+    lb_bg = _get32(p2 + 24)
+    lb_fg = _get32(p2 + 28)
+    if (lb_bg != 0xFFFFFFFF or lb_fg != 0xFFFFFFFF) and (lb_bg != 0 or lb_fg != 0xFF00):
+        writer.write(&#39;InstallColors&#39;)
+        writer.space()
+        writer.add_color(lb_fg)
+        writer.space()
+        writer.add_color(lb_bg)
+        writer.newline()
+
+    license_bg = _get32(p2 + 36)
+    signed_license_bg = license_bg if license_bg &lt; 0x80000000 else license_bg - 0x100000000
+    if license_bg != 0xFFFFFFFF and signed_license_bg != -15:
+        writer.write(&#39;LicenseBkColor&#39;)
+        if signed_license_bg == -5:
+            writer.write(&#39; /windows&#39;)
+        else:
+            writer.space()
+            writer.add_color(license_bg)
+        writer.newline()
+
+    langtable_size = _get32(p2 + 32)
+    bh_langtbl = header.bh_langtbl
+    if bh_langtbl.count &gt; 0 and langtable_size != 0xFFFFFFFF:
+        if langtable_size &gt;= 10:
+            num_strings = (langtable_size - 10) // 4
+        else:
+            num_strings = 0
+
+        writer.newline()
+        writer.separator()
+        writer.comment(F&#39;LANG TABLES: {bh_langtbl.count}&#39;)
+        writer.newline()
+        writer.comment(F&#39;LANG STRINGS: {num_strings}&#39;)
+        writer.newline()
+        writer.newline()
+
+        license_lang_index = -1
+        bh_pages = header.bh_pages
+        if bh_pages.count &gt; 0:
+            for page_i in range(bh_pages.count):
+                page_base = bh_pages.offset + page_i * PAGE_SIZE
+                if page_base + PAGE_SIZE &gt; len(raw):
+                    break
+                wnd_proc_id = struct.unpack_from(&#39;&lt;I&#39;, raw, page_base + 4)[0]
+                param1 = struct.unpack_from(&#39;&lt;I&#39;, raw, page_base + 44 + 4)[0]
+                if wnd_proc_id != PAGE_LICENSE or param1 == 0:
+                    continue
+                signed_param1 = param1 if param1 &lt; 0x80000000 else param1 - 0x100000000
+                if signed_param1 &lt; 0:
+                    license_lang_index = -(signed_param1 + 1)
+
+        if license_lang_index &gt;= 0:
+            for i in range(bh_langtbl.count):
+                lang_base = bh_langtbl.offset + langtable_size * i
+                if lang_base + 10 + (license_lang_index + 1) * 4 &gt; len(raw):
+                    break
+                lang_id = struct.unpack_from(&#39;&lt;H&#39;, raw, lang_base)[0]
+                val = struct.unpack_from(&#39;&lt;I&#39;, raw, lang_base + 10 + license_lang_index * 4)[0]
+                if val != 0:
+                    writer.write(F&#39;LicenseLangString LSTR_{license_lang_index}&#39;)
+                    writer.write(F&#39; {lang_id}&#39;)
+                    s = header._read_string(val)
+                    if s:
+                        writer.space_quoted(nsis_escape(s))
+                    writer.newline()
+            writer.newline()
+
+        branding_text = 0
+        name_val = 0
+        for i in range(bh_langtbl.count):
+            lang_base = bh_langtbl.offset + langtable_size * i
+            if lang_base + 10 + 3 * 4 &gt; len(raw):
+                break
+            lang_id = struct.unpack_from(&#39;&lt;H&#39;, raw, lang_base)[0]
+            v0 = struct.unpack_from(&#39;&lt;I&#39;, raw, lang_base + 10 + 0 * 4)[0]
+            v2 = struct.unpack_from(&#39;&lt;I&#39;, raw, lang_base + 10 + 2 * 4)[0]
+            if v0 != 0 and (lang_id == 1033 or branding_text == 0):
+                branding_text = v0
+            if v2 != 0 and (lang_id == 1033 or name_val == 0):
+                name_val = v2
+
+        if name_val != 0:
+            writer.write(&#39;Name&#39;)
+            s = header._read_string(name_val)
+            if s:
+                writer.space_quoted(s)
+            writer.newline()
+
+        if branding_text != 0:
+            writer.write(&#39;BrandingText&#39;)
+            s = header._read_string(branding_text)
+            if s:
+                writer.space_quoted(s)
+            writer.newline()
+
+        for i in range(bh_langtbl.count):
+            lang_base = bh_langtbl.offset + langtable_size * i
+            if lang_base + 10 &gt; len(raw):
+                break
+            lang_id = struct.unpack_from(&#39;&lt;H&#39;, raw, lang_base)[0]
+            writer.newline()
+            writer.comment(F&#39;LANG: {lang_id}&#39;)
+            writer.newline()
+
+            for j in range(num_strings):
+                str_off = lang_base + 10 + j * 4
+                if str_off + 4 &gt; len(raw):
+                    break
+                val = struct.unpack_from(&#39;&lt;I&#39;, raw, str_off)[0]
+                if val != 0 and j != license_lang_index:
+                    writer.write(F&#39;LangString LSTR_{j} {lang_id}&#39;)
+                    s = header._read_string(val)
+                    if s:
+                        writer.space_quoted(nsis_escape(s))
+                    writer.newline()
+            writer.newline()
+
+    on_func_count = len(ON_FUNCS)
+    if header.bh_pages.offset == 276:
+        on_func_count -= 1
+
+    p2_after = params_offset + 40 + on_func_count * 4
+    writer.newline()
+
+    for i in range(NSIS_MAX_INST_TYPES + 1):
+        off = p2_after + i * 4
+        if off + 4 &gt; len(raw):
+            break
+        inst_type = _get32(off)
+        if inst_type != 0:
+            writer.write(&#39;InstType&#39;)
+            s = &#39;&#39;
+            if not is_installer:
+                s = &#39;un.&#39;
+            resolved = header._read_string(inst_type)
+            if resolved:
+                s += resolved
+            writer.space_quoted(s)
+            writer.newline()
+
+    install_dir_off = p2_after + (NSIS_MAX_INST_TYPES + 1) * 4
+    if install_dir_off + 4 &lt;= len(raw):
+        install_dir = _get32(install_dir_off)
+        if install_dir != 0:
+            writer.write(&#39;InstallDir&#39;)
+            s = header._read_string(install_dir)
+            if s:
+                writer.space_quoted(nsis_escape(s))
+            writer.newline()
+
+    if header.bh_pages.offset &gt;= 288:
+        post_off = install_dir_off + 4
+        for i in range(4):
+            if i != 0 and header.bh_pages.offset &lt; 300:
+                break
+            if post_off + 4 &gt; len(raw):
+                break
+            param = _get32(post_off + 4 * i)
+            if param == 0 or param == 0xFFFFFFFF:
+                continue
+            writer.comment(F&#39;{_POST_STRINGS[i]} =&#39;)
+            s = header._read_string(param)
+            if s:
+                writer.space_quoted(nsis_escape(s))
+            writer.newline()
+
+    writer.newline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.render_opcode"><code class="name flex">
+<span>def <span class="ident">render_opcode</span></span>(<span>writer, header, instruction, opcode, labels, raw, overwrite_state, address, commented)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Render a single NSIS opcode's arguments to the writer. Handles all opcodes except Ret and
+INVALID_OPCODE, which require structural context handled by the caller.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L1269-L1919" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def render_opcode(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    instruction: NSScriptInstruction | NSScriptExtendedInstruction,
+    opcode: Op,
+    labels: list[int],
+    raw: bytes,
+    overwrite_state: list[int],
+    address: int,
+    commented: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Render a single NSIS opcode&#39;s arguments to the writer. Handles all opcodes except Ret and
+    INVALID_OPCODE, which require structural context handled by the caller.
+    &#34;&#34;&#34;
+    params = instruction.arguments
+
+    if opcode is Op.Nop:
+        if params[0] == 0:
+            writer.write(&#39;Nop&#39;)
+        else:
+            writer.write(&#39;Goto&#39;)
+            _add_goto_var(writer, header, params[0])
+
+    elif opcode is Op.Abort:
+        writer.write(opcode.name)
+        _add_optional_param(writer, header, params[0])
+
+    elif opcode is Op.Quit:
+        writer.write(opcode.name)
+
+    elif opcode is Op.Call:
+        writer.write(&#39;Call &#39;)
+        signed_p0 = params[0] if params[0] &lt; 0x80000000 else params[0] - 0x100000000
+        if signed_p0 &lt; 0:
+            writer.write(header._string_code_variable(-(signed_p0 + 1)))
+        elif params[0] == 0:
+            writer.write(&#39;0&#39;)
+        else:
+            val = params[0] - 1
+            if params[1] == 1:
+                writer.write(F&#39;:label_{val}&#39;)
+            else:
+                writer.write(_func_name(labels, val))
+
+    elif opcode is Op.DetailPrint or opcode is Op.Sleep:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.BringToFront:
+        writer.write(opcode.name)
+
+    elif opcode is Op.SetDetailsView:
+        writer.write(opcode.name)
+        if params[0] == SW_SHOWNA and params[1] == SW_HIDE:
+            writer.write(&#39; show&#39;)
+        elif params[1] == SW_SHOWNA and params[0] == SW_HIDE:
+            writer.write(&#39; hide&#39;)
+        else:
+            for i in range(2):
+                writer.space()
+                writer.write(decode_showwindow(params[i]))
+
+    elif opcode is Op.SetFileAttributes:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        writer.space()
+        writer.write(decode_file_attributes(params[1]))
+
+    elif opcode is Op.CreateDirectory:
+        is_set_out_path = params[1] != 0
+        writer.write(&#39;SetOutPath&#39; if is_set_out_path else &#39;CreateDirectory&#39;)
+        _add_param(writer, header, params[0])
+        if params[2] != 0:
+            writer.small_space_comment()
+            writer.write(&#39;CreateRestrictedDirectory&#39;)
+
+    elif opcode is Op.IfFileExists:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        _add_goto_vars2(writer, header, params[1], params[2])
+
+    elif opcode is Op.SetFlag:
+        s_val = header._read_string(params[1]) or &#39;&#39;
+        if params[0] == K_EXEC_FLAGS_ERRORS and params[2] == 0:
+            if s_val == &#39;0&#39;:
+                writer.write(&#39;ClearErrors&#39;)
+            else:
+                writer.write(&#39;SetErrors&#39;)
+        else:
+            writer.write(&#39;Set&#39;)
+            writer.write(decode_exec_flags(params[0]))
+            if params[2] != 0:
+                writer.write(&#39; lastused&#39;)
+            else:
+                decoded = _decode_flag_value(params[0], s_val)
+                if decoded is not None:
+                    writer.space()
+                    writer.write(decoded)
+                else:
+                    writer.space_quoted(nsis_escape(s_val))
+
+    elif opcode is Op.IfFlag:
+        writer.write(&#39;If&#39;)
+        writer.write(decode_exec_flags(params[2]))
+        _add_goto_vars2(writer, header, params[0], params[1])
+
+    elif opcode is Op.GetFlag:
+        writer.write(&#39;Get&#39;)
+        writer.write(decode_exec_flags(params[1]))
+        _add_param_var(writer, header, params[0])
+
+    elif opcode is Op.Rename:
+        writer.write(opcode.name)
+        if params[2] != 0:
+            writer.write(&#39; /REBOOTOK&#39;)
+        _add_params(writer, header, params, 2)
+        if params[3] != 0:
+            writer.small_space_comment()
+            _add_param(writer, header, params[3])
+
+    elif opcode is Op.GetFullPathName:
+        writer.write(opcode.name)
+        if params[2] == 0:
+            writer.write(&#39; /SHORT&#39;)
+        _add_param_var(writer, header, params[1])
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.SearchPath or opcode is Op.StrLen:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.GetTempFileName:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        s = header._read_string(params[1])
+        if s and s != &#39;$TEMP&#39;:
+            writer.space_quoted(nsis_escape(s))
+
+    elif opcode is Op.ExtractFile:
+        overwrite = params[0] &amp; 0x7
+        if overwrite != overwrite_state[0]:
+            writer.write(&#39;SetOverwrite &#39;)
+            writer.write(decode_setoverwrite(overwrite))
+            overwrite_state[0] = overwrite
+            writer.newline()
+            writer.tab(commented)
+        writer.write(&#39;File&#39;)
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.Delete:
+        writer.write(opcode.name)
+        flag = params[1]
+        if flag &amp; DEL_REBOOT:
+            writer.write(&#39; /REBOOTOK&#39;)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.MessageBox:
+        writer.write(opcode.name)
+        writer.space()
+        writer.write(decode_messagebox(params[0]))
+        _add_param(writer, header, params[1])
+        button_id = params[0] &gt;&gt; 21
+        if button_id != 0:
+            writer.write(&#39; /SD&#39;)
+            writer.write(decode_button_id(button_id))
+        for i in range(2, 6, 2):
+            if params[i] != 0:
+                writer.space()
+                writer.write(decode_button_id(params[i]))
+                _add_goto_var1(writer, header, params[i + 1])
+
+    elif opcode is Op.RMDir:
+        writer.write(opcode.name)
+        flag = params[1]
+        if flag &amp; DEL_RECURSE:
+            writer.write(&#39; /r&#39;)
+        if flag &amp; DEL_REBOOT:
+            writer.write(&#39; /REBOOTOK&#39;)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.AssignVar:
+        writer.write(&#39;StrCpy&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+        _add_optional_params(writer, header, params[2:4], 2)
+
+    elif opcode is Op.StrCmp:
+        writer.write(&#39;StrCmpS&#39; if params[4] != 0 else &#39;StrCmp&#39;)
+        _add_params(writer, header, params, 2)
+        _add_goto_vars2(writer, header, params[2], params[3])
+
+    elif opcode is Op.ReadEnvStr:
+        writer.write(&#39;ReadEnvStr&#39; if params[2] != 0 else &#39;ExpandEnvStrings&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.IntCmp:
+        writer.write(&#39;IntCmpU&#39; if params[5] != 0 else &#39;IntCmp&#39;)
+        _add_params(writer, header, params, 2)
+        _add_goto_var1(writer, header, params[2])
+        if params[3] != 0 or params[4] != 0:
+            _add_goto_vars2(writer, header, params[3], params[4])
+
+    elif opcode is Op.IntOp:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        op_index = params[3]
+        c = K_INTOP_OPS[op_index] if op_index &lt; 13 else &#39;?&#39;
+        c2 = &#39;&#39; if (op_index &lt; 8 or op_index == 10) else c
+        num_ops = 1 if op_index == 7 else 2
+        _add_param(writer, header, params[1])
+        writer.space()
+        writer.write(c)
+        if num_ops != 1:
+            if c2:
+                writer.write(c2)
+            _add_param(writer, header, params[2])
+
+    elif opcode is Op.IntFmt:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_params(writer, header, params[1:3], 2)
+
+    elif opcode is Op.PushPop:
+        if params[2] != 0:
+            writer.write(&#39;Exch&#39;)
+            if params[2] != 1:
+                writer.write(F&#39; {params[2]}&#39;)
+        elif params[1] != 0:
+            writer.write(&#39;Pop&#39;)
+            _add_param_var(writer, header, params[0])
+        else:
+            writer.write(&#39;Push&#39;)
+            _add_param(writer, header, params[0])
+
+    elif opcode is Op.FindWindow:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+        _add_optional_params(writer, header, params[2:5], 3)
+
+    elif opcode is Op.SendMessage:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[1])
+        _add_param(writer, header, params[2])
+        spec = params[5]
+        for i in range(2):
+            prefix = &#39;STR:&#39; if (spec &amp; (1 &lt;&lt; i)) else &#39;&#39;
+            s = header._read_string(params[3 + i])
+            writer.space_quoted(prefix + nsis_escape(s or &#39;&#39;))
+        signed_p0 = params[0] if params[0] &lt; 0x80000000 else params[0] - 0x100000000
+        if signed_p0 &gt;= 0:
+            _add_param_var(writer, header, params[0])
+        timeout = spec &gt;&gt; 2
+        if timeout != 0:
+            writer.write(F&#39; /TIMEOUT={timeout}&#39;)
+
+    elif opcode is Op.IsWindow:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        _add_goto_vars2(writer, header, params[1], params[2])
+
+    elif opcode is Op.GetDlgItem:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_params(writer, header, params[1:3], 2)
+
+    elif opcode is Op.SetCtlColors:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        offset = params[1]
+        bh_cc = header.bh_ctlcolors
+        if (
+            header.raw_size &lt; bh_cc.offset
+            or header.raw_size - bh_cc.offset &lt; offset
+            or header.raw_size - bh_cc.offset - offset &lt; CTL_COLORS_SIZE
+        ):
+            writer.write(&#39; ; bad offset&#39;)
+        else:
+            p2 = bh_cc.offset + offset
+            cc_text = struct.unpack_from(&#39;&lt;I&#39;, raw, p2)[0]
+            cc_bkc = struct.unpack_from(&#39;&lt;I&#39;, raw, p2 + 4)[0]
+            cc_bkmode = struct.unpack_from(&#39;&lt;i&#39;, raw, p2 + 16)[0]
+            cc_flags = struct.unpack_from(&#39;&lt;i&#39;, raw, p2 + 20)[0]
+            if (cc_flags &amp; COLORS_BK_SYS) or (cc_flags &amp; COLORS_TEXT_SYS):
+                writer.write(&#39; /BRANDING&#39;)
+            bk = &#39;&#39;
+            bkc_print = False
+            if cc_bkmode == TRANSPARENT:
+                bk = &#39; transparent&#39;
+            elif cc_flags &amp; COLORS_BKB:
+                if not (cc_flags &amp; COLORS_BK_SYS) and (cc_flags &amp; COLORS_BK):
+                    bkc_print = True
+            if (cc_flags &amp; COLORS_TEXT) or bk or bkc_print:
+                writer.space()
+                if (cc_flags &amp; COLORS_TEXT_SYS) or not (cc_flags &amp; COLORS_TEXT):
+                    writer.add_quotes()
+                else:
+                    writer.add_color(cc_text)
+            writer.write(bk)
+            if bkc_print:
+                writer.space()
+                writer.add_color(cc_bkc)
+
+    elif opcode is Op.SetBrandingImage:
+        writer.write(opcode.name)
+        writer.write(F&#39; /IMGID={params[1]}&#39;)
+        if params[2] == 1:
+            writer.write(&#39; /RESIZETOFIT&#39;)
+        _add_param(writer, header, params[0])
+
+    elif opcode is Op.CreateFont:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+        _add_optional_params(writer, header, params[2:4], 2)
+        if params[4] &amp; 1:
+            writer.write(&#39; /ITALIC&#39;)
+        if params[4] &amp; 2:
+            writer.write(&#39; /UNDERLINE&#39;)
+        if params[4] &amp; 4:
+            writer.write(&#39; /STRIKE&#39;)
+
+    elif opcode is Op.ShowWindow:
+        if params[3] != 0:
+            writer.write(&#39;EnableWindow&#39;)
+        else:
+            writer.write(&#39;ShowWindow&#39;)
+        _add_param(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.ExecShell:
+        writer.write(opcode.name)
+        _add_params(writer, header, params, 2)
+        if params[2] != 0 or params[3] != SW_SHOWNORMAL:
+            _add_param(writer, header, params[2])
+            if params[3] != SW_SHOWNORMAL:
+                writer.space()
+                writer.write(decode_showwindow(params[3]))
+        if params[5] != 0:
+            writer.write(&#39;    ;&#39;)
+            _add_param(writer, header, params[5])
+
+    elif opcode is Op.Exec:
+        writer.write(&#39;ExecWait&#39; if params[2] != 0 else &#39;Exec&#39;)
+        _add_param(writer, header, params[0])
+        signed_p1 = params[1] if params[1] &lt; 0x80000000 else params[1] - 0x100000000
+        if params[2] != 0 and signed_p1 &gt;= 0:
+            _add_param_var(writer, header, params[1])
+
+    elif opcode is Op.GetFileTime or opcode is Op.GetDLLVersion:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[2])
+        _add_param_var(writer, header, params[0])
+        _add_param_var(writer, header, params[1])
+
+    elif opcode is Op.RegisterDll:
+        func_str = header._read_string(params[1]) or &#39;&#39;
+        print_func = True
+        if params[2] == 0:
+            writer.write(&#39;CallInstDLL&#39;)
+            _add_param(writer, header, params[0])
+            if params[3] == 1:
+                writer.write(&#39; /NOUNLOAD&#39;)
+        else:
+            if func_str == &#39;DllUnregisterServer&#39;:
+                writer.write(&#39;UnRegDLL&#39;)
+                print_func = False
+            else:
+                writer.write(&#39;RegDLL&#39;)
+                if func_str == &#39;DllRegisterServer&#39;:
+                    print_func = False
+            _add_param(writer, header, params[0])
+        if print_func:
+            writer.space_quoted(nsis_escape(func_str))
+
+    elif opcode is Op.CreateShortCut:
+        writer.write(opcode.name)
+        num_params = 6
+        while num_params &gt; 2 and params[num_params - 1] == 0:
+            num_params -= 1
+        spec = params[4]
+        if spec &amp; 0x8000:
+            writer.write(&#39; /NoWorkingDir&#39;)
+        _add_params(writer, header, params, min(num_params, 4))
+        if num_params &lt;= 4:
+            pass
+        else:
+            icon = spec &amp; 0xFF
+            writer.space()
+            if icon != 0:
+                writer.add_uint(icon)
+            else:
+                writer.add_quotes()
+            sw = (spec &gt;&gt; 8) &amp; 0x7F
+            if (spec &gt;&gt; 8) == 0 and num_params &lt; 6:
+                pass
+            else:
+                if sw == SW_SHOWMINNOACTIVE:
+                    sw = SW_SHOWMINIMIZED
+                writer.space()
+                if sw == 0:
+                    writer.add_quotes()
+                else:
+                    writer.write(decode_showwindow(sw))
+                hotkey = decode_shortcut_hotkey(spec)
+                if hotkey:
+                    writer.space()
+                    writer.write(hotkey)
+                elif num_params &gt;= 6:
+                    writer.space()
+                    writer.add_quotes()
+                _add_optional_param(writer, header, params[5])
+
+    elif opcode is Op.CopyFiles:
+        writer.write(opcode.name)
+        if params[2] &amp; 0x04:
+            writer.write(&#39; /SILENT&#39;)
+        if params[2] &amp; 0x80:
+            writer.write(&#39; /FILESONLY&#39;)
+        _add_params(writer, header, params, 2)
+        if params[3] != 0:
+            writer.write(&#39;    ;&#39;)
+            _add_param(writer, header, params[3])
+
+    elif opcode is Op.Reboot:
+        writer.write(opcode.name)
+        if params[0] != 0xBADF00D:
+            writer.write(&#39; ; Corrupted ???&#39;)
+
+    elif opcode is Op.WriteINI:
+        num_always = 0
+        if params[0] == 0:
+            writer.write(&#39;FlushINI&#39;)
+        elif params[4] != 0:
+            writer.write(&#39;WriteINIStr&#39;)
+            num_always = 3
+        else:
+            writer.write(&#39;DeleteINI&#39;)
+            writer.write(&#39;Sec&#39; if params[1] == 0 else &#39;Str&#39;)
+            num_always = 1
+        _add_param(writer, header, params[3])
+        _add_params(writer, header, params, num_always)
+        _add_optional_params(writer, header, params[num_always:3], 3 - num_always)
+
+    elif opcode is Op.ReadINIStr:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[3])
+        _add_params(writer, header, params[1:3], 2)
+
+    elif opcode is Op.DeleteReg:
+        writer.write(opcode.name)
+        if params[4] == 0:
+            writer.write(&#39;Value&#39;)
+        else:
+            writer.write(&#39;Key&#39;)
+            if params[4] &amp; 2:
+                writer.write(&#39; /ifempty&#39;)
+        writer.space()
+        writer.write(decode_reg_root(params[1]))
+        _add_param(writer, header, params[2])
+        _add_optional_param(writer, header, params[3])
+
+    elif opcode is Op.WriteReg:
+        writer.write(opcode.name)
+        reg_type_name = {1: &#39;Str&#39;, 2: &#39;ExpandStr&#39;, 3: &#39;Bin&#39;, 4: &#39;DWORD&#39;}.get(params[4])
+        if params[4] == 1 and params[5] == 2:
+            reg_type_name = &#39;ExpandStr&#39;
+        if reg_type_name:
+            writer.write(reg_type_name)
+        else:
+            writer.write(F&#39;?{params[4]}&#39;)
+        writer.space()
+        writer.write(decode_reg_root(params[0]))
+        _add_params(writer, header, params[1:3], 2)
+        if params[4] != 3:
+            _add_param(writer, header, params[3])
+        else:
+            writer.write(F&#39; data[{params[3]} ... ]&#39;)
+
+    elif opcode is Op.ReadReg:
+        writer.write(opcode.name)
+        writer.write(&#39;DWORD&#39; if params[4] == 1 else &#39;Str&#39;)
+        _add_param_var(writer, header, params[0])
+        writer.space()
+        writer.write(decode_reg_root(params[1]))
+        _add_params(writer, header, params[2:4], 2)
+
+    elif opcode is Op.EnumReg:
+        writer.write(opcode.name)
+        writer.write(&#39;Key&#39; if params[4] != 0 else &#39;Value&#39;)
+        _add_param_var(writer, header, params[0])
+        writer.space()
+        writer.write(decode_reg_root(params[1]))
+        _add_params(writer, header, params[2:4], 2)
+
+    elif opcode is Op.FileClose or opcode is Op.FindClose:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+
+    elif opcode is Op.FileOpen:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[3])
+        acc = params[1]
+        creat = params[2]
+        if acc != 0 or creat != 0:
+            cc = &#39;&#39;
+            if acc == GENERIC_READ and creat == OPEN_EXISTING:
+                cc = &#39;r&#39;
+            elif creat == CREATE_ALWAYS and acc == GENERIC_WRITE:
+                cc = &#39;w&#39;
+            elif creat == OPEN_ALWAYS and acc == (GENERIC_WRITE | GENERIC_READ):
+                cc = &#39;a&#39;
+            if cc:
+                writer.write(F&#39; {cc}&#39;)
+            else:
+                if acc &amp; GENERIC_READ:
+                    writer.write(&#39; GENERIC_READ&#39;)
+                if acc &amp; GENERIC_WRITE:
+                    writer.write(&#39; GENERIC_WRITE&#39;)
+                if acc &amp; GENERIC_EXECUTE:
+                    writer.write(&#39; GENERIC_EXECUTE&#39;)
+                if acc &amp; GENERIC_ALL:
+                    writer.write(&#39; GENERIC_ALL&#39;)
+                creat_name = {
+                    CREATE_NEW: &#39;CREATE_NEW&#39;,
+                    CREATE_ALWAYS: &#39;CREATE_ALWAYS&#39;,
+                    OPEN_EXISTING: &#39;OPEN_EXISTING&#39;,
+                    OPEN_ALWAYS: &#39;OPEN_ALWAYS&#39;,
+                    TRUNCATE_EXISTING: &#39;TRUNCATE_EXISTING&#39;,
+                }.get(creat)
+                writer.space()
+                writer.write(creat_name or str(creat))
+
+    elif opcode is Op.FileWrite or opcode is Op.FileWriteW:
+        writer.write(&#39;FileWrite&#39;)
+        if opcode is Op.FileWriteW:
+            writer.write(&#39;UTF16LE&#39; if params[2] == 0 else &#39;Word&#39;)
+        elif params[2] != 0:
+            writer.write(&#39;Byte&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.FileRead or opcode is Op.FileReadW:
+        writer.write(&#39;FileRead&#39;)
+        if opcode is Op.FileReadW:
+            writer.write(&#39;UTF16LE&#39; if params[3] == 0 else &#39;Word&#39;)
+        elif params[3] != 0:
+            writer.write(&#39;Byte&#39;)
+        _add_param_var(writer, header, params[0])
+        _add_param_var(writer, header, params[1])
+        _add_optional_param(writer, header, params[2])
+
+    elif opcode is Op.FileSeek:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[2])
+        if params[3] == 1:
+            writer.write(&#39; CUR&#39;)
+        if params[3] == 2:
+            writer.write(&#39; END&#39;)
+        signed_p1 = params[1] if params[1] &lt; 0x80000000 else params[1] - 0x100000000
+        if signed_p1 &gt;= 0:
+            if params[3] == 0:
+                writer.write(&#39; SET&#39;)
+            _add_param_var(writer, header, params[1])
+
+    elif opcode is Op.FindNext:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[1])
+        _add_param_var(writer, header, params[0])
+
+    elif opcode is Op.FindFirst:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[1])
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[2])
+
+    elif opcode is Op.WriteUninstaller:
+        writer.write(opcode.name)
+        _add_param(writer, header, params[0])
+        if params[3] != 0:
+            writer.small_space_comment()
+            _add_param(writer, header, params[3])
+
+    elif opcode is Op.SectionSet:
+        writer.write(&#39;Section&#39;)
+        signed_p2 = params[2] if params[2] &lt; 0x80000000 else params[2] - 0x100000000
+        if signed_p2 &gt;= 0:
+            writer.write(&#39;Get&#39;)
+            writer.write(decode_sect_op(params[2]))
+            _add_param(writer, header, params[0])
+            _add_param_var(writer, header, params[1])
+        else:
+            writer.write(&#39;Set&#39;)
+            t = -(signed_p2) - 1
+            writer.write(decode_sect_op(t))
+            _add_param(writer, header, params[0])
+            _add_param(writer, header, params[4] if t == 0 else params[1])
+
+    elif opcode is Op.InstTypeSet:
+        if params[3] == 0:
+            if params[2] == 0:
+                writer.write(&#39;InstTypeGetText&#39;)
+                _add_param(writer, header, params[0])
+                _add_param_var(writer, header, params[1])
+            else:
+                writer.write(&#39;InstTypeSetText&#39;)
+                _add_params(writer, header, params, 2)
+        else:
+            if params[2] == 0:
+                writer.write(&#39;GetCurInstType&#39;)
+                _add_param_var(writer, header, params[1])
+            else:
+                writer.write(&#39;SetCurInstType&#39;)
+                _add_param(writer, header, params[0])
+
+    elif opcode is Op.LockWindow:
+        writer.write(opcode.name)
+        writer.write(&#39; on&#39; if params[0] == 0 else &#39; off&#39;)
+
+    elif opcode is Op.Log:
+        if params[0] != 0:
+            writer.write(&#39;LogSet &#39;)
+            writer.write(&#39;off&#39; if params[1] == 0 else &#39;on&#39;)
+        else:
+            writer.write(&#39;LogText&#39;)
+            _add_param(writer, header, params[1])
+
+    elif opcode is Op.FindProc:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.GetFontVersion or opcode is Op.GetFontName:
+        writer.write(opcode.name)
+        _add_param_var(writer, header, params[0])
+        _add_param(writer, header, params[1])
+
+    elif opcode is Op.GetOSInfo:
+        writer.write(opcode.name)
+
+    elif opcode is Op.ReservedOpcode:
+        writer.write(&#39;GetFunctionAddress&#39;)
+
+    else:
+        writer.write(F&#39;Command{int(opcode)}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.emit_commands"><code class="name flex">
+<span>def <span class="ident">emit_commands</span></span>(<span>writer, header, label_info, sections, is_installer)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Emit the main instruction body: per-opcode decompilation switch, section open/close, function
+open/close, and label markers. Function bodies are rendered using structural analysis to
+recover If/Else constructs with indentation.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L1922-L2104" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def emit_commands(
+    writer: NSScriptWriter,
+    header: NSHeader,
+    label_info: LabelInfo,
+    sections: list[NSSection],
+    is_installer: bool,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Emit the main instruction body: per-opcode decompilation switch, section open/close, function
+    open/close, and label markers. Function bodies are rendered using structural analysis to
+    recover If/Else constructs with indentation.
+    &#34;&#34;&#34;
+    from refinery.lib.nsis.controlflow import (
+        build_cfg,
+        eliminate_dead_code,
+        linearize,
+        reduce_if_else,
+        reduce_loops,
+        render_node,
+    )
+
+    labels = label_info.labels
+    num_instructions = len(header.instructions)
+    num_sections = len(sections)
+
+    overwrite_state = [0]
+    cur_section_index = 0
+    section_is_open = False
+    on_func_is_open = False
+    end_comment_index = 0
+
+    raw = bytes(header.raw_data)
+
+    func_ranges: dict[int, int] = {}
+    k = 0
+    while k &lt; num_instructions:
+        flg = labels[k]
+        if not is_func(flg):
+            k += 1
+            continue
+        func_start = k
+        k += 1
+        while k &lt; num_instructions:
+            insn = header.instructions[k]
+            opcode = header.opcode(insn)
+            if opcode is Op.Ret:
+                if k + 1 &gt;= num_instructions or is_probably_end_of_func(labels[k + 1]):
+                    func_ranges[func_start] = k + 1
+                    k += 1
+                    break
+            k += 1
+        else:
+            func_ranges[func_start] = k
+
+    writer.separator()
+
+    kkk = 0
+    while kkk &lt; num_instructions:
+        instruction = header.instructions[kkk]
+        opcode = header.opcode(instruction)
+
+        is_section_group = False
+        while cur_section_index &lt; num_sections:
+            sect = sections[cur_section_index]
+            if section_is_open:
+                if sect.start_cmd_index + sect.num_commands + 1 != kkk:
+                    break
+                format_section_end(writer)
+                section_is_open = False
+                cur_section_index += 1
+                continue
+            if sect.start_cmd_index != kkk:
+                break
+            if format_section_begin(writer, sect, cur_section_index, header._read_string, is_installer):
+                is_section_group = True
+                cur_section_index += 1
+            else:
+                section_is_open = True
+
+        if labels[kkk] != 0 and labels[kkk] != CMD_REF_Section:
+            flg = labels[kkk]
+            if is_func(flg):
+                if kkk == label_info.init_plugins_dir_start:
+                    writer.comment_open()
+                on_func_is_open = True
+                writer.write(&#39;Function &#39;)
+                writer.write(_func_name(labels, kkk))
+                if is_page_func(flg):
+                    writer.big_space_comment()
+                    writer.write(&#39;Page &#39;)
+                    writer.add_uint((flg &amp; CMD_REF_Page_Mask) &gt;&gt; CMD_REF_Page_NumShifts)
+                    if flg &amp; CMD_REF_Leave:
+                        writer.write(&#39;, Leave&#39;)
+                    if flg &amp; CMD_REF_Pre:
+                        writer.write(&#39;, Pre&#39;)
+                    if flg &amp; CMD_REF_Show:
+                        writer.write(&#39;, Show&#39;)
+                writer.newline()
+
+                if kkk in func_ranges:
+                    func_end = func_ranges[kkk]
+                    body_end = func_end - 1
+                    cfg = build_cfg(header, kkk, body_end)
+                    root = linearize(header, cfg, labels, kkk, body_end)
+                    reduced = reduce_loops(root, header)
+                    reduced = reduce_if_else(reduced, header)
+                    reduced = eliminate_dead_code(reduced)
+                    render_node(
+                        reduced, writer, header, labels, raw,
+                        overwrite_state, end_comment_index,
+                    )
+                    if labels[body_end] &amp; CMD_REF_Goto:
+                        writer.write(F&#39;label_{body_end}:&#39;)
+                        writer.newline()
+                    writer.add_string_lf(&#39;FunctionEnd&#39;)
+                    if func_end == label_info.init_plugins_dir_end:
+                        writer.comment_close()
+                    writer.newline()
+                    on_func_is_open = False
+                    kkk = func_end
+                    continue
+
+            if flg &amp; CMD_REF_Goto:
+                writer.write(F&#39;label_{kkk}:&#39;)
+                writer.newline()
+
+        commented = kkk &lt; end_comment_index
+
+        if opcode is Op.INVALID_OPCODE:
+            writer.tab(commented)
+            writer.write(F&#39;Command{instruction.opcode}&#39;)
+            writer.newline()
+
+        elif opcode is Op.Ret:
+            if on_func_is_open:
+                if kkk == num_instructions - 1 or is_probably_end_of_func(labels[kkk + 1]):
+                    writer.add_string_lf(&#39;FunctionEnd&#39;)
+                    if kkk + 1 == label_info.init_plugins_dir_end:
+                        writer.comment_close()
+                    writer.newline()
+                    on_func_is_open = False
+                    kkk += 1
+                    continue
+            if is_section_group:
+                kkk += 1
+                continue
+            if section_is_open:
+                sect = sections[cur_section_index]
+                if sect.start_cmd_index + sect.num_commands == kkk:
+                    format_section_end(writer)
+                    section_is_open = False
+                    cur_section_index += 1
+                    kkk += 1
+                    continue
+            writer.tab_string(&#39;Return&#39;)
+            writer.newline()
+
+        else:
+            writer.tab(commented)
+            render_opcode(writer, header, instruction, opcode, labels, raw, overwrite_state, kkk, commented)
+            writer.newline()
+
+        kkk += 1
+
+    if section_is_open and cur_section_index &lt; num_sections:
+        sect = sections[cur_section_index]
+        if sect.start_cmd_index + sect.num_commands + 1 == num_instructions:
+            format_section_end(writer)
+            cur_section_index += 1
+
+    while cur_section_index &lt; num_sections:
+        sect = sections[cur_section_index]
+        if section_is_open:
+            if sect.start_cmd_index + sect.num_commands != num_instructions:
+                break
+            format_section_end(writer)
+            section_is_open = False
+            cur_section_index += 1
+            continue
+        if sect.start_cmd_index != num_instructions:
+            break
+        format_section_begin(writer, sect, cur_section_index, header._read_string, is_installer)
+        cur_section_index += 1</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.is_func"><code class="name flex">
+<span>def <span class="ident">is_func</span></span>(<span>flag)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Check whether a label flag indicates a function start.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2118-L2122" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_func(flag: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether a label flag indicates a function start.
+    &#34;&#34;&#34;
+    return bool(flag &amp; (CMD_REF_Call | CMD_REF_Pre | CMD_REF_Show | CMD_REF_Leave | CMD_REF_OnFunc))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.is_page_func"><code class="name flex">
+<span>def <span class="ident">is_page_func</span></span>(<span>flag)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Check whether a label flag indicates a page callback function.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2125-L2129" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_page_func(flag: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether a label flag indicates a page callback function.
+    &#34;&#34;&#34;
+    return bool(flag &amp; (CMD_REF_Pre | CMD_REF_Show | CMD_REF_Leave))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.is_probably_end_of_func"><code class="name flex">
+<span>def <span class="ident">is_probably_end_of_func</span></span>(<span>flag)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Check whether a label flag likely ends a function body.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2132-L2136" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_probably_end_of_func(flag: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether a label flag likely ends a function body.
+    &#34;&#34;&#34;
+    return flag != 0 and flag != CMD_REF_Goto</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.build_labels"><code class="name flex">
+<span>def <span class="ident">build_labels</span></span>(<span>header, sections)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the label array from an NSHeader. Each entry is a bitmask indicating whether the
+instruction at that index is a jump target, call target, function start, section start,
+onFunc entry, or InitPluginsDir.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2149-L2234" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_labels(header: NSHeader, sections: list[NSSection]) -&gt; LabelInfo:
+    &#34;&#34;&#34;
+    Build the label array from an NSHeader. Each entry is a bitmask indicating whether the
+    instruction at that index is a jump target, call target, function start, section start,
+    onFunc entry, or InitPluginsDir.
+    &#34;&#34;&#34;
+    num_instructions = len(header.instructions)
+    labels = [0] * num_instructions
+    raw = bytes(header.raw_data)
+
+    bho_size = 12 if header.is64bit else 8
+    params_offset = 4 + bho_size * 8
+    if header.bh_pages.offset == 276:
+        params_offset -= bho_size
+    on_func_offset = params_offset + 40
+    num_on_func = len(ON_FUNCS)
+    if header.bh_pages.offset == 276:
+        num_on_func -= 1
+
+    for i in range(num_on_func):
+        off = on_func_offset + 4 * i
+        if off + 4 &lt;= len(raw):
+            func = struct.unpack_from(&#39;&lt;I&#39;, raw, off)[0]
+            if func &lt; num_instructions:
+                labels[func] = (labels[func] &amp; ~CMD_REF_OnFunc_Mask) | (CMD_REF_OnFunc | (i &lt;&lt; CMD_REF_OnFunc_NumShifts))
+
+    for section in sections:
+        if section.start_cmd_index &lt; num_instructions:
+            labels[section.start_cmd_index] |= CMD_REF_Section
+
+    for instruction in header.instructions:
+        opcode = header.opcode(instruction)
+        args = instruction.arguments
+
+        if opcode is Op.Call:
+            if len(args) &gt; 1 and args[1] == 1:
+                param0 = args[0]
+                if 0 &lt; param0 &lt;= num_instructions:
+                    labels[param0 - 1] |= CMD_REF_Goto
+            else:
+                param0 = args[0]
+                if param0 &gt; 0 and param0 &lt;= num_instructions:
+                    labels[param0 - 1] |= CMD_REF_Call
+            continue
+
+        mask = _GOTO_MASKS.get(opcode)
+        if mask is None:
+            continue
+
+        for i in range(6):
+            if not mask:
+                break
+            if mask &amp; 1:
+                param = args[i] if i &lt; len(args) else 0
+                signed = param if param &lt; 0x80000000 else param - 0x100000000
+                if signed &gt; 0 and param &lt;= num_instructions:
+                    labels[param - 1] |= CMD_REF_Goto
+            mask &gt;&gt;= 1
+
+    init_start = -1
+    init_end = -1
+    ipd_len = len(INITPLUGINDIR_OPCODES)
+    for k in range(num_instructions):
+        flg = labels[k]
+        if not is_func(flg):
+            continue
+        if num_instructions - k &lt; ipd_len:
+            continue
+        match = True
+        for j in range(ipd_len):
+            insn = header.instructions[k + j]
+            cmd_id = header.opcode(insn)
+            if cmd_id != INITPLUGINDIR_OPCODES[j]:
+                match = False
+                break
+        if match:
+            init_start = k
+            init_end = k + ipd_len
+            labels[k] |= CMD_REF_InitPluginDir
+            break
+
+    return LabelInfo(
+        labels=labels,
+        init_plugins_dir_start=init_start,
+        init_plugins_dir_end=init_end,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter"><code class="flex name class">
+<span>class <span class="ident">NSScriptWriter</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Thin wrapper around an output buffer providing NSIS script formatting helpers.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L376-L473" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class NSScriptWriter:
+    &#34;&#34;&#34;
+    Thin wrapper around an output buffer providing NSIS script formatting helpers.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self._buf = io.StringIO()
+        self._indent = 0
+        self._block_comment = False
+        self._line_start = True
+
+    def _emit_line_prefix(self):
+        if self._line_start and self._block_comment:
+            self._buf.write(&#39;; &#39;)
+        self._line_start = False
+
+    def indent(self):
+        self._indent += 1
+
+    def dedent(self):
+        if self._indent &gt; 0:
+            self._indent -= 1
+
+    def write(self, s: str):
+        self._emit_line_prefix()
+        self._buf.write(s)
+
+    def newline(self):
+        self._buf.write(&#39;\n&#39;)
+        self._line_start = True
+
+    def space(self):
+        self._buf.write(&#39; &#39;)
+
+    def tab(self, commented: bool = False):
+        self._emit_line_prefix()
+        if commented and not self._block_comment:
+            self._buf.write(&#39;    ; &#39;)
+        else:
+            self._buf.write(&#39;  &#39; + &#39;  &#39; * self._indent)
+
+    def big_space_comment(self):
+        self._buf.write(&#39;    ; &#39;)
+
+    def small_space_comment(self):
+        self._buf.write(&#39; ; &#39;)
+
+    def comment(self, s: str):
+        self._emit_line_prefix()
+        self._buf.write(F&#39;; {s}&#39;)
+
+    def separator(self):
+        self.newline()
+        self.comment(F&#39;{&#34;&#34;:-&lt;72}&#39;)
+        self.newline()
+
+    def comment_open(self):
+        self._block_comment = True
+        self._line_start = True
+
+    def comment_close(self):
+        self._block_comment = False
+
+    def add_uint(self, v: int):
+        self._buf.write(str(v))
+
+    def add_hex(self, v: int):
+        self._buf.write(F&#39;0x{v:08X}&#39;)
+
+    def add_color(self, v: int):
+        v = ((v &amp; 0xFF) &lt;&lt; 16) | (v &amp; 0xFF00) | ((v &gt;&gt; 16) &amp; 0xFF)
+        self._buf.write(F&#39;0x{v:06X}&#39;)
+
+    def add_quoted(self, s: str):
+        self._emit_line_prefix()
+        if _is_bare_identifier(s) or _is_numeric(s):
+            self._buf.write(s)
+        else:
+            self._buf.write(F&#39;&#34;{s}&#34;&#39;)
+
+    def space_quoted(self, s: str):
+        self.space()
+        self.add_quoted(s)
+
+    def add_string_lf(self, s: str):
+        self._emit_line_prefix()
+        self._buf.write(s)
+        self.newline()
+
+    def tab_string(self, s: str):
+        self.tab()
+        self._buf.write(s)
+
+    def add_quotes(self):
+        self._buf.write(&#39;&#34;&#34;&#39;)
+
+    def getvalue(self) -&gt; str:
+        return self._buf.getvalue()</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.indent"><code class="name flex">
+<span>def <span class="ident">indent</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L392-L393" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def indent(self):
+    self._indent += 1</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.dedent"><code class="name flex">
+<span>def <span class="ident">dedent</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L395-L397" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dedent(self):
+    if self._indent &gt; 0:
+        self._indent -= 1</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self, s)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L399-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write(self, s: str):
+    self._emit_line_prefix()
+    self._buf.write(s)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.newline"><code class="name flex">
+<span>def <span class="ident">newline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L403-L405" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def newline(self):
+    self._buf.write(&#39;\n&#39;)
+    self._line_start = True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.space"><code class="name flex">
+<span>def <span class="ident">space</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L407-L408" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def space(self):
+    self._buf.write(&#39; &#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.tab"><code class="name flex">
+<span>def <span class="ident">tab</span></span>(<span>self, commented=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L410-L415" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tab(self, commented: bool = False):
+    self._emit_line_prefix()
+    if commented and not self._block_comment:
+        self._buf.write(&#39;    ; &#39;)
+    else:
+        self._buf.write(&#39;  &#39; + &#39;  &#39; * self._indent)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.big_space_comment"><code class="name flex">
+<span>def <span class="ident">big_space_comment</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L417-L418" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def big_space_comment(self):
+    self._buf.write(&#39;    ; &#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.small_space_comment"><code class="name flex">
+<span>def <span class="ident">small_space_comment</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L420-L421" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def small_space_comment(self):
+    self._buf.write(&#39; ; &#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.comment"><code class="name flex">
+<span>def <span class="ident">comment</span></span>(<span>self, s)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L423-L425" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def comment(self, s: str):
+    self._emit_line_prefix()
+    self._buf.write(F&#39;; {s}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.separator"><code class="name flex">
+<span>def <span class="ident">separator</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L427-L430" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def separator(self):
+    self.newline()
+    self.comment(F&#39;{&#34;&#34;:-&lt;72}&#39;)
+    self.newline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.comment_open"><code class="name flex">
+<span>def <span class="ident">comment_open</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L432-L434" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def comment_open(self):
+    self._block_comment = True
+    self._line_start = True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.comment_close"><code class="name flex">
+<span>def <span class="ident">comment_close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L436-L437" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def comment_close(self):
+    self._block_comment = False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.add_uint"><code class="name flex">
+<span>def <span class="ident">add_uint</span></span>(<span>self, v)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L439-L440" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def add_uint(self, v: int):
+    self._buf.write(str(v))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.add_hex"><code class="name flex">
+<span>def <span class="ident">add_hex</span></span>(<span>self, v)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L442-L443" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def add_hex(self, v: int):
+    self._buf.write(F&#39;0x{v:08X}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.add_color"><code class="name flex">
+<span>def <span class="ident">add_color</span></span>(<span>self, v)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L445-L447" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def add_color(self, v: int):
+    v = ((v &amp; 0xFF) &lt;&lt; 16) | (v &amp; 0xFF00) | ((v &gt;&gt; 16) &amp; 0xFF)
+    self._buf.write(F&#39;0x{v:06X}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.add_quoted"><code class="name flex">
+<span>def <span class="ident">add_quoted</span></span>(<span>self, s)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L449-L454" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def add_quoted(self, s: str):
+    self._emit_line_prefix()
+    if _is_bare_identifier(s) or _is_numeric(s):
+        self._buf.write(s)
+    else:
+        self._buf.write(F&#39;&#34;{s}&#34;&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.space_quoted"><code class="name flex">
+<span>def <span class="ident">space_quoted</span></span>(<span>self, s)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L456-L458" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def space_quoted(self, s: str):
+    self.space()
+    self.add_quoted(s)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.add_string_lf"><code class="name flex">
+<span>def <span class="ident">add_string_lf</span></span>(<span>self, s)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L460-L463" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def add_string_lf(self, s: str):
+    self._emit_line_prefix()
+    self._buf.write(s)
+    self.newline()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.tab_string"><code class="name flex">
+<span>def <span class="ident">tab_string</span></span>(<span>self, s)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L465-L467" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tab_string(self, s: str):
+    self.tab()
+    self._buf.write(s)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.add_quotes"><code class="name flex">
+<span>def <span class="ident">add_quotes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L469-L470" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def add_quotes(self):
+    self._buf.write(&#39;&#34;&#34;&#39;)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSScriptWriter.getvalue"><code class="name flex">
+<span>def <span class="ident">getvalue</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L472-L473" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def getvalue(self) -&gt; str:
+    return self._buf.getvalue()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.LabelInfo"><code class="flex name class">
+<span>class <span class="ident">LabelInfo</span></span>
+<span>(</span><span>labels, init_plugins_dir_start=-1, init_plugins_dir_end=-1)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Result of label analysis pass over NSIS instructions.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2139-L2146" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclasses.dataclass
+class LabelInfo:
+    &#34;&#34;&#34;
+    Result of label analysis pass over NSIS instructions.
+    &#34;&#34;&#34;
+    labels: list[int]
+    init_plugins_dir_start: int = -1
+    init_plugins_dir_end: int = -1</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.nsis.decompiler.LabelInfo.labels"><code class="name">var <span class="ident">labels</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.LabelInfo.init_plugins_dir_start"><code class="name">var <span class="ident">init_plugins_dir_start</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.LabelInfo.init_plugins_dir_end"><code class="name">var <span class="ident">init_plugins_dir_end</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSDecompiler"><code class="flex name class">
+<span>class <span class="ident">NSDecompiler</span></span>
+<span>(</span><span>header, archive=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Produces NSIS script output from a parsed NSIS header, combining header info emission, page
+emission, and per-opcode command emission.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2237-L2258" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class NSDecompiler:
+    &#34;&#34;&#34;
+    Produces NSIS script output from a parsed NSIS header, combining header info emission, page
+    emission, and per-opcode command emission.
+    &#34;&#34;&#34;
+
+    def __init__(self, header: NSHeader, archive: NSArchive | None = None):
+        self.header = header
+        self.archive = archive
+        self.is_installer = True
+        if archive is not None:
+            self.is_installer = not bool(archive.flags &amp; NSHeaderFlags.Uninstall)
+
+    def decompile(self) -&gt; str:
+        header = self.header
+        writer = NSScriptWriter()
+        sections = header.sections
+        label_info = build_labels(header, sections)
+        emit_header_info(writer, header, self.archive, self.is_installer)
+        emit_pages(writer, header, label_info.labels, self.is_installer)
+        emit_commands(writer, header, label_info, sections, self.is_installer)
+        return writer.getvalue()</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.nsis.decompiler.NSDecompiler.decompile"><code class="name flex">
+<span>def <span class="ident">decompile</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2250-L2258" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decompile(self) -&gt; str:
+    header = self.header
+    writer = NSScriptWriter()
+    sections = header.sections
+    label_info = build_labels(header, sections)
+    emit_header_info(writer, header, self.archive, self.is_installer)
+    emit_pages(writer, header, label_info.labels, self.is_installer)
+    emit_commands(writer, header, label_info, sections, self.is_installer)
+    return writer.getvalue()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.nsis.decompiler.NSDisassembler"><code class="flex name class">
+<span>class <span class="ident">NSDisassembler</span></span>
+<span>(</span><span>header)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Produces a flat opcode listing from an NSIS script header.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2261-L2296" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class NSDisassembler:
+    &#34;&#34;&#34;
+    Produces a flat opcode listing from an NSIS script header.
+    &#34;&#34;&#34;
+
+    def __init__(self, header: NSHeader):
+        self.header = header
+
+    def disassemble(self) -&gt; str:
+        header = self.header
+        script = io.StringIO()
+        name_width = max(len(op.name) for op in Op)
+        addr_width = len(F&#39;{len(header.instructions):X}&#39;)
+        for k, instruction in enumerate(header.instructions):
+            if k &gt; 0:
+                script.write(&#39;\n&#39;)
+            opcode = header.opcode(instruction)
+            if opcode is Op.INVALID_OPCODE:
+                name = F&#39;Command{instruction.opcode}&#39;
+            else:
+                name = opcode.name
+            script.write(F&#39;0x{k:0{addr_width}X}: {name:&lt;{name_width}} &#39;)
+            for j, arg in enumerate(
+                instruction.arguments[:OP_PARAMETER_COUNT.get(opcode, 6)]
+            ):
+                if j &gt; 0:
+                    script.write(&#39;, &#39;)
+                if arg &gt; 20 and header._is_good_string(arg):
+                    script.write(repr(header._read_string(arg)))
+                elif arg &lt; 0x100:
+                    script.write(str(arg))
+                elif arg &lt; 0x10000:
+                    script.write(F&#39;0x{arg:04X}&#39;)
+                else:
+                    script.write(F&#39;0x{arg:08X}&#39;)
+        return script.getvalue()</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.nsis.decompiler.NSDisassembler.disassemble"><code class="name flex">
+<span>def <span class="ident">disassemble</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/a4d8c908f8e107e3d99de0138d7732f89b4145cb/refinery/lib/nsis/decompiler.py#L2269-L2296" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def disassemble(self) -&gt; str:
+    header = self.header
+    script = io.StringIO()
+    name_width = max(len(op.name) for op in Op)
+    addr_width = len(F&#39;{len(header.instructions):X}&#39;)
+    for k, instruction in enumerate(header.instructions):
+        if k &gt; 0:
+            script.write(&#39;\n&#39;)
+        opcode = header.opcode(instruction)
+        if opcode is Op.INVALID_OPCODE:
+            name = F&#39;Command{instruction.opcode}&#39;
+        else:
+            name = opcode.name
+        script.write(F&#39;0x{k:0{addr_width}X}: {name:&lt;{name_width}} &#39;)
+        for j, arg in enumerate(
+            instruction.arguments[:OP_PARAMETER_COUNT.get(opcode, 6)]
+        ):
+            if j &gt; 0:
+                script.write(&#39;, &#39;)
+            if arg &gt; 20 and header._is_good_string(arg):
+                script.write(repr(header._read_string(arg)))
+            elif arg &lt; 0x100:
+                script.write(str(arg))
+            elif arg &lt; 0x10000:
+                script.write(F&#39;0x{arg:04X}&#39;)
+            else:
+                script.write(F&#39;0x{arg:08X}&#39;)
+    return script.getvalue()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.nsis" href="index.html">refinery.lib.nsis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.nsis.decompiler.decode_messagebox" href="#refinery.lib.nsis.decompiler.decode_messagebox">decode_messagebox</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_button_id" href="#refinery.lib.nsis.decompiler.decode_button_id">decode_button_id</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_showwindow" href="#refinery.lib.nsis.decompiler.decode_showwindow">decode_showwindow</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_reg_root" href="#refinery.lib.nsis.decompiler.decode_reg_root">decode_reg_root</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_exec_flags" href="#refinery.lib.nsis.decompiler.decode_exec_flags">decode_exec_flags</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_sect_op" href="#refinery.lib.nsis.decompiler.decode_sect_op">decode_sect_op</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_file_attributes" href="#refinery.lib.nsis.decompiler.decode_file_attributes">decode_file_attributes</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_setoverwrite" href="#refinery.lib.nsis.decompiler.decode_setoverwrite">decode_setoverwrite</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.decode_shortcut_hotkey" href="#refinery.lib.nsis.decompiler.decode_shortcut_hotkey">decode_shortcut_hotkey</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.nsis_escape" href="#refinery.lib.nsis.decompiler.nsis_escape">nsis_escape</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.format_section_begin" href="#refinery.lib.nsis.decompiler.format_section_begin">format_section_begin</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.format_section_end" href="#refinery.lib.nsis.decompiler.format_section_end">format_section_end</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.emit_pages" href="#refinery.lib.nsis.decompiler.emit_pages">emit_pages</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.emit_header_info" href="#refinery.lib.nsis.decompiler.emit_header_info">emit_header_info</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.render_opcode" href="#refinery.lib.nsis.decompiler.render_opcode">render_opcode</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.emit_commands" href="#refinery.lib.nsis.decompiler.emit_commands">emit_commands</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.is_func" href="#refinery.lib.nsis.decompiler.is_func">is_func</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.is_page_func" href="#refinery.lib.nsis.decompiler.is_page_func">is_page_func</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.is_probably_end_of_func" href="#refinery.lib.nsis.decompiler.is_probably_end_of_func">is_probably_end_of_func</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.build_labels" href="#refinery.lib.nsis.decompiler.build_labels">build_labels</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter" href="#refinery.lib.nsis.decompiler.NSScriptWriter">NSScriptWriter</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.indent" href="#refinery.lib.nsis.decompiler.NSScriptWriter.indent">indent</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.dedent" href="#refinery.lib.nsis.decompiler.NSScriptWriter.dedent">dedent</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.write" href="#refinery.lib.nsis.decompiler.NSScriptWriter.write">write</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.newline" href="#refinery.lib.nsis.decompiler.NSScriptWriter.newline">newline</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.space" href="#refinery.lib.nsis.decompiler.NSScriptWriter.space">space</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.tab" href="#refinery.lib.nsis.decompiler.NSScriptWriter.tab">tab</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.big_space_comment" href="#refinery.lib.nsis.decompiler.NSScriptWriter.big_space_comment">big_space_comment</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.small_space_comment" href="#refinery.lib.nsis.decompiler.NSScriptWriter.small_space_comment">small_space_comment</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.comment" href="#refinery.lib.nsis.decompiler.NSScriptWriter.comment">comment</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.separator" href="#refinery.lib.nsis.decompiler.NSScriptWriter.separator">separator</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.comment_open" href="#refinery.lib.nsis.decompiler.NSScriptWriter.comment_open">comment_open</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.comment_close" href="#refinery.lib.nsis.decompiler.NSScriptWriter.comment_close">comment_close</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.add_uint" href="#refinery.lib.nsis.decompiler.NSScriptWriter.add_uint">add_uint</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.add_hex" href="#refinery.lib.nsis.decompiler.NSScriptWriter.add_hex">add_hex</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.add_color" href="#refinery.lib.nsis.decompiler.NSScriptWriter.add_color">add_color</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.add_quoted" href="#refinery.lib.nsis.decompiler.NSScriptWriter.add_quoted">add_quoted</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.space_quoted" href="#refinery.lib.nsis.decompiler.NSScriptWriter.space_quoted">space_quoted</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.add_string_lf" href="#refinery.lib.nsis.decompiler.NSScriptWriter.add_string_lf">add_string_lf</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.tab_string" href="#refinery.lib.nsis.decompiler.NSScriptWriter.tab_string">tab_string</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.add_quotes" href="#refinery.lib.nsis.decompiler.NSScriptWriter.add_quotes">add_quotes</a></code></li>
+<li><code><a title="refinery.lib.nsis.decompiler.NSScriptWriter.getvalue" href="#refinery.lib.nsis.decompiler.NSScriptWriter.getvalue">getvalue</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.nsis.decompiler.LabelInfo" href="#refinery.lib.nsis.decompiler.LabelInfo">LabelInfo</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.nsis.decompiler.NSDecompiler" href="#refinery.lib.nsis.decompiler.NSDecompiler">NSDecompiler</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.nsis.decompiler.NSDecompiler.decompile" href="#refinery.lib.nsis.decompiler.NSDecompiler.decompile">decompile</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.nsis.decompiler.NSDisassembler" href="#refinery.lib.nsis.decompiler.NSDisassembler">NSDisassembler</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.nsis.decompiler.NSDisassembler.disassemble" href="#refinery.lib.nsis.decompiler.NSDisassembler.disassemble">disassemble</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
