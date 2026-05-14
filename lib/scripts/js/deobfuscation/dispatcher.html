@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.dispatcher documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.dispatcher</code></h1>
+</header>
+<section id="section-intro">
+<p>The dispatcher obfuscation wraps function bodies into a central routing function that uses a string
+keyed lookup table and a global payload array for argument passing. This transformer detects the
+pattern structurally (no reliance on variable names), extracts the original functions, rewrites all
+call sites, and removes the dispatcher scaffolding.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/98f4049e1730e8bb672bda1f73b0dbce8abb4bc6/refinery/lib/scripts/js/deobfuscation/dispatcher.py#L1-L563" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The dispatcher obfuscation wraps function bodies into a central routing function that uses a string
+keyed lookup table and a global payload array for argument passing. This transformer detects the
+pattern structurally (no reliance on variable names), extracts the original functions, rewrites all
+call sites, and removes the dispatcher scaffolding.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from refinery.lib.scripts import (
+    Node,
+    _replace_in_parent,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    ScopeProcessingTransformer,
+    access_key,
+    has_remaining_references,
+    property_key,
+    remove_declarator,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsArrayPattern,
+    JsAssignmentExpression,
+    JsBinaryExpression,
+    JsBlockStatement,
+    JsCallExpression,
+    JsExpressionStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsIfStatement,
+    JsLogicalExpression,
+    JsMemberExpression,
+    JsNewExpression,
+    JsNullLiteral,
+    JsObjectExpression,
+    JsProperty,
+    JsReturnStatement,
+    JsSequenceExpression,
+    JsStringLiteral,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+)
+
+
+@dataclass
+class _DispatcherInfo:
+    &#34;&#34;&#34;
+    All structurally-extracted metadata about a single dispatcher function.
+    &#34;&#34;&#34;
+    decl: JsFunctionDeclaration
+    dispatcher_id: str
+    fns_map: dict[str, JsFunctionExpression]
+    fns_declarator: JsVariableDeclarator
+    payload_id: str
+    wrap_key: str | None
+    cache_id: str | None
+
+
+def _extract_fns_table(
+    body: list,
+) -&gt; tuple[JsVariableDeclarator, dict[str, JsFunctionExpression]] | None:
+    &#34;&#34;&#34;
+    Finds a declaration of the form
+
+        var fns = { ... }
+
+    where every property value is a zero-parameter `JsFunctionExpression`. Returns the declarator
+    node and a map from string key to function.
+    &#34;&#34;&#34;
+    for stmt in body:
+        if not isinstance(stmt, JsVariableDeclaration):
+            continue
+        for decl in stmt.declarations:
+            if not isinstance(decl, JsVariableDeclarator):
+                continue
+            if not isinstance(decl.init, JsObjectExpression):
+                continue
+            obj = decl.init
+            if not obj.properties:
+                continue
+            fns: dict[str, JsFunctionExpression] = {}
+            ok = True
+            for prop in obj.properties:
+                if not isinstance(prop, JsProperty):
+                    ok = False
+                    break
+                key = property_key(prop)
+                if key is None:
+                    ok = False
+                    break
+                if not isinstance(prop.value, JsFunctionExpression):
+                    ok = False
+                    break
+                if prop.value.params:
+                    ok = False
+                    break
+                fns[key] = prop.value
+            if ok and fns:
+                return decl, fns
+    return None
+
+
+def _find_payload_id(body: list, second_param: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    Find the payload-init guard:
+
+        if (p1 === &#34;...&#34;) { payload = []; }
+
+    and return the payload identifier name. The guard compares the function&#39;s second parameter to a
+    string literal and assigns an empty array to the payload variable.
+    &#34;&#34;&#34;
+    for stmt in body:
+        if not isinstance(stmt, JsIfStatement):
+            continue
+        test = stmt.test
+        if not isinstance(test, JsBinaryExpression) or test.operator != &#39;===&#39;:
+            continue
+        if not (
+            isinstance(test.left, JsIdentifier)
+            and test.left.name == second_param
+            and isinstance(test.right, JsStringLiteral)
+        ):
+            continue
+        cons = stmt.consequent
+        if isinstance(cons, JsBlockStatement) and len(cons.body) == 1:
+            cons = cons.body[0]
+        if not isinstance(cons, JsExpressionStatement):
+            continue
+        expr = cons.expression
+        if not isinstance(expr, JsAssignmentExpression) or expr.operator != &#39;=&#39;:
+            continue
+        if isinstance(expr.left, JsIdentifier) and isinstance(expr.right, JsArrayExpression):
+            if not expr.right.elements:
+                return expr.left.name
+    return None
+
+
+def _find_wrap_key(body: list, third_param: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    Find the return-type wrapper:
+
+        if (p2 === &#34;...&#34;) { return { &#34;wrapKey&#34;: output }; }
+
+    and return the wrapper property name.
+    &#34;&#34;&#34;
+    for stmt in body:
+        if not isinstance(stmt, JsIfStatement):
+            continue
+        test = stmt.test
+        if not isinstance(test, JsBinaryExpression) or test.operator != &#39;===&#39;:
+            continue
+        if not (
+            isinstance(test.left, JsIdentifier)
+            and test.left.name == third_param
+            and isinstance(test.right, JsStringLiteral)
+        ):
+            continue
+        cons = stmt.consequent
+        if isinstance(cons, JsBlockStatement) and len(cons.body) == 1:
+            inner = cons.body[0]
+        else:
+            inner = cons
+        if not isinstance(inner, JsReturnStatement):
+            continue
+        ret_val = inner.argument
+        if not isinstance(ret_val, JsObjectExpression):
+            continue
+        if len(ret_val.properties) != 1:
+            continue
+        prop = ret_val.properties[0]
+        if isinstance(prop, JsProperty):
+            key = property_key(prop)
+            if key is not None:
+                return key
+    return None
+
+
+def _find_cache_id(body: list, first_param: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    Find the cache variable from the create-flag branch. Looks for an `if` whose body contains a
+    logical-or assignment like
+
+        cache[p0] || (cache[p0] = ...)
+
+    Returns the cache identifier.
+    &#34;&#34;&#34;
+    for stmt in body:
+        if not isinstance(stmt, JsIfStatement):
+            continue
+        for node in stmt.walk():
+            if not isinstance(node, JsMemberExpression):
+                continue
+            if (
+                isinstance(node.object, JsIdentifier)
+                and isinstance(node.property, JsIdentifier)
+                and node.property.name == first_param
+                and node.computed
+            ):
+                parent = node.parent
+                if isinstance(parent, JsLogicalExpression) and parent.operator == &#39;||&#39;:
+                    return node.object.name
+    return None
+
+
+def _detect_dispatcher(func: JsFunctionDeclaration) -&gt; _DispatcherInfo | None:
+    &#34;&#34;&#34;
+    Structurally detect whether `func` is a dispatcher function. Returns the extracted metadata or
+    `None` if the function does not match the pattern.
+    &#34;&#34;&#34;
+    if not isinstance(func.id, JsIdentifier):
+        return None
+    if not isinstance(func.body, JsBlockStatement):
+        return None
+    if len(func.params) &lt; 3:
+        return None
+    p0 = func.params[0]
+    p1 = func.params[1]
+    p2 = func.params[2]
+    if (
+        not isinstance(p0, JsIdentifier)
+        or not isinstance(p1, JsIdentifier)
+        or not isinstance(p2, JsIdentifier)
+    ):
+        return None
+    first_param: str = p0.name
+    second_param: str = p1.name
+    third_param: str = p2.name
+    body = func.body.body
+    result = _extract_fns_table(body)
+    if result is None:
+        return None
+    fns_declarator, fns_map = result
+    payload_id = _find_payload_id(body, second_param)
+    if payload_id is None:
+        return None
+    wrap_key = _find_wrap_key(body, third_param)
+    cache_id = _find_cache_id(body, first_param)
+    return _DispatcherInfo(
+        decl=func,
+        dispatcher_id=func.id.name,
+        fns_map=fns_map,
+        fns_declarator=fns_declarator,
+        payload_id=payload_id,
+        wrap_key=wrap_key,
+        cache_id=cache_id,
+    )
+
+
+def _extract_params(
+    fn: JsFunctionExpression,
+    payload_id: str,
+) -&gt; list[JsIdentifier] | None:
+    &#34;&#34;&#34;
+    Extract parameter names from the leading payload destructuring statement:
+
+        var [a, b] = payload;
+
+    Returns the parameter identifiers or `None` if the pattern is not found.
+    &#34;&#34;&#34;
+    if not isinstance(fn.body, JsBlockStatement) or not fn.body.body:
+        return []
+    first = fn.body.body[0]
+    if not isinstance(first, JsVariableDeclaration):
+        return []
+    for decl in first.declarations:
+        if not isinstance(decl, JsVariableDeclarator):
+            continue
+        if not isinstance(decl.id, JsArrayPattern):
+            continue
+        if not isinstance(decl.init, JsIdentifier):
+            continue
+        if decl.init.name != payload_id:
+            continue
+        params: list[JsIdentifier] = []
+        for elem in decl.id.elements:
+            if not isinstance(elem, JsIdentifier):
+                return None
+            params.append(JsIdentifier(name=elem.name))
+        return params
+    return []
+
+
+def _build_extracted_function(
+    key: str,
+    fn: JsFunctionExpression,
+    payload_id: str,
+) -&gt; JsFunctionDeclaration | None:
+    &#34;&#34;&#34;
+    Convert a dispatcher function-table entry into a standalone `JsFunctionDeclaration`. Extracts
+    parameters from the payload destructuring and removes that statement.
+    &#34;&#34;&#34;
+    params = _extract_params(fn, payload_id)
+    if params is None:
+        return None
+    body = fn.body
+    if not isinstance(body, JsBlockStatement):
+        return None
+    new_body_stmts = list(body.body)
+    if new_body_stmts and params:
+        first = new_body_stmts[0]
+        if isinstance(first, JsVariableDeclaration):
+            remaining = [
+                d for d in first.declarations
+                if not (
+                    isinstance(d, JsVariableDeclarator)
+                    and isinstance(d.id, JsArrayPattern)
+                    and isinstance(d.init, JsIdentifier)
+                    and d.init.name == payload_id
+                )
+            ]
+            if not remaining:
+                new_body_stmts = new_body_stmts[1:]
+            else:
+                first.declarations = remaining
+    new_body = JsBlockStatement(body=new_body_stmts)
+    decl = JsFunctionDeclaration(
+        id=JsIdentifier(name=key),
+        params=list(params),
+        body=new_body,
+    )
+    return decl
+
+
+def _is_object_create_null(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Check if *node* is `Object.create(null)`.
+    &#34;&#34;&#34;
+    if not isinstance(node, JsCallExpression):
+        return False
+    if len(node.arguments) != 1 or not isinstance(node.arguments[0], JsNullLiteral):
+        return False
+    callee = node.callee
+    if not isinstance(callee, JsMemberExpression):
+        return False
+    if not isinstance(callee.object, JsIdentifier) or callee.object.name != &#39;Object&#39;:
+        return False
+    prop = callee.property
+    if isinstance(prop, JsStringLiteral):
+        return prop.value == &#39;create&#39;
+    if isinstance(prop, JsIdentifier) and not callee.computed:
+        return prop.name == &#39;create&#39;
+    return False
+
+
+class JsDispatcherUnwrapper(ScopeProcessingTransformer):
+    &#34;&#34;&#34;
+    Detect and unwrap a dispatcher pattern. For each dispatcher found, extract the wrapped
+    functions, rewrite call sites, and remove the dispatcher scaffolding.
+    &#34;&#34;&#34;
+
+    def _process_scope_body(self, scope: Node, body: list) -&gt; None:
+        for func in list(body):
+            if not isinstance(func, JsFunctionDeclaration):
+                continue
+            info = _detect_dispatcher(func)
+            if info is None:
+                continue
+            self._unwrap_dispatcher(scope, body, info)
+
+    def _unwrap_dispatcher(
+        self,
+        scope: Node,
+        body: list,
+        info: _DispatcherInfo,
+    ) -&gt; None:
+        extracted: dict[str, JsFunctionDeclaration] = {}
+        for key, fn in info.fns_map.items():
+            decl = _build_extracted_function(key, fn, info.payload_id)
+            if decl is None:
+                return
+            extracted[key] = decl
+        self._rewrite_call_sites(scope, info, extracted)
+        insert_idx = body.index(info.decl)
+        body.remove(info.decl)
+        for i, (key, decl) in enumerate(extracted.items()):
+            decl.parent = scope
+            body.insert(insert_idx + i, decl)
+        self._remove_boilerplate(scope, body, info)
+        self.mark_changed()
+
+    def _rewrite_call_sites(
+        self,
+        scope: Node,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        for node in list(scope.walk()):
+            if isinstance(node, JsSequenceExpression):
+                self._try_rewrite_direct_call(node, info, extracted)
+            elif isinstance(node, JsMemberExpression):
+                self._try_rewrite_wrapped_ref(node, info, extracted)
+            elif isinstance(node, JsCallExpression):
+                self._try_rewrite_bare_call(node, info, extracted)
+
+    def _try_rewrite_direct_call(
+        self,
+        seq: JsSequenceExpression,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite a sequence expression dispatch call to a direct call:
+
+            (payload = [args], dispatcher(&#34;key&#34;))  -&gt;  key(args)
+
+        Also handles the wrapped variant where the return value is unwrapped via a member access
+        on the wrap key:
+
+            (payload = [args], dispatcher(&#34;key&#34;, s, wrapFlag)[&#34;wk&#34;])
+        &#34;&#34;&#34;
+        if len(seq.expressions) != 2:
+            return
+        assign, second = seq.expressions
+        if not isinstance(assign, JsAssignmentExpression):
+            return
+        if assign.operator != &#39;=&#39;:
+            return
+        if not isinstance(assign.left, JsIdentifier) or assign.left.name != info.payload_id:
+            return
+        if not isinstance(assign.right, JsArrayExpression):
+            return
+        dispatch_call = self._unwrap_dispatch_call(second, info)
+        if dispatch_call is None:
+            return
+        if not dispatch_call.arguments:
+            return
+        key_arg = dispatch_call.arguments[0]
+        if not isinstance(key_arg, JsStringLiteral):
+            return
+        key = key_arg.value
+        if key not in extracted:
+            return
+        args = [
+            JsIdentifier(name=&#39;undefined&#39;) if e is None else e
+            for e in assign.right.elements
+        ]
+        replacement = JsCallExpression(
+            callee=JsIdentifier(name=key),
+            arguments=args,
+        )
+        _replace_in_parent(seq, replacement)
+
+    @staticmethod
+    def _unwrap_dispatch_call(
+        node: Node,
+        info: _DispatcherInfo,
+    ) -&gt; JsCallExpression | JsNewExpression | None:
+        &#34;&#34;&#34;
+        Extract a dispatcher call from *node*, which may be a bare call or a member access of
+        the form:
+
+            dispatcher(...)[&#34;wrapKey&#34;]
+
+        Returns the call node or `None`.
+        &#34;&#34;&#34;
+        call = node
+        if isinstance(node, JsMemberExpression) and info.wrap_key is not None:
+            if access_key(node) == info.wrap_key:
+                call = node.object
+        if not isinstance(call, (JsCallExpression, JsNewExpression)):
+            return None
+        if not isinstance(call.callee, JsIdentifier):
+            return None
+        if call.callee.name != info.dispatcher_id:
+            return None
+        return call
+
+    def _try_rewrite_wrapped_ref(
+        self,
+        member: JsMemberExpression,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite new-expression dispatch with wrap key access to the resolved function identifier:
+
+            new dispatcher(&#34;key&#34;, s2, s3)[&#34;wrapKey&#34;]  -&gt;  key
+        &#34;&#34;&#34;
+        if info.wrap_key is None:
+            return
+        if access_key(member) != info.wrap_key:
+            return
+        new_expr = member.object
+        if not isinstance(new_expr, JsNewExpression):
+            return
+        if not isinstance(new_expr.callee, JsIdentifier):
+            return
+        if new_expr.callee.name != info.dispatcher_id:
+            return
+        if not new_expr.arguments:
+            return
+        key_arg = new_expr.arguments[0]
+        if not isinstance(key_arg, JsStringLiteral):
+            return
+        key = key_arg.value
+        if key not in extracted:
+            return
+        _replace_in_parent(member, JsIdentifier(name=key))
+
+    def _try_rewrite_bare_call(
+        self,
+        call: JsCallExpression,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite bare `dispatcher(&#34;key&#34;)` calls (without a preceding payload assignment) to
+        `key()`. These occur when the dispatched function takes no arguments.
+        &#34;&#34;&#34;
+        if not isinstance(call.callee, JsIdentifier):
+            return
+        if call.callee.name != info.dispatcher_id:
+            return
+        if not call.arguments:
+            return
+        key_arg = call.arguments[0]
+        if not isinstance(key_arg, JsStringLiteral):
+            return
+        key = key_arg.value
+        if key not in extracted:
+            return
+        if isinstance(call.parent, JsSequenceExpression):
+            return
+        replacement = JsCallExpression(
+            callee=JsIdentifier(name=key),
+            arguments=[],
+        )
+        _replace_in_parent(call, replacement)
+
+    @staticmethod
+    def _remove_boilerplate(scope: Node, body: list, info: _DispatcherInfo) -&gt; None:
+        &#34;&#34;&#34;
+        Remove dispatcher-related boilerplate declarations from the scope body.
+        &#34;&#34;&#34;
+        to_remove = []
+        for stmt in list(body):
+            if isinstance(stmt, JsVariableDeclaration):
+                for decl in stmt.declarations:
+                    if not isinstance(decl, JsVariableDeclarator):
+                        continue
+                    if not isinstance(decl.id, JsIdentifier):
+                        continue
+                    if decl.id.name == info.payload_id and decl.init is None:
+                        remove_declarator(decl)
+                        break
+                    if info.cache_id and decl.id.name == info.cache_id:
+                        if decl.init is not None and _is_object_create_null(decl.init):
+                            remove_declarator(decl)
+                            break
+            elif isinstance(stmt, JsFunctionDeclaration):
+                if (
+                    isinstance(stmt.id, JsIdentifier)
+                    and isinstance(stmt.body, JsBlockStatement)
+                    and not stmt.body.body
+                    and not stmt.params
+                ):
+                    if not has_remaining_references(scope, stmt.id.name, exclude=stmt):
+                        to_remove.append(stmt)
+        for stmt in to_remove:
+            body.remove(stmt)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.dispatcher.JsDispatcherUnwrapper"><code class="flex name class">
+<span>class <span class="ident">JsDispatcherUnwrapper</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Detect and unwrap a dispatcher pattern. For each dispatcher found, extract the wrapped
+functions, rewrite call sites, and remove the dispatcher scaffolding.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/98f4049e1730e8bb672bda1f73b0dbce8abb4bc6/refinery/lib/scripts/js/deobfuscation/dispatcher.py#L348-L563" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsDispatcherUnwrapper(ScopeProcessingTransformer):
+    &#34;&#34;&#34;
+    Detect and unwrap a dispatcher pattern. For each dispatcher found, extract the wrapped
+    functions, rewrite call sites, and remove the dispatcher scaffolding.
+    &#34;&#34;&#34;
+
+    def _process_scope_body(self, scope: Node, body: list) -&gt; None:
+        for func in list(body):
+            if not isinstance(func, JsFunctionDeclaration):
+                continue
+            info = _detect_dispatcher(func)
+            if info is None:
+                continue
+            self._unwrap_dispatcher(scope, body, info)
+
+    def _unwrap_dispatcher(
+        self,
+        scope: Node,
+        body: list,
+        info: _DispatcherInfo,
+    ) -&gt; None:
+        extracted: dict[str, JsFunctionDeclaration] = {}
+        for key, fn in info.fns_map.items():
+            decl = _build_extracted_function(key, fn, info.payload_id)
+            if decl is None:
+                return
+            extracted[key] = decl
+        self._rewrite_call_sites(scope, info, extracted)
+        insert_idx = body.index(info.decl)
+        body.remove(info.decl)
+        for i, (key, decl) in enumerate(extracted.items()):
+            decl.parent = scope
+            body.insert(insert_idx + i, decl)
+        self._remove_boilerplate(scope, body, info)
+        self.mark_changed()
+
+    def _rewrite_call_sites(
+        self,
+        scope: Node,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        for node in list(scope.walk()):
+            if isinstance(node, JsSequenceExpression):
+                self._try_rewrite_direct_call(node, info, extracted)
+            elif isinstance(node, JsMemberExpression):
+                self._try_rewrite_wrapped_ref(node, info, extracted)
+            elif isinstance(node, JsCallExpression):
+                self._try_rewrite_bare_call(node, info, extracted)
+
+    def _try_rewrite_direct_call(
+        self,
+        seq: JsSequenceExpression,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite a sequence expression dispatch call to a direct call:
+
+            (payload = [args], dispatcher(&#34;key&#34;))  -&gt;  key(args)
+
+        Also handles the wrapped variant where the return value is unwrapped via a member access
+        on the wrap key:
+
+            (payload = [args], dispatcher(&#34;key&#34;, s, wrapFlag)[&#34;wk&#34;])
+        &#34;&#34;&#34;
+        if len(seq.expressions) != 2:
+            return
+        assign, second = seq.expressions
+        if not isinstance(assign, JsAssignmentExpression):
+            return
+        if assign.operator != &#39;=&#39;:
+            return
+        if not isinstance(assign.left, JsIdentifier) or assign.left.name != info.payload_id:
+            return
+        if not isinstance(assign.right, JsArrayExpression):
+            return
+        dispatch_call = self._unwrap_dispatch_call(second, info)
+        if dispatch_call is None:
+            return
+        if not dispatch_call.arguments:
+            return
+        key_arg = dispatch_call.arguments[0]
+        if not isinstance(key_arg, JsStringLiteral):
+            return
+        key = key_arg.value
+        if key not in extracted:
+            return
+        args = [
+            JsIdentifier(name=&#39;undefined&#39;) if e is None else e
+            for e in assign.right.elements
+        ]
+        replacement = JsCallExpression(
+            callee=JsIdentifier(name=key),
+            arguments=args,
+        )
+        _replace_in_parent(seq, replacement)
+
+    @staticmethod
+    def _unwrap_dispatch_call(
+        node: Node,
+        info: _DispatcherInfo,
+    ) -&gt; JsCallExpression | JsNewExpression | None:
+        &#34;&#34;&#34;
+        Extract a dispatcher call from *node*, which may be a bare call or a member access of
+        the form:
+
+            dispatcher(...)[&#34;wrapKey&#34;]
+
+        Returns the call node or `None`.
+        &#34;&#34;&#34;
+        call = node
+        if isinstance(node, JsMemberExpression) and info.wrap_key is not None:
+            if access_key(node) == info.wrap_key:
+                call = node.object
+        if not isinstance(call, (JsCallExpression, JsNewExpression)):
+            return None
+        if not isinstance(call.callee, JsIdentifier):
+            return None
+        if call.callee.name != info.dispatcher_id:
+            return None
+        return call
+
+    def _try_rewrite_wrapped_ref(
+        self,
+        member: JsMemberExpression,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite new-expression dispatch with wrap key access to the resolved function identifier:
+
+            new dispatcher(&#34;key&#34;, s2, s3)[&#34;wrapKey&#34;]  -&gt;  key
+        &#34;&#34;&#34;
+        if info.wrap_key is None:
+            return
+        if access_key(member) != info.wrap_key:
+            return
+        new_expr = member.object
+        if not isinstance(new_expr, JsNewExpression):
+            return
+        if not isinstance(new_expr.callee, JsIdentifier):
+            return
+        if new_expr.callee.name != info.dispatcher_id:
+            return
+        if not new_expr.arguments:
+            return
+        key_arg = new_expr.arguments[0]
+        if not isinstance(key_arg, JsStringLiteral):
+            return
+        key = key_arg.value
+        if key not in extracted:
+            return
+        _replace_in_parent(member, JsIdentifier(name=key))
+
+    def _try_rewrite_bare_call(
+        self,
+        call: JsCallExpression,
+        info: _DispatcherInfo,
+        extracted: dict[str, JsFunctionDeclaration],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite bare `dispatcher(&#34;key&#34;)` calls (without a preceding payload assignment) to
+        `key()`. These occur when the dispatched function takes no arguments.
+        &#34;&#34;&#34;
+        if not isinstance(call.callee, JsIdentifier):
+            return
+        if call.callee.name != info.dispatcher_id:
+            return
+        if not call.arguments:
+            return
+        key_arg = call.arguments[0]
+        if not isinstance(key_arg, JsStringLiteral):
+            return
+        key = key_arg.value
+        if key not in extracted:
+            return
+        if isinstance(call.parent, JsSequenceExpression):
+            return
+        replacement = JsCallExpression(
+            callee=JsIdentifier(name=key),
+            arguments=[],
+        )
+        _replace_in_parent(call, replacement)
+
+    @staticmethod
+    def _remove_boilerplate(scope: Node, body: list, info: _DispatcherInfo) -&gt; None:
+        &#34;&#34;&#34;
+        Remove dispatcher-related boilerplate declarations from the scope body.
+        &#34;&#34;&#34;
+        to_remove = []
+        for stmt in list(body):
+            if isinstance(stmt, JsVariableDeclaration):
+                for decl in stmt.declarations:
+                    if not isinstance(decl, JsVariableDeclarator):
+                        continue
+                    if not isinstance(decl.id, JsIdentifier):
+                        continue
+                    if decl.id.name == info.payload_id and decl.init is None:
+                        remove_declarator(decl)
+                        break
+                    if info.cache_id and decl.id.name == info.cache_id:
+                        if decl.init is not None and _is_object_create_null(decl.init):
+                            remove_declarator(decl)
+                            break
+            elif isinstance(stmt, JsFunctionDeclaration):
+                if (
+                    isinstance(stmt.id, JsIdentifier)
+                    and isinstance(stmt.body, JsBlockStatement)
+                    and not stmt.body.body
+                    and not stmt.params
+                ):
+                    if not has_remaining_references(scope, stmt.id.name, exclude=stmt):
+                        to_remove.append(stmt)
+        for stmt in to_remove:
+            body.remove(stmt)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer">ScopeProcessingTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.dispatcher.JsDispatcherUnwrapper" href="#refinery.lib.scripts.js.deobfuscation.dispatcher.JsDispatcherUnwrapper">JsDispatcherUnwrapper</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
