@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.scramble documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.scramble</code></h1>
+</header>
+<section id="section-intro">
+<p>Resolves string concealment using the Scramble cipher. Scramble uses PBKDF2 key derivation
+followed by multiple rounds of a permutation-based substitution cipher with CBC-like chaining.
+Detection is structural: a class whose constructor calls pbkdf2Sync with 'sha256', assigns
+this.masterKey and this.rounds, and exposes a decode method.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/scripts/js/deobfuscation/scramble.py#L1-L407" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Resolves string concealment using the Scramble cipher. Scramble uses PBKDF2 key derivation
+followed by multiple rounds of a permutation-based substitution cipher with CBC-like chaining.
+Detection is structural: a class whose constructor calls pbkdf2Sync with &#39;sha256&#39;, assigns
+this.masterKey and this.rounds, and exposes a decode method.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import base64
+import hashlib
+
+from typing import NamedTuple, Sequence
+
+from refinery.lib.fast.scramble import decrypt_round as _decrypt_round
+from refinery.lib.scripts import Node, _remove_from_parent, _replace_in_parent
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    GLOBAL_OBJECT_ALIASES,
+    ScriptLevelTransformer,
+    access_key,
+    make_string_literal,
+    remove_declarator,
+)
+from refinery.lib.scripts.js.model import (
+    JsAssignmentExpression,
+    JsCallExpression,
+    JsClassBody,
+    JsClassDeclaration,
+    JsExpressionStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsMemberExpression,
+    JsMethodDefinition,
+    JsMethodKind,
+    JsNewExpression,
+    JsNumericLiteral,
+    JsReturnStatement,
+    JsScript,
+    JsStringLiteral,
+    JsThisExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+)
+
+_DEFAULT_ROUNDS = 3
+_DEFAULT_ITERATIONS = 200000
+
+
+class ScrambleCipher:
+    __slots__ = (&#39;_master_key&#39;, &#39;_rounds&#39;)
+
+    def __init__(
+        self,
+        password: str,
+        salt: str,
+        iterations: int = _DEFAULT_ITERATIONS,
+        rounds: int = _DEFAULT_ROUNDS,
+    ):
+        self._master_key = hashlib.pbkdf2_hmac(
+            &#39;sha256&#39;, password.encode(), salt.encode(), iterations, dklen=32,
+        )
+        self._rounds = rounds
+
+    def decode(self, encoded: str) -&gt; str:
+        data = base64.b64decode(encoded)
+        nonce = data[:16]
+        ciphertext = data[16:]
+        round_key = hashlib.sha256(self._master_key + nonce).digest()
+        for r in range(self._rounds - 1, -1, -1):
+            ciphertext = _decrypt_round(ciphertext, round_key, r)
+        return ciphertext.decode(&#39;utf-8&#39;)
+
+
+def _method_name(method: JsMethodDefinition) -&gt; str | None:
+    if method.kind == JsMethodKind.CONSTRUCTOR:
+        return &#39;constructor&#39;
+    if method.key is None:
+        return None
+    if isinstance(method.key, JsIdentifier) and not method.computed:
+        return method.key.name
+    if isinstance(method.key, JsStringLiteral):
+        return method.key.value
+    return None
+
+
+def _is_scramble_class(node: Node) -&gt; bool:
+    body: JsClassBody | None = getattr(node, &#39;body&#39;, None)
+    if body is None:
+        return False
+    has_decode = False
+    has_pbkdf2 = False
+    for method in body.body:
+        if not isinstance(method, JsMethodDefinition):
+            continue
+        name = _method_name(method)
+        if name == &#39;decode&#39;:
+            has_decode = True
+        elif name == &#39;constructor&#39;:
+            has_pbkdf2 = _constructor_has_pbkdf2(method)
+    return has_decode and has_pbkdf2
+
+
+def _constructor_has_pbkdf2(method: JsMethodDefinition) -&gt; bool:
+    fn = method.value
+    if fn is None or fn.body is None:
+        return False
+    for node in fn.body.walk():
+        if not isinstance(node, JsAssignmentExpression):
+            continue
+        if not _is_this_member(node.left, &#39;masterKey&#39;):
+            continue
+        call = node.right
+        if not isinstance(call, JsCallExpression) or len(call.arguments) &lt; 5:
+            continue
+        last_arg = call.arguments[-1]
+        return isinstance(last_arg, JsStringLiteral) and last_arg.value == &#39;sha256&#39;
+    return False
+
+
+def _is_this_member(node: Node | None, name: str) -&gt; bool:
+    return (
+        isinstance(node, JsMemberExpression)
+        and isinstance(node.object, JsThisExpression)
+        and access_key(node) == name
+    )
+
+
+def _extract_constructor_params(method: JsMethodDefinition) -&gt; tuple[int, int]:
+    fn = method.value
+    rounds = _DEFAULT_ROUNDS
+    iterations = _DEFAULT_ITERATIONS
+    if fn is None or fn.body is None:
+        return rounds, iterations
+    for node in fn.body.walk():
+        if not isinstance(node, JsAssignmentExpression):
+            continue
+        if _is_this_member(node.left, &#39;rounds&#39;):
+            if isinstance(node.right, JsNumericLiteral) and isinstance(node.right.value, int):
+                rounds = node.right.value
+        elif _is_this_member(node.left, &#39;masterKey&#39;):
+            if not isinstance(node.right, JsCallExpression) or len(node.right.arguments) &lt; 5:
+                continue
+            iters_arg = node.right.arguments[2]
+            if isinstance(iters_arg, JsNumericLiteral) and isinstance(iters_arg.value, int):
+                iterations = iters_arg.value
+    return rounds, iterations
+
+
+def _get_class_params(class_node: JsClassDeclaration) -&gt; tuple[int, int]:
+    if class_node.body is None:
+        return _DEFAULT_ROUNDS, _DEFAULT_ITERATIONS
+    for method in class_node.body.body:
+        if not isinstance(method, JsMethodDefinition):
+            continue
+        if _method_name(method) == &#39;constructor&#39;:
+            return _extract_constructor_params(method)
+    return _DEFAULT_ROUNDS, _DEFAULT_ITERATIONS
+
+
+def _resolve_string(node: Node | None, scope_body: Sequence[Node]) -&gt; str | None:
+    if isinstance(node, JsStringLiteral):
+        return node.value
+    if not isinstance(node, JsIdentifier):
+        return None
+    name = node.name
+    for stmt in scope_body:
+        if isinstance(stmt, JsVariableDeclaration):
+            for decl in stmt.declarations:
+                if (
+                    isinstance(decl, JsVariableDeclarator)
+                    and isinstance(decl.id, JsIdentifier)
+                    and decl.id.name == name
+                    and isinstance(decl.init, JsStringLiteral)
+                ):
+                    return decl.init.value
+    return None
+
+
+class _InstanceInfo(NamedTuple):
+    name: str
+    password: str
+    salt: str
+    iterations: int
+    rounds: int
+
+
+class JsScrambleStringDecoder(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Detects Scramble cipher infrastructure, decrypts all encoded strings in Python, and replaces
+    call sites with the decoded string literals.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        body = node.body
+        class_node = self._find_scramble_class(body)
+        if class_node is None or class_node.id is None:
+            return
+        instance = self._find_instance(body, class_node.id.name, class_node)
+        if instance is None:
+            return
+        decode_names = self._find_decode_functions(body, instance.name)
+        if not decode_names:
+            return
+        cipher = ScrambleCipher(
+            instance.password,
+            instance.salt,
+            instance.iterations,
+            instance.rounds,
+        )
+        count = self._substitute_calls(node, decode_names, cipher)
+        if count &gt; 0:
+            self._remove_infrastructure(body, class_node, instance, decode_names)
+            self.mark_changed()
+
+    def _find_scramble_class(self, body: Sequence[Node]) -&gt; JsClassDeclaration | None:
+        for stmt in body:
+            if (
+                isinstance(stmt, JsClassDeclaration)
+                and _is_scramble_class(stmt)
+                and stmt.id is not None
+                and isinstance(stmt.id, JsIdentifier)
+            ):
+                return stmt
+        return None
+
+    def _find_instance(
+        self, body: Sequence[Node], class_name: str, class_node: JsClassDeclaration,
+    ) -&gt; _InstanceInfo | None:
+        for stmt in body:
+            if not isinstance(stmt, JsVariableDeclaration):
+                continue
+            for decl in stmt.declarations:
+                if not isinstance(decl, JsVariableDeclarator):
+                    continue
+                if not isinstance(decl.id, JsIdentifier):
+                    continue
+                init = decl.init
+                if not isinstance(init, JsNewExpression):
+                    continue
+                if not isinstance(init.callee, JsIdentifier):
+                    continue
+                if init.callee.name != class_name:
+                    continue
+                if len(init.arguments) &lt; 2:
+                    continue
+                password = _resolve_string(init.arguments[0], body)
+                salt = _resolve_string(init.arguments[1], body)
+                if password is None or salt is None:
+                    continue
+                rounds, iterations = _get_class_params(class_node)
+                return _InstanceInfo(
+                    name=decl.id.name,
+                    password=password,
+                    salt=salt,
+                    iterations=iterations,
+                    rounds=rounds,
+                )
+        return None
+
+    def _find_decode_functions(self, body: Sequence[Node], instance_name: str) -&gt; set[str]:
+        names: set[str] = set()
+        for stmt in body:
+            if isinstance(stmt, JsFunctionDeclaration):
+                if self._is_decode_wrapper(stmt, instance_name) and stmt.id is not None:
+                    names.add(stmt.id.name)
+            elif isinstance(stmt, JsVariableDeclaration):
+                for decl in stmt.declarations:
+                    if not isinstance(decl, JsVariableDeclarator):
+                        continue
+                    if not isinstance(decl.id, JsIdentifier):
+                        continue
+                    if not isinstance(decl.init, JsFunctionExpression):
+                        continue
+                    if self._is_decode_wrapper(decl.init, instance_name):
+                        names.add(decl.id.name)
+        aliases = self._find_aliases(body, names)
+        names.update(aliases)
+        return names
+
+    def _is_decode_wrapper(
+        self, fn: JsFunctionDeclaration | JsFunctionExpression, instance_name: str,
+    ) -&gt; bool:
+        if fn.body is None or len(fn.body.body) != 1:
+            return False
+        stmt = fn.body.body[0]
+        if not isinstance(stmt, JsReturnStatement) or stmt.argument is None:
+            return False
+        call = stmt.argument
+        if not isinstance(call, JsCallExpression):
+            return False
+        callee = call.callee
+        return (
+            isinstance(callee, JsMemberExpression)
+            and isinstance(callee.object, JsIdentifier)
+            and callee.object.name == instance_name
+            and access_key(callee) == &#39;decode&#39;
+        )
+
+    def _find_aliases(self, body: Sequence[Node], known: set[str]) -&gt; set[str]:
+        aliases: set[str] = set()
+        for stmt in body:
+            if not isinstance(stmt, JsExpressionStatement):
+                continue
+            expr = stmt.expression
+            if not isinstance(expr, JsAssignmentExpression) or expr.operator != &#39;=&#39;:
+                continue
+            if not isinstance(expr.right, JsIdentifier) or expr.right.name not in known:
+                continue
+            if isinstance(expr.left, JsIdentifier):
+                aliases.add(expr.left.name)
+            elif isinstance(expr.left, JsMemberExpression):
+                name = self._resolve_global_property_name(expr.left, body)
+                if name is not None:
+                    aliases.add(name)
+        return aliases
+
+    @staticmethod
+    def _resolve_global_property_name(
+        member: JsMemberExpression, body: Sequence[Node],
+    ) -&gt; str | None:
+        if not isinstance(member.object, JsIdentifier):
+            return None
+        if member.object.name not in GLOBAL_OBJECT_ALIASES:
+            return None
+        key = access_key(member)
+        if key is not None:
+            return key
+        if member.computed and isinstance(member.property, JsIdentifier):
+            return _resolve_string(member.property, body)
+        return None
+
+    def _substitute_calls(
+        self, root: Node, decode_names: set[str], cipher: ScrambleCipher,
+    ) -&gt; int:
+        count = 0
+        for node in list(root.walk()):
+            if not isinstance(node, JsCallExpression):
+                continue
+            if not isinstance(node.callee, JsIdentifier):
+                continue
+            if node.callee.name not in decode_names:
+                continue
+            if len(node.arguments) != 1:
+                continue
+            arg = node.arguments[0]
+            if not isinstance(arg, JsStringLiteral):
+                continue
+            try:
+                decoded = cipher.decode(arg.value)
+            except Exception:
+                continue
+            _replace_in_parent(node, make_string_literal(decoded))
+            count += 1
+        return count
+
+    def _remove_infrastructure(
+        self,
+        body: Sequence[Node],
+        class_node: JsClassDeclaration,
+        instance: _InstanceInfo,
+        decode_names: set[str],
+    ) -&gt; None:
+        removals: list[Node] = [class_node]
+        declarator_removals: list[JsVariableDeclarator] = []
+        global_name_vars: set[str] = set()
+        for stmt in body:
+            if not isinstance(stmt, JsExpressionStatement):
+                continue
+            expr = stmt.expression
+            if not isinstance(expr, JsAssignmentExpression) or expr.operator != &#39;=&#39;:
+                continue
+            if not isinstance(expr.left, JsMemberExpression):
+                continue
+            if not isinstance(expr.right, JsIdentifier) or expr.right.name not in decode_names:
+                continue
+            name = self._resolve_global_property_name(expr.left, body)
+            if name is not None and name in decode_names:
+                removals.append(stmt)
+                if isinstance(expr.left.property, JsIdentifier) and expr.left.computed:
+                    global_name_vars.add(expr.left.property.name)
+        for stmt in body:
+            if isinstance(stmt, JsVariableDeclaration):
+                for decl in stmt.declarations:
+                    if not isinstance(decl, JsVariableDeclarator):
+                        continue
+                    if not isinstance(decl.id, JsIdentifier):
+                        continue
+                    if decl.id.name == instance.name or decl.id.name in decode_names:
+                        declarator_removals.append(decl)
+                    elif decl.id.name in global_name_vars:
+                        declarator_removals.append(decl)
+            elif isinstance(stmt, JsFunctionDeclaration):
+                if stmt.id is not None and stmt.id.name in decode_names:
+                    removals.append(stmt)
+            elif isinstance(stmt, JsExpressionStatement):
+                expr = stmt.expression
+                if (
+                    isinstance(expr, JsAssignmentExpression)
+                    and expr.operator == &#39;=&#39;
+                    and isinstance(expr.left, JsIdentifier)
+                    and expr.left.name in decode_names
+                ):
+                    removals.append(stmt)
+        for decl in declarator_removals:
+            remove_declarator(decl)
+        for stmt in removals:
+            _remove_from_parent(stmt)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.scramble.ScrambleCipher"><code class="flex name class">
+<span>class <span class="ident">ScrambleCipher</span></span>
+<span>(</span><span>password, salt, iterations=200000, rounds=3)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/scripts/js/deobfuscation/scramble.py#L49-L71" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ScrambleCipher:
+    __slots__ = (&#39;_master_key&#39;, &#39;_rounds&#39;)
+
+    def __init__(
+        self,
+        password: str,
+        salt: str,
+        iterations: int = _DEFAULT_ITERATIONS,
+        rounds: int = _DEFAULT_ROUNDS,
+    ):
+        self._master_key = hashlib.pbkdf2_hmac(
+            &#39;sha256&#39;, password.encode(), salt.encode(), iterations, dklen=32,
+        )
+        self._rounds = rounds
+
+    def decode(self, encoded: str) -&gt; str:
+        data = base64.b64decode(encoded)
+        nonce = data[:16]
+        ciphertext = data[16:]
+        round_key = hashlib.sha256(self._master_key + nonce).digest()
+        for r in range(self._rounds - 1, -1, -1):
+            ciphertext = _decrypt_round(ciphertext, round_key, r)
+        return ciphertext.decode(&#39;utf-8&#39;)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.scramble.ScrambleCipher.decode"><code class="name flex">
+<span>def <span class="ident">decode</span></span>(<span>self, encoded)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/scripts/js/deobfuscation/scramble.py#L64-L71" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode(self, encoded: str) -&gt; str:
+    data = base64.b64decode(encoded)
+    nonce = data[:16]
+    ciphertext = data[16:]
+    round_key = hashlib.sha256(self._master_key + nonce).digest()
+    for r in range(self._rounds - 1, -1, -1):
+        ciphertext = _decrypt_round(ciphertext, round_key, r)
+    return ciphertext.decode(&#39;utf-8&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.deobfuscation.scramble.JsScrambleStringDecoder"><code class="flex name class">
+<span>class <span class="ident">JsScrambleStringDecoder</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Detects Scramble cipher infrastructure, decrypts all encoded strings in Python, and replaces
+call sites with the decoded string literals.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/scripts/js/deobfuscation/scramble.py#L187-L407" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsScrambleStringDecoder(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Detects Scramble cipher infrastructure, decrypts all encoded strings in Python, and replaces
+    call sites with the decoded string literals.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        body = node.body
+        class_node = self._find_scramble_class(body)
+        if class_node is None or class_node.id is None:
+            return
+        instance = self._find_instance(body, class_node.id.name, class_node)
+        if instance is None:
+            return
+        decode_names = self._find_decode_functions(body, instance.name)
+        if not decode_names:
+            return
+        cipher = ScrambleCipher(
+            instance.password,
+            instance.salt,
+            instance.iterations,
+            instance.rounds,
+        )
+        count = self._substitute_calls(node, decode_names, cipher)
+        if count &gt; 0:
+            self._remove_infrastructure(body, class_node, instance, decode_names)
+            self.mark_changed()
+
+    def _find_scramble_class(self, body: Sequence[Node]) -&gt; JsClassDeclaration | None:
+        for stmt in body:
+            if (
+                isinstance(stmt, JsClassDeclaration)
+                and _is_scramble_class(stmt)
+                and stmt.id is not None
+                and isinstance(stmt.id, JsIdentifier)
+            ):
+                return stmt
+        return None
+
+    def _find_instance(
+        self, body: Sequence[Node], class_name: str, class_node: JsClassDeclaration,
+    ) -&gt; _InstanceInfo | None:
+        for stmt in body:
+            if not isinstance(stmt, JsVariableDeclaration):
+                continue
+            for decl in stmt.declarations:
+                if not isinstance(decl, JsVariableDeclarator):
+                    continue
+                if not isinstance(decl.id, JsIdentifier):
+                    continue
+                init = decl.init
+                if not isinstance(init, JsNewExpression):
+                    continue
+                if not isinstance(init.callee, JsIdentifier):
+                    continue
+                if init.callee.name != class_name:
+                    continue
+                if len(init.arguments) &lt; 2:
+                    continue
+                password = _resolve_string(init.arguments[0], body)
+                salt = _resolve_string(init.arguments[1], body)
+                if password is None or salt is None:
+                    continue
+                rounds, iterations = _get_class_params(class_node)
+                return _InstanceInfo(
+                    name=decl.id.name,
+                    password=password,
+                    salt=salt,
+                    iterations=iterations,
+                    rounds=rounds,
+                )
+        return None
+
+    def _find_decode_functions(self, body: Sequence[Node], instance_name: str) -&gt; set[str]:
+        names: set[str] = set()
+        for stmt in body:
+            if isinstance(stmt, JsFunctionDeclaration):
+                if self._is_decode_wrapper(stmt, instance_name) and stmt.id is not None:
+                    names.add(stmt.id.name)
+            elif isinstance(stmt, JsVariableDeclaration):
+                for decl in stmt.declarations:
+                    if not isinstance(decl, JsVariableDeclarator):
+                        continue
+                    if not isinstance(decl.id, JsIdentifier):
+                        continue
+                    if not isinstance(decl.init, JsFunctionExpression):
+                        continue
+                    if self._is_decode_wrapper(decl.init, instance_name):
+                        names.add(decl.id.name)
+        aliases = self._find_aliases(body, names)
+        names.update(aliases)
+        return names
+
+    def _is_decode_wrapper(
+        self, fn: JsFunctionDeclaration | JsFunctionExpression, instance_name: str,
+    ) -&gt; bool:
+        if fn.body is None or len(fn.body.body) != 1:
+            return False
+        stmt = fn.body.body[0]
+        if not isinstance(stmt, JsReturnStatement) or stmt.argument is None:
+            return False
+        call = stmt.argument
+        if not isinstance(call, JsCallExpression):
+            return False
+        callee = call.callee
+        return (
+            isinstance(callee, JsMemberExpression)
+            and isinstance(callee.object, JsIdentifier)
+            and callee.object.name == instance_name
+            and access_key(callee) == &#39;decode&#39;
+        )
+
+    def _find_aliases(self, body: Sequence[Node], known: set[str]) -&gt; set[str]:
+        aliases: set[str] = set()
+        for stmt in body:
+            if not isinstance(stmt, JsExpressionStatement):
+                continue
+            expr = stmt.expression
+            if not isinstance(expr, JsAssignmentExpression) or expr.operator != &#39;=&#39;:
+                continue
+            if not isinstance(expr.right, JsIdentifier) or expr.right.name not in known:
+                continue
+            if isinstance(expr.left, JsIdentifier):
+                aliases.add(expr.left.name)
+            elif isinstance(expr.left, JsMemberExpression):
+                name = self._resolve_global_property_name(expr.left, body)
+                if name is not None:
+                    aliases.add(name)
+        return aliases
+
+    @staticmethod
+    def _resolve_global_property_name(
+        member: JsMemberExpression, body: Sequence[Node],
+    ) -&gt; str | None:
+        if not isinstance(member.object, JsIdentifier):
+            return None
+        if member.object.name not in GLOBAL_OBJECT_ALIASES:
+            return None
+        key = access_key(member)
+        if key is not None:
+            return key
+        if member.computed and isinstance(member.property, JsIdentifier):
+            return _resolve_string(member.property, body)
+        return None
+
+    def _substitute_calls(
+        self, root: Node, decode_names: set[str], cipher: ScrambleCipher,
+    ) -&gt; int:
+        count = 0
+        for node in list(root.walk()):
+            if not isinstance(node, JsCallExpression):
+                continue
+            if not isinstance(node.callee, JsIdentifier):
+                continue
+            if node.callee.name not in decode_names:
+                continue
+            if len(node.arguments) != 1:
+                continue
+            arg = node.arguments[0]
+            if not isinstance(arg, JsStringLiteral):
+                continue
+            try:
+                decoded = cipher.decode(arg.value)
+            except Exception:
+                continue
+            _replace_in_parent(node, make_string_literal(decoded))
+            count += 1
+        return count
+
+    def _remove_infrastructure(
+        self,
+        body: Sequence[Node],
+        class_node: JsClassDeclaration,
+        instance: _InstanceInfo,
+        decode_names: set[str],
+    ) -&gt; None:
+        removals: list[Node] = [class_node]
+        declarator_removals: list[JsVariableDeclarator] = []
+        global_name_vars: set[str] = set()
+        for stmt in body:
+            if not isinstance(stmt, JsExpressionStatement):
+                continue
+            expr = stmt.expression
+            if not isinstance(expr, JsAssignmentExpression) or expr.operator != &#39;=&#39;:
+                continue
+            if not isinstance(expr.left, JsMemberExpression):
+                continue
+            if not isinstance(expr.right, JsIdentifier) or expr.right.name not in decode_names:
+                continue
+            name = self._resolve_global_property_name(expr.left, body)
+            if name is not None and name in decode_names:
+                removals.append(stmt)
+                if isinstance(expr.left.property, JsIdentifier) and expr.left.computed:
+                    global_name_vars.add(expr.left.property.name)
+        for stmt in body:
+            if isinstance(stmt, JsVariableDeclaration):
+                for decl in stmt.declarations:
+                    if not isinstance(decl, JsVariableDeclarator):
+                        continue
+                    if not isinstance(decl.id, JsIdentifier):
+                        continue
+                    if decl.id.name == instance.name or decl.id.name in decode_names:
+                        declarator_removals.append(decl)
+                    elif decl.id.name in global_name_vars:
+                        declarator_removals.append(decl)
+            elif isinstance(stmt, JsFunctionDeclaration):
+                if stmt.id is not None and stmt.id.name in decode_names:
+                    removals.append(stmt)
+            elif isinstance(stmt, JsExpressionStatement):
+                expr = stmt.expression
+                if (
+                    isinstance(expr, JsAssignmentExpression)
+                    and expr.operator == &#39;=&#39;
+                    and isinstance(expr.left, JsIdentifier)
+                    and expr.left.name in decode_names
+                ):
+                    removals.append(stmt)
+        for decl in declarator_removals:
+            remove_declarator(decl)
+        for stmt in removals:
+            _remove_from_parent(stmt)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.scramble.ScrambleCipher" href="#refinery.lib.scripts.js.deobfuscation.scramble.ScrambleCipher">ScrambleCipher</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.scramble.ScrambleCipher.decode" href="#refinery.lib.scripts.js.deobfuscation.scramble.ScrambleCipher.decode">decode</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.scramble.JsScrambleStringDecoder" href="#refinery.lib.scripts.js.deobfuscation.scramble.JsScrambleStringDecoder">JsScrambleStringDecoder</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

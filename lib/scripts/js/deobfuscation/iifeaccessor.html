@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.iifeaccessor documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.iifeaccessor</code></h1>
+</header>
+<section id="section-intro">
+<p>Promote IIFE-bound function accessors to plain function declarations.</p>
+<p>Recognizes the pattern</p>
+<pre><code>var X = function () {
+    var c1 = &lt;literal&gt;;
+    var c2 = &lt;literal-array&gt;;
+    return function (p) { ... uses c1, c2 ... };
+}();
+</code></pre>
+<p>and rewrites it as</p>
+<pre><code>function X(p) {
+    var c1 = &lt;literal&gt;;
+    var c2 = &lt;literal-array&gt;;
+    ... uses c1, c2 ...
+}
+</code></pre>
+<p>This is a common obfuscator pattern where a string-decoding accessor is built once and bound
+to a variable through the result of an IIFE that closes over a constant lookup table and a few
+scalar parameters. <code><a title="refinery.lib.scripts.js.deobfuscation.evaluator.JsFunctionEvaluator" href="evaluator.html#refinery.lib.scripts.js.deobfuscation.evaluator.JsFunctionEvaluator">JsFunctionEvaluator</a></code> only
+registers <code>JsFunctionDeclaration</code> nodes in its scope tree, so call sites like <code>X(0x3a2)</code> are
+otherwise never folded. The rewrite is only applied when the captured closure variables are
+read-only inside the returned function; under that condition the hoisting is semantically
+equivalent because the closure values are re-initialised to identical literals on every call.
+After the rewrite, the function evaluator folds each call site to its computed string literal.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/scripts/js/deobfuscation/iifeaccessor.py#L1-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Promote IIFE-bound function accessors to plain function declarations.
+
+Recognizes the pattern
+
+    var X = function () {
+        var c1 = &lt;literal&gt;;
+        var c2 = &lt;literal-array&gt;;
+        return function (p) { ... uses c1, c2 ... };
+    }();
+
+and rewrites it as
+
+    function X(p) {
+        var c1 = &lt;literal&gt;;
+        var c2 = &lt;literal-array&gt;;
+        ... uses c1, c2 ...
+    }
+
+This is a common obfuscator pattern where a string-decoding accessor is built once and bound
+to a variable through the result of an IIFE that closes over a constant lookup table and a few
+scalar parameters. `refinery.lib.scripts.js.deobfuscation.evaluator.JsFunctionEvaluator` only
+registers `JsFunctionDeclaration` nodes in its scope tree, so call sites like `X(0x3a2)` are
+otherwise never folded. The rewrite is only applied when the captured closure variables are
+read-only inside the returned function; under that condition the hoisting is semantically
+equivalent because the closure values are re-initialised to identical literals on every call.
+After the rewrite, the function evaluator folds each call site to its computed string literal.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import NamedTuple
+
+from refinery.lib.scripts import (
+    Node,
+    _clone_node,
+    _replace_in_parent,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    FUNCTION_NODE_TYPES,
+    ScriptLevelTransformer,
+    extract_identifier_params,
+    is_literal,
+    references_receiver_this,
+    walk_scope,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsArrowFunctionExpression,
+    JsAssignmentExpression,
+    JsBlockStatement,
+    JsCallExpression,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsObjectExpression,
+    JsParenthesizedExpression,
+    JsProperty,
+    JsReturnStatement,
+    JsScript,
+    JsUpdateExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+)
+
+
+def _unwrap_paren(node: Node | None) -&gt; Node | None:
+    while isinstance(node, JsParenthesizedExpression):
+        if node.expression is None:
+            return None
+        node = node.expression
+    return node
+
+
+def _is_literal_initializer(node: Node | None) -&gt; bool:
+    if node is None:
+        return False
+    if is_literal(node):
+        return True
+    if isinstance(node, JsArrayExpression):
+        return all(el is not None and _is_literal_initializer(el) for el in node.elements)
+    if isinstance(node, JsObjectExpression):
+        for prop in node.properties:
+            if not isinstance(prop, JsProperty):
+                return False
+            if prop.value is None or not _is_literal_initializer(prop.value):
+                return False
+        return True
+    return False
+
+
+class _Pattern(NamedTuple):
+    declaration: JsVariableDeclaration
+    name: str
+    closure_decls: list[JsVariableDeclaration]
+    inner_func: JsFunctionExpression | JsArrowFunctionExpression
+
+
+def _detect(declarator: JsVariableDeclarator) -&gt; _Pattern | None:
+    if not isinstance(declarator.id, JsIdentifier):
+        return None
+    declaration = declarator.parent
+    if not isinstance(declaration, JsVariableDeclaration):
+        return None
+    if len(declaration.declarations) != 1:
+        return None
+    init = _unwrap_paren(declarator.init)
+    if not isinstance(init, JsCallExpression):
+        return None
+    if init.arguments:
+        return None
+    callee = _unwrap_paren(init.callee)
+    if not isinstance(callee, (JsFunctionExpression, JsArrowFunctionExpression)):
+        return None
+    if callee.params:
+        return None
+    body = callee.body
+    if not isinstance(body, JsBlockStatement) or not body.body:
+        return None
+    closure_decls: list[JsVariableDeclaration] = []
+    inner_func: JsFunctionExpression | JsArrowFunctionExpression | None = None
+    for stmt in body.body:
+        if inner_func is not None:
+            return None
+        if isinstance(stmt, JsVariableDeclaration):
+            for decl in stmt.declarations:
+                if not isinstance(decl, JsVariableDeclarator):
+                    return None
+                if not isinstance(decl.id, JsIdentifier):
+                    return None
+                if not _is_literal_initializer(decl.init):
+                    return None
+            closure_decls.append(stmt)
+            continue
+        if isinstance(stmt, JsReturnStatement):
+            ret_arg = _unwrap_paren(stmt.argument)
+            if not isinstance(ret_arg, (JsFunctionExpression, JsArrowFunctionExpression)):
+                return None
+            if not isinstance(ret_arg.body, JsBlockStatement):
+                return None
+            inner_func = ret_arg
+            continue
+        return None
+    if inner_func is None:
+        return None
+    return _Pattern(declaration, declarator.id.name, closure_decls, inner_func)
+
+
+def _closure_names(closure_decls: list[JsVariableDeclaration]) -&gt; set[str]:
+    names: set[str] = set()
+    for decl in closure_decls:
+        for d in decl.declarations:
+            if isinstance(d, JsVariableDeclarator) and isinstance(d.id, JsIdentifier):
+                names.add(d.id.name)
+    return names
+
+
+def _is_safe_to_promote(
+    inner: JsFunctionExpression | JsArrowFunctionExpression,
+    closure_names: set[str],
+) -&gt; bool:
+    param_names = extract_identifier_params(inner.params)
+    if param_names is None:
+        return False
+    if any(p in closure_names for p in param_names):
+        return False
+    body = inner.body
+    if not isinstance(body, JsBlockStatement):
+        return False
+    inner_name: str | None = None
+    if isinstance(inner, JsFunctionExpression) and isinstance(inner.id, JsIdentifier):
+        inner_name = inner.id.name
+    if references_receiver_this(body):
+        return False
+    for node in walk_scope(body):
+        if isinstance(node, JsIdentifier) and node.name == &#39;arguments&#39;:
+            return False
+        if inner_name is not None and isinstance(node, JsIdentifier) and node.name == inner_name:
+            return False
+    for node in body.walk():
+        if isinstance(node, JsAssignmentExpression):
+            if isinstance(node.left, JsIdentifier) and node.left.name in closure_names:
+                return False
+        if isinstance(node, JsUpdateExpression):
+            if (
+                isinstance(node.argument, JsIdentifier)
+                and node.argument.name in closure_names
+            ):
+                return False
+        if isinstance(node, JsVariableDeclarator):
+            if isinstance(node.id, JsIdentifier) and node.id.name in closure_names:
+                return False
+        if isinstance(node, FUNCTION_NODE_TYPES) and node is not inner:
+            for p in node.params:
+                if isinstance(p, JsIdentifier) and p.name in closure_names:
+                    return False
+            if (
+                isinstance(node, JsFunctionDeclaration)
+                and isinstance(node.id, JsIdentifier)
+                and node.id.name in closure_names
+            ):
+                return False
+    return True
+
+
+class JsIIFEAccessorPromoter(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Detect accessor variables built from an IIFE that closes over literal lookup tables, and
+    rewrite each one into a plain named function declaration so that the function evaluator can
+    fold its call sites.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        for declarator in list(node.walk()):
+            if not isinstance(declarator, JsVariableDeclarator):
+                continue
+            pattern = _detect(declarator)
+            if pattern is None:
+                continue
+            closure_names = _closure_names(pattern.closure_decls)
+            if not _is_safe_to_promote(pattern.inner_func, closure_names):
+                continue
+            self._promote(pattern)
+
+    def _promote(self, pattern: _Pattern) -&gt; None:
+        inner = pattern.inner_func
+        inner_body = inner.body
+        if not isinstance(inner_body, JsBlockStatement):
+            return
+        new_body_stmts = [_clone_node(d) for d in pattern.closure_decls]
+        new_body_stmts.extend(_clone_node(s) for s in inner_body.body)
+        new_func = JsFunctionDeclaration(
+            id=JsIdentifier(name=pattern.name),
+            params=[_clone_node(p) for p in inner.params],
+            body=JsBlockStatement(body=new_body_stmts),
+        )
+        _replace_in_parent(pattern.declaration, new_func)
+        self.mark_changed()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.iifeaccessor.JsIIFEAccessorPromoter"><code class="flex name class">
+<span>class <span class="ident">JsIIFEAccessorPromoter</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Detect accessor variables built from an IIFE that closes over literal lookup tables, and
+rewrite each one into a plain named function declaration so that the function evaluator can
+fold its call sites.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/scripts/js/deobfuscation/iifeaccessor.py#L205-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsIIFEAccessorPromoter(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Detect accessor variables built from an IIFE that closes over literal lookup tables, and
+    rewrite each one into a plain named function declaration so that the function evaluator can
+    fold its call sites.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        for declarator in list(node.walk()):
+            if not isinstance(declarator, JsVariableDeclarator):
+                continue
+            pattern = _detect(declarator)
+            if pattern is None:
+                continue
+            closure_names = _closure_names(pattern.closure_decls)
+            if not _is_safe_to_promote(pattern.inner_func, closure_names):
+                continue
+            self._promote(pattern)
+
+    def _promote(self, pattern: _Pattern) -&gt; None:
+        inner = pattern.inner_func
+        inner_body = inner.body
+        if not isinstance(inner_body, JsBlockStatement):
+            return
+        new_body_stmts = [_clone_node(d) for d in pattern.closure_decls]
+        new_body_stmts.extend(_clone_node(s) for s in inner_body.body)
+        new_func = JsFunctionDeclaration(
+            id=JsIdentifier(name=pattern.name),
+            params=[_clone_node(p) for p in inner.params],
+            body=JsBlockStatement(body=new_body_stmts),
+        )
+        _replace_in_parent(pattern.declaration, new_func)
+        self.mark_changed()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.iifeaccessor.JsIIFEAccessorPromoter" href="#refinery.lib.scripts.js.deobfuscation.iifeaccessor.JsIIFEAccessorPromoter">JsIIFEAccessorPromoter</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

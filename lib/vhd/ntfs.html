@@ -1,0 +1,1456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.vhd.ntfs documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.vhd.ntfs</code></h1>
+</header>
+<section id="section-intro">
+<p>A parser for the NTFS file system. The implementation bootstraps the Master File Table (MFT) from
+the boot sector, parses each MFT record (applying the update sequence array fixups), and decodes
+the standard information, file name, and data attributes. Non-resident data is reconstructed from
+its data runs, including support for sparse runs and LZNT1 compressed runs. File paths are built
+by following the parent directory references stored in the file name attributes.</p>
+<p>The parser operates on a single volume that is provided as a <code><a title="refinery.lib.vhd.ntfs.VolumeSource" href="#refinery.lib.vhd.ntfs.VolumeSource">VolumeSource</a></code>,
+i.e. any object exposing a <code>read(offset, length)</code> method. It is independent of any container
+format and follows the NTFS handler from the 7-Zip source code as its reference. Only the parts
+required to enumerate and extract regular files are implemented; alternate data streams, security
+descriptors, and reparse points are not exposed.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L1-L636" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+A parser for the NTFS file system. The implementation bootstraps the Master File Table (MFT) from
+the boot sector, parses each MFT record (applying the update sequence array fixups), and decodes
+the standard information, file name, and data attributes. Non-resident data is reconstructed from
+its data runs, including support for sparse runs and LZNT1 compressed runs. File paths are built
+by following the parent directory references stored in the file name attributes.
+
+The parser operates on a single volume that is provided as a `refinery.lib.vhd.ntfs.VolumeSource`,
+i.e. any object exposing a `read(offset, length)` method. It is independent of any container
+format and follows the NTFS handler from the 7-Zip source code as its reference. Only the parts
+required to enumerate and extract regular files are implemented; alternate data streams, security
+descriptors, and reparse points are not exposed.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import datetime
+
+from dataclasses import dataclass, field
+from typing import Iterator, Protocol
+
+_FILE_MAGIC = B&#39;FILE&#39;
+
+_ATTR_STANDARD_INFO = 0x10
+_ATTR_FILE_NAME = 0x30
+_ATTR_DATA = 0x80
+_ATTR_END = 0xFFFFFFFF
+
+_FILE_NAME_DOS = 2
+
+_SI_CREATED = 0x00
+_SI_MODIFIED = 0x08
+_SI_CHANGED = 0x10
+_SI_ACCESSED = 0x18
+_SI_ATTRIBUTES = 0x20
+
+_FN_CREATED = 0x08
+_FN_MODIFIED = 0x10
+_FN_CHANGED = 0x18
+_FN_ACCESSED = 0x20
+
+_FLAG_IN_USE = 0x0001
+_FLAG_DIRECTORY = 0x0002
+
+_RECORD_ROOT = 5
+_NUM_SYSTEM_RECORDS = 16
+
+_EMPTY_EXTENT = -1
+
+
+class VolumeSource(Protocol):
+    def read(self, offset: int, length: int) -&gt; bytearray:
+        ...
+
+
+class NtfsError(ValueError):
+    pass
+
+
+def _filetime(value: int) -&gt; datetime.datetime | None:
+    if value == 0:
+        return None
+    try:
+        epoch = datetime.datetime(1601, 1, 1, tzinfo=datetime.timezone.utc)
+        return epoch + datetime.timedelta(microseconds=value // 10)
+    except (ValueError, OverflowError):
+        return None
+
+
+@dataclass
+class _Attr:
+    type: int
+    name: str
+    non_resident: bool
+    data: bytearray
+    compression_unit: int = 0
+    low_vcn: int = 0
+    high_vcn: int = 0
+    allocated_size: int = 0
+    real_size: int = 0
+    initialized_size: int = 0
+
+
+@dataclass
+class _FileName:
+    parent: int
+    name: str
+    name_type: int
+    attrib: int
+    created: datetime.datetime | None = None
+    modified: datetime.datetime | None = None
+    changed: datetime.datetime | None = None
+    accessed: datetime.datetime | None = None
+
+
+@dataclass
+class _Record:
+    index: int
+    in_use: bool
+    is_dir: bool
+    file_names: list[_FileName]
+    data_attrs: list[_Attr]
+    date: datetime.datetime | None
+    created: datetime.datetime | None = None
+    changed: datetime.datetime | None = None
+    accessed: datetime.datetime | None = None
+    attributes: int = 0
+
+
+@dataclass
+class NtfsFile:
+    &#34;&#34;&#34;
+    A file or directory entry within an NTFS volume. The `extract` method reconstructs the file
+    contents from the unnamed data attribute of the underlying MFT record. The timestamp and
+    attribute fields are sourced from the record&#39;s `$STANDARD_INFORMATION` and `$FILE_NAME`
+    attributes; the latter (`fn_` prefix) are exposed separately because a mismatch between the
+    two timestamp sets is a classic indicator of timestamp manipulation (timestomping).
+    &#34;&#34;&#34;
+    path: str
+    date: datetime.datetime | None
+    size: int
+    is_dir: bool
+    _volume: NtfsVolume = field(repr=False)
+    _record: int = 0
+    record: int = 0
+    allocated: int = 0
+    attributes: int = 0
+    btime: datetime.datetime | None = None
+    mtime: datetime.datetime | None = None
+    atime: datetime.datetime | None = None
+    ctime: datetime.datetime | None = None
+    fn_btime: datetime.datetime | None = None
+    fn_mtime: datetime.datetime | None = None
+    fn_atime: datetime.datetime | None = None
+    fn_ctime: datetime.datetime | None = None
+    deleted: bool = False
+
+    def extract(self) -&gt; bytearray:
+        return self._volume._extract(self._record)
+
+
+class NtfsVolume:
+    &#34;&#34;&#34;
+    Parses an NTFS volume. The boot sector supplies the cluster geometry and the location of the
+    MFT, which is then read as a file in order to enumerate all other records. The `files` method
+    yields all non-system file and directory entries with their full paths.
+    &#34;&#34;&#34;
+    def __init__(self, source: VolumeSource):
+        self._source = source
+        boot = source.read(0, 512)
+        if boot[3:11] != B&#39;NTFS    &#39;:
+            raise NtfsError(&#39;missing NTFS boot sector signature&#39;)
+
+        bytes_per_sector = int.from_bytes(boot[0x0B:0x0D], &#39;little&#39;)
+        sectors_per_cluster = boot[0x0D]
+        if not bytes_per_sector or not sectors_per_cluster:
+            raise NtfsError(&#39;invalid NTFS BIOS parameter block&#39;)
+        self.sector_size_log = bytes_per_sector.bit_length() - 1
+        self.cluster_size_log = self.sector_size_log + (sectors_per_cluster.bit_length() - 1)
+        self.num_sectors = int.from_bytes(boot[0x28:0x30], &#39;little&#39;)
+        self.num_clusters = self.num_sectors &gt;&gt; (sectors_per_cluster.bit_length() - 1)
+        self.mft_cluster = int.from_bytes(boot[0x30:0x38], &#39;little&#39;)
+
+        record_descriptor = int.from_bytes(boot[0x40:0x44], &#39;little&#39;, signed=True)
+        if 0 &lt; record_descriptor &lt; 0x80:
+            self.record_size_log = (record_descriptor.bit_length() - 1) + self.cluster_size_log
+        else:
+            self.record_size_log = 0x100 - (record_descriptor &amp; 0xFF)
+        self.record_size = 1 &lt;&lt; self.record_size_log
+        self.cluster_size = 1 &lt;&lt; self.cluster_size_log
+
+        self._records: list[_Record | None] = []
+        self._load_mft()
+
+    def _read_clusters(self, cluster: int, count: int) -&gt; bytearray:
+        return self._source.read(cluster &lt;&lt; self.cluster_size_log, count &lt;&lt; self.cluster_size_log)
+
+    def _load_mft(self) -&gt; None:
+        first = self._read_clusters(self.mft_cluster, max(1, self.record_size &gt;&gt; self.cluster_size_log))
+        record = self._parse_record(first[:self.record_size], 0)
+        if record is None:
+            raise NtfsError(&#39;failed to parse the $MFT record&#39;)
+        data = self._find_unnamed_data(record)
+        if data is None:
+            raise NtfsError(&#39;the $MFT record has no data attribute&#39;)
+        mft = self._read_attr_data(data)
+        count = len(mft) // self.record_size
+        self._records = [None] * count
+        for index in range(count):
+            chunk = mft[index * self.record_size:(index + 1) * self.record_size]
+            self._records[index] = self._parse_record(chunk, index)
+
+    def _apply_fixups(self, record: bytearray) -&gt; bool:
+        usa_offset = int.from_bytes(record[0x04:0x06], &#39;little&#39;)
+        usa_count = int.from_bytes(record[0x06:0x08], &#39;little&#39;)
+        if usa_count == 0:
+            return False
+        usn = record[usa_offset:usa_offset + 2]
+        for index in range(1, usa_count):
+            tail = (index &lt;&lt; self.sector_size_log) - 2
+            if tail + 2 &gt; len(record):
+                return False
+            if record[tail:tail + 2] != usn:
+                return False
+            source = usa_offset + index * 2
+            record[tail:tail + 2] = record[source:source + 2]
+        return True
+
+    def _parse_record(self, raw: bytearray, index: int) -&gt; _Record | None:
+        record = bytearray(raw)
+        if len(record) &lt; self.record_size or record[:4] != _FILE_MAGIC:
+            return None
+        if not self._apply_fixups(record):
+            return None
+        flags = int.from_bytes(record[0x16:0x18], &#39;little&#39;)
+        attr_offset = int.from_bytes(record[0x14:0x16], &#39;little&#39;)
+        bytes_in_use = int.from_bytes(record[0x18:0x1C], &#39;little&#39;)
+        limit = min(bytes_in_use, len(record))
+
+        file_names: list[_FileName] = []
+        data_attrs: list[_Attr] = []
+        date = None
+        created = None
+        changed = None
+        accessed = None
+        attributes = 0
+
+        position = attr_offset
+        while position + 4 &lt;= limit:
+            attr_type = int.from_bytes(record[position:position + 4], &#39;little&#39;)
+            if attr_type == _ATTR_END:
+                break
+            attr, length = self._parse_attr(record, position, limit)
+            if attr is None or length == 0:
+                break
+            position += length
+            if attr.type == _ATTR_FILE_NAME:
+                name = self._parse_file_name(attr.data)
+                if name is not None:
+                    file_names.append(name)
+            elif attr.type == _ATTR_STANDARD_INFO:
+                if len(attr.data) &gt;= 0x24:
+                    created = _filetime(int.from_bytes(attr.data[_SI_CREATED:_SI_CREATED + 8], &#39;little&#39;))
+                    date = _filetime(int.from_bytes(attr.data[_SI_MODIFIED:_SI_MODIFIED + 8], &#39;little&#39;))
+                    changed = _filetime(int.from_bytes(attr.data[_SI_CHANGED:_SI_CHANGED + 8], &#39;little&#39;))
+                    accessed = _filetime(int.from_bytes(attr.data[_SI_ACCESSED:_SI_ACCESSED + 8], &#39;little&#39;))
+                    attributes = int.from_bytes(attr.data[_SI_ATTRIBUTES:_SI_ATTRIBUTES + 4], &#39;little&#39;)
+                elif len(attr.data) &gt;= 8:
+                    date = _filetime(int.from_bytes(attr.data[_SI_MODIFIED:_SI_MODIFIED + 8], &#39;little&#39;))
+            elif attr.type == _ATTR_DATA:
+                data_attrs.append(attr)
+
+        return _Record(
+            index=index,
+            in_use=bool(flags &amp; _FLAG_IN_USE),
+            is_dir=bool(flags &amp; _FLAG_DIRECTORY),
+            file_names=file_names,
+            data_attrs=data_attrs,
+            date=date,
+            created=created,
+            changed=changed,
+            accessed=accessed,
+            attributes=attributes,
+        )
+
+    def _parse_attr(self, record: bytearray, offset: int, limit: int) -&gt; tuple[_Attr | None, int]:
+        if offset + 0x18 &gt; limit:
+            return None, 0
+        attr_type = int.from_bytes(record[offset:offset + 4], &#39;little&#39;)
+        length = int.from_bytes(record[offset + 4:offset + 8], &#39;little&#39;)
+        if length == 0 or length &amp; 7 or offset + length &gt; limit:
+            return None, 0
+        non_resident = bool(record[offset + 8])
+        name_length = record[offset + 9]
+        name_offset = int.from_bytes(record[offset + 0x0A:offset + 0x0C], &#39;little&#39;)
+        name = &#39;&#39;
+        if name_length:
+            start = offset + name_offset
+            name = bytes(record[start:start + name_length * 2]).decode(&#39;utf-16le&#39;, &#39;replace&#39;)
+
+        if non_resident:
+            if length &lt; 0x40:
+                return None, 0
+            low_vcn = int.from_bytes(record[offset + 0x10:offset + 0x18], &#39;little&#39;)
+            high_vcn = int.from_bytes(record[offset + 0x18:offset + 0x20], &#39;little&#39;)
+            data_offset = int.from_bytes(record[offset + 0x20:offset + 0x22], &#39;little&#39;)
+            compression_unit = record[offset + 0x22]
+            allocated = int.from_bytes(record[offset + 0x28:offset + 0x30], &#39;little&#39;)
+            real_size = int.from_bytes(record[offset + 0x30:offset + 0x38], &#39;little&#39;)
+            initialized = int.from_bytes(record[offset + 0x38:offset + 0x40], &#39;little&#39;)
+            data = bytearray(record[offset + data_offset:offset + length])
+            return _Attr(
+                attr_type, name, True, data,
+                compression_unit=compression_unit,
+                low_vcn=low_vcn,
+                high_vcn=high_vcn,
+                allocated_size=allocated,
+                real_size=real_size,
+                initialized_size=initialized,
+            ), length
+        else:
+            data_size = int.from_bytes(record[offset + 0x10:offset + 0x14], &#39;little&#39;)
+            data_offset = int.from_bytes(record[offset + 0x14:offset + 0x16], &#39;little&#39;)
+            if data_offset + data_size &gt; length:
+                return None, 0
+            data = bytearray(record[offset + data_offset:offset + data_offset + data_size])
+            return _Attr(attr_type, name, False, data), length
+
+    @staticmethod
+    def _parse_file_name(data: bytearray) -&gt; _FileName | None:
+        if len(data) &lt; 0x42:
+            return None
+        parent = int.from_bytes(data[0:6], &#39;little&#39;)
+        created = _filetime(int.from_bytes(data[_FN_CREATED:_FN_CREATED + 8], &#39;little&#39;))
+        modified = _filetime(int.from_bytes(data[_FN_MODIFIED:_FN_MODIFIED + 8], &#39;little&#39;))
+        changed = _filetime(int.from_bytes(data[_FN_CHANGED:_FN_CHANGED + 8], &#39;little&#39;))
+        accessed = _filetime(int.from_bytes(data[_FN_ACCESSED:_FN_ACCESSED + 8], &#39;little&#39;))
+        attrib = int.from_bytes(data[0x38:0x3C], &#39;little&#39;)
+        name_length = data[0x40]
+        name_type = data[0x41]
+        if 0x42 + name_length * 2 &gt; len(data):
+            return None
+        name = bytes(data[0x42:0x42 + name_length * 2]).decode(&#39;utf-16le&#39;, &#39;replace&#39;)
+        return _FileName(
+            parent, name, name_type, attrib,
+            created=created,
+            modified=modified,
+            changed=changed,
+            accessed=accessed,
+        )
+
+    @staticmethod
+    def _find_unnamed_data(record: _Record) -&gt; _Attr | None:
+        for attr in record.data_attrs:
+            if not attr.name:
+                return attr
+        return None
+
+    def _collect_data_attrs(self, record: _Record) -&gt; list[_Attr]:
+        return [attr for attr in record.data_attrs if not attr.name]
+
+    def _read_attr_data(self, attr: _Attr, extra: list[_Attr] | None = None) -&gt; bytearray:
+        if not attr.non_resident:
+            return bytearray(attr.data)
+        attrs = [attr]
+        if extra:
+            attrs = sorted({id(a): a for a in [attr, *extra]}.values(), key=lambda a: a.low_vcn)
+        extents = self._parse_extents(attrs)
+        return self._read_extents(extents, attr)
+
+    def _parse_extents(self, attrs: list[_Attr]) -&gt; list[tuple[int, int, int]]:
+        extents: list[tuple[int, int, int]] = []
+        for attr in attrs:
+            vcn = attr.low_vcn
+            lcn = 0
+            data = attr.data
+            position = 0
+            while position &lt; len(data):
+                header = data[position]
+                position += 1
+                if header == 0:
+                    break
+                run_len = header &amp; 0x0F
+                run_off = header &gt;&gt; 4
+                if run_len == 0 or position + run_len &gt; len(data):
+                    break
+                length = int.from_bytes(data[position:position + run_len], &#39;little&#39;)
+                position += run_len
+                if run_off == 0:
+                    extents.append((vcn, _EMPTY_EXTENT, length))
+                    vcn += length
+                    continue
+                if position + run_off &gt; len(data):
+                    break
+                delta = int.from_bytes(data[position:position + run_off], &#39;little&#39;, signed=True)
+                position += run_off
+                lcn += delta
+                extents.append((vcn, lcn, length))
+                vcn += length
+        return extents
+
+    def _read_extents(self, extents: list[tuple[int, int, int]], attr: _Attr) -&gt; bytearray:
+        if attr.compression_unit:
+            return self._read_compressed(extents, attr)
+        out = bytearray()
+        for _, lcn, length in extents:
+            size = length &lt;&lt; self.cluster_size_log
+            if lcn == _EMPTY_EXTENT:
+                out.extend(bytes(size))
+            else:
+                out.extend(self._read_clusters(lcn, length))
+        del out[attr.real_size:]
+        if len(out) &lt; attr.real_size:
+            out.extend(bytes(attr.real_size - len(out)))
+        if attr.initialized_size &lt; attr.real_size:
+            zeros = attr.real_size - attr.initialized_size
+            out[attr.initialized_size:] = bytes(zeros)
+        return out
+
+    def _read_compressed(self, extents: list[tuple[int, int, int]], attr: _Attr) -&gt; bytearray:
+        unit = 1 &lt;&lt; attr.compression_unit
+        clusters: dict[int, int] = {}
+        for vcn, lcn, length in extents:
+            if lcn == _EMPTY_EXTENT:
+                continue
+            for offset in range(length):
+                clusters[vcn + offset] = lcn + offset
+        out = bytearray()
+        total_clusters = (attr.real_size + self.cluster_size - 1) &gt;&gt; self.cluster_size_log
+        vcn = 0
+        while vcn &lt; total_clusters:
+            block = [clusters.get(vcn + k) for k in range(unit)]
+            if all(c is None for c in block):
+                out.extend(bytes(unit &lt;&lt; self.cluster_size_log))
+            elif all(c is not None for c in block):
+                for cluster in block:
+                    if cluster is not None:
+                        out.extend(self._read_clusters(cluster, 1))
+            else:
+                compressed = bytearray()
+                for cluster in block:
+                    if cluster is None:
+                        break
+                    compressed.extend(self._read_clusters(cluster, 1))
+                out.extend(_lznt1_decompress(compressed, unit &lt;&lt; self.cluster_size_log))
+            vcn += unit
+        del out[attr.real_size:]
+        if len(out) &lt; attr.real_size:
+            out.extend(bytes(attr.real_size - len(out)))
+        if attr.initialized_size &lt; attr.real_size:
+            out[attr.initialized_size:] = bytes(attr.real_size - attr.initialized_size)
+        return out
+
+    def _extract(self, index: int) -&gt; bytearray:
+        record = self._records[index]
+        if record is None:
+            return bytearray()
+        attrs = self._collect_data_attrs(record)
+        if not attrs:
+            return bytearray()
+        primary = next((a for a in attrs if a.low_vcn == 0), attrs[0])
+        return self._read_attr_data(primary, attrs)
+
+    def files(self, recover: bool = False) -&gt; Iterator[NtfsFile]:
+        names: dict[int, _FileName] = {}
+        for record in self._records:
+            if record is None or not record.in_use:
+                continue
+            if record.index &lt; _NUM_SYSTEM_RECORDS:
+                continue
+            chosen = self._select_name(record)
+            if chosen is not None:
+                names[record.index] = chosen
+        for index, chosen in names.items():
+            record = self._records[index]
+            if record is None:
+                continue
+            path = self._build_path(index, names)
+            if path is None:
+                continue
+            yield self._make_file(record, chosen, path, deleted=False)
+        if recover:
+            yield from self._recover(names)
+
+    def _recover(self, names: dict[int, _FileName]) -&gt; Iterator[NtfsFile]:
+        for record in self._records:
+            if record is None or record.in_use:
+                continue
+            if record.index &lt; _NUM_SYSTEM_RECORDS:
+                continue
+            if self._find_unnamed_data(record) is None:
+                continue
+            chosen = self._select_name(record)
+            if chosen is None:
+                continue
+            path = self._build_path(record.index, names, chosen)
+            if path is None:
+                path = F&#39;?/{chosen.name}&#39;
+            yield self._make_file(record, chosen, path, deleted=True)
+
+    def _make_file(
+        self,
+        record: _Record,
+        chosen: _FileName,
+        path: str,
+        deleted: bool,
+    ) -&gt; NtfsFile:
+        return NtfsFile(
+            path=path,
+            date=record.date,
+            size=self._file_size(record),
+            is_dir=record.is_dir,
+            _volume=self,
+            _record=record.index,
+            record=record.index,
+            allocated=self._allocated_size(record),
+            attributes=record.attributes,
+            btime=record.created,
+            mtime=record.date,
+            ctime=record.changed,
+            atime=record.accessed,
+            fn_btime=chosen.created,
+            fn_mtime=chosen.modified,
+            fn_ctime=chosen.changed,
+            fn_atime=chosen.accessed,
+            deleted=deleted,
+        )
+
+    def _select_name(self, record: _Record) -&gt; _FileName | None:
+        chosen = None
+        for name in record.file_names:
+            if name.name_type == _FILE_NAME_DOS:
+                continue
+            if chosen is None or name.name_type &gt;= chosen.name_type:
+                chosen = name
+        if chosen is None and record.file_names:
+            chosen = record.file_names[0]
+        return chosen
+
+    def _build_path(
+        self,
+        index: int,
+        names: dict[int, _FileName],
+        start: _FileName | None = None,
+    ) -&gt; str | None:
+        parts: list[str] = []
+        current = index
+        seen = set()
+        if start is not None:
+            parts.append(start.name)
+            parent = start.parent
+            if parent == _RECORD_ROOT or parent == current:
+                return start.name
+            if parent &lt; _NUM_SYSTEM_RECORDS:
+                return F&#39;?/{start.name}&#39;
+            current = parent
+        while True:
+            if current in seen:
+                return None
+            seen.add(current)
+            name = names.get(current)
+            if name is None:
+                if parts:
+                    return &#39;/&#39;.join([&#39;?&#39;, *reversed(parts)])
+                return None
+            parts.append(name.name)
+            parent = name.parent
+            if parent == _RECORD_ROOT or parent == current:
+                break
+            if parent &lt; _NUM_SYSTEM_RECORDS:
+                return None
+            current = parent
+        return &#39;/&#39;.join(reversed(parts))
+
+    def _allocated_size(self, record: _Record) -&gt; int:
+        attr = self._find_unnamed_data(record)
+        if attr is None or not attr.non_resident:
+            return 0
+        return attr.allocated_size
+
+    def _file_size(self, record: _Record) -&gt; int:
+        attr = self._find_unnamed_data(record)
+        if attr is None:
+            return 0
+        if attr.non_resident:
+            return attr.real_size
+        return len(attr.data)
+
+
+def _lznt1_decompress(src: bytearray, out_limit: int) -&gt; bytearray:
+    dest = bytearray()
+    position = 0
+    while position + 2 &lt;= len(src):
+        header = int.from_bytes(src[position:position + 2], &#39;little&#39;)
+        if header == 0:
+            break
+        position += 2
+        block_size = (header &amp; 0x0FFF) + 1
+        if position + block_size &gt; len(src):
+            break
+        block = src[position:position + block_size]
+        position += block_size
+        if not header &amp; 0x8000:
+            dest.extend(block)
+            continue
+        dest.extend(_lznt1_block(block, len(dest)))
+        if len(dest) &gt;= out_limit:
+            break
+    return dest
+
+
+def _lznt1_block(block: bytearray, already: int) -&gt; bytearray:
+    out = bytearray()
+    position = 0
+    base = already
+    while position &lt; len(block):
+        flags = block[position]
+        position += 1
+        for bit in range(8):
+            if position &gt;= len(block):
+                break
+            if not (flags &gt;&gt; bit) &amp; 1:
+                out.append(block[position])
+                position += 1
+                continue
+            if position + 2 &gt; len(block):
+                return out
+            token = int.from_bytes(block[position:position + 2], &#39;little&#39;)
+            position += 2
+            current = len(out)
+            if current == 0:
+                return out
+            distance_bits = 4
+            while ((current - 1) &gt;&gt; distance_bits) != 0:
+                distance_bits += 1
+            length_mask = 0xFFFF &gt;&gt; distance_bits
+            length = (token &amp; length_mask) + 3
+            distance = (token &gt;&gt; (16 - distance_bits)) + 1
+            start = current - distance
+            if start &lt; 0:
+                return out
+            for offset in range(length):
+                out.append(out[start + offset])
+    del base
+    return out
+
+
+def is_ntfs(data: bytearray) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether the start of a volume looks like an NTFS boot sector by testing for the `NTFS`
+    OEM identifier and the boot signature.
+    &#34;&#34;&#34;
+    if len(data) &lt; 512:
+        return False
+    if int.from_bytes(data[0x1FE:0x200], &#39;little&#39;) != 0xAA55:
+        return False
+    return data[3:11] == B&#39;NTFS    &#39;</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.vhd.ntfs.is_ntfs"><code class="name flex">
+<span>def <span class="ident">is_ntfs</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Check whether the start of a volume looks like an NTFS boot sector by testing for the <code>NTFS</code>
+OEM identifier and the boot signature.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L627-L636" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_ntfs(data: bytearray) -&gt; bool:
+    &#34;&#34;&#34;
+    Check whether the start of a volume looks like an NTFS boot sector by testing for the `NTFS`
+    OEM identifier and the boot signature.
+    &#34;&#34;&#34;
+    if len(data) &lt; 512:
+        return False
+    if int.from_bytes(data[0x1FE:0x200], &#39;little&#39;) != 0xAA55:
+        return False
+    return data[3:11] == B&#39;NTFS    &#39;</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.vhd.ntfs.VolumeSource"><code class="flex name class">
+<span>class <span class="ident">VolumeSource</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Base class for protocol classes.</p>
+<p>Protocol classes are defined as::</p>
+<pre><code>class Proto(Protocol):
+    def meth(self) -&gt; int:
+        ...
+</code></pre>
+<p>Such classes are primarily used with static type checkers that recognize
+structural subtyping (static duck-typing).</p>
+<p>For example::</p>
+<pre><code>class C:
+    def meth(self) -&gt; int:
+        return 0
+
+def func(x: Proto) -&gt; int:
+    return x.meth()
+
+func(C())  # Passes static type check
+</code></pre>
+<p>See PEP 544 for details. Protocol classes decorated with
+@typing.runtime_checkable act as simple-minded runtime protocols that check
+only the presence of given attributes, ignoring their type signatures.
+Protocol classes can be generic, they are defined as::</p>
+<pre><code>class GenProto[T](Protocol):
+    def meth(self) -&gt; T:
+        ...
+</code></pre></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L50-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class VolumeSource(Protocol):
+    def read(self, offset: int, length: int) -&gt; bytearray:
+        ...</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Protocol</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.vhd.ntfs.VolumeSource.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>self, offset, length)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L51-L52" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def read(self, offset: int, length: int) -&gt; bytearray:
+    ...</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsError"><code class="flex name class">
+<span>class <span class="ident">NtfsError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Inappropriate argument value (of correct type).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L55-L56" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class NtfsError(ValueError):
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.ValueError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile"><code class="flex name class">
+<span>class <span class="ident">NtfsFile</span></span>
+<span>(</span><span>path, date, size, is_dir, _volume, record=0, allocated=0, attributes=0, btime=None, mtime=None, atime=None, ctime=None, fn_btime=None, fn_mtime=None, fn_atime=None, fn_ctime=None, deleted=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A file or directory entry within an NTFS volume. The <code>extract</code> method reconstructs the file
+contents from the unnamed data attribute of the underlying MFT record. The timestamp and
+attribute fields are sourced from the record's <code>$STANDARD_INFORMATION</code> and <code>$FILE_NAME</code>
+attributes; the latter (<code>fn_</code> prefix) are exposed separately because a mismatch between the
+two timestamp sets is a classic indicator of timestamp manipulation (timestomping).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L109-L138" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class NtfsFile:
+    &#34;&#34;&#34;
+    A file or directory entry within an NTFS volume. The `extract` method reconstructs the file
+    contents from the unnamed data attribute of the underlying MFT record. The timestamp and
+    attribute fields are sourced from the record&#39;s `$STANDARD_INFORMATION` and `$FILE_NAME`
+    attributes; the latter (`fn_` prefix) are exposed separately because a mismatch between the
+    two timestamp sets is a classic indicator of timestamp manipulation (timestomping).
+    &#34;&#34;&#34;
+    path: str
+    date: datetime.datetime | None
+    size: int
+    is_dir: bool
+    _volume: NtfsVolume = field(repr=False)
+    _record: int = 0
+    record: int = 0
+    allocated: int = 0
+    attributes: int = 0
+    btime: datetime.datetime | None = None
+    mtime: datetime.datetime | None = None
+    atime: datetime.datetime | None = None
+    ctime: datetime.datetime | None = None
+    fn_btime: datetime.datetime | None = None
+    fn_mtime: datetime.datetime | None = None
+    fn_atime: datetime.datetime | None = None
+    fn_ctime: datetime.datetime | None = None
+    deleted: bool = False
+
+    def extract(self) -&gt; bytearray:
+        return self._volume._extract(self._record)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.path"><code class="name">var <span class="ident">path</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.date"><code class="name">var <span class="ident">date</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.size"><code class="name">var <span class="ident">size</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.is_dir"><code class="name">var <span class="ident">is_dir</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.record"><code class="name">var <span class="ident">record</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.allocated"><code class="name">var <span class="ident">allocated</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.attributes"><code class="name">var <span class="ident">attributes</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.btime"><code class="name">var <span class="ident">btime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.mtime"><code class="name">var <span class="ident">mtime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.atime"><code class="name">var <span class="ident">atime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.ctime"><code class="name">var <span class="ident">ctime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.fn_btime"><code class="name">var <span class="ident">fn_btime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.fn_mtime"><code class="name">var <span class="ident">fn_mtime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.fn_atime"><code class="name">var <span class="ident">fn_atime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.fn_ctime"><code class="name">var <span class="ident">fn_ctime</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.deleted"><code class="name">var <span class="ident">deleted</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.vhd.ntfs.NtfsFile.extract"><code class="name flex">
+<span>def <span class="ident">extract</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L137-L138" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def extract(self) -&gt; bytearray:
+    return self._volume._extract(self._record)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.vhd.ntfs.NtfsVolume"><code class="flex name class">
+<span>class <span class="ident">NtfsVolume</span></span>
+<span>(</span><span>source)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Parses an NTFS volume. The boot sector supplies the cluster geometry and the location of the
+MFT, which is then read as a file in order to enumerate all other records. The <code>files</code> method
+yields all non-system file and directory entries with their full paths.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L141-L566" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class NtfsVolume:
+    &#34;&#34;&#34;
+    Parses an NTFS volume. The boot sector supplies the cluster geometry and the location of the
+    MFT, which is then read as a file in order to enumerate all other records. The `files` method
+    yields all non-system file and directory entries with their full paths.
+    &#34;&#34;&#34;
+    def __init__(self, source: VolumeSource):
+        self._source = source
+        boot = source.read(0, 512)
+        if boot[3:11] != B&#39;NTFS    &#39;:
+            raise NtfsError(&#39;missing NTFS boot sector signature&#39;)
+
+        bytes_per_sector = int.from_bytes(boot[0x0B:0x0D], &#39;little&#39;)
+        sectors_per_cluster = boot[0x0D]
+        if not bytes_per_sector or not sectors_per_cluster:
+            raise NtfsError(&#39;invalid NTFS BIOS parameter block&#39;)
+        self.sector_size_log = bytes_per_sector.bit_length() - 1
+        self.cluster_size_log = self.sector_size_log + (sectors_per_cluster.bit_length() - 1)
+        self.num_sectors = int.from_bytes(boot[0x28:0x30], &#39;little&#39;)
+        self.num_clusters = self.num_sectors &gt;&gt; (sectors_per_cluster.bit_length() - 1)
+        self.mft_cluster = int.from_bytes(boot[0x30:0x38], &#39;little&#39;)
+
+        record_descriptor = int.from_bytes(boot[0x40:0x44], &#39;little&#39;, signed=True)
+        if 0 &lt; record_descriptor &lt; 0x80:
+            self.record_size_log = (record_descriptor.bit_length() - 1) + self.cluster_size_log
+        else:
+            self.record_size_log = 0x100 - (record_descriptor &amp; 0xFF)
+        self.record_size = 1 &lt;&lt; self.record_size_log
+        self.cluster_size = 1 &lt;&lt; self.cluster_size_log
+
+        self._records: list[_Record | None] = []
+        self._load_mft()
+
+    def _read_clusters(self, cluster: int, count: int) -&gt; bytearray:
+        return self._source.read(cluster &lt;&lt; self.cluster_size_log, count &lt;&lt; self.cluster_size_log)
+
+    def _load_mft(self) -&gt; None:
+        first = self._read_clusters(self.mft_cluster, max(1, self.record_size &gt;&gt; self.cluster_size_log))
+        record = self._parse_record(first[:self.record_size], 0)
+        if record is None:
+            raise NtfsError(&#39;failed to parse the $MFT record&#39;)
+        data = self._find_unnamed_data(record)
+        if data is None:
+            raise NtfsError(&#39;the $MFT record has no data attribute&#39;)
+        mft = self._read_attr_data(data)
+        count = len(mft) // self.record_size
+        self._records = [None] * count
+        for index in range(count):
+            chunk = mft[index * self.record_size:(index + 1) * self.record_size]
+            self._records[index] = self._parse_record(chunk, index)
+
+    def _apply_fixups(self, record: bytearray) -&gt; bool:
+        usa_offset = int.from_bytes(record[0x04:0x06], &#39;little&#39;)
+        usa_count = int.from_bytes(record[0x06:0x08], &#39;little&#39;)
+        if usa_count == 0:
+            return False
+        usn = record[usa_offset:usa_offset + 2]
+        for index in range(1, usa_count):
+            tail = (index &lt;&lt; self.sector_size_log) - 2
+            if tail + 2 &gt; len(record):
+                return False
+            if record[tail:tail + 2] != usn:
+                return False
+            source = usa_offset + index * 2
+            record[tail:tail + 2] = record[source:source + 2]
+        return True
+
+    def _parse_record(self, raw: bytearray, index: int) -&gt; _Record | None:
+        record = bytearray(raw)
+        if len(record) &lt; self.record_size or record[:4] != _FILE_MAGIC:
+            return None
+        if not self._apply_fixups(record):
+            return None
+        flags = int.from_bytes(record[0x16:0x18], &#39;little&#39;)
+        attr_offset = int.from_bytes(record[0x14:0x16], &#39;little&#39;)
+        bytes_in_use = int.from_bytes(record[0x18:0x1C], &#39;little&#39;)
+        limit = min(bytes_in_use, len(record))
+
+        file_names: list[_FileName] = []
+        data_attrs: list[_Attr] = []
+        date = None
+        created = None
+        changed = None
+        accessed = None
+        attributes = 0
+
+        position = attr_offset
+        while position + 4 &lt;= limit:
+            attr_type = int.from_bytes(record[position:position + 4], &#39;little&#39;)
+            if attr_type == _ATTR_END:
+                break
+            attr, length = self._parse_attr(record, position, limit)
+            if attr is None or length == 0:
+                break
+            position += length
+            if attr.type == _ATTR_FILE_NAME:
+                name = self._parse_file_name(attr.data)
+                if name is not None:
+                    file_names.append(name)
+            elif attr.type == _ATTR_STANDARD_INFO:
+                if len(attr.data) &gt;= 0x24:
+                    created = _filetime(int.from_bytes(attr.data[_SI_CREATED:_SI_CREATED + 8], &#39;little&#39;))
+                    date = _filetime(int.from_bytes(attr.data[_SI_MODIFIED:_SI_MODIFIED + 8], &#39;little&#39;))
+                    changed = _filetime(int.from_bytes(attr.data[_SI_CHANGED:_SI_CHANGED + 8], &#39;little&#39;))
+                    accessed = _filetime(int.from_bytes(attr.data[_SI_ACCESSED:_SI_ACCESSED + 8], &#39;little&#39;))
+                    attributes = int.from_bytes(attr.data[_SI_ATTRIBUTES:_SI_ATTRIBUTES + 4], &#39;little&#39;)
+                elif len(attr.data) &gt;= 8:
+                    date = _filetime(int.from_bytes(attr.data[_SI_MODIFIED:_SI_MODIFIED + 8], &#39;little&#39;))
+            elif attr.type == _ATTR_DATA:
+                data_attrs.append(attr)
+
+        return _Record(
+            index=index,
+            in_use=bool(flags &amp; _FLAG_IN_USE),
+            is_dir=bool(flags &amp; _FLAG_DIRECTORY),
+            file_names=file_names,
+            data_attrs=data_attrs,
+            date=date,
+            created=created,
+            changed=changed,
+            accessed=accessed,
+            attributes=attributes,
+        )
+
+    def _parse_attr(self, record: bytearray, offset: int, limit: int) -&gt; tuple[_Attr | None, int]:
+        if offset + 0x18 &gt; limit:
+            return None, 0
+        attr_type = int.from_bytes(record[offset:offset + 4], &#39;little&#39;)
+        length = int.from_bytes(record[offset + 4:offset + 8], &#39;little&#39;)
+        if length == 0 or length &amp; 7 or offset + length &gt; limit:
+            return None, 0
+        non_resident = bool(record[offset + 8])
+        name_length = record[offset + 9]
+        name_offset = int.from_bytes(record[offset + 0x0A:offset + 0x0C], &#39;little&#39;)
+        name = &#39;&#39;
+        if name_length:
+            start = offset + name_offset
+            name = bytes(record[start:start + name_length * 2]).decode(&#39;utf-16le&#39;, &#39;replace&#39;)
+
+        if non_resident:
+            if length &lt; 0x40:
+                return None, 0
+            low_vcn = int.from_bytes(record[offset + 0x10:offset + 0x18], &#39;little&#39;)
+            high_vcn = int.from_bytes(record[offset + 0x18:offset + 0x20], &#39;little&#39;)
+            data_offset = int.from_bytes(record[offset + 0x20:offset + 0x22], &#39;little&#39;)
+            compression_unit = record[offset + 0x22]
+            allocated = int.from_bytes(record[offset + 0x28:offset + 0x30], &#39;little&#39;)
+            real_size = int.from_bytes(record[offset + 0x30:offset + 0x38], &#39;little&#39;)
+            initialized = int.from_bytes(record[offset + 0x38:offset + 0x40], &#39;little&#39;)
+            data = bytearray(record[offset + data_offset:offset + length])
+            return _Attr(
+                attr_type, name, True, data,
+                compression_unit=compression_unit,
+                low_vcn=low_vcn,
+                high_vcn=high_vcn,
+                allocated_size=allocated,
+                real_size=real_size,
+                initialized_size=initialized,
+            ), length
+        else:
+            data_size = int.from_bytes(record[offset + 0x10:offset + 0x14], &#39;little&#39;)
+            data_offset = int.from_bytes(record[offset + 0x14:offset + 0x16], &#39;little&#39;)
+            if data_offset + data_size &gt; length:
+                return None, 0
+            data = bytearray(record[offset + data_offset:offset + data_offset + data_size])
+            return _Attr(attr_type, name, False, data), length
+
+    @staticmethod
+    def _parse_file_name(data: bytearray) -&gt; _FileName | None:
+        if len(data) &lt; 0x42:
+            return None
+        parent = int.from_bytes(data[0:6], &#39;little&#39;)
+        created = _filetime(int.from_bytes(data[_FN_CREATED:_FN_CREATED + 8], &#39;little&#39;))
+        modified = _filetime(int.from_bytes(data[_FN_MODIFIED:_FN_MODIFIED + 8], &#39;little&#39;))
+        changed = _filetime(int.from_bytes(data[_FN_CHANGED:_FN_CHANGED + 8], &#39;little&#39;))
+        accessed = _filetime(int.from_bytes(data[_FN_ACCESSED:_FN_ACCESSED + 8], &#39;little&#39;))
+        attrib = int.from_bytes(data[0x38:0x3C], &#39;little&#39;)
+        name_length = data[0x40]
+        name_type = data[0x41]
+        if 0x42 + name_length * 2 &gt; len(data):
+            return None
+        name = bytes(data[0x42:0x42 + name_length * 2]).decode(&#39;utf-16le&#39;, &#39;replace&#39;)
+        return _FileName(
+            parent, name, name_type, attrib,
+            created=created,
+            modified=modified,
+            changed=changed,
+            accessed=accessed,
+        )
+
+    @staticmethod
+    def _find_unnamed_data(record: _Record) -&gt; _Attr | None:
+        for attr in record.data_attrs:
+            if not attr.name:
+                return attr
+        return None
+
+    def _collect_data_attrs(self, record: _Record) -&gt; list[_Attr]:
+        return [attr for attr in record.data_attrs if not attr.name]
+
+    def _read_attr_data(self, attr: _Attr, extra: list[_Attr] | None = None) -&gt; bytearray:
+        if not attr.non_resident:
+            return bytearray(attr.data)
+        attrs = [attr]
+        if extra:
+            attrs = sorted({id(a): a for a in [attr, *extra]}.values(), key=lambda a: a.low_vcn)
+        extents = self._parse_extents(attrs)
+        return self._read_extents(extents, attr)
+
+    def _parse_extents(self, attrs: list[_Attr]) -&gt; list[tuple[int, int, int]]:
+        extents: list[tuple[int, int, int]] = []
+        for attr in attrs:
+            vcn = attr.low_vcn
+            lcn = 0
+            data = attr.data
+            position = 0
+            while position &lt; len(data):
+                header = data[position]
+                position += 1
+                if header == 0:
+                    break
+                run_len = header &amp; 0x0F
+                run_off = header &gt;&gt; 4
+                if run_len == 0 or position + run_len &gt; len(data):
+                    break
+                length = int.from_bytes(data[position:position + run_len], &#39;little&#39;)
+                position += run_len
+                if run_off == 0:
+                    extents.append((vcn, _EMPTY_EXTENT, length))
+                    vcn += length
+                    continue
+                if position + run_off &gt; len(data):
+                    break
+                delta = int.from_bytes(data[position:position + run_off], &#39;little&#39;, signed=True)
+                position += run_off
+                lcn += delta
+                extents.append((vcn, lcn, length))
+                vcn += length
+        return extents
+
+    def _read_extents(self, extents: list[tuple[int, int, int]], attr: _Attr) -&gt; bytearray:
+        if attr.compression_unit:
+            return self._read_compressed(extents, attr)
+        out = bytearray()
+        for _, lcn, length in extents:
+            size = length &lt;&lt; self.cluster_size_log
+            if lcn == _EMPTY_EXTENT:
+                out.extend(bytes(size))
+            else:
+                out.extend(self._read_clusters(lcn, length))
+        del out[attr.real_size:]
+        if len(out) &lt; attr.real_size:
+            out.extend(bytes(attr.real_size - len(out)))
+        if attr.initialized_size &lt; attr.real_size:
+            zeros = attr.real_size - attr.initialized_size
+            out[attr.initialized_size:] = bytes(zeros)
+        return out
+
+    def _read_compressed(self, extents: list[tuple[int, int, int]], attr: _Attr) -&gt; bytearray:
+        unit = 1 &lt;&lt; attr.compression_unit
+        clusters: dict[int, int] = {}
+        for vcn, lcn, length in extents:
+            if lcn == _EMPTY_EXTENT:
+                continue
+            for offset in range(length):
+                clusters[vcn + offset] = lcn + offset
+        out = bytearray()
+        total_clusters = (attr.real_size + self.cluster_size - 1) &gt;&gt; self.cluster_size_log
+        vcn = 0
+        while vcn &lt; total_clusters:
+            block = [clusters.get(vcn + k) for k in range(unit)]
+            if all(c is None for c in block):
+                out.extend(bytes(unit &lt;&lt; self.cluster_size_log))
+            elif all(c is not None for c in block):
+                for cluster in block:
+                    if cluster is not None:
+                        out.extend(self._read_clusters(cluster, 1))
+            else:
+                compressed = bytearray()
+                for cluster in block:
+                    if cluster is None:
+                        break
+                    compressed.extend(self._read_clusters(cluster, 1))
+                out.extend(_lznt1_decompress(compressed, unit &lt;&lt; self.cluster_size_log))
+            vcn += unit
+        del out[attr.real_size:]
+        if len(out) &lt; attr.real_size:
+            out.extend(bytes(attr.real_size - len(out)))
+        if attr.initialized_size &lt; attr.real_size:
+            out[attr.initialized_size:] = bytes(attr.real_size - attr.initialized_size)
+        return out
+
+    def _extract(self, index: int) -&gt; bytearray:
+        record = self._records[index]
+        if record is None:
+            return bytearray()
+        attrs = self._collect_data_attrs(record)
+        if not attrs:
+            return bytearray()
+        primary = next((a for a in attrs if a.low_vcn == 0), attrs[0])
+        return self._read_attr_data(primary, attrs)
+
+    def files(self, recover: bool = False) -&gt; Iterator[NtfsFile]:
+        names: dict[int, _FileName] = {}
+        for record in self._records:
+            if record is None or not record.in_use:
+                continue
+            if record.index &lt; _NUM_SYSTEM_RECORDS:
+                continue
+            chosen = self._select_name(record)
+            if chosen is not None:
+                names[record.index] = chosen
+        for index, chosen in names.items():
+            record = self._records[index]
+            if record is None:
+                continue
+            path = self._build_path(index, names)
+            if path is None:
+                continue
+            yield self._make_file(record, chosen, path, deleted=False)
+        if recover:
+            yield from self._recover(names)
+
+    def _recover(self, names: dict[int, _FileName]) -&gt; Iterator[NtfsFile]:
+        for record in self._records:
+            if record is None or record.in_use:
+                continue
+            if record.index &lt; _NUM_SYSTEM_RECORDS:
+                continue
+            if self._find_unnamed_data(record) is None:
+                continue
+            chosen = self._select_name(record)
+            if chosen is None:
+                continue
+            path = self._build_path(record.index, names, chosen)
+            if path is None:
+                path = F&#39;?/{chosen.name}&#39;
+            yield self._make_file(record, chosen, path, deleted=True)
+
+    def _make_file(
+        self,
+        record: _Record,
+        chosen: _FileName,
+        path: str,
+        deleted: bool,
+    ) -&gt; NtfsFile:
+        return NtfsFile(
+            path=path,
+            date=record.date,
+            size=self._file_size(record),
+            is_dir=record.is_dir,
+            _volume=self,
+            _record=record.index,
+            record=record.index,
+            allocated=self._allocated_size(record),
+            attributes=record.attributes,
+            btime=record.created,
+            mtime=record.date,
+            ctime=record.changed,
+            atime=record.accessed,
+            fn_btime=chosen.created,
+            fn_mtime=chosen.modified,
+            fn_ctime=chosen.changed,
+            fn_atime=chosen.accessed,
+            deleted=deleted,
+        )
+
+    def _select_name(self, record: _Record) -&gt; _FileName | None:
+        chosen = None
+        for name in record.file_names:
+            if name.name_type == _FILE_NAME_DOS:
+                continue
+            if chosen is None or name.name_type &gt;= chosen.name_type:
+                chosen = name
+        if chosen is None and record.file_names:
+            chosen = record.file_names[0]
+        return chosen
+
+    def _build_path(
+        self,
+        index: int,
+        names: dict[int, _FileName],
+        start: _FileName | None = None,
+    ) -&gt; str | None:
+        parts: list[str] = []
+        current = index
+        seen = set()
+        if start is not None:
+            parts.append(start.name)
+            parent = start.parent
+            if parent == _RECORD_ROOT or parent == current:
+                return start.name
+            if parent &lt; _NUM_SYSTEM_RECORDS:
+                return F&#39;?/{start.name}&#39;
+            current = parent
+        while True:
+            if current in seen:
+                return None
+            seen.add(current)
+            name = names.get(current)
+            if name is None:
+                if parts:
+                    return &#39;/&#39;.join([&#39;?&#39;, *reversed(parts)])
+                return None
+            parts.append(name.name)
+            parent = name.parent
+            if parent == _RECORD_ROOT or parent == current:
+                break
+            if parent &lt; _NUM_SYSTEM_RECORDS:
+                return None
+            current = parent
+        return &#39;/&#39;.join(reversed(parts))
+
+    def _allocated_size(self, record: _Record) -&gt; int:
+        attr = self._find_unnamed_data(record)
+        if attr is None or not attr.non_resident:
+            return 0
+        return attr.allocated_size
+
+    def _file_size(self, record: _Record) -&gt; int:
+        attr = self._find_unnamed_data(record)
+        if attr is None:
+            return 0
+        if attr.non_resident:
+            return attr.real_size
+        return len(attr.data)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.vhd.ntfs.NtfsVolume.files"><code class="name flex">
+<span>def <span class="ident">files</span></span>(<span>self, recover=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/vhd/ntfs.py#L443-L462" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def files(self, recover: bool = False) -&gt; Iterator[NtfsFile]:
+    names: dict[int, _FileName] = {}
+    for record in self._records:
+        if record is None or not record.in_use:
+            continue
+        if record.index &lt; _NUM_SYSTEM_RECORDS:
+            continue
+        chosen = self._select_name(record)
+        if chosen is not None:
+            names[record.index] = chosen
+    for index, chosen in names.items():
+        record = self._records[index]
+        if record is None:
+            continue
+        path = self._build_path(index, names)
+        if path is None:
+            continue
+        yield self._make_file(record, chosen, path, deleted=False)
+    if recover:
+        yield from self._recover(names)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.vhd" href="index.html">refinery.lib.vhd</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.vhd.ntfs.is_ntfs" href="#refinery.lib.vhd.ntfs.is_ntfs">is_ntfs</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.vhd.ntfs.VolumeSource" href="#refinery.lib.vhd.ntfs.VolumeSource">VolumeSource</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.vhd.ntfs.VolumeSource.read" href="#refinery.lib.vhd.ntfs.VolumeSource.read">read</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.vhd.ntfs.NtfsError" href="#refinery.lib.vhd.ntfs.NtfsError">NtfsError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.vhd.ntfs.NtfsFile" href="#refinery.lib.vhd.ntfs.NtfsFile">NtfsFile</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.vhd.ntfs.NtfsFile.extract" href="#refinery.lib.vhd.ntfs.NtfsFile.extract">extract</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.vhd.ntfs.NtfsVolume" href="#refinery.lib.vhd.ntfs.NtfsVolume">NtfsVolume</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.vhd.ntfs.NtfsVolume.files" href="#refinery.lib.vhd.ntfs.NtfsVolume.files">files</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

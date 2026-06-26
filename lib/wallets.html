@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.wallets documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.wallets</code></h1>
+</header>
+<section id="section-intro">
+<p>Validation routines for the wallet address patterns in <code><a title="refinery.lib.patterns.wallets" href="patterns/index.html#refinery.lib.patterns.wallets">wallets</a></code>. The regular
+expressions in that module are often too permissive; they recognize the shape of an address but
+cannot tell apart a genuine address from an arbitrary string that happens to use the same
+alphabet and length. The functions here add a second stage that verifies the integrity check built
+into each address format:</p>
+<ul>
+<li>Base58Check addresses (most legacy coins) carry a four byte <code>SHA256</code> double hash checksum.</li>
+<li>Bech32 and Bech32m addresses (SegWit, Cosmos, and related) carry a <code>BCH</code> code checksum.</li>
+<li>CashAddr addresses (Bitcoin Cash) carry a wider 40 bit <code>BCH</code> code checksum.</li>
+<li>EVM addresses optionally carry an <code>EIP55</code> mixed case checksum derived from <code>Keccak256</code>.</li>
+<li>Stellar addresses are Base32 encoded with a trailing <code>CRC16</code> (XMODEM) checksum.</li>
+<li>Algorand addresses are Base32 encoded with a trailing <code>SHA512/256</code> checksum.</li>
+<li>TON addresses are Base64 encoded with a trailing <code>CRC16</code> (XMODEM) checksum.</li>
+<li>NEM addresses are Base32 encoded with a trailing <code>Keccak256</code> checksum.</li>
+<li>Monero addresses use a block based Base58 encoding with a trailing <code>Keccak256</code> checksum.</li>
+<li>Substrate addresses (Polkadot) carry a <code>Blake2b</code> checksum over an <code>SS58PRE</code> prefixed payload.</li>
+<li>Cardano Shelley addresses are Bech32; Byron addresses are <code>CBOR</code> with a <code>CRC32</code> checksum.</li>
+<li>Tezos addresses are Base58Check encoded with a multi byte version prefix that selects the key
+type (<code>tz1</code>, <code>tz2</code>, <code>tz3</code>) or an originated contract (<code>KT1</code>).</li>
+<li>Solana addresses are a raw 32 byte public key and are validated by their decoded length.</li>
+<li>WIF private keys are Base58Check encoded with a <code>0x80</code> version byte; <code>xtw</code> surfaces them as a
+leaked secret rather than as a destination address.</li>
+</ul>
+<p>The <code><a title="refinery.lib.wallets.validate" href="#refinery.lib.wallets.validate">validate()</a></code> function is the entry point used by <code><a title="refinery.units.pattern.xtw" href="../units/pattern/xtw.html">refinery.units.pattern.xtw</a></code>. Address kinds
+for which no validator is registered always pass, so enabling validation never discards a coin
+that we do not yet know how to check.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L1-L455" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Validation routines for the wallet address patterns in `refinery.lib.patterns.wallets`. The regular
+expressions in that module are often too permissive; they recognize the shape of an address but
+cannot tell apart a genuine address from an arbitrary string that happens to use the same
+alphabet and length. The functions here add a second stage that verifies the integrity check built
+into each address format:
+
+- Base58Check addresses (most legacy coins) carry a four byte `SHA256` double hash checksum.
+- Bech32 and Bech32m addresses (SegWit, Cosmos, and related) carry a `BCH` code checksum.
+- CashAddr addresses (Bitcoin Cash) carry a wider 40 bit `BCH` code checksum.
+- EVM addresses optionally carry an `EIP55` mixed case checksum derived from `Keccak256`.
+- Stellar addresses are Base32 encoded with a trailing `CRC16` (XMODEM) checksum.
+- Algorand addresses are Base32 encoded with a trailing `SHA512/256` checksum.
+- TON addresses are Base64 encoded with a trailing `CRC16` (XMODEM) checksum.
+- NEM addresses are Base32 encoded with a trailing `Keccak256` checksum.
+- Monero addresses use a block based Base58 encoding with a trailing `Keccak256` checksum.
+- Substrate addresses (Polkadot) carry a `Blake2b` checksum over an `SS58PRE` prefixed payload.
+- Cardano Shelley addresses are Bech32; Byron addresses are `CBOR` with a `CRC32` checksum.
+- Tezos addresses are Base58Check encoded with a multi byte version prefix that selects the key
+  type (`tz1`, `tz2`, `tz3`) or an originated contract (`KT1`).
+- Solana addresses are a raw 32 byte public key and are validated by their decoded length.
+- WIF private keys are Base58Check encoded with a `0x80` version byte; `xtw` surfaces them as a
+  leaked secret rather than as a destination address.
+
+The `validate` function is the entry point used by `refinery.units.pattern.xtw`. Address kinds
+for which no validator is registered always pass, so enabling validation never discards a coin
+that we do not yet know how to check.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import hashlib
+
+from typing import Callable
+
+from refinery.lib.types import buf
+
+_BASE58 = b&#39;123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz&#39;
+_BASE58_INVERSE = {character: value for value, character in enumerate(_BASE58)}
+
+_RIPPLE = b&#39;rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz&#39;
+
+_BECH32 = b&#39;qpzry9x8gf2tvdw0s3jn54khce6mua7l&#39;
+_BECH32_INVERSE = {character: value for value, character in enumerate(_BECH32)}
+_BECH32_CONST = 1
+_BECH32M_CONST = 0x2BC830A3
+
+
+def _base58_decode(data: buf, alphabet: bytes = _BASE58) -&gt; bytes | None:
+    inverse = _BASE58_INVERSE if alphabet is _BASE58 else {
+        character: value for value, character in enumerate(alphabet)}
+    zero = alphabet[0]
+    number = 0
+    leading_zeros = 0
+    counting = True
+    for character in bytes(data):
+        value = inverse.get(character)
+        if value is None:
+            return None
+        number = number * 58 + value
+        if counting and character == zero:
+            leading_zeros += 1
+        else:
+            counting = False
+    body = number.to_bytes((number.bit_length() + 7) // 8, &#39;big&#39;) if number else B&#39;&#39;
+    return B&#39;\0&#39; * leading_zeros + body
+
+
+def base58check(data: buf, alphabet: bytes = _BASE58) -&gt; bytes | None:
+    &#34;&#34;&#34;
+    Decode a Base58Check string and verify its trailing four byte double-`SHA256` checksum. The
+    decoded payload, including its version prefix, is returned when the checksum is valid, and
+    `None` is returned otherwise. The optional `alphabet` selects the Base58 dialect; it defaults
+    to the Bitcoin alphabet but can be set to the Ripple alphabet for XRP addresses.
+    &#34;&#34;&#34;
+    raw = _base58_decode(data, alphabet)
+    if raw is None or len(raw) &lt; 5:
+        return None
+    payload, checksum = raw[:-4], raw[-4:]
+    if hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4] != checksum:
+        return None
+    return payload
+
+
+_MONERO_BLOCK_SIZES = {2: 1, 3: 2, 5: 3, 6: 4, 7: 5, 9: 6, 10: 7, 11: 8}
+
+
+def _monero_base58_decode(data: buf) -&gt; bytes | None:
+    &#34;&#34;&#34;
+    Decode a Monero style Base58 string. Unlike Base58Check, Monero encodes the payload in eight
+    byte blocks that each map to eleven characters; the final, shorter block uses a fixed lookup
+    from encoded length to decoded length. Returns `None` for any malformed block.
+    &#34;&#34;&#34;
+    body = bytes(data)
+    out = bytearray()
+    for index in range(0, len(body), 11):
+        block = body[index:index + 11]
+        size = _MONERO_BLOCK_SIZES.get(len(block))
+        if size is None:
+            return None
+        number = 0
+        for character in block:
+            value = _BASE58_INVERSE.get(character)
+            if value is None:
+                return None
+            number = number * 58 + value
+        if number &gt;&gt; (8 * size):
+            return None
+        out += number.to_bytes(size, &#39;big&#39;)
+    return bytes(out)
+
+
+def _bech32_polymod(values: list[int]) -&gt; int:
+    generator = (0x3B6A57B2, 0x26508E6D, 0x1EA119FA, 0x3D4233DD, 0x2A1462B3)
+    checksum = 1
+    for value in values:
+        top = checksum &gt;&gt; 25
+        checksum = (checksum &amp; 0x1FFFFFF) &lt;&lt; 5 ^ value
+        for bit, term in enumerate(generator):
+            if (top &gt;&gt; bit) &amp; 1:
+                checksum ^= term
+    return checksum
+
+
+def bech32_valid(data: buf, hrp: bytes) -&gt; bool:
+    &#34;&#34;&#34;
+    Verify that the input is a valid Bech32 or Bech32m string with the given human readable part.
+    The distinction between the two checksum variants is irrelevant for address validation, so
+    either constant is accepted.
+    &#34;&#34;&#34;
+    address = bytes(data).lower()
+    if not address.startswith(hrp + B&#39;1&#39;):
+        return False
+    values = []
+    for character in address[len(hrp) + 1:]:
+        value = _BECH32_INVERSE.get(character)
+        if value is None:
+            return False
+        values.append(value)
+    expanded = [c &gt;&gt; 5 for c in hrp] + [0] + [c &amp; 31 for c in hrp]
+    checksum = _bech32_polymod(expanded + values)
+    return checksum == _BECH32_CONST or checksum == _BECH32M_CONST
+
+
+def _cashaddr_polymod(values: list[int]) -&gt; int:
+    generator = (
+        0x98F2BC8E61,
+        0x79B76D99E2,
+        0xF33E5FB3C4,
+        0xAE2EABE2A8,
+        0x1E4F43E470,
+    )
+    checksum = 1
+    for value in values:
+        top = checksum &gt;&gt; 35
+        checksum = ((checksum &amp; 0x07FFFFFFFF) &lt;&lt; 5) ^ value
+        for bit, term in enumerate(generator):
+            if (top &gt;&gt; bit) &amp; 1:
+                checksum ^= term
+    return checksum ^ 1
+
+
+def cashaddr_valid(data: buf, prefix: bytes) -&gt; bool:
+    &#34;&#34;&#34;
+    Verify a Bitcoin Cash CashAddr string against its 40 bit `BCH` checksum. The CashAddr format
+    shares the Bech32 character set but uses a wider checksum with its own generator polynomial.
+    An optional `prefix:` component is accepted and must match the given prefix.
+    &#34;&#34;&#34;
+    address = bytes(data).lower()
+    payload = address
+    if B&#39;:&#39; in address:
+        head, _, payload = address.partition(B&#39;:&#39;)
+        if head != prefix:
+            return False
+    values = []
+    for character in payload:
+        value = _BECH32_INVERSE.get(character)
+        if value is None:
+            return False
+        values.append(value)
+    expanded = [c &amp; 31 for c in prefix] + [0] + values
+    return _cashaddr_polymod(expanded) == 0
+
+
+def _crc16_xmodem(data: buf) -&gt; int:
+    crc = 0
+    for byte in bytes(data):
+        crc ^= byte &lt;&lt; 8
+        for _ in range(8):
+            if crc &amp; 0x8000:
+                crc = (crc &lt;&lt; 1) ^ 0x1021
+            else:
+                crc &lt;&lt;= 1
+            crc &amp;= 0xFFFF
+    return crc
+
+
+def _eip55_body_valid(body: bytes) -&gt; bool:
+    if len(body) != 40:
+        return False
+    lower = body.lower()
+    if any(c not in B&#39;0123456789abcdefABCDEF&#39; for c in body):
+        return False
+    if body == lower or body == body.upper():
+        return True
+    from Cryptodome.Hash import keccak
+    digest = keccak.new(digest_bits=256, data=lower).hexdigest()
+    for character, nibble in zip(bytes(body), digest):
+        if character in B&#39;0123456789&#39;:
+            continue
+        upper = character &lt; 0x61
+        if upper != (int(nibble, 16) &gt;= 8):
+            return False
+    return True
+
+
+def eip55_valid(data: buf) -&gt; bool:
+    &#34;&#34;&#34;
+    Validate an EVM `0x` address. A purely lower or upper case address carries no checksum and is
+    accepted unconditionally. A mixed case address is verified against the `EIP55` checksum, which
+    is computed from the `Keccak256` hash of the lower case hexadecimal digits.
+    &#34;&#34;&#34;
+    address = bytes(data)
+    if not address[:2] == B&#39;0x&#39; or len(address) != 42:
+        return False
+    return _eip55_body_valid(address[2:])
+
+
+def solana_valid(data: buf) -&gt; bool:
+    &#34;&#34;&#34;
+    Validate a Solana address by confirming that it Base58 decodes to a 32 byte public key.
+    &#34;&#34;&#34;
+    raw = _base58_decode(data)
+    return raw is not None and len(raw) == 32
+
+
+def _base58check_valid(data: buf) -&gt; bool:
+    return base58check(data) is not None
+
+
+def _bitcoin_valid(data: buf) -&gt; bool:
+    if bytes(data[:3]).lower() == B&#39;bc1&#39;:
+        return bech32_valid(data, B&#39;bc&#39;)
+    return _base58check_valid(data)
+
+
+def _litecoin_valid(data: buf) -&gt; bool:
+    if bytes(data[:4]).lower() == B&#39;ltc1&#39;:
+        return bech32_valid(data, B&#39;ltc&#39;)
+    return _base58check_valid(data)
+
+
+def _harmony_valid(data: buf) -&gt; bool:
+    return bech32_valid(data, B&#39;one&#39;) or bech32_valid(data, B&#39;bnb&#39;)
+
+
+def _avalanche_valid(data: buf) -&gt; bool:
+    body = bytes(data)
+    if body[:2] in (B&#39;X-&#39;, B&#39;P-&#39;):
+        return bech32_valid(body[2:], B&#39;avax&#39;)
+    return False
+
+
+def _ripple_valid(data: buf) -&gt; bool:
+    body = bytes(data)
+    if body[:1] == B&#39;X&#39;:
+        return True
+    return base58check(body, _RIPPLE) is not None
+
+
+def _stellar_valid(data: buf) -&gt; bool:
+    import base64
+    try:
+        raw = base64.b32decode(bytes(data))
+    except Exception:
+        return False
+    if len(raw) &lt; 3:
+        return False
+    body, checksum = raw[:-2], raw[-2:]
+    return _crc16_xmodem(body).to_bytes(2, &#39;little&#39;) == checksum
+
+
+def _polkadot_valid(data: buf) -&gt; bool:
+    raw = _base58_decode(data)
+    if raw is None or len(raw) &lt; 3:
+        return False
+    body, checksum = raw[:-2], raw[-2:]
+    digest = hashlib.blake2b(B&#39;SS58PRE&#39; + body, digest_size=64).digest()
+    return digest[:2] == checksum
+
+
+def _cardano_valid(data: buf) -&gt; bool:
+    body = bytes(data)
+    if body[:4].lower() == B&#39;addr&#39;:
+        return bech32_valid(body, B&#39;addr&#39;)
+    raw = _base58_decode(body)
+    if raw is None:
+        return False
+    import zlib
+
+    from refinery.lib.cbor import CBORReader
+    item = CBORReader(memoryview(raw), bigendian=True).read_item()
+    if not isinstance(item, list) or len(item) != 2:
+        return False
+    tagged, checksum = item
+    if not isinstance(tagged, dict) or tagged.get(&#39;tag&#39;) != 24:
+        return False
+    inner = tagged.get(&#39;value&#39;)
+    if not isinstance(inner, (bytes, bytearray, memoryview)):
+        return False
+    return zlib.crc32(bytes(inner)) == checksum
+
+
+def _bech32_valid_cosmos(data: buf):
+    return bech32_valid(data, b&#39;cosmos&#39;)
+
+
+def _bech32_valid_terra(data: buf):
+    return bech32_valid(data, b&#39;terra&#39;)
+
+
+def _cashaddr_valid_bitcoincash(data: buf):
+    return cashaddr_valid(data, B&#39;bitcoincash&#39;)
+
+
+def _ronin_valid(data: buf) -&gt; bool:
+    body = bytes(data)
+    if body[:6].lower() != B&#39;ronin:&#39;:
+        return False
+    return _eip55_body_valid(body[6:])
+
+
+def _wif_valid(data: buf) -&gt; bool:
+    payload = base58check(data)
+    if payload is None:
+        return False
+    return payload[:1] == B&#39;\x80&#39; and len(payload) == 33
+
+
+def _iota_valid(data: buf) -&gt; bool:
+    return bech32_valid(data, B&#39;iota&#39;)
+
+
+def _ton_valid(data: buf) -&gt; bool:
+    import base64
+    body = bytes(data).translate(bytes.maketrans(B&#39;-_&#39;, B&#39;+/&#39;))
+    try:
+        raw = base64.b64decode(body, validate=True)
+    except Exception:
+        return False
+    if len(raw) != 36:
+        return False
+    payload, checksum = raw[:34], raw[34:]
+    return _crc16_xmodem(payload).to_bytes(2, &#39;big&#39;) == checksum
+
+
+def _monero_valid(data: buf) -&gt; bool:
+    raw = _monero_base58_decode(data)
+    if raw is None or len(raw) &lt;= 4:
+        return False
+    from Cryptodome.Hash import keccak
+    body, checksum = raw[:-4], raw[-4:]
+    return keccak.new(digest_bits=256, data=body).digest()[:4] == checksum
+
+
+def _nem_valid(data: buf) -&gt; bool:
+    import base64
+    body = bytes(data).replace(B&#39;-&#39;, B&#39;&#39;)
+    try:
+        raw = base64.b32decode(body)
+    except Exception:
+        return False
+    if len(raw) != 25:
+        return False
+    from Cryptodome.Hash import keccak
+    payload, checksum = raw[:21], raw[21:]
+    return keccak.new(digest_bits=256, data=payload).digest()[:4] == checksum
+
+
+_TEZOS_PREFIXES = (
+    bytes((6, 161, 159)),
+    bytes((6, 161, 161)),
+    bytes((6, 161, 164)),
+    bytes((2, 90, 121)),
+)
+
+
+def _tezos_valid(data: buf) -&gt; bool:
+    payload = base58check(data)
+    if payload is None or len(payload) != 23:
+        return False
+    return payload[:3] in _TEZOS_PREFIXES
+
+
+def _algorand_valid(data: buf) -&gt; bool:
+    import base64
+    body = bytes(data)
+    if len(body) != 58:
+        return False
+    try:
+        raw = base64.b32decode(body + B&#39;=&#39; * 6)
+    except Exception:
+        return False
+    if len(raw) != 36:
+        return False
+    from Cryptodome.Hash import SHA512
+    payload, checksum = raw[:32], raw[32:]
+    return SHA512.new(truncate=&#39;256&#39;, data=payload).digest()[-4:] == checksum
+
+
+VALIDATORS: dict[str, Callable[[buf], bool]] = {
+    &#39;BTC&#39;    : _bitcoin_valid,
+    &#39;LTC&#39;    : _litecoin_valid,
+    &#39;DOGE&#39;   : _base58check_valid,
+    &#39;DASH&#39;   : _base58check_valid,
+    &#39;ZCASH&#39;  : _base58check_valid,
+    &#39;RVN&#39;    : _base58check_valid,
+    &#39;TRON&#39;   : _base58check_valid,
+    &#39;NEO&#39;    : _base58check_valid,
+    &#39;ONT&#39;    : _base58check_valid,
+    &#39;ATOM&#39;   : _bech32_valid_cosmos,
+    &#39;TERRA&#39;  : _bech32_valid_terra,
+    &#39;ONE&#39;    : _harmony_valid,
+    &#39;ETH&#39;    : eip55_valid,
+    &#39;AVAX&#39;   : _avalanche_valid,
+    &#39;RONIN&#39;  : _ronin_valid,
+    &#39;SOLANA&#39; : solana_valid,
+    &#39;XRP&#39;    : _ripple_valid,
+    &#39;BCH&#39;    : _cashaddr_valid_bitcoincash,
+    &#39;XLM&#39;    : _stellar_valid,
+    &#39;DOT&#39;    : _polkadot_valid,
+    &#39;ADA&#39;    : _cardano_valid,
+    &#39;IOTA&#39;   : _iota_valid,
+    &#39;TON&#39;    : _ton_valid,
+    &#39;XMR&#39;    : _monero_valid,
+    &#39;XEM&#39;    : _nem_valid,
+    &#39;WIF&#39;    : _wif_valid,
+    &#39;XTZ&#39;    : _tezos_valid,
+    &#39;ALGO&#39;   : _algorand_valid,
+}
+
+
+def validate(kind: str, address: buf) -&gt; bool:
+    &#34;&#34;&#34;
+    Return whether the given address is valid for the wallet kind named by `kind`, where the name
+    is a member name of `refinery.lib.patterns.wallets`. When no validator is registered for the
+    kind, the address is considered valid; this guarantees that validation only ever rejects an
+    address that a registered checker positively identifies as malformed.
+    &#34;&#34;&#34;
+    validator = VALIDATORS.get(kind)
+    if validator is None:
+        return True
+    try:
+        return validator(address)
+    except Exception:
+        return False</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.wallets.base58check"><code class="name flex">
+<span>def <span class="ident">base58check</span></span>(<span>data, alphabet=b'123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode a Base58Check string and verify its trailing four byte double-<code>SHA256</code> checksum. The
+decoded payload, including its version prefix, is returned when the checksum is valid, and
+<code>None</code> is returned otherwise. The optional <code>alphabet</code> selects the Base58 dialect; it defaults
+to the Bitcoin alphabet but can be set to the Ripple alphabet for XRP addresses.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L68-L81" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def base58check(data: buf, alphabet: bytes = _BASE58) -&gt; bytes | None:
+    &#34;&#34;&#34;
+    Decode a Base58Check string and verify its trailing four byte double-`SHA256` checksum. The
+    decoded payload, including its version prefix, is returned when the checksum is valid, and
+    `None` is returned otherwise. The optional `alphabet` selects the Base58 dialect; it defaults
+    to the Bitcoin alphabet but can be set to the Ripple alphabet for XRP addresses.
+    &#34;&#34;&#34;
+    raw = _base58_decode(data, alphabet)
+    if raw is None or len(raw) &lt; 5:
+        return None
+    payload, checksum = raw[:-4], raw[-4:]
+    if hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4] != checksum:
+        return None
+    return payload</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.wallets.bech32_valid"><code class="name flex">
+<span>def <span class="ident">bech32_valid</span></span>(<span>data, hrp)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Verify that the input is a valid Bech32 or Bech32m string with the given human readable part.
+The distinction between the two checksum variants is irrelevant for address validation, so
+either constant is accepted.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L124-L141" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def bech32_valid(data: buf, hrp: bytes) -&gt; bool:
+    &#34;&#34;&#34;
+    Verify that the input is a valid Bech32 or Bech32m string with the given human readable part.
+    The distinction between the two checksum variants is irrelevant for address validation, so
+    either constant is accepted.
+    &#34;&#34;&#34;
+    address = bytes(data).lower()
+    if not address.startswith(hrp + B&#39;1&#39;):
+        return False
+    values = []
+    for character in address[len(hrp) + 1:]:
+        value = _BECH32_INVERSE.get(character)
+        if value is None:
+            return False
+        values.append(value)
+    expanded = [c &gt;&gt; 5 for c in hrp] + [0] + [c &amp; 31 for c in hrp]
+    checksum = _bech32_polymod(expanded + values)
+    return checksum == _BECH32_CONST or checksum == _BECH32M_CONST</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.wallets.cashaddr_valid"><code class="name flex">
+<span>def <span class="ident">cashaddr_valid</span></span>(<span>data, prefix)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Verify a Bitcoin Cash CashAddr string against its 40 bit <code>BCH</code> checksum. The CashAddr format
+shares the Bech32 character set but uses a wider checksum with its own generator polynomial.
+An optional <code>prefix:</code> component is accepted and must match the given prefix.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L162-L181" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def cashaddr_valid(data: buf, prefix: bytes) -&gt; bool:
+    &#34;&#34;&#34;
+    Verify a Bitcoin Cash CashAddr string against its 40 bit `BCH` checksum. The CashAddr format
+    shares the Bech32 character set but uses a wider checksum with its own generator polynomial.
+    An optional `prefix:` component is accepted and must match the given prefix.
+    &#34;&#34;&#34;
+    address = bytes(data).lower()
+    payload = address
+    if B&#39;:&#39; in address:
+        head, _, payload = address.partition(B&#39;:&#39;)
+        if head != prefix:
+            return False
+    values = []
+    for character in payload:
+        value = _BECH32_INVERSE.get(character)
+        if value is None:
+            return False
+        values.append(value)
+    expanded = [c &amp; 31 for c in prefix] + [0] + values
+    return _cashaddr_polymod(expanded) == 0</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.wallets.eip55_valid"><code class="name flex">
+<span>def <span class="ident">eip55_valid</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Validate an EVM <code>0x</code> address. A purely lower or upper case address carries no checksum and is
+accepted unconditionally. A mixed case address is verified against the <code>EIP55</code> checksum, which
+is computed from the <code>Keccak256</code> hash of the lower case hexadecimal digits.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L216-L225" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def eip55_valid(data: buf) -&gt; bool:
+    &#34;&#34;&#34;
+    Validate an EVM `0x` address. A purely lower or upper case address carries no checksum and is
+    accepted unconditionally. A mixed case address is verified against the `EIP55` checksum, which
+    is computed from the `Keccak256` hash of the lower case hexadecimal digits.
+    &#34;&#34;&#34;
+    address = bytes(data)
+    if not address[:2] == B&#39;0x&#39; or len(address) != 42:
+        return False
+    return _eip55_body_valid(address[2:])</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.wallets.solana_valid"><code class="name flex">
+<span>def <span class="ident">solana_valid</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Validate a Solana address by confirming that it Base58 decodes to a 32 byte public key.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L228-L233" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def solana_valid(data: buf) -&gt; bool:
+    &#34;&#34;&#34;
+    Validate a Solana address by confirming that it Base58 decodes to a 32 byte public key.
+    &#34;&#34;&#34;
+    raw = _base58_decode(data)
+    return raw is not None and len(raw) == 32</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.wallets.validate"><code class="name flex">
+<span>def <span class="ident">validate</span></span>(<span>kind, address)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return whether the given address is valid for the wallet kind named by <code>kind</code>, where the name
+is a member name of <code><a title="refinery.lib.patterns.wallets" href="patterns/index.html#refinery.lib.patterns.wallets">wallets</a></code>. When no validator is registered for the
+kind, the address is considered valid; this guarantees that validation only ever rejects an
+address that a registered checker positively identifies as malformed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6978c113d4e7daffbbbe07c29d2f2d83c5f75804/refinery/lib/wallets.py#L442-L455" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def validate(kind: str, address: buf) -&gt; bool:
+    &#34;&#34;&#34;
+    Return whether the given address is valid for the wallet kind named by `kind`, where the name
+    is a member name of `refinery.lib.patterns.wallets`. When no validator is registered for the
+    kind, the address is considered valid; this guarantees that validation only ever rejects an
+    address that a registered checker positively identifies as malformed.
+    &#34;&#34;&#34;
+    validator = VALIDATORS.get(kind)
+    if validator is None:
+        return True
+    try:
+        return validator(address)
+    except Exception:
+        return False</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib" href="index.html">refinery.lib</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="refinery.lib.wallets.base58check" href="#refinery.lib.wallets.base58check">base58check</a></code></li>
+<li><code><a title="refinery.lib.wallets.bech32_valid" href="#refinery.lib.wallets.bech32_valid">bech32_valid</a></code></li>
+<li><code><a title="refinery.lib.wallets.cashaddr_valid" href="#refinery.lib.wallets.cashaddr_valid">cashaddr_valid</a></code></li>
+<li><code><a title="refinery.lib.wallets.eip55_valid" href="#refinery.lib.wallets.eip55_valid">eip55_valid</a></code></li>
+<li><code><a title="refinery.lib.wallets.solana_valid" href="#refinery.lib.wallets.solana_valid">solana_valid</a></code></li>
+<li><code><a title="refinery.lib.wallets.validate" href="#refinery.lib.wallets.validate">validate</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
