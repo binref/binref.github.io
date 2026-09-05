@@ -1,0 +1,2672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis</code></h1>
+</header>
+<section id="section-intro">
+<p>Static-analysis substrate for PowerShell deobfuscation. Transforms query a shared, computed model of
+the program here instead of each re-deriving scope, binding, effect, and liveness facts on their
+own.</p>
+<p>The foundation is <code><a title="refinery.lib.scripts.ps1.analysis.model" href="model.html">refinery.lib.scripts.ps1.analysis.model</a></code>, a semantic model of scopes and resolved variable bindings, and
+<code><a title="refinery.lib.scripts.ps1.analysis.callgraph" href="callgraph.html">refinery.lib.scripts.ps1.analysis.callgraph</a></code>, which records what a command name denotes and who reaches it. On top of both, <code><a title="refinery.lib.scripts.ps1.analysis.effects" href="effects.html">refinery.lib.scripts.ps1.analysis.effects</a></code>
+decides what evaluating a node does, whether it can raise, and — through the call graph — where the
+value a body writes to the output stream is finally read. Later layers (control-flow graphs,
+interprocedural summaries) attach behind the same representation-agnostic surface.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/__init__.py#L1-L53" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Static-analysis substrate for PowerShell deobfuscation. Transforms query a shared, computed model of
+the program here instead of each re-deriving scope, binding, effect, and liveness facts on their
+own.
+
+The foundation is `model`, a semantic model of scopes and resolved variable bindings, and
+`callgraph`, which records what a command name denotes and who reaches it. On top of both, `effects`
+decides what evaluating a node does, whether it can raise, and — through the call graph — where the
+value a body writes to the output stream is finally read. Later layers (control-flow graphs,
+interprocedural summaries) attach behind the same representation-agnostic surface.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts.ps1.analysis.cache import Ps1ModelCache, model_cache
+from refinery.lib.scripts.ps1.analysis.effects import (
+    StatementEffect,
+    is_side_effect_free,
+    statement_effect,
+)
+from refinery.lib.scripts.ps1.analysis.model import (
+    Binding,
+    Ps1OccurrenceRole,
+    Ps1SemanticModel,
+    Scope,
+    ScopeKind,
+    build_semantic_model,
+    declares_binding,
+    is_assignment_write_target,
+    is_substitutable_position,
+    is_write_occurrence,
+    occurrence_role,
+    replaces_value,
+)
+
+__all__ = [
+    &#39;Binding&#39;,
+    &#39;Ps1ModelCache&#39;,
+    &#39;Ps1OccurrenceRole&#39;,
+    &#39;Ps1SemanticModel&#39;,
+    &#39;Scope&#39;,
+    &#39;ScopeKind&#39;,
+    &#39;StatementEffect&#39;,
+    &#39;build_semantic_model&#39;,
+    &#39;declares_binding&#39;,
+    &#39;is_assignment_write_target&#39;,
+    &#39;is_side_effect_free&#39;,
+    &#39;is_substitutable_position&#39;,
+    &#39;is_write_occurrence&#39;,
+    &#39;model_cache&#39;,
+    &#39;occurrence_role&#39;,
+    &#39;replaces_value&#39;,
+    &#39;statement_effect&#39;,
+]</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.arguments" href="arguments.html">refinery.lib.scripts.ps1.analysis.arguments</a></code></dt>
+<dd>
+<section class="desc"><p>Which slots of a .NET call the callee writes through …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.blocks" href="blocks.html">refinery.lib.scripts.ps1.analysis.blocks</a></code></dt>
+<dd>
+<section class="desc"><p>Where a PowerShell script block runs: at what point, in whose scope, and how many times …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.cache" href="cache.html">refinery.lib.scripts.ps1.analysis.cache</a></code></dt>
+<dd>
+<section class="desc"><p>A per-run cache of the PowerShell analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.callgraph" href="callgraph.html">refinery.lib.scripts.ps1.analysis.callgraph</a></code></dt>
+<dd>
+<section class="desc"><p>The call graph of one PowerShell script: which function definitions a command name denotes, which
+invocations reach that name, and whether the two …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.cfg" href="cfg.html">refinery.lib.scripts.ps1.analysis.cfg</a></code></dt>
+<dd>
+<section class="desc"><p>PowerShell's contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.commands" href="commands.html">refinery.lib.scripts.ps1.analysis.commands</a></code></dt>
+<dd>
+<section class="desc"><p>What command a name denotes at a point in one PowerShell script …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.dataflow" href="dataflow.html">refinery.lib.scripts.ps1.analysis.dataflow</a></code></dt>
+<dd>
+<section class="desc"><p>Which write a PowerShell variable read observes …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code></dt>
+<dd>
+<section class="desc"><p>Dominance over the per-body control-flow graphs of one PowerShell script …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.effects" href="effects.html">refinery.lib.scripts.ps1.analysis.effects</a></code></dt>
+<dd>
+<section class="desc"><p>The effect layer of the PowerShell analysis substrate: whether evaluating a node produces an
+observable side effect, and what a standalone statement …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.faults" href="faults.html">refinery.lib.scripts.ps1.analysis.faults</a></code></dt>
+<dd>
+<section class="desc"><p>Where a terminating error raised at a point in a PowerShell script goes …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.model" href="model.html">refinery.lib.scripts.ps1.analysis.model</a></code></dt>
+<dd>
+<section class="desc"><p>A semantic model for PowerShell: a tree of scopes with resolved variable bindings and def/use sets,
+computed once over an AST and then queried by the …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.mutation" href="mutation.html">refinery.lib.scripts.ps1.analysis.mutation</a></code></dt>
+<dd>
+<section class="desc"><p>What a call leaves in the slot it writes through …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.naming" href="naming.html">refinery.lib.scripts.ps1.analysis.naming</a></code></dt>
+<dd>
+<section class="desc"><p>The names a script addresses as <em>strings</em> rather than as variables …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.opaque" href="opaque.html">refinery.lib.scripts.ps1.analysis.opaque</a></code></dt>
+<dd>
+<section class="desc"><p>The writes no reading of one script attributes to a name …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.separator" href="separator.html">refinery.lib.scripts.ps1.analysis.separator</a></code></dt>
+<dd>
+<section class="desc"><p>What a collection is written with between its elements where PowerShell coerces one to a String …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.values" href="values.html">refinery.lib.scripts.ps1.analysis.values</a></code></dt>
+<dd>
+<section class="desc"><p>What a PowerShell expression evaluates to and what type that value carries: the value when the
+source pins it, the .NET type when the static surface …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.variable_types" href="variable_types.html">refinery.lib.scripts.ps1.analysis.variable_types</a></code></dt>
+<dd>
+<section class="desc"><p>The .NET type a variable carries where it is read …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.world" href="world.html">refinery.lib.scripts.ps1.analysis.world</a></code></dt>
+<dd>
+<section class="desc"><p>The closed-world model of the PowerShell analysis substrate: whether the script leaves the .NET type
+system and the command table intact, so that a …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.ps1.analysis.worldflow" href="worldflow.html">refinery.lib.scripts.ps1.analysis.worldflow</a></code></dt>
+<dd>
+<section class="desc"><p>The flow-sensitive reading of the closed-world model: whether the type world is closed at <em>one</em>
+particular read, rather than anywhere the script runs …</p></section>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.build_semantic_model"><code class="name flex">
+<span>def <span class="ident">build_semantic_model</span></span>(<span>root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel" href="#refinery.lib.scripts.ps1.analysis.Ps1SemanticModel">Ps1SemanticModel</a></code> for a parsed PowerShell script.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L1314-L1318" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_semantic_model(root: Ps1Script) -&gt; Ps1SemanticModel:
+    &#34;&#34;&#34;
+    Build the `Ps1SemanticModel` for a parsed PowerShell script.
+    &#34;&#34;&#34;
+    return Ps1SemanticModel(root)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.declares_binding"><code class="name flex">
+<span>def <span class="ident">declares_binding</span></span>(<span>var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the occurrence brings the binding into existence in the scope it resolves to.</p>
+<p>Every write that installs a value does, except a reference: PowerShell resolves <code>[ref]$n</code> by
+ordinary lookup and creates nothing, so filing one as a declaration invents a local binding in
+whatever body the reference is written in and hides the outer one the callee actually stores
+through. A write that reaches <em>through</em> the value declares nothing for the same reason: it needs
+a value to reach into, so the binding it names already exists wherever it exists.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L182-L195" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def declares_binding(var: Ps1Variable) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the occurrence brings the binding into existence in the scope it resolves to.
+
+    Every write that installs a value does, except a reference: PowerShell resolves `[ref]$n` by
+    ordinary lookup and creates nothing, so filing one as a declaration invents a local binding in
+    whatever body the reference is written in and hides the outer one the callee actually stores
+    through. A write that reaches *through* the value declares nothing for the same reason: it needs
+    a value to reach into, so the binding it names already exists wherever it exists.
+    &#34;&#34;&#34;
+    if is_reference_cast(var.parent):
+        return False
+    role = occurrence_role(var)
+    return role.stores and not role.through</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.is_assignment_write_target"><code class="name flex">
+<span>def <span class="ident">is_assignment_write_target</span></span>(<span>var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <code>var</code> occupies the target position of an enclosing
+<code><a title="refinery.lib.scripts.ps1.model.Ps1AssignmentExpression" href="../model.html#refinery.lib.scripts.ps1.model.Ps1AssignmentExpression">Ps1AssignmentExpression</a></code>, including as an element of a
+multi-assignment <code><a title="refinery.lib.scripts.ps1.model.Ps1ArrayLiteral" href="../model.html#refinery.lib.scripts.ps1.model.Ps1ArrayLiteral">Ps1ArrayLiteral</a></code> target. Enclosing casts and
+parentheses are transparent.</p>
+<p>A question about syntax rather than about role, which is why it is not derived from
+<code><a title="refinery.lib.scripts.ps1.analysis.occurrence_role" href="#refinery.lib.scripts.ps1.analysis.occurrence_role">occurrence_role()</a></code>: a <code>foreach</code> variable and a parameter replace the value exactly as a plain
+assignment target does and occupy no assignment at all.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L198-L209" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_assignment_write_target(var: Ps1Variable) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `var` occupies the target position of an enclosing
+    `refinery.lib.scripts.ps1.model.Ps1AssignmentExpression`, including as an element of a
+    multi-assignment `refinery.lib.scripts.ps1.model.Ps1ArrayLiteral` target. Enclosing casts and
+    parentheses are transparent.
+
+    A question about syntax rather than about role, which is why it is not derived from
+    `occurrence_role`: a `foreach` variable and a parameter replace the value exactly as a plain
+    assignment target does and occupy no assignment at all.
+    &#34;&#34;&#34;
+    return assignment_of(var) is not None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.is_side_effect_free"><code class="name flex">
+<span>def <span class="ident">is_side_effect_free</span></span>(<span>node, world)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Conservative check: return <code>True</code> only when evaluating <code>node</code> is guaranteed to produce no
+observable side effects beyond yielding a value. The <code><a title="refinery.lib.scripts.ps1.analysis.world" href="world.html">refinery.lib.scripts.ps1.analysis.world</a></code> decides whether a present-member
+grant may be trusted and whether a command name still denotes what the metadata says, each at
+the position of the node it is asked about: a world opened, or a name rebound, only by
+statements no path places before the node still answers for it.</p>
+<p>A variable read is one of the few things that is free of its own accord, and <code>$input</code> is the
+exception the grant has to name: reading it advances an enumerator the statements below it read,
+so a statement whose only content is that read still changes what the next one writes.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/effects.py#L802-L974" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_side_effect_free(node, world: Ps1WorldReach) -&gt; bool:
+    &#34;&#34;&#34;
+    Conservative check: return `True` only when evaluating `node` is guaranteed to produce no
+    observable side effects beyond yielding a value. The `world` decides whether a present-member
+    grant may be trusted and whether a command name still denotes what the metadata says, each at
+    the position of the node it is asked about: a world opened, or a name rebound, only by
+    statements no path places before the node still answers for it.
+
+    A variable read is one of the few things that is free of its own accord, and `$input` is the
+    exception the grant has to name: reading it advances an enumerator the statements below it read,
+    so a statement whose only content is that read still changes what the next one writes.
+    &#34;&#34;&#34;
+    if isinstance(node, _LITERAL_EXPRESSIONS):
+        return True
+    if isinstance(node, Ps1TypeExpression):
+        return True
+    if isinstance(node, Ps1Variable):
+        return not _reads_the_pipeline_enumerator(node)
+    if isinstance(node, Ps1ParenExpression):
+        return node.expression is None or is_side_effect_free(node.expression, world)
+    if isinstance(node, Ps1CastExpression):
+        # A cast is a conversion the engine performs by calling into the target type, so it is a
+        # present-type grant like any other: a remapped accelerator invalidates it, and a name the
+        # metadata cannot resolve is not a type this analysis knows anything about. `Add-Type`, a
+        # PowerShell `class` and `[Reflection.Assembly]::Load` all make such a name denote code —
+        # PowerShell converts a string to it by running a constructor — so granting on the operand
+        # alone deleted the call. Resolving is necessary here, not sufficient: a conversion to a
+        # collected type can still run code (`[xml]$s` parses, and follows external DTDs), which
+        # `_PURE_CAST_TYPES` is the eventual answer to. The world is read before either check
+        # because it is a stored bool that can only veto, while both checks below walk.
+        if not world.closed_at(node):
+            return False
+        if data.resolve_type(node.type_name) is None:
+            return False
+        return is_side_effect_free(node.operand, world)
+    if isinstance(node, Ps1UnaryExpression):
+        if node.operator in (&#39;++&#39;, &#39;--&#39;):
+            return False
+        return is_side_effect_free(node.operand, world)
+    if isinstance(node, Ps1BinaryExpression):
+        # The regex operators write the automatic `$Matches`, which the statements after them read;
+        # that is a store to shared engine state, not a value the expression merely yields, so the
+        # operator has to be read and not just the operands. Deleting `$s -match &#39;p(.*)q&#39;` left the
+        # `$Matches[1]` that carries the payload reading an unset variable.
+        if node.operator.lower() in _MATCH_OPERATORS:
+            return False
+        return is_side_effect_free(node.left, world) and is_side_effect_free(node.right, world)
+    if isinstance(node, Ps1RangeExpression):
+        return is_side_effect_free(node.start, world) and is_side_effect_free(node.end, world)
+    if isinstance(node, Ps1ArrayLiteral):
+        return all(is_side_effect_free(e, world) for e in node.elements)
+    if isinstance(node, Ps1HashLiteral):
+        return all(
+            is_side_effect_free(key, world) and is_side_effect_free(value, world)
+            for key, value in node.pairs
+        )
+    if isinstance(node, Ps1ArrayExpression):
+        if len(node.body) == 1:
+            stmt = node.body[0]
+            if isinstance(stmt, Ps1ExpressionStatement) and stmt.expression is not None:
+                return is_side_effect_free(stmt.expression, world)
+        return len(node.body) == 0
+    if isinstance(node, Ps1IndexExpression):
+        # Indexing selects the `Item` member, so it is the bracket spelling of the member read
+        # below and carries the same Extended Type System exposure.
+        pure = is_side_effect_free(node.object, world) and is_side_effect_free(node.index, world)
+        return _grant(pure, node, world)
+    if isinstance(node, Ps1MemberAccess):
+        # A read is side-effect free only when the object is pure to evaluate *and* selecting the
+        # member runs no code. Returning the object&#39;s own purity was the fail-open shape this gate
+        # replaces: it deleted `(Get-Process).Path`, an Extended Type System getter that shells out,
+        # because the pipeline that produced the object was itself pure. A literal member name —
+        # bare (`.Path`) or quoted (`.&#39;Path&#39;`) — names one member the gate can check; a computed
+        # member name (`$x.$(...)`) leaves the selected member unknown, so a read through it can
+        # never be proven pure however pure the name expression is.
+        if not is_side_effect_free(node.object, world):
+            return False
+        member = get_member_name(node.member)
+        if member is None:
+            return False
+        return _grant(_member_read_is_pure(node.object, member, world), node, world)
+    if isinstance(node, Ps1InvokeMember):
+        if not _arguments_are_pure(node.arguments, world):
+            return False
+        if node.access == Ps1AccessKind.STATIC:
+            obj = node.object
+            member = node.member
+            # A computed or quoted member name (`[IO.Path]::$m()`, `[IO.Path]::&#39;GetTempFileName&#39;()`)
+            # cannot be matched against the carve-outs, so the whole-type grant below must not fire
+            # for it either — that is how an obfuscated call reaches the one writing member of an
+            # otherwise pure type.
+            if isinstance(obj, Ps1TypeExpression) and isinstance(member, str):
+                # The type name is resolved through the collected metadata, not truncated, so every
+                # spelling of a type lands on one canonical key, and a type the data does not
+                # describe resolves to nothing and falls through to impure: the fail-closed default.
+                resolved = data.resolve_type(obj.name)
+                if resolved is not None:
+                    type_key = resolved.generic_definition
+                    key = (type_key, member.lower())
+                    if key in _IMPURE_STATIC_METHODS:
+                        return False
+                    written = written_slots(
+                        resolved, member, len(node.arguments), static=True)
+                    if written.slots:
+                        return _grant(
+                            not _writes_shared_storage(written, node.arguments), node, world)
+                    if not written.settled:
+                        # The table names the member and no overload takes this many arguments, so
+                        # 5.1 binds none and raises. Granting purity here would let the junk remover
+                        # delete a statement that writes an error record and stops the pipeline.
+                        return False
+                    if _writes_through_out_parameter(obj.name, member, node.arguments):
+                        return False
+                    if type_key in _PURE_STATIC_METHOD_TYPES:
+                        return _grant(True, node, world)
+                    if key in _PURE_STATIC_METHODS:
+                        return _grant(True, node, world)
+        elif is_side_effect_free(node.object, world):
+            member = node.member
+            if isinstance(member, str) and member.lower() in _PURE_INSTANCE_METHODS:
+                return _grant(True, node, world)
+        return False
+    if isinstance(node, Ps1CommandInvocation):
+        if node.redirections:
+            return False
+        new_object = extract_new_object(node)
+        if new_object is not None:
+            if not world.may_trust_command_name_at(&#39;new-object&#39;, node):
+                return False
+            type_name, ctor_args = new_object
+            resolved = data.resolve_type(type_name)
+            if (
+                resolved is not None
+                and resolved.generic_definition in _PURE_STATIC_METHOD_TYPES
+            ):
+                return _grant(_arguments_are_pure(ctor_args, world), node, world)
+            return False
+        name = get_command_name(node)
+        if name is None:
+            return False
+        name = name.lower()
+        # A command a reachable statement may have rebound no longer surely runs what the metadata
+        # describes, so its purity is not the built-in&#39;s. The gate is positional — the identity
+        # twin of the `_grant` below — trusting the name only where no opener and no redefinition
+        # of this very name can have run first.
+        if not world.may_trust_command_name_at(name, node):
+            return False
+        # The pipeline set is checked through the same gate rather than after the plain one: three
+        # of its four members are in both, so testing the plain set first would make the body check
+        # below unreachable for `Where-Object`, `Select-Object` and `Sort-Object`.
+        if name not in _PURE_CMDLETS and name not in _PURE_PIPELINE_CMDLETS:
+            return False
+        if not _command_arguments_are_pure(node, world):
+            return False
+        # Routed through `_grant` like every other grant. `may_trust_command_name_at` above refuses
+        # a name a rebinding statement can reach; `_grant` here refuses a member the type world
+        # does not hold at this node. The two read different floods — the name gate adds the
+        # per-name redefinition flood the type axis never reads — so a name that passed the first
+        # is still gated on the second, and narrowing either check back into the other would reopen
+        # a fail-open hole with nothing in the path to catch it.
+        if name in _PURE_PIPELINE_CMDLETS:
+            return _grant(_command_body_is_pure(node, world), node, world)
+        return _grant(True, node, world)
+    if isinstance(node, Ps1Pipeline):
+        return all(
+            isinstance(el, Ps1PipelineElement)
+            and not el.redirections
+            and is_side_effect_free(el.expression, world)
+            for el in node.elements
+        )
+    if isinstance(node, Ps1ExpandableString):
+        return all(is_side_effect_free(p, world) for p in node.parts)
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.is_substitutable_position"><code class="name flex">
+<span>def <span class="ident">is_substitutable_position</span></span>(<span>var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a value may be installed where <code>var</code> stands, replacing the occurrence.</p>
+<p>This is not the complement of writing, and reading it off the role alone is what let two
+corruptions through. A splatted <code>@p</code> observes the value like any read, but it spreads an array
+over a command's parameters, and the array written in its place is one argument rather than
+several. A <code>[ref]$n</code> observes the value too, and the literal put in its place is a reference to
+nothing that the callee's store is silently lost through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L169-L179" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_substitutable_position(var: Ps1Variable) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a value may be installed where `var` stands, replacing the occurrence.
+
+    This is not the complement of writing, and reading it off the role alone is what let two
+    corruptions through. A splatted `@p` observes the value like any read, but it spreads an array
+    over a command&#39;s parameters, and the array written in its place is one argument rather than
+    several. A `[ref]$n` observes the value too, and the literal put in its place is a reference to
+    nothing that the callee&#39;s store is silently lost through.
+    &#34;&#34;&#34;
+    return occurrence_role(var).substitutable and not var.splatted</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.is_write_occurrence"><code class="name flex">
+<span>def <span class="ident">is_write_occurrence</span></span>(<span>var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <code>var</code> occurs in a position that writes it: the target of an assignment (including a
+multi-assignment slot), the operand of a <code>++</code>/<code>--</code> update, the loop variable of a <code>foreach</code>, a
+parameter declaration, the operand of a <code>[ref]</code> cast, or a position an assignment stores
+<em>through</em>. Every other occurrence reads the variable.</p>
+<p>A store through is one of these although it installs nothing. <code>$x[0] = 'z'</code> leaves the name
+bound to the object it was bound to, but a read below it observes a different value, and that
+is the whole of what a write is to the layer that orders reads against writes. Counting it a
+read instead is what forced <code>Ps1VariableFlow</code> to give up on every occurrence of the name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L476-L488" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_write_occurrence(var: Ps1Variable) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `var` occurs in a position that writes it: the target of an assignment (including a
+    multi-assignment slot), the operand of a `++`/`--` update, the loop variable of a `foreach`, a
+    parameter declaration, the operand of a `[ref]` cast, or a position an assignment stores
+    *through*. Every other occurrence reads the variable.
+
+    A store through is one of these although it installs nothing. `$x[0] = &#39;z&#39;` leaves the name
+    bound to the object it was bound to, but a read below it observes a different value, and that
+    is the whole of what a write is to the layer that orders reads against writes. Counting it a
+    read instead is what forced `Ps1VariableFlow` to give up on every occurrence of the name.
+    &#34;&#34;&#34;
+    return occurrence_role(var).stores</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.model_cache"><code class="name flex">
+<span>def <span class="ident">model_cache</span></span>(<span>transformer, root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The pipeline's shared <code><a title="refinery.lib.scripts.ps1.analysis.Ps1ModelCache" href="#refinery.lib.scripts.ps1.analysis.Ps1ModelCache">Ps1ModelCache</a></code> for <em>root</em> when one is attached to <em>transformer</em> and
+built over that same root, otherwise a fresh cache stashed back onto <em>transformer</em> for reuse
+within its single-pass lifetime. See
+<code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">ModelCacheBase.for_transformer()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L256-L263" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def model_cache(transformer: Transformer, root: Node) -&gt; Ps1ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `Ps1ModelCache` for *root* when one is attached to *transformer* and
+    built over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse
+    within its single-pass lifetime. See
+    `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return Ps1ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.occurrence_role"><code class="name flex">
+<span>def <span class="ident">occurrence_role</span></span>(<span>var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The <code><a title="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole" href="#refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole">Ps1OccurrenceRole</a></code> of <code>var</code>.</p>
+<p>The order the cases are tried in is the order they nest. An occurrence an assignment stores
+through is a target position as much as a plain target is, and is decided first because
+<code>assignment_of</code> deliberately answers <code>None</code> for it; a reference cast is decided last among the
+writes because everything above it is a syntactic position and a cast is a value form.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L138-L166" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def occurrence_role(var: Ps1Variable) -&gt; Ps1OccurrenceRole:
+    &#34;&#34;&#34;
+    The `Ps1OccurrenceRole` of `var`.
+
+    The order the cases are tried in is the order they nest. An occurrence an assignment stores
+    through is a target position as much as a plain target is, and is decided first because
+    `assignment_of` deliberately answers `None` for it; a reference cast is decided last among the
+    writes because everything above it is a syntactic position and a cast is a value form.
+    &#34;&#34;&#34;
+    if _is_member_declaration(var):
+        return Ps1OccurrenceRole.NOT_A_REFERENCE
+    if _stores_through(var) or _stores_through_a_call_slot(_enclosing_call_slot(var)):
+        return Ps1OccurrenceRole.WRITE_THROUGH
+    assignment = assignment_of(var)
+    if assignment is not None:
+        if assignment.operator == &#39;=&#39;:
+            return Ps1OccurrenceRole.WRITE_REPLACING
+        return Ps1OccurrenceRole.WRITE_OBSERVING
+    parent = var.parent
+    if isinstance(parent, Ps1UnaryExpression) and parent.operator in (&#39;++&#39;, &#39;--&#39;):
+        if parent.operand is var:
+            return Ps1OccurrenceRole.WRITE_OBSERVING
+    if isinstance(parent, Ps1ForEachLoop) and parent.variable is var:
+        return Ps1OccurrenceRole.WRITE_REPLACING
+    if isinstance(parent, Ps1ParameterDeclaration) and parent.variable is var:
+        return Ps1OccurrenceRole.WRITE_REPLACING
+    if is_reference_cast(parent) and parent.operand is var:
+        return Ps1OccurrenceRole.WRITE_OBSERVING
+    return Ps1OccurrenceRole.READ</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.replaces_value"><code class="name flex">
+<span>def <span class="ident">replaces_value</span></span>(<span>var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <code>var</code> occupies the target position of a plain <code>=</code> assignment, which overwrites the
+variable without observing its previous value. The target of a compound assignment (<code>+=</code>, <code>-=</code>,
+<code>.=</code>, …) is excluded: it reads the variable as well as writing it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L212-L219" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def replaces_value(var: Ps1Variable) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `var` occupies the target position of a plain `=` assignment, which overwrites the
+    variable without observing its previous value. The target of a compound assignment (`+=`, `-=`,
+    `.=`, …) is excluded: it reads the variable as well as writing it.
+    &#34;&#34;&#34;
+    assignment = assignment_of(var)
+    return assignment is not None and assignment.operator == &#39;=&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.statement_effect"><code class="name flex">
+<span>def <span class="ident">statement_effect</span></span>(<span>stmt, world)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Classify the observable effect of a standalone statement as a <code><a title="refinery.lib.scripts.ps1.analysis.StatementEffect" href="#refinery.lib.scripts.ps1.analysis.StatementEffect">StatementEffect</a></code>. This is the one
+shared authority the dead-code and junk-removal passes consult so they never disagree about
+whether a statement carries a body's output: a <code>DISCARD</code> emits nothing, an <code>OUTPUT</code> yields a
+value that emit-safety must protect in a captured body, and an <code>EFFECT</code> must always be kept.</p>
+<p><strong><code>DISCARD</code> is a claim about emission and about nothing else.</strong> It used to be read as <em>always
+safe to drop</em>, which held only because the one thing it admitted was a discard idiom over a pure
+expression. A call returning <code>System.Void</code> emits as little and can still throw, so what decides
+whether dropping it changes anything is the removal veto — <code>fault_is_observed</code> — and not this.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/effects.py#L1254-L1302" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def statement_effect(stmt, world: Ps1WorldReach) -&gt; StatementEffect:
+    &#34;&#34;&#34;
+    Classify the observable effect of a standalone statement as a `StatementEffect`. This is the one
+    shared authority the dead-code and junk-removal passes consult so they never disagree about
+    whether a statement carries a body&#39;s output: a `DISCARD` emits nothing, an `OUTPUT` yields a
+    value that emit-safety must protect in a captured body, and an `EFFECT` must always be kept.
+
+    **`DISCARD` is a claim about emission and about nothing else.** It used to be read as *always
+    safe to drop*, which held only because the one thing it admitted was a discard idiom over a pure
+    expression. A call returning `System.Void` emits as little and can still throw, so what decides
+    whether dropping it changes anything is the removal veto — `fault_is_observed` — and not this.
+    &#34;&#34;&#34;
+    if not isinstance(stmt, Ps1ExpressionStatement):
+        return StatementEffect.EFFECT
+    expr = stmt.expression
+    if expr is None:
+        return StatementEffect.DISCARD
+    if _is_void_cast(expr):
+        if is_side_effect_free(expr.operand, world):
+            return StatementEffect.DISCARD
+        return StatementEffect.EFFECT
+    if isinstance(expr, Ps1Pipeline):
+        # The prefix is walked exactly once and every branch below is derived from that one answer.
+        # Asking `_pipeline_prefix_is_pure` per idiom and then falling through to
+        # `is_side_effect_free(expr)` re-walks the same elements, and because a pipeline cmdlet
+        # body re-enters here through `_command_body_is_pure`, that doubling compounds into 2^depth
+        # work on the nested `... | ForEach-Object { ... } | Out-Null` shape.
+        prefix_is_pure = _pipeline_prefix_is_pure(expr, world)
+        if prefix_is_pure and (
+            _pipeline_ends_with_out_null(expr, world)
+            or _pipeline_ends_with_void_foreach(expr, world)
+        ):
+            return StatementEffect.DISCARD
+        if _pipeline_ends_with_cmdlet(expr, _PURE_PIPELINE_CMDLETS):
+            # A pure pipeline cmdlet (`... | Where-Object {...}`) yields a filtered value a caller
+            # may consume, so it is kept even though it performs no side effect of its own.
+            return StatementEffect.EFFECT
+        if prefix_is_pure and _pipeline_final_is_pure(expr, world):
+            return StatementEffect.OUTPUT
+        return StatementEffect.EFFECT
+    if _is_null_discard(expr):
+        if expr.value is not None and is_side_effect_free(expr.value, world):
+            return StatementEffect.DISCARD
+        return StatementEffect.EFFECT
+    if is_side_effect_free(expr, world):
+        if _emits_nothing(expr, world):
+            return StatementEffect.DISCARD
+        return StatementEffect.OUTPUT
+    return StatementEffect.EFFECT</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding"><code class="flex name class">
+<span>class <span class="ident">Binding</span></span>
+<span>(</span><span>name, scope, reads=&lt;factory&gt;, writes=&lt;factory&gt;, dynamic_or_qualified=False, constraints=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A single variable name bound within one scope. <code>writes</code> holds every occurrence that writes it
+(an assignment target, a <code>++</code>/<code>--</code> operand, a <code>foreach</code> variable, a parameter, a <code>[ref]</code>, a
+command that addresses the name as a string, a store <em>through</em> the value such as the <code>$x</code> of
+<code>$x[0] = 9</code> or of <code>[Array]::Reverse($x)</code>, and a store shared in from another name for the same
+object); <code>reads</code> holds every occurrence that reads it, including a bare read that fell through
+from a nested block. <code>dynamic_or_qualified</code> marks a binding a scope qualifier or dynamic scope
+could reach with no occurrence in <code>reads</code> — conservatively kept live.</p>
+<p>Not every occurrence in <code>writes</code> installs a value, so a consumer reading one has to ask.
+<code>Occurrence.role</code> says whether the store replaces the value or reaches through it, and
+<code>Occurrence.shared_through</code> whether the occurrence is spelled on this name at all.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L637-L700" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(eq=False)
+class Binding:
+    &#34;&#34;&#34;
+    A single variable name bound within one scope. `writes` holds every occurrence that writes it
+    (an assignment target, a `++`/`--` operand, a `foreach` variable, a parameter, a `[ref]`, a
+    command that addresses the name as a string, a store *through* the value such as the `$x` of
+    `$x[0] = 9` or of `[Array]::Reverse($x)`, and a store shared in from another name for the same
+    object); `reads` holds every occurrence that reads it, including a bare read that fell through
+    from a nested block. `dynamic_or_qualified` marks a binding a scope qualifier or dynamic scope
+    could reach with no occurrence in `reads` — conservatively kept live.
+
+    Not every occurrence in `writes` installs a value, so a consumer reading one has to ask.
+    `Occurrence.role` says whether the store replaces the value or reaches through it, and
+    `Occurrence.shared_through` whether the occurrence is spelled on this name at all.
+    &#34;&#34;&#34;
+    name: str
+    scope: Scope
+    reads: list[Occurrence] = field(default_factory=list)
+    writes: list[Occurrence] = field(default_factory=list)
+    dynamic_or_qualified: bool = False
+    #: Every type a constrained write of this binding names — the `string` of `[string]$q = 5`.
+    #: PowerShell stores the constraint on the *variable*, not on the write, so it converts what
+    #: every later write stores as well: measured, `[string]$q = 5; $q = 1, 2, 3; $q.Length` is 5,
+    #: because `$q` holds the String `1 2 3`, not the array. Empty for a name no write constrains.
+    #:
+    #: Resolved rather than spelled, so that `[string]` and `[System.String]` are the one constraint
+    #: they are. A set of source spellings would read those two as a name constrained twice, which
+    #: a consumer has to refuse outright — and spelling a type two ways is obfuscation rather than
+    #: an oddity. A spelling the data resolves to nothing is `None`, which is a constraint whose
+    #: conversion cannot be named and is refused on its own account.
+    constraints: set[Ps1TypeName | None] = field(default_factory=set)
+
+    @property
+    def is_read(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any occurrence reads the binding&#39;s value.
+        &#34;&#34;&#34;
+        return bool(self.reads)
+
+    @property
+    def uses(self) -&gt; list[Occurrence]:
+        &#34;&#34;&#34;
+        Every occurrence that observes the binding&#39;s value: its `reads`, and those of its `writes`
+        that read what was there in order to write it.
+
+        The two lists are buckets, not roles, and an occurrence that both reads and writes has no
+        bucket of its own — `$x += 1` and `[ref]$x` are filed under `writes` and observe the value
+        as surely as anything in `reads`. Every consumer deciding whether a value is still wanted
+        asks this rather than `reads`, because asking `reads` is exactly how a store whose only
+        reader is a compound assignment came to be deletable.
+        &#34;&#34;&#34;
+        return [
+            *self.reads,
+            *(write for write in self.writes if write.role.observes),
+        ]
+
+    @property
+    def is_dead(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether no use observes the binding&#39;s value: no occurrence observes it and no qualifier or
+        dynamic scope reaches it. The write occurrences of a dead binding can be removed when they
+        carry no other side effect (which the caller decides).
+        &#34;&#34;&#34;
+        return not self.uses and not self.dynamic_or_qualified</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.scope"><code class="name">var <span class="ident">scope</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.reads"><code class="name">var <span class="ident">reads</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.writes"><code class="name">var <span class="ident">writes</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.constraints"><code class="name">var <span class="ident">constraints</span></code></dt>
+<dd>
+<section class="desc"><p>Resolved rather than spelled, so that <code>[string]</code> and <code>[System.String]</code> are the one constraint
+they are. A set of source spellings would read those two as a name constrained twice, which
+a consumer has to refuse outright — and spelling a type two ways is obfuscation rather than
+an oddity. A spelling the data resolves to nothing is <code>None</code>, which is a constraint whose
+conversion cannot be named and is refused on its own account.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.dynamic_or_qualified"><code class="name">var <span class="ident">dynamic_or_qualified</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.is_read"><code class="name">var <span class="ident">is_read</span></code></dt>
+<dd>
+<section class="desc"><p>Whether any occurrence reads the binding's value.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L669-L674" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_read(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether any occurrence reads the binding&#39;s value.
+    &#34;&#34;&#34;
+    return bool(self.reads)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.uses"><code class="name">var <span class="ident">uses</span></code></dt>
+<dd>
+<section class="desc"><p>Every occurrence that observes the binding's value: its <code>reads</code>, and those of its <code>writes</code>
+that read what was there in order to write it.</p>
+<p>The two lists are buckets, not roles, and an occurrence that both reads and writes has no
+bucket of its own — <code>$x += 1</code> and <code>[ref]$x</code> are filed under <code>writes</code> and observe the value
+as surely as anything in <code>reads</code>. Every consumer deciding whether a value is still wanted
+asks this rather than <code>reads</code>, because asking <code>reads</code> is exactly how a store whose only
+reader is a compound assignment came to be deletable.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L676-L691" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def uses(self) -&gt; list[Occurrence]:
+    &#34;&#34;&#34;
+    Every occurrence that observes the binding&#39;s value: its `reads`, and those of its `writes`
+    that read what was there in order to write it.
+
+    The two lists are buckets, not roles, and an occurrence that both reads and writes has no
+    bucket of its own — `$x += 1` and `[ref]$x` are filed under `writes` and observe the value
+    as surely as anything in `reads`. Every consumer deciding whether a value is still wanted
+    asks this rather than `reads`, because asking `reads` is exactly how a store whose only
+    reader is a compound assignment came to be deletable.
+    &#34;&#34;&#34;
+    return [
+        *self.reads,
+        *(write for write in self.writes if write.role.observes),
+    ]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Binding.is_dead"><code class="name">var <span class="ident">is_dead</span></code></dt>
+<dd>
+<section class="desc"><p>Whether no use observes the binding's value: no occurrence observes it and no qualifier or
+dynamic scope reaches it. The write occurrences of a dead binding can be removed when they
+carry no other side effect (which the caller decides).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L693-L700" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_dead(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether no use observes the binding&#39;s value: no occurrence observes it and no qualifier or
+    dynamic scope reaches it. The write occurrences of a dead binding can be removed when they
+    carry no other side effect (which the caller decides).
+    &#34;&#34;&#34;
+    return not self.uses and not self.dynamic_or_qualified</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache"><code class="flex name class">
+<span>class <span class="ident">Ps1ModelCache</span></span>
+<span>(</span><span>root, options=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Lazily builds and memoizes the analysis models for one root script — the
+<code><a title="refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel" href="model.html#refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel">Ps1SemanticModel</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld" href="world.html#refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld">Ps1TypeWorld</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph" href="callgraph.html#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph">Ps1CallGraph</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow">Ps1OutputFlow</a></code>, the
+<code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach" href="faults.html#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach">Ps1FaultReach</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel" href="blocks.html#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel">Ps1BlockModel</a></code> and the
+<code><a title="refinery.lib.scripts.analysis.cycles.CycleModel" href="../../analysis/cycles.html#refinery.lib.scripts.analysis.cycles.CycleModel">CycleModel</a></code> derived from it — each dropped
+whenever this root's AST-mutation counter advances past the value it was built at.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L39-L253" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the analysis models for one root script — the
+    `refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel`, the
+    `refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld`, the
+    `refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph`, the
+    `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow`, the
+    `refinery.lib.scripts.analysis.cfg.ControlFlowModel`, the
+    `refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach`, the
+    `refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel` and the
+    `refinery.lib.scripts.analysis.cycles.CycleModel` derived from it — each dropped
+    whenever this root&#39;s AST-mutation counter advances past the value it was built at.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_model&#39;,
+        &#39;_world_measurement&#39;,
+        &#39;_world_reach&#39;,
+        &#39;_call_graph&#39;,
+        &#39;_output_flow&#39;,
+        &#39;_control_flow&#39;,
+        &#39;_faults&#39;,
+        &#39;_dominance&#39;,
+        &#39;_blocks&#39;,
+        &#39;_cycles&#39;,
+        &#39;_variable_flow&#39;,
+        &#39;_commands&#39;,
+        &#39;_used_before_defined&#39;,
+    )
+
+    root: Ps1Script
+    _model: Ps1SemanticModel | None
+    _world_measurement: Ps1WorldMeasurement | None
+    _world_reach: Ps1WorldReach | None
+    _call_graph: Ps1CallGraph | None
+    _output_flow: Ps1OutputFlow | None
+    _control_flow: ControlFlowModel | None
+    _faults: Ps1FaultReach | None
+    _dominance: DominatorModel | None
+    _blocks: Ps1BlockModel | None
+    _cycles: CycleModel | None
+    _variable_flow: Ps1VariableFlow | None
+    _commands: Ps1CommandModel | None
+    _used_before_defined: frozenset[str] | None
+
+    @property
+    def model(self) -&gt; Ps1SemanticModel:
+        return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))
+
+    @property
+    def world_measurement(self) -&gt; Ps1WorldMeasurement:
+        &#34;&#34;&#34;
+        The one walk that reads whether this script leaves the .NET type system and the command
+        table intact, which command names it takes over, and where every world-opening statement
+        sits. `closed_world` projects the verdict from it and `world_reach` floods from its openers,
+        so the whole-run answer and the positional one are never two different readings of the tree.
+
+        The run&#39;s `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions` are read from the cache
+        because the walk is performed once per cache. A cache made without them — a model built
+        standalone in a test — measures the suspecting model, which is the sound answer.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_world_measurement&#39;, lambda: measure_world(self.root, self.options))
+
+    @property
+    def closed_world(self) -&gt; Ps1TypeWorld:
+        &#34;&#34;&#34;
+        Whether this script leaves the .NET type system and the command table intact, and which
+        command names it takes over. `refinery.lib.scripts.ps1.analysis.effects` takes this as the
+        context of every purity verdict, and every verdict in a run must be asked against the same
+        one, or two transforms reach opposite conclusions about the same node.
+        &#34;&#34;&#34;
+        return self.world_measurement.world
+
+    @property
+    def world_reach(self) -&gt; Ps1WorldReach:
+        &#34;&#34;&#34;
+        The flow-sensitive reading of `closed_world`: whether the type world is closed, and a
+        command name still trustworthy, at one particular node, over `control_flow`. The effect
+        layer takes this in place of the leaf world so a member-read grant or a pure-command
+        verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+        cache when this root&#39;s tree changes, so a transform never reads a position against a stale
+        graph. The control-flow model is passed as a thunk so a script that neither opens the
+        world nor redefines a command — one with nothing to flood from — never pays to build a
+        graph its reach model would not read.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_world_reach&#39;, lambda: build_world_reach(
+            self.world_measurement, lambda: self.control_flow))
+
+    @property
+    def call_graph(self) -&gt; Ps1CallGraph:
+        &#34;&#34;&#34;
+        Which definitions a command name reaches and which invocations reach it, over this root. The
+        `closed_world` is a parameter of the build rather than of the queries because the verdict it
+        supplies is one of the reasons the graph declares itself unreadable, and a graph that
+        answered that differently per caller would be two graphs.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_call_graph&#39;,
+            lambda: build_call_graph(self.root, self.closed_world, self.options),
+        )
+
+    @property
+    def output_flow(self) -&gt; Ps1OutputFlow:
+        &#34;&#34;&#34;
+        Where each function body&#39;s output ends up, joined over the call sites in `call_graph`.
+        Every pass that deletes a write to the output stream reads this one, so no two of them can
+        disagree about who was going to see the value.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_output_flow&#39;, lambda: build_output_flow(self.call_graph))
+
+    @property
+    def control_flow(self) -&gt; ControlFlowModel:
+        &#34;&#34;&#34;
+        One control-flow graph per script block and one for the script itself, over this root — see
+        `refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES` for what owns one and why.
+
+        Purely syntactic, so it needs none of the models above and nothing about the order they are
+        built in matters. What it answers is the question every pass here has been approximating
+        privately: whether one statement runs before another, whether a branch runs at all, and
+        whether a handler is still reachable once a body is emptied.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))
+
+    @property
+    def faults(self) -&gt; Ps1FaultReach:
+        &#34;&#34;&#34;
+        Where a terminating error raised at a point in this root goes, over `control_flow`. The
+        single place a pass asks whether deleting something changes which handler runs — the
+        question every removing pass used to answer for itself by looking at the statement&#39;s
+        immediate holder, which reads a handler one nesting level away as no handler at all.
+
+        The transpose that weighs deleting a `trap` reads one further graph — this root at the finer
+        granularity that descends into a `$( )` or `@( )` — so a soft error stepping over inside such
+        a construct is the local path it is rather than detail hidden in the one node the coarse
+        graph gives the whole statement. The reader draws that itself, on demand, from the root it
+        already holds, so only a script whose trap removal turns on such a step-over ever pays for it.
+
+        Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_faults&#39;, lambda: build_fault_reach(self.control_flow))
+
+    @property
+    def dominance(self) -&gt; DominatorModel:
+        &#34;&#34;&#34;
+        Whether one statement of this root is guaranteed to have executed by the time another runs,
+        over `control_flow`. The single place that ordering is answered: a pass that needs to know a
+        write runs before a read, or that a statement after a `return` cannot be reached, asks here
+        rather than reconstructing the relation from the tree.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.control_flow))
+
+    @property
+    def blocks(self) -&gt; Ps1BlockModel:
+        &#34;&#34;&#34;
+        Where each script block of this root runs — at what point, in whose scope, how many times.
+        Reads the whole-run shadow set from `closed_world` so a body handed to a `ForEach-Object` or
+        `Where-Object` the script has redefined is placed as data, and is otherwise syntactic like
+        `control_flow` — the answer three other layers used to guess from the code a block is
+        *written* in.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_blocks&#39;, lambda: build_block_model(
+            self.root, self.closed_world.shadowed_names))
+
+    @property
+    def cycles(self) -&gt; CycleModel:
+        &#34;&#34;&#34;
+        Which points of this script can be reached more than once, over `control_flow`. A pass that
+        establishes a fact from one visit to a statement — a variable&#39;s value, a stream&#39;s contents —
+        asks this before carrying it to a reader, because a point control returns to has no single
+        value to carry.
+
+        It is built over `blocks` so that a body run by a cmdlet that enumerates is known to repeat.
+        Without that the walk out of a block follows it to where its value was written, and a
+        `ForEach-Object` body reads as running exactly once.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_cycles&#39;, lambda: CycleModel(self.control_flow, self.blocks.body_site))
+
+    @property
+    def commands(self) -&gt; Ps1CommandModel:
+        &#34;&#34;&#34;
+        What each command invocation of this root denotes — a name, nothing, or unknown — over
+        `control_flow` and `dominance`. The one place command identity is answered: a pass that
+        rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+        rather than splitting the alias relation or ignoring the precedence that makes a default
+        alias beat a script function. It reads the script&#39;s function names from `call_graph`, the
+        layer that already owns which definitions a name denotes, and the wider set of names the
+        script takes over from `closed_world`, so the two models agree on what has been shadowed.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_commands&#39;, lambda: build_command_model(
+            self.root, self.control_flow, self.dominance, self.blocks,
+            frozenset(self.call_graph.defined_names), self.closed_world.shadowed_names))
+
+    @property
+    def variable_flow(self) -&gt; Ps1VariableFlow:
+        &#34;&#34;&#34;
+        Which write each variable read observes, over `model`, `control_flow`, `dominance`, `blocks`
+        and `cycles`. The one place that question is answered: a pass that decides what a name holds
+        at a point asks here rather than walking the tree for an assignment that looks near enough.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_variable_flow&#39;, lambda: build_variable_flow(
+            self.model, self.control_flow, self.dominance, self.blocks, self.cycles))
+
+    @property
+    def used_before_defined(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        The command names some call to which no definition of the name is guaranteed to have run
+        before, over `call_graph` and `dominance`. The single place that ordering is asked of the
+        call graph: a pass that folds a call into its body or deletes a definition with its calls
+        reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+        the fold cannot carry. It composes the two models here because
+        `refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined` needs the ordering
+        `dominance` owns, which the deliberately syntactic `call_graph` does not carry.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_used_before_defined&#39;, lambda: names_used_before_defined(
+            self.call_graph, self.dominance))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.model"><code class="name">var <span class="ident">model</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L84-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def model(self) -&gt; Ps1SemanticModel:
+    return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.world_measurement"><code class="name">var <span class="ident">world_measurement</span></code></dt>
+<dd>
+<section class="desc"><p>The one walk that reads whether this script leaves the .NET type system and the command
+table intact, which command names it takes over, and where every world-opening statement
+sits. <code>closed_world</code> projects the verdict from it and <code>world_reach</code> floods from its openers,
+so the whole-run answer and the positional one are never two different readings of the tree.</p>
+<p>The run's <code><a title="refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions" href="../options.html#refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions">Ps1DeobfuscationOptions</a></code> are read from the cache
+because the walk is performed once per cache. A cache made without them — a model built
+standalone in a test — measures the suspecting model, which is the sound answer.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L88-L100" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def world_measurement(self) -&gt; Ps1WorldMeasurement:
+    &#34;&#34;&#34;
+    The one walk that reads whether this script leaves the .NET type system and the command
+    table intact, which command names it takes over, and where every world-opening statement
+    sits. `closed_world` projects the verdict from it and `world_reach` floods from its openers,
+    so the whole-run answer and the positional one are never two different readings of the tree.
+
+    The run&#39;s `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions` are read from the cache
+    because the walk is performed once per cache. A cache made without them — a model built
+    standalone in a test — measures the suspecting model, which is the sound answer.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_world_measurement&#39;, lambda: measure_world(self.root, self.options))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.closed_world"><code class="name">var <span class="ident">closed_world</span></code></dt>
+<dd>
+<section class="desc"><p>Whether this script leaves the .NET type system and the command table intact, and which
+command names it takes over. <code><a title="refinery.lib.scripts.ps1.analysis.effects" href="effects.html">refinery.lib.scripts.ps1.analysis.effects</a></code> takes this as the
+context of every purity verdict, and every verdict in a run must be asked against the same
+one, or two transforms reach opposite conclusions about the same node.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L102-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def closed_world(self) -&gt; Ps1TypeWorld:
+    &#34;&#34;&#34;
+    Whether this script leaves the .NET type system and the command table intact, and which
+    command names it takes over. `refinery.lib.scripts.ps1.analysis.effects` takes this as the
+    context of every purity verdict, and every verdict in a run must be asked against the same
+    one, or two transforms reach opposite conclusions about the same node.
+    &#34;&#34;&#34;
+    return self.world_measurement.world</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.world_reach"><code class="name">var <span class="ident">world_reach</span></code></dt>
+<dd>
+<section class="desc"><p>The flow-sensitive reading of <code>closed_world</code>: whether the type world is closed, and a
+command name still trustworthy, at one particular node, over <code>control_flow</code>. The effect
+layer takes this in place of the leaf world so a member-read grant or a pure-command
+verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+cache when this root's tree changes, so a transform never reads a position against a stale
+graph. The control-flow model is passed as a thunk so a script that neither opens the
+world nor redefines a command — one with nothing to flood from — never pays to build a
+graph its reach model would not read.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L112-L125" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def world_reach(self) -&gt; Ps1WorldReach:
+    &#34;&#34;&#34;
+    The flow-sensitive reading of `closed_world`: whether the type world is closed, and a
+    command name still trustworthy, at one particular node, over `control_flow`. The effect
+    layer takes this in place of the leaf world so a member-read grant or a pure-command
+    verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+    cache when this root&#39;s tree changes, so a transform never reads a position against a stale
+    graph. The control-flow model is passed as a thunk so a script that neither opens the
+    world nor redefines a command — one with nothing to flood from — never pays to build a
+    graph its reach model would not read.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_world_reach&#39;, lambda: build_world_reach(
+        self.world_measurement, lambda: self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.call_graph"><code class="name">var <span class="ident">call_graph</span></code></dt>
+<dd>
+<section class="desc"><p>Which definitions a command name reaches and which invocations reach it, over this root. The
+<code>closed_world</code> is a parameter of the build rather than of the queries because the verdict it
+supplies is one of the reasons the graph declares itself unreadable, and a graph that
+answered that differently per caller would be two graphs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L127-L138" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def call_graph(self) -&gt; Ps1CallGraph:
+    &#34;&#34;&#34;
+    Which definitions a command name reaches and which invocations reach it, over this root. The
+    `closed_world` is a parameter of the build rather than of the queries because the verdict it
+    supplies is one of the reasons the graph declares itself unreadable, and a graph that
+    answered that differently per caller would be two graphs.
+    &#34;&#34;&#34;
+    return self._lazy(
+        &#39;_call_graph&#39;,
+        lambda: build_call_graph(self.root, self.closed_world, self.options),
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.output_flow"><code class="name">var <span class="ident">output_flow</span></code></dt>
+<dd>
+<section class="desc"><p>Where each function body's output ends up, joined over the call sites in <code>call_graph</code>.
+Every pass that deletes a write to the output stream reads this one, so no two of them can
+disagree about who was going to see the value.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L140-L147" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def output_flow(self) -&gt; Ps1OutputFlow:
+    &#34;&#34;&#34;
+    Where each function body&#39;s output ends up, joined over the call sites in `call_graph`.
+    Every pass that deletes a write to the output stream reads this one, so no two of them can
+    disagree about who was going to see the value.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_output_flow&#39;, lambda: build_output_flow(self.call_graph))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.control_flow"><code class="name">var <span class="ident">control_flow</span></code></dt>
+<dd>
+<section class="desc"><p>One control-flow graph per script block and one for the script itself, over this root — see
+<code><a title="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES" href="cfg.html#refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES">FUNCTION_NODES</a></code> for what owns one and why.</p>
+<p>Purely syntactic, so it needs none of the models above and nothing about the order they are
+built in matters. What it answers is the question every pass here has been approximating
+privately: whether one statement runs before another, whether a branch runs at all, and
+whether a handler is still reachable once a body is emptied.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L149-L160" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def control_flow(self) -&gt; ControlFlowModel:
+    &#34;&#34;&#34;
+    One control-flow graph per script block and one for the script itself, over this root — see
+    `refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES` for what owns one and why.
+
+    Purely syntactic, so it needs none of the models above and nothing about the order they are
+    built in matters. What it answers is the question every pass here has been approximating
+    privately: whether one statement runs before another, whether a branch runs at all, and
+    whether a handler is still reachable once a body is emptied.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.faults"><code class="name">var <span class="ident">faults</span></code></dt>
+<dd>
+<section class="desc"><p>Where a terminating error raised at a point in this root goes, over <code>control_flow</code>. The
+single place a pass asks whether deleting something changes which handler runs — the
+question every removing pass used to answer for itself by looking at the statement's
+immediate holder, which reads a handler one nesting level away as no handler at all.</p>
+<p>The transpose that weighs deleting a <code>trap</code> reads one further graph — this root at the finer
+granularity that descends into a <code>$( )</code> or <code>@( )</code> — so a soft error stepping over inside such
+a construct is the local path it is rather than detail hidden in the one node the coarse
+graph gives the whole statement. The reader draws that itself, on demand, from the root it
+already holds, so only a script whose trap removal turns on such a step-over ever pays for it.</p>
+<p>Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L162-L178" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def faults(self) -&gt; Ps1FaultReach:
+    &#34;&#34;&#34;
+    Where a terminating error raised at a point in this root goes, over `control_flow`. The
+    single place a pass asks whether deleting something changes which handler runs — the
+    question every removing pass used to answer for itself by looking at the statement&#39;s
+    immediate holder, which reads a handler one nesting level away as no handler at all.
+
+    The transpose that weighs deleting a `trap` reads one further graph — this root at the finer
+    granularity that descends into a `$( )` or `@( )` — so a soft error stepping over inside such
+    a construct is the local path it is rather than detail hidden in the one node the coarse
+    graph gives the whole statement. The reader draws that itself, on demand, from the root it
+    already holds, so only a script whose trap removal turns on such a step-over ever pays for it.
+
+    Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_faults&#39;, lambda: build_fault_reach(self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.dominance"><code class="name">var <span class="ident">dominance</span></code></dt>
+<dd>
+<section class="desc"><p>Whether one statement of this root is guaranteed to have executed by the time another runs,
+over <code>control_flow</code>. The single place that ordering is answered: a pass that needs to know a
+write runs before a read, or that a statement after a <code>return</code> cannot be reached, asks here
+rather than reconstructing the relation from the tree.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L180-L188" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def dominance(self) -&gt; DominatorModel:
+    &#34;&#34;&#34;
+    Whether one statement of this root is guaranteed to have executed by the time another runs,
+    over `control_flow`. The single place that ordering is answered: a pass that needs to know a
+    write runs before a read, or that a statement after a `return` cannot be reached, asks here
+    rather than reconstructing the relation from the tree.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.blocks"><code class="name">var <span class="ident">blocks</span></code></dt>
+<dd>
+<section class="desc"><p>Where each script block of this root runs — at what point, in whose scope, how many times.
+Reads the whole-run shadow set from <code>closed_world</code> so a body handed to a <code>ForEach-Object</code> or
+<code>Where-Object</code> the script has redefined is placed as data, and is otherwise syntactic like
+<code>control_flow</code> — the answer three other layers used to guess from the code a block is
+<em>written</em> in.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L190-L200" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def blocks(self) -&gt; Ps1BlockModel:
+    &#34;&#34;&#34;
+    Where each script block of this root runs — at what point, in whose scope, how many times.
+    Reads the whole-run shadow set from `closed_world` so a body handed to a `ForEach-Object` or
+    `Where-Object` the script has redefined is placed as data, and is otherwise syntactic like
+    `control_flow` — the answer three other layers used to guess from the code a block is
+    *written* in.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_blocks&#39;, lambda: build_block_model(
+        self.root, self.closed_world.shadowed_names))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.cycles"><code class="name">var <span class="ident">cycles</span></code></dt>
+<dd>
+<section class="desc"><p>Which points of this script can be reached more than once, over <code>control_flow</code>. A pass that
+establishes a fact from one visit to a statement — a variable's value, a stream's contents —
+asks this before carrying it to a reader, because a point control returns to has no single
+value to carry.</p>
+<p>It is built over <code><a title="refinery.lib.scripts.ps1.analysis.blocks" href="blocks.html">refinery.lib.scripts.ps1.analysis.blocks</a></code> so that a body run by a cmdlet that enumerates is known to repeat.
+Without that the walk out of a block follows it to where its value was written, and a
+<code>ForEach-Object</code> body reads as running exactly once.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L202-L214" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def cycles(self) -&gt; CycleModel:
+    &#34;&#34;&#34;
+    Which points of this script can be reached more than once, over `control_flow`. A pass that
+    establishes a fact from one visit to a statement — a variable&#39;s value, a stream&#39;s contents —
+    asks this before carrying it to a reader, because a point control returns to has no single
+    value to carry.
+
+    It is built over `blocks` so that a body run by a cmdlet that enumerates is known to repeat.
+    Without that the walk out of a block follows it to where its value was written, and a
+    `ForEach-Object` body reads as running exactly once.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_cycles&#39;, lambda: CycleModel(self.control_flow, self.blocks.body_site))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.commands"><code class="name">var <span class="ident">commands</span></code></dt>
+<dd>
+<section class="desc"><p>What each command invocation of this root denotes — a name, nothing, or unknown — over
+<code>control_flow</code> and <code><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code>. The one place command identity is answered: a pass that
+rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+rather than splitting the alias relation or ignoring the precedence that makes a default
+alias beat a script function. It reads the script's function names from <code>call_graph</code>, the
+layer that already owns which definitions a name denotes, and the wider set of names the
+script takes over from <code>closed_world</code>, so the two models agree on what has been shadowed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L216-L229" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def commands(self) -&gt; Ps1CommandModel:
+    &#34;&#34;&#34;
+    What each command invocation of this root denotes — a name, nothing, or unknown — over
+    `control_flow` and `dominance`. The one place command identity is answered: a pass that
+    rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+    rather than splitting the alias relation or ignoring the precedence that makes a default
+    alias beat a script function. It reads the script&#39;s function names from `call_graph`, the
+    layer that already owns which definitions a name denotes, and the wider set of names the
+    script takes over from `closed_world`, so the two models agree on what has been shadowed.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_commands&#39;, lambda: build_command_model(
+        self.root, self.control_flow, self.dominance, self.blocks,
+        frozenset(self.call_graph.defined_names), self.closed_world.shadowed_names))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.variable_flow"><code class="name">var <span class="ident">variable_flow</span></code></dt>
+<dd>
+<section class="desc"><p>Which write each variable read observes, over <code><a title="refinery.lib.scripts.ps1.analysis.model" href="model.html">refinery.lib.scripts.ps1.analysis.model</a></code>, <code>control_flow</code>, <code><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code>, <code><a title="refinery.lib.scripts.ps1.analysis.blocks" href="blocks.html">refinery.lib.scripts.ps1.analysis.blocks</a></code>
+and <code>cycles</code>. The one place that question is answered: a pass that decides what a name holds
+at a point asks here rather than walking the tree for an assignment that looks near enough.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L231-L239" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def variable_flow(self) -&gt; Ps1VariableFlow:
+    &#34;&#34;&#34;
+    Which write each variable read observes, over `model`, `control_flow`, `dominance`, `blocks`
+    and `cycles`. The one place that question is answered: a pass that decides what a name holds
+    at a point asks here rather than walking the tree for an assignment that looks near enough.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_variable_flow&#39;, lambda: build_variable_flow(
+        self.model, self.control_flow, self.dominance, self.blocks, self.cycles))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1ModelCache.used_before_defined"><code class="name">var <span class="ident">used_before_defined</span></code></dt>
+<dd>
+<section class="desc"><p>The command names some call to which no definition of the name is guaranteed to have run
+before, over <code>call_graph</code> and <code><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code>. The single place that ordering is asked of the
+call graph: a pass that folds a call into its body or deletes a definition with its calls
+reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+the fold cannot carry. It composes the two models here because
+<code><a title="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined" href="callgraph.html#refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined">names_used_before_defined()</a></code> needs the ordering
+<code><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code> owns, which the deliberately syntactic <code>call_graph</code> does not carry.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L241-L253" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def used_before_defined(self) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    The command names some call to which no definition of the name is guaranteed to have run
+    before, over `call_graph` and `dominance`. The single place that ordering is asked of the
+    call graph: a pass that folds a call into its body or deletes a definition with its calls
+    reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+    the fold cannot carry. It composes the two models here because
+    `refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined` needs the ordering
+    `dominance` owns, which the deliberately syntactic `call_graph` does not carry.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_used_before_defined&#39;, lambda: names_used_before_defined(
+        self.call_graph, self.dominance))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">for_transformer</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.options" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.options">options</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.pinned" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.pinned">pinned</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.root" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.root">root</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole"><code class="flex name class">
+<span>class <span class="ident">Ps1OccurrenceRole</span></span>
+<span>(</span><span>stores, observes, substitutable, through)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What one occurrence of a variable does to the value the name holds. Every occurrence has exactly
+one role, and the transforms ask for it rather than each assembling an answer from a handful of
+positional predicates — which is how <code>[ref]$n</code> came to be read as a plain read by every one of
+them at once.</p>
+<p><code>NOT_A_REFERENCE</code> — the occurrence does not reference a variable at all: a class property member
+declaration names a member of the class, a namespace of its own.
+<code>READ</code> — observes the value and does not change it.
+<code>WRITE_REPLACING</code> — stores without observing what was there: <code>$x = v</code>, a <code>foreach</code> variable, a
+parameter.
+<code>WRITE_OBSERVING</code> — stores <em>and</em> observes: <code>$x += v</code>, <code>$x++</code>, and <code>[ref]$x</code>, whose callee may
+store back through the wrapper it is handed.
+<code>WRITE_THROUGH</code> — reads the variable to reach a place inside it that is written: the <code>$x</code> of
+<code>$x[0] = 'z'</code> or <code>$x.Length = 5</code>. The name still holds whatever it held, so this observes the
+value like a read and installs none of its own; but <em>what</em> it holds is no longer what it held,
+so it is a write of the binding all the same and no value may be installed in its place.</p>
+<p>Each member carries the four answers a consumer needs, in the order the fields are declared
+below, rather than being compared against a list of members at every site. A question answered
+by a membership test lives at each of its call sites and has to be found again by grep whenever
+a role is added or its meaning moves; a field lives here, beside the member it is about.</p>
+<p><code>enum.unique</code> because the answers <em>are</em> the value: two members answering alike would be one
+member under two names, dispatching as whichever was declared first while every <code>is</code> test
+against the other still passed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L84-L135" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@enum.unique
+class Ps1OccurrenceRole(enum.Enum):
+    &#34;&#34;&#34;
+    What one occurrence of a variable does to the value the name holds. Every occurrence has exactly
+    one role, and the transforms ask for it rather than each assembling an answer from a handful of
+    positional predicates — which is how `[ref]$n` came to be read as a plain read by every one of
+    them at once.
+
+    `NOT_A_REFERENCE` — the occurrence does not reference a variable at all: a class property member
+    declaration names a member of the class, a namespace of its own.
+    `READ` — observes the value and does not change it.
+    `WRITE_REPLACING` — stores without observing what was there: `$x = v`, a `foreach` variable, a
+    parameter.
+    `WRITE_OBSERVING` — stores *and* observes: `$x += v`, `$x++`, and `[ref]$x`, whose callee may
+    store back through the wrapper it is handed.
+    `WRITE_THROUGH` — reads the variable to reach a place inside it that is written: the `$x` of
+    `$x[0] = &#39;z&#39;` or `$x.Length = 5`. The name still holds whatever it held, so this observes the
+    value like a read and installs none of its own; but *what* it holds is no longer what it held,
+    so it is a write of the binding all the same and no value may be installed in its place.
+
+    Each member carries the four answers a consumer needs, in the order the fields are declared
+    below, rather than being compared against a list of members at every site. A question answered
+    by a membership test lives at each of its call sites and has to be found again by grep whenever
+    a role is added or its meaning moves; a field lives here, beside the member it is about.
+
+    `enum.unique` because the answers *are* the value: two members answering alike would be one
+    member under two names, dispatching as whichever was declared first while every `is` test
+    against the other still passed.
+    &#34;&#34;&#34;
+    NOT_A_REFERENCE = (False, False, False, False)
+    READ            = (False, True, True, False)    # noqa
+    WRITE_REPLACING = (True, False, False, False)
+    WRITE_OBSERVING = (True, True, False, False)
+    WRITE_THROUGH   = (True, True, False, True)     # noqa
+
+    #: Whether the occurrence is filed among the binding&#39;s writes, because it changes what a read
+    #: below it observes.
+    stores: bool
+    #: Whether the occurrence observes the value the name holds.
+    observes: bool
+    #: Whether a value may be installed in the occurrence&#39;s place. Only a plain read, and even then
+    #: `is_substitutable_position` has a caveat of its own to add.
+    substitutable: bool
+    #: Whether the occurrence reaches a place *inside* the value rather than the binding itself, so
+    #: that the name is left holding whatever it held.
+    through: bool
+
+    def __init__(self, stores: bool, observes: bool, substitutable: bool, through: bool):
+        self.stores = stores
+        self.observes = observes
+        self.substitutable = substitutable
+        self.through = through</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.stores"><code class="name">var <span class="ident">stores</span></code></dt>
+<dd>
+<section class="desc"><p>Whether the occurrence is filed among the binding's writes, because it changes what a read
+below it observes.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.observes"><code class="name">var <span class="ident">observes</span></code></dt>
+<dd>
+<section class="desc"><p>Whether the occurrence observes the value the name holds.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.substitutable"><code class="name">var <span class="ident">substitutable</span></code></dt>
+<dd>
+<section class="desc"><p>Whether a value may be installed in the occurrence's place. Only a plain read, and even then
+<code><a title="refinery.lib.scripts.ps1.analysis.is_substitutable_position" href="#refinery.lib.scripts.ps1.analysis.is_substitutable_position">is_substitutable_position()</a></code> has a caveat of its own to add.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.through"><code class="name">var <span class="ident">through</span></code></dt>
+<dd>
+<section class="desc"><p>Whether the occurrence reaches a place <em>inside</em> the value rather than the binding itself, so
+that the name is left holding whatever it held.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.NOT_A_REFERENCE"><code class="name">var <span class="ident">NOT_A_REFERENCE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.READ"><code class="name">var <span class="ident">READ</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.WRITE_REPLACING"><code class="name">var <span class="ident">WRITE_REPLACING</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.WRITE_OBSERVING"><code class="name">var <span class="ident">WRITE_OBSERVING</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole.WRITE_THROUGH"><code class="name">var <span class="ident">WRITE_THROUGH</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel"><code class="flex name class">
+<span>class <span class="ident">Ps1SemanticModel</span></span>
+<span>(</span><span>root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The resolved scope/binding/def-use model for one PowerShell script. Build it with
+<code><a title="refinery.lib.scripts.ps1.analysis.build_semantic_model" href="#refinery.lib.scripts.ps1.analysis.build_semantic_model">build_semantic_model()</a></code> and query it through <code>scope_of</code> and <code>binding_of</code>, through the <code>bindings</code>
+of a <code><a title="refinery.lib.scripts.ps1.analysis.Scope" href="#refinery.lib.scripts.ps1.analysis.Scope">Scope</a></code>, and — for the flow-sensitive dead-store sweep — through <code>reads_in_scope</code> and
+<code>variables_in_scope</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L758-L1311" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1SemanticModel:
+    &#34;&#34;&#34;
+    The resolved scope/binding/def-use model for one PowerShell script. Build it with
+    `build_semantic_model` and query it through `scope_of` and `binding_of`, through the `bindings`
+    of a `Scope`, and — for the flow-sensitive dead-store sweep — through `reads_in_scope` and
+    `variables_in_scope`.
+    &#34;&#34;&#34;
+
+    def __init__(self, root: Ps1Script):
+        self.root = root
+        self._node_scope: dict[int, Scope] = {}
+        self._binding_of: dict[int, Binding] = {}
+        self.root_scope = Scope(kind=ScopeKind.SCRIPT, node=root)
+        self._node_scope[id(root)] = self.root_scope
+        self._changes_in_place: bool | None = None
+        self._populate(self.root_scope)
+        self._build_def_use()
+
+    @property
+    def script_scope(self) -&gt; Scope:
+        &#34;&#34;&#34;
+        The scope the script itself introduces — the outermost scope, whose bindings are the
+        script-level variables.
+        &#34;&#34;&#34;
+        return self.root_scope
+
+    @property
+    def changes_an_object_in_place(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any occurrence in the script stores *through* a value rather than into a name — the
+        `$x` of `$x[0] = 9`, of `$h.k = 9` and of `[Array]::Reverse($x)`.
+
+        A script with none never changes an object after it is built, so there a copy of one and a
+        second name for it are indistinguishable, and a consumer weighing the two may stop asking.
+        That is the question every sharing guard is really about, and it is a fact about the script
+        rather than about the name a guard happens to be standing on: an object handed to a
+        hashtable key, to a property or to a callee is changed under a name the guard cannot see.
+        &#34;&#34;&#34;
+        if self._changes_in_place is None:
+            self._changes_in_place = any(
+                write.role.through for write in self._every_write())
+        return self._changes_in_place
+
+    def scope_of(self, node: Node) -&gt; Scope | None:
+        &#34;&#34;&#34;
+        The innermost scope that contains *node*, or `None` if the node was not part of the script
+        the model was built from. A node in an `if`/loop/`try` body resolves to the enclosing script
+        or scriptblock scope, since those bodies introduce no scope of their own.
+        &#34;&#34;&#34;
+        return self._node_scope.get(id(node))
+
+    def binding_of(self, var: Ps1Variable) -&gt; Binding | None:
+        &#34;&#34;&#34;
+        The binding a variable occurrence resolves to — for a write, the binding in its defining
+        scope; for a bare read, the nearest enclosing binding of the name — or `None` when the
+        occurrence is free (an automatic or external variable the model never binds) or names a
+        namespace outside the script&#39;s variables.
+        &#34;&#34;&#34;
+        return self._binding_of.get(id(var))
+
+    def reads_in_scope(self, node: Node, scope: Scope) -&gt; set[str]:
+        &#34;&#34;&#34;
+        The names of *scope*&#39;s bindings read anywhere within *node*&#39;s subtree — every bare read of a
+        name *scope* binds, including one nested in a scriptblock, but not the target of a plain `=`
+        assignment, which replaces the value without observing it. A compound-assignment target
+        (`$x += 1`) does observe it and counts as a read. This is the read set the dead-store sweep
+        flushes pending stores against: unlike the walk it replaces, it does not stop at a nested
+        scriptblock, so a store read only through a captured block is correctly seen as live.
+        &#34;&#34;&#34;
+        names: set[str] = set()
+        for descendant in node.walk():
+            if not isinstance(descendant, Ps1Variable):
+                continue
+            if descendant.scope is not Ps1ScopeModifier.NONE:
+                continue
+            name = descendant.name.lower()
+            if name in scope.bindings and not replaces_value(descendant):
+                names.add(name)
+        return names
+
+    def variables_in_scope(self, node: Node, scope: Scope) -&gt; set[str]:
+        &#34;&#34;&#34;
+        The names of *scope*&#39;s bindings referenced in any way — read or written — within *node*&#39;s
+        subtree. The conservative flush set for a control-flow statement whose internal effect on a
+        variable the linear sweep does not model: any mention of a bound name defers its pending
+        store.
+        &#34;&#34;&#34;
+        names: set[str] = set()
+        for descendant in node.walk():
+            if isinstance(descendant, Ps1Variable) and descendant.scope is Ps1ScopeModifier.NONE:
+                name = descendant.name.lower()
+                if name in scope.bindings:
+                    names.add(name)
+        return names
+
+    def _populate(self, scope: Scope):
+        for node in scope_local_nodes(scope.node):
+            if isinstance(node, Ps1ScriptBlock):
+                child = Scope(kind=self._scriptblock_kind(node), node=node, parent=scope)
+                scope.children.append(child)
+                self._node_scope[id(node)] = child
+                self._populate(child)
+                continue
+            self._node_scope[id(node)] = scope
+            if isinstance(node, Ps1Variable) and declares_binding(node):
+                self._declare(node, scope)
+            elif isinstance(node, Ps1CommandInvocation):
+                self._declare_named(node, scope)
+
+    @staticmethod
+    def _scriptblock_kind(node: Ps1ScriptBlock) -&gt; ScopeKind:
+        if isinstance(node.parent, Ps1FunctionDefinition) and node.parent.body is node:
+            return ScopeKind.FUNCTION
+        return ScopeKind.SCRIPTBLOCK
+
+    def _declare(self, var: Ps1Variable, current: Scope):
+        scope = self._defining_scope(var, current)
+        if scope is None:
+            return
+        key = binding_key(var)
+        if key not in scope.bindings:
+            scope.bindings[key] = Binding(name=key, scope=scope)
+
+    def _declare_named(self, cmd: Ps1CommandInvocation, current: Scope):
+        &#34;&#34;&#34;
+        Create the bindings a command addresses by string, and record a name it addresses that
+        cannot be read.
+
+        This is why the census is consulted while the model is built rather than applied to it
+        afterwards: `Get-Process -OutVariable x` in a script that never writes `$x` any other way is
+        the only mention of the name there is, so nothing exists to hang the reference on unless the
+        binding is created here.
+
+        An unreadable name landing in the command&#39;s own scope is *not* recorded here. That write
+        happens at a point, and a point is what
+        `refinery.lib.scripts.ps1.analysis.dataflow.Ps1VariableFlow.unattributable_writes` holds, so
+        a read before it keeps the value it would have observed anyway. Only a write this cannot
+        place against the reads it may reach — one aimed at the script scope, or at a scope the
+        lexical chain cannot name — is a fact about the scope as a whole.
+        &#34;&#34;&#34;
+        unreadable = unreadable_name_target(cmd)
+        if unreadable is not None and unreadable is not Ps1NameTarget.LOCAL:
+            self._doubt(unreadable, current)
+        for reference in named_references(cmd):
+            if reference.role is Ps1NameRole.READS:
+                continue
+            scope = self._named_scope(reference, current)
+            if scope is None:
+                continue
+            if reference.key not in scope.bindings:
+                scope.bindings[reference.key] = Binding(name=reference.key, scope=scope)
+
+    def _named_scope(self, reference: Ps1NamedReference, current: Scope) -&gt; Scope | None:
+        &#34;&#34;&#34;
+        The scope a named reference resolves in: the one the command is written in for the measured
+        default, the script scope for an explicitly script- or global-qualified form, and none at
+        all for a target the lexical chain cannot name — `-Scope 1` writes the *caller&#39;s* scope,
+        which is not an ancestor of anything here. An unplaceable write is recorded on the scope
+        instead, where it puts every name in doubt rather than the wrong one.
+        &#34;&#34;&#34;
+        if reference.target is Ps1NameTarget.SCRIPT:
+            return self.root_scope
+        if reference.target is Ps1NameTarget.LOCAL:
+            return current
+        self._doubt(Ps1NameTarget.UNREADABLE, current)
+        return None
+
+    def _doubt(self, target: Ps1NameTarget, current: Scope) -&gt; None:
+        &#34;&#34;&#34;
+        Record that a write nobody can attribute lands in *target*, so every binding it could reach
+        is in doubt.
+
+        A target the lexical chain cannot name reaches anywhere, and the script scope is the one
+        scope every other can see through, so it is marked as well as the scope holding the command:
+        under-marking here is a fold across a write, which is the direction that corrupts.
+        &#34;&#34;&#34;
+        if target is Ps1NameTarget.SCRIPT:
+            self.root_scope.writes_unreadable_names = True
+            return
+        current.writes_unreadable_names = True
+        if target is Ps1NameTarget.UNREADABLE:
+            self.root_scope.writes_unreadable_names = True
+
+    def _defining_scope(self, var: Ps1Variable, current: Scope) -&gt; Scope | None:
+        &#34;&#34;&#34;
+        The scope a write to *var* binds. A bare, `$local:`, or `$private:` assignment binds in the
+        current scope (write-local); a `$script:`, `$global:`, or `$using:` assignment, and an
+        `$env:` assignment (a process-global environment variable, bound under an `env:`-prefixed
+        key), bind at the script scope. The provider namespaces (`variable:`, `function:`,
+        `alias:`, `drive:`) name a namespace distinct from script variables and bind nothing here.
+        &#34;&#34;&#34;
+        modifier = var.scope
+        if modifier in (Ps1ScopeModifier.NONE, Ps1ScopeModifier.LOCAL, Ps1ScopeModifier.PRIVATE):
+            return current
+        if modifier in (
+            Ps1ScopeModifier.SCRIPT,
+            Ps1ScopeModifier.GLOBAL,
+            Ps1ScopeModifier.USING,
+            Ps1ScopeModifier.ENV,
+        ):
+            return self.root_scope
+        return None
+
+    def _build_def_use(self):
+        for node in self.root.walk():
+            scope = self._node_scope.get(id(node))
+            if scope is None:
+                continue
+            if isinstance(node, Ps1CommandInvocation):
+                self._attribute_named(node, scope)
+                continue
+            if not isinstance(node, Ps1Variable) or _is_member_declaration(node):
+                continue
+            role = occurrence_role(node)
+            if not role.stores:
+                self._attribute_read(node, scope)
+            elif role.through:
+                self._attribute_write_through(node, scope)
+            elif declares_binding(node):
+                self._attribute_write(node, scope)
+            else:
+                self._attribute_reference(node, scope)
+        self._record_type_constraints()
+        self._share_stores_through_aliases()
+
+    def _record_type_constraints(self):
+        &#34;&#34;&#34;
+        File the type each constrained write names against the binding it writes.
+
+        The constraint outlives the statement that carries it: `[string]$q = 5` stores an
+        `ArgumentTypeConverterAttribute` on the variable, and every later write is converted through
+        it. So this is a fact about the binding rather than about the occurrence, and a caller
+        reading a value out of an *unconstrained* write of a constrained name has to know.
+        &#34;&#34;&#34;
+        for binding in self._every_binding():
+            for write in binding.writes:
+                if write.may_define or not isinstance(write.node, Ps1Variable):
+                    continue
+                named = _constraint_on(write.node)
+                if named is not None:
+                    binding.constraints.add(data.resolve_type(named))
+
+    def _every_binding(self) -&gt; Iterator[Binding]:
+        stack = [self.root_scope]
+        while stack:
+            scope = stack.pop()
+            stack.extend(scope.children)
+            yield from scope.bindings.values()
+
+    def _share_stores_through_aliases(self):
+        &#34;&#34;&#34;
+        File every store-through against each binding that names the same object.
+
+        `$y = $x` does not copy the array; it gives the one array a second name. So
+        `[Array]::Reverse($x)` changes what a read of `$y` observes and `$y[0] = 9` changes what a
+        read of `$x` observes, and neither is an occurrence of the other name. This is Chow&#39;s χ —
+        a may-def filed against every member of an alias class — at the one depth a syntactic model
+        can see: a definition whose whole value is a bare variable.
+
+        **A shared store-through is a may-def and nothing stronger, which is what keeps it from
+        corrupting.** Whether the alias still holds where the store runs is an ordering question,
+        and this layer sees no order: `$x = 1, 2, 3; $y = $x; $y = 9, 9, 9; [Array]::Reverse($x)`
+        leaves `$y` holding `9, 9, 9` — measured — although the definition `$y = $x` is filed all
+        the same. So every occurrence shared here carries the chain of definitions it came through,
+        and only kills until
+        `refinery.lib.scripts.ps1.analysis.dataflow.Ps1VariableFlow.reaching_definition` finds that
+        chain intact at the store. Filing one where the alias does not hold then costs a fold and
+        can never install a value the name never held.
+
+        The class is closed under the relation rather than read off one definition, because a name
+        reached through two of them is reached: `$y = $x; $z = $y` gives all three the one array,
+        and a member that missed a store it did receive is the direction that answers with the value
+        from before. The chain is what the second link is checked by: filed for `$z`, the store on
+        `$x` carries both definitions, and either one broken breaks the answer.
+        &#34;&#34;&#34;
+        for members, links in self._alias_classes():
+            stores = [
+                (binding, write)
+                for binding in members
+                for write in binding.writes
+                if write.role.through and not write.may_define
+            ]
+            if not stores:
+                continue
+            adjacent = _link_adjacency(links)
+            reached: dict[int, dict[int, tuple[Ps1AliasLink, ...]]] = {}
+            for source, _ in stores:
+                if id(source) not in reached:
+                    reached[id(source)] = _alias_chains_from(adjacent, source)
+            for binding in members:
+                filed = {id(write.node) for write in binding.writes}
+                for source, write in stores:
+                    if source is binding or id(write.node) in filed:
+                        continue
+                    chain = reached[id(source)].get(id(binding))
+                    if chain is None:
+                        continue
+                    filed.add(id(write.node))
+                    binding.writes.append(
+                        Occurrence(write.node, write.role, binding.name, chain))
+
+    def _alias_classes(self) -&gt; Iterator[tuple[list[Binding], list[Ps1AliasLink]]]:
+        &#34;&#34;&#34;
+        The bindings a chain of definitions gives one object to, grouped, each beside the
+        definitions that joined them. A definition qualifies when its whole value is a bare variable
+        read — `$y = $x`, and `$y = ($x)`, since a parenthesis hands over what it wraps — or that
+        read under a conversion, which qualifies as an *uncertain* link.
+
+        One shape that reads like a definition is refused outright. A subexpression is not a
+        parenthesis: measured, `$y = $($x)` unrolls the array to the pipeline and collects a fresh
+        one, and `[object]::ReferenceEquals($x, $y)` is `False`. That is not doubt about whether the
+        two names share, it is a definition that certainly copies, and filing it would cost folds
+        for nothing.
+        &#34;&#34;&#34;
+        classes: dict[int, list[Binding]] = {}
+        joined: dict[int, list[Ps1AliasLink]] = {}
+        for link in self._alias_definitions():
+            here = classes.setdefault(id(link.first), [link.first])
+            there = classes.get(id(link.second))
+            if there is not here:
+                if there is None:
+                    here.append(link.second)
+                else:
+                    here.extend(there)
+                    joined.setdefault(id(here), []).extend(joined.pop(id(there), []))
+                for binding in there or (link.second,):
+                    classes[id(binding)] = here
+            joined.setdefault(id(here), []).append(link)
+        seen: set[int] = set()
+        for members in classes.values():
+            if id(members) in seen:
+                continue
+            seen.add(id(members))
+            yield members, joined.get(id(members), [])
+
+    def _alias_definitions(self) -&gt; Iterator[Ps1AliasLink]:
+        &#34;&#34;&#34;
+        Each definition that hands one object to a second name, as the link between the two
+        bindings it joins.
+
+        A conversion on either side of the `=` is passed through and makes the link uncertain: it is
+        the same object where nothing needed converting and a fresh one where something did, and
+        which of the two ran is a question about the operand&#39;s runtime type. Both spellings count —
+        `$y = [array]$x` and `$y = $x -as [array]` convert the value, `[int[]]$y = $x` constrains
+        the variable — because the object either name ends up holding is the same question in all
+        three. Measured: `$x = 1, 2, 3; $y = [array]$x; $y[0] = 9` leaves `$x` reading `9 2 3`.
+
+        A constraint the *target* binding carries counts as much as one this occurrence spells,
+        because PowerShell stores it on the variable and converts every later write through it.
+        Measured: `[string]$y = 0; $x = 1, 2, 3; $y = $x; [Array]::Reverse($x); $y` writes `1 2 3`,
+        because `$y` was handed the String `1 2 3` and never the array — so the definition that
+        reads as the plainest of all is the one a constraint three statements above has already
+        converted. `Binding.constraints` is therefore filed before this runs; see `_build_def_use`.
+
+        A constraint the *named* binding carries is not one of these. It converted what that name
+        was written with, at the write that carried it, and a read of the name hands over whatever
+        it holds with nothing converting on the way out — measured, `[array]$x = 1, 2, 3; $y = $x;
+        [Array]::Reverse($x); $y` writes `3 2 1`, the same as the script without the constraint.
+        &#34;&#34;&#34;
+        for write in self._every_write():
+            if write.may_define or not isinstance(write.node, Ps1Variable) or write.role.through:
+                continue
+            assignment = assignment_of(write.node)
+            if assignment is None or assignment.operator != &#39;=&#39; or assignment.value is None:
+                continue
+            certain = True
+            source: Node | None = assignment.value
+            while source is not None and not isinstance(source, Ps1Variable):
+                if isinstance(source, Ps1ParenExpression):
+                    source = source.expression
+                    continue
+                if isinstance(source, Ps1CastExpression) or is_conversion_operator(source):
+                    certain = False
+                    source = _climbed_operand(source)
+                    continue
+                break
+            if not isinstance(source, Ps1Variable):
+                continue
+            target = self._binding_of.get(id(write.node))
+            named = self._binding_of.get(id(source))
+            if target is None or named is None or target is named:
+                continue
+            yield Ps1AliasLink(write.node, target, named, certain and not target.constraints)
+
+    def _every_write(self) -&gt; Iterator[Occurrence]:
+        for binding in self._every_binding():
+            yield from binding.writes
+
+    def _attribute_write(self, var: Ps1Variable, scope: Scope):
+        binding = self._lookup_write_binding(var, scope)
+        if binding is not None:
+            self._record(binding, var, binding.writes)
+
+    def _attribute_reference(self, var: Ps1Variable, scope: Scope):
+        &#34;&#34;&#34;
+        Attribute a `[ref]$x` occurrence: resolved the way a read is, recorded the way a write is.
+
+        The two halves are not the same question. PowerShell resolves the name by ordinary lookup,
+        so a reference written inside a body reaches the enclosing binding and declares nothing —
+        resolving it the way a write is resolved would look for a local binding that was never
+        created and attribute the occurrence to nothing at all, losing the very use this exists to
+        keep. What it then does to that binding is store into it, so it is recorded among the
+        writes, where it both keeps the binding alive through `Binding.uses` and stops an earlier
+        value reaching a later read.
+        &#34;&#34;&#34;
+        if var.scope is not Ps1ScopeModifier.NONE:
+            self._attribute_read(var, scope)
+            return
+        for binding in self._bindings_a_read_reaches(var, scope):
+            self._record(binding, var, binding.writes)
+
+    def _attribute_write_through(self, var: Ps1Variable, scope: Scope):
+        &#34;&#34;&#34;
+        Attribute an occurrence a store reaches *through* — the `$x` of `$x[0] = &#39;z&#39;`: resolved the
+        way a read is, recorded the way a write is, and declaring nothing.
+
+        Resolving it as a write would look for a binding in the scope the occurrence is written in
+        and declare one PowerShell never creates, hiding the outer binding the store actually
+        reaches. What it does to that binding is change the value under it, so it is recorded among
+        the writes, where it kills whatever stood before it and leaves a read below it with a value
+        nothing here can name.
+
+        Unlike `[ref]`, a scope qualifier does not stop it. Measured: `[Array]::Reverse($script:x)`
+        and `$script:x[0] = 9` both reach the script scope&#39;s array, so a qualified occurrence is
+        recorded against the bindings the qualifier names rather than dropped to a read.
+
+        It leaves `Binding.dynamic_or_qualified` alone, and so does every other write. That flag is
+        what keeps a binding *no read names* alive, which is a question about reads; a qualified
+        write of any kind — `$script:x = 5` as much as `$script:x[0] = 9` — is resolved through
+        the scopes the qualifier names and needs nothing further.
+        &#34;&#34;&#34;
+        for binding in self._bindings_a_read_reaches(var, scope):
+            self._record(binding, var, binding.writes)
+
+    def _bindings_a_read_reaches(self, var: Ps1Variable, scope: Scope) -&gt; Iterator[Binding]:
+        &#34;&#34;&#34;
+        Every binding an ordinary read of *var* written in *scope* could observe: the binding of the
+        name in each enclosing scope for a bare reference, and the scopes `_qualified_read_scopes`
+        names for a qualified one.
+
+        Which one of several a reference resolves to depends on what ran, so every one of them is
+        yielded and the caller records against all of them. For a write that is the conservative
+        direction: a binding credited with a write it did not receive answers nothing about the
+        values below it, where one that missed a write it did receive answers the value from before.
+        &#34;&#34;&#34;
+        name = binding_key(var)
+        if var.scope is Ps1ScopeModifier.NONE:
+            cursor: Scope | None = scope
+            while cursor is not None:
+                binding = cursor.bindings.get(name)
+                if binding is not None:
+                    yield binding
+                cursor = cursor.parent
+            return
+        for target in self._qualified_read_scopes(var, scope):
+            binding = target.bindings.get(name)
+            if binding is not None:
+                yield binding
+
+    def _attribute_named(self, cmd: Ps1CommandInvocation, scope: Scope):
+        &#34;&#34;&#34;
+        File a command&#39;s string-addressed references against the bindings they name.
+
+        A read resolves the way a bare variable read does, up the scope chain, and is recorded on
+        every enclosing binding of the name — `Get-Variable x` inside a body observes whichever `$x`
+        is in reach, and which one that is depends on what ran. A write resolves to the one scope
+        the census placed it in.
+        &#34;&#34;&#34;
+        for reference in named_references(cmd):
+            role = NAME_ROLES[reference.role]
+            if reference.role is Ps1NameRole.READS:
+                cursor: Scope | None = scope
+                while cursor is not None:
+                    binding = cursor.bindings.get(reference.key)
+                    if binding is not None:
+                        binding.reads.append(
+                            Occurrence(node=cmd, role=role, key=reference.key))
+                    cursor = cursor.parent
+                continue
+            target = self._named_scope(reference, scope)
+            if target is None:
+                continue
+            binding = target.bindings.get(reference.key)
+            if binding is not None:
+                binding.writes.append(Occurrence(node=cmd, role=role, key=reference.key))
+
+    def _record(self, binding: Binding, var: Ps1Variable, into: list[Occurrence]) -&gt; None:
+        &#34;&#34;&#34;
+        File one variable occurrence against *binding*, and make it the occurrence&#39;s own binding
+        unless an inner scope already claimed it — a bare reference is recorded on every enclosing
+        binding of the name and resolves to the innermost.
+        &#34;&#34;&#34;
+        into.append(Occurrence(node=var, role=occurrence_role(var), key=binding.name))
+        self._binding_of.setdefault(id(var), binding)
+
+    def _lookup_write_binding(self, var: Ps1Variable, scope: Scope) -&gt; Binding | None:
+        defining = self._defining_scope(var, scope)
+        if defining is None:
+            return None
+        return defining.bindings.get(binding_key(var))
+
+    def _attribute_read(self, var: Ps1Variable, scope: Scope):
+        if var.scope is Ps1ScopeModifier.NONE:
+            self._attribute_bare_read(var, scope)
+        elif var.scope is Ps1ScopeModifier.ENV:
+            binding = self.root_scope.bindings.get(binding_key(var))
+            if binding is not None:
+                self._record(binding, var, binding.reads)
+        elif var.scope in _QUALIFIED_SCOPES:
+            self._attribute_qualified_read(var, scope)
+
+    def _attribute_qualified_read(self, var: Ps1Variable, scope: Scope):
+        &#34;&#34;&#34;
+        Mark every binding a scope-qualified read can reach as `Binding.dynamic_or_qualified`, so it
+        is never reported dead even though no occurrence in `Binding.reads` names it.
+        &#34;&#34;&#34;
+        name = var.name.lower()
+        primary: Binding | None = None
+        for target in self._qualified_read_scopes(var, scope):
+            binding = target.bindings.get(name)
+            if binding is None:
+                continue
+            binding.dynamic_or_qualified = True
+            if primary is None:
+                primary = binding
+        if primary is not None:
+            self._binding_of[id(var)] = primary
+
+    def _qualified_read_scopes(self, var: Ps1Variable, scope: Scope) -&gt; Iterator[Scope]:
+        &#34;&#34;&#34;
+        The scopes a scope-qualified read of *var* can reach. `$variable:` addresses the Variable
+        provider drive, which resolves like a bare reference, so it reaches every enclosing scope;
+        every other qualifier names the one scope `_defining_scope` binds a write through it in —
+        the scope of the reference itself for `$local:` and `$private:`, the script scope for
+        `$script:`, `$global:`, and `$using:`.
+        &#34;&#34;&#34;
+        if var.scope is Ps1ScopeModifier.VARIABLE:
+            cursor: Scope | None = scope
+            while cursor is not None:
+                yield cursor
+                cursor = cursor.parent
+            return
+        defining = self._defining_scope(var, scope)
+        if defining is not None:
+            yield defining
+
+    def _attribute_bare_read(self, var: Ps1Variable, scope: Scope):
+        name = var.name.lower()
+        cursor: Scope | None = scope
+        while cursor is not None:
+            binding = cursor.bindings.get(name)
+            if binding is not None:
+                self._record(binding, var, binding.reads)
+            cursor = cursor.parent</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.script_scope"><code class="name">var <span class="ident">script_scope</span></code></dt>
+<dd>
+<section class="desc"><p>The scope the script itself introduces — the outermost scope, whose bindings are the
+script-level variables.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L776-L782" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def script_scope(self) -&gt; Scope:
+    &#34;&#34;&#34;
+    The scope the script itself introduces — the outermost scope, whose bindings are the
+    script-level variables.
+    &#34;&#34;&#34;
+    return self.root_scope</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.changes_an_object_in_place"><code class="name">var <span class="ident">changes_an_object_in_place</span></code></dt>
+<dd>
+<section class="desc"><p>Whether any occurrence in the script stores <em>through</em> a value rather than into a name — the
+<code>$x</code> of <code>$x[0] = 9</code>, of <code>$h.k = 9</code> and of <code>[Array]::Reverse($x)</code>.</p>
+<p>A script with none never changes an object after it is built, so there a copy of one and a
+second name for it are indistinguishable, and a consumer weighing the two may stop asking.
+That is the question every sharing guard is really about, and it is a fact about the script
+rather than about the name a guard happens to be standing on: an object handed to a
+hashtable key, to a property or to a callee is changed under a name the guard cannot see.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L784-L799" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def changes_an_object_in_place(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether any occurrence in the script stores *through* a value rather than into a name — the
+    `$x` of `$x[0] = 9`, of `$h.k = 9` and of `[Array]::Reverse($x)`.
+
+    A script with none never changes an object after it is built, so there a copy of one and a
+    second name for it are indistinguishable, and a consumer weighing the two may stop asking.
+    That is the question every sharing guard is really about, and it is a fact about the script
+    rather than about the name a guard happens to be standing on: an object handed to a
+    hashtable key, to a property or to a callee is changed under a name the guard cannot see.
+    &#34;&#34;&#34;
+    if self._changes_in_place is None:
+        self._changes_in_place = any(
+            write.role.through for write in self._every_write())
+    return self._changes_in_place</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.scope_of"><code class="name flex">
+<span>def <span class="ident">scope_of</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The innermost scope that contains <em>node</em>, or <code>None</code> if the node was not part of the script
+the model was built from. A node in an <code>if</code>/loop/<code>try</code> body resolves to the enclosing script
+or scriptblock scope, since those bodies introduce no scope of their own.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L801-L807" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def scope_of(self, node: Node) -&gt; Scope | None:
+    &#34;&#34;&#34;
+    The innermost scope that contains *node*, or `None` if the node was not part of the script
+    the model was built from. A node in an `if`/loop/`try` body resolves to the enclosing script
+    or scriptblock scope, since those bodies introduce no scope of their own.
+    &#34;&#34;&#34;
+    return self._node_scope.get(id(node))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.binding_of"><code class="name flex">
+<span>def <span class="ident">binding_of</span></span>(<span>self, var)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The binding a variable occurrence resolves to — for a write, the binding in its defining
+scope; for a bare read, the nearest enclosing binding of the name — or <code>None</code> when the
+occurrence is free (an automatic or external variable the model never binds) or names a
+namespace outside the script's variables.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L809-L816" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def binding_of(self, var: Ps1Variable) -&gt; Binding | None:
+    &#34;&#34;&#34;
+    The binding a variable occurrence resolves to — for a write, the binding in its defining
+    scope; for a bare read, the nearest enclosing binding of the name — or `None` when the
+    occurrence is free (an automatic or external variable the model never binds) or names a
+    namespace outside the script&#39;s variables.
+    &#34;&#34;&#34;
+    return self._binding_of.get(id(var))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.reads_in_scope"><code class="name flex">
+<span>def <span class="ident">reads_in_scope</span></span>(<span>self, node, scope)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The names of <em>scope</em>'s bindings read anywhere within <em>node</em>'s subtree — every bare read of a
+name <em>scope</em> binds, including one nested in a scriptblock, but not the target of a plain <code>=</code>
+assignment, which replaces the value without observing it. A compound-assignment target
+(<code>$x += 1</code>) does observe it and counts as a read. This is the read set the dead-store sweep
+flushes pending stores against: unlike the walk it replaces, it does not stop at a nested
+scriptblock, so a store read only through a captured block is correctly seen as live.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L818-L836" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reads_in_scope(self, node: Node, scope: Scope) -&gt; set[str]:
+    &#34;&#34;&#34;
+    The names of *scope*&#39;s bindings read anywhere within *node*&#39;s subtree — every bare read of a
+    name *scope* binds, including one nested in a scriptblock, but not the target of a plain `=`
+    assignment, which replaces the value without observing it. A compound-assignment target
+    (`$x += 1`) does observe it and counts as a read. This is the read set the dead-store sweep
+    flushes pending stores against: unlike the walk it replaces, it does not stop at a nested
+    scriptblock, so a store read only through a captured block is correctly seen as live.
+    &#34;&#34;&#34;
+    names: set[str] = set()
+    for descendant in node.walk():
+        if not isinstance(descendant, Ps1Variable):
+            continue
+        if descendant.scope is not Ps1ScopeModifier.NONE:
+            continue
+        name = descendant.name.lower()
+        if name in scope.bindings and not replaces_value(descendant):
+            names.add(name)
+    return names</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.variables_in_scope"><code class="name flex">
+<span>def <span class="ident">variables_in_scope</span></span>(<span>self, node, scope)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The names of <em>scope</em>'s bindings referenced in any way — read or written — within <em>node</em>'s
+subtree. The conservative flush set for a control-flow statement whose internal effect on a
+variable the linear sweep does not model: any mention of a bound name defers its pending
+store.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L838-L851" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def variables_in_scope(self, node: Node, scope: Scope) -&gt; set[str]:
+    &#34;&#34;&#34;
+    The names of *scope*&#39;s bindings referenced in any way — read or written — within *node*&#39;s
+    subtree. The conservative flush set for a control-flow statement whose internal effect on a
+    variable the linear sweep does not model: any mention of a bound name defers its pending
+    store.
+    &#34;&#34;&#34;
+    names: set[str] = set()
+    for descendant in node.walk():
+        if isinstance(descendant, Ps1Variable) and descendant.scope is Ps1ScopeModifier.NONE:
+            name = descendant.name.lower()
+            if name in scope.bindings:
+                names.add(name)
+    return names</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope"><code class="flex name class">
+<span>class <span class="ident">Scope</span></span>
+<span>(</span><span>kind, node, parent=None, children=&lt;factory&gt;, bindings=&lt;factory&gt;, writes_unreadable_names=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A lexical scope introduced by the script or a <code><a title="refinery.lib.scripts.ps1.model.Ps1ScriptBlock" href="../model.html#refinery.lib.scripts.ps1.model.Ps1ScriptBlock">Ps1ScriptBlock</a></code>.
+<code>node</code> is the introducing AST node, <code>bindings</code> maps a lowercased variable name to its <code><a title="refinery.lib.scripts.ps1.analysis.Binding" href="#refinery.lib.scripts.ps1.analysis.Binding">Binding</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L703-L725" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(eq=False)
+class Scope:
+    &#34;&#34;&#34;
+    A lexical scope introduced by the script or a `refinery.lib.scripts.ps1.model.Ps1ScriptBlock`.
+    `node` is the introducing AST node, `bindings` maps a lowercased variable name to its `Binding`.
+    &#34;&#34;&#34;
+    kind: ScopeKind
+    node: Node
+    parent: Scope | None = None
+    children: list[Scope] = field(default_factory=list)
+    bindings: dict[str, Binding] = field(default_factory=dict)
+    #: Whether a write this cannot place reaches every binding here: one aimed at the script scope
+    #: from anywhere — `Set-Variable $n &#39;v&#39; -Scope Global` — or at a scope the lexical chain cannot
+    #: name at all, of which `-Scope 1` is the one that occurs. Every binding is then in doubt for
+    #: as long as the tree stands, since the write may have landed on any of them and nothing says
+    #: when.
+    #:
+    #: A write landing in the scope it is *written* in is not one of these. That one happens at a
+    #: point, and `refinery.lib.scripts.ps1.analysis.dataflow.Ps1VariableFlow.unattributable_writes`
+    #: holds it there, which leaves the reads before it answerable. Kept apart from
+    #: `Binding.dynamic_or_qualified`, which says a *known* name is reachable another way; these are
+    #: different reasons and a consumer may be able to live with one and not the other.
+    writes_unreadable_names: bool = False</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope.kind"><code class="name">var <span class="ident">kind</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope.children"><code class="name">var <span class="ident">children</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope.bindings"><code class="name">var <span class="ident">bindings</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope.parent"><code class="name">var <span class="ident">parent</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.Scope.writes_unreadable_names"><code class="name">var <span class="ident">writes_unreadable_names</span></code></dt>
+<dd>
+<section class="desc"><p>A write landing in the scope it is <em>written</em> in is not one of these. That one happens at a
+point, and <code><a title="refinery.lib.scripts.ps1.analysis.dataflow.Ps1VariableFlow.unattributable_writes" href="dataflow.html#refinery.lib.scripts.ps1.analysis.dataflow.Ps1VariableFlow.unattributable_writes">Ps1VariableFlow.unattributable_writes()</a></code>
+holds it there, which leaves the reads before it answerable. Kept apart from
+<code><a title="refinery.lib.scripts.ps1.analysis.Binding.dynamic_or_qualified" href="#refinery.lib.scripts.ps1.analysis.Binding.dynamic_or_qualified">Binding.dynamic_or_qualified</a></code>, which says a <em>known</em> name is reachable another way; these are
+different reasons and a consumer may be able to live with one and not the other.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.ScopeKind"><code class="flex name class">
+<span>class <span class="ident">ScopeKind</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Create a collection of name/value pairs.</p>
+<p>Example enumeration:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+</code></pre>
+<p>Access them by:</p>
+<ul>
+<li>attribute access:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color.RED
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>value lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color(1)
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>name lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color['RED']
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Enumerations can be iterated over, and know how many members they have:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; len(Color)
+3
+</code></pre>
+<pre><code class="language-python-repl">&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+</code></pre>
+<p>Methods can be added to enumerations, and members can have their own
+attributes &ndash; see the documentation for details.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/model.py#L501-L504" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ScopeKind(enum.Enum):
+    SCRIPT      = &#39;script&#39;       # noqa
+    FUNCTION    = &#39;function&#39;     # noqa
+    SCRIPTBLOCK = &#39;scriptblock&#39;  # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.ScopeKind.SCRIPT"><code class="name">var <span class="ident">SCRIPT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.ScopeKind.FUNCTION"><code class="name">var <span class="ident">FUNCTION</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.ScopeKind.SCRIPTBLOCK"><code class="name">var <span class="ident">SCRIPTBLOCK</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.StatementEffect"><code class="flex name class">
+<span>class <span class="ident">StatementEffect</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The observable effect of evaluating a standalone statement, used by every pass that decides
+whether a statement can be pruned from a body:</p>
+<ul>
+<li><code>EFFECT</code>: the statement performs a side effect (a command call, a store to a real variable, an
+increment); it must be preserved.</li>
+<li><code>OUTPUT</code>: the statement is side-effect-free but yields a value to the enclosing pipeline (a
+bare constant, a pure expression); it is junk at a discarding position, but in a captured body
+it may be the return value, so removing it needs an emit-safety check.</li>
+<li><code>DISCARD</code>: the statement is a syntactic no-op that yields nothing and does nothing observable
+(an empty statement, the <code>$Null = &lt;pure&gt;</code> and <code>[Void]&lt;pure&gt;</code> discard idioms, an <code>Out-Null</code>
+pipeline, a discarding <code>ForEach</code>); it is always safe to remove, even when it empties the body.</li>
+</ul>
+<p>A discard idiom throws away a <em>value</em>, never the work that produced it: every one of them is
+recognized only over an operand that <code><a title="refinery.lib.scripts.ps1.analysis.is_side_effect_free" href="#refinery.lib.scripts.ps1.analysis.is_side_effect_free">is_side_effect_free()</a></code> accepts, so <code>[Void](Start-Process x)</code>
+is an <code>EFFECT</code> like any other call.</p>
+<p><code>EFFECT</code> deliberately says nothing about emission, and splitting it into an emitting and a
+silent member would not pay: a silent <code>EFFECT</code> is still un-removable, so every consumer would
+grow a branch to reach the verdict it already reaches. <code>Write-Host x</code> and <code>Get-Item x</code> are both
+<code>EFFECT</code>, and nothing here distinguishes them because nothing needs to.</p>
+<p>Nor does any member say whether the statement can <em>throw</em>. That is <code>expression_cannot_fault</code>,
+which a caller about to remove an <code>OUTPUT</code> statement has to ask separately: <code>[Int]'abc'</code> and
+<code>1/0</code> are both <code>OUTPUT</code>, and removing either resumes a script that had terminated.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/effects.py#L1169-L1198" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class StatementEffect(enum.Enum):
+    &#34;&#34;&#34;
+    The observable effect of evaluating a standalone statement, used by every pass that decides
+    whether a statement can be pruned from a body:
+
+    - `EFFECT`: the statement performs a side effect (a command call, a store to a real variable, an
+      increment); it must be preserved.
+    - `OUTPUT`: the statement is side-effect-free but yields a value to the enclosing pipeline (a
+      bare constant, a pure expression); it is junk at a discarding position, but in a captured body
+      it may be the return value, so removing it needs an emit-safety check.
+    - `DISCARD`: the statement is a syntactic no-op that yields nothing and does nothing observable
+      (an empty statement, the `$Null = &lt;pure&gt;` and `[Void]&lt;pure&gt;` discard idioms, an `Out-Null`
+      pipeline, a discarding `ForEach`); it is always safe to remove, even when it empties the body.
+
+    A discard idiom throws away a *value*, never the work that produced it: every one of them is
+    recognized only over an operand that `is_side_effect_free` accepts, so `[Void](Start-Process x)`
+    is an `EFFECT` like any other call.
+
+    `EFFECT` deliberately says nothing about emission, and splitting it into an emitting and a
+    silent member would not pay: a silent `EFFECT` is still un-removable, so every consumer would
+    grow a branch to reach the verdict it already reaches. `Write-Host x` and `Get-Item x` are both
+    `EFFECT`, and nothing here distinguishes them because nothing needs to.
+
+    Nor does any member say whether the statement can *throw*. That is `expression_cannot_fault`,
+    which a caller about to remove an `OUTPUT` statement has to ask separately: `[Int]&#39;abc&#39;` and
+    `1/0` are both `OUTPUT`, and removing either resumes a script that had terminated.
+    &#34;&#34;&#34;
+    EFFECT = &#39;effect&#39;
+    OUTPUT = &#39;output&#39;
+    DISCARD = &#39;discard&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.StatementEffect.EFFECT"><code class="name">var <span class="ident">EFFECT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.StatementEffect.OUTPUT"><code class="name">var <span class="ident">OUTPUT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.StatementEffect.DISCARD"><code class="name">var <span class="ident">DISCARD</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1" href="../index.html">refinery.lib.scripts.ps1</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.arguments" href="arguments.html">refinery.lib.scripts.ps1.analysis.arguments</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks" href="blocks.html">refinery.lib.scripts.ps1.analysis.blocks</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cache" href="cache.html">refinery.lib.scripts.ps1.analysis.cache</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph" href="callgraph.html">refinery.lib.scripts.ps1.analysis.callgraph</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg" href="cfg.html">refinery.lib.scripts.ps1.analysis.cfg</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.commands" href="commands.html">refinery.lib.scripts.ps1.analysis.commands</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.dataflow" href="dataflow.html">refinery.lib.scripts.ps1.analysis.dataflow</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.effects" href="effects.html">refinery.lib.scripts.ps1.analysis.effects</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults" href="faults.html">refinery.lib.scripts.ps1.analysis.faults</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.model" href="model.html">refinery.lib.scripts.ps1.analysis.model</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.mutation" href="mutation.html">refinery.lib.scripts.ps1.analysis.mutation</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.naming" href="naming.html">refinery.lib.scripts.ps1.analysis.naming</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.opaque" href="opaque.html">refinery.lib.scripts.ps1.analysis.opaque</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.separator" href="separator.html">refinery.lib.scripts.ps1.analysis.separator</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.values" href="values.html">refinery.lib.scripts.ps1.analysis.values</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.variable_types" href="variable_types.html">refinery.lib.scripts.ps1.analysis.variable_types</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.world" href="world.html">refinery.lib.scripts.ps1.analysis.world</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.worldflow" href="worldflow.html">refinery.lib.scripts.ps1.analysis.worldflow</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.build_semantic_model" href="#refinery.lib.scripts.ps1.analysis.build_semantic_model">build_semantic_model</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.declares_binding" href="#refinery.lib.scripts.ps1.analysis.declares_binding">declares_binding</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.is_assignment_write_target" href="#refinery.lib.scripts.ps1.analysis.is_assignment_write_target">is_assignment_write_target</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.is_side_effect_free" href="#refinery.lib.scripts.ps1.analysis.is_side_effect_free">is_side_effect_free</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.is_substitutable_position" href="#refinery.lib.scripts.ps1.analysis.is_substitutable_position">is_substitutable_position</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.is_write_occurrence" href="#refinery.lib.scripts.ps1.analysis.is_write_occurrence">is_write_occurrence</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.model_cache" href="#refinery.lib.scripts.ps1.analysis.model_cache">model_cache</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.occurrence_role" href="#refinery.lib.scripts.ps1.analysis.occurrence_role">occurrence_role</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.replaces_value" href="#refinery.lib.scripts.ps1.analysis.replaces_value">replaces_value</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.statement_effect" href="#refinery.lib.scripts.ps1.analysis.statement_effect">statement_effect</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.Binding" href="#refinery.lib.scripts.ps1.analysis.Binding">Binding</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.Ps1ModelCache" href="#refinery.lib.scripts.ps1.analysis.Ps1ModelCache">Ps1ModelCache</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole" href="#refinery.lib.scripts.ps1.analysis.Ps1OccurrenceRole">Ps1OccurrenceRole</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel" href="#refinery.lib.scripts.ps1.analysis.Ps1SemanticModel">Ps1SemanticModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.scope_of" href="#refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.scope_of">scope_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.binding_of" href="#refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.binding_of">binding_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.reads_in_scope" href="#refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.reads_in_scope">reads_in_scope</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.variables_in_scope" href="#refinery.lib.scripts.ps1.analysis.Ps1SemanticModel.variables_in_scope">variables_in_scope</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.Scope" href="#refinery.lib.scripts.ps1.analysis.Scope">Scope</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.ScopeKind" href="#refinery.lib.scripts.ps1.analysis.ScopeKind">ScopeKind</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.StatementEffect" href="#refinery.lib.scripts.ps1.analysis.StatementEffect">StatementEffect</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

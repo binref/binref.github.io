@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.globalfinder documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.globalfinder</code></h1>
+</header>
+<section id="section-intro">
+<p>Resolve global-object-finder functions to <code>globalThis</code>.</p>
+<p>A <em>global-object finder</em> is the common obfuscation idiom of a function that locates the host's global
+object by probing a sequence of candidates — <code>globalThis</code>, <code>global</code>, <code>window</code>, <code>self</code>, <code>this</code>, or
+closures returning them — validating each and returning the first that works. Because <code>globalThis</code> is
+the global object in every standard host, a call to such a finder evaluates to the same value as the
+identifier <code>globalThis</code>; rewriting the call as <code>globalThis</code> lets the surrounding reflection collapse and
+leaves the finder unreferenced for
+<code><a title="refinery.lib.scripts.js.deobfuscation.unused.JsUnusedCodeRemoval" href="unused.html#refinery.lib.scripts.js.deobfuscation.unused.JsUnusedCodeRemoval">JsUnusedCodeRemoval</a></code> to drop.</p>
+<p>This recognition is a <em>trusted</em> judgment rather than a static proof: a finder's success depends on which
+globals the host defines, and its fallback path is not statically decidable, so "returns the global
+object" holds only under the standard-host assumption the obfuscator itself relies on. The trust is the
+same one <code><a title="refinery.lib.scripts.js.deobfuscation.reflection.JsReflectionInlining" href="reflection.html#refinery.lib.scripts.js.deobfuscation.reflection.JsReflectionInlining">JsReflectionInlining</a></code> already applies when it
+rewrites the <code>Function('return this')()</code> idiom to <code>globalThis</code>. It is confined by strict gates: every
+return is global-object-valued, the function performs no observable write, every call it makes is rooted
+at one of its own locals (never <code>console.log</code> or any other external), and it actually references a
+global-object alias — so only a function that does nothing but compute the global object qualifies.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/globalfinder.py#L1-L352" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Resolve global-object-finder functions to `globalThis`.
+
+A *global-object finder* is the common obfuscation idiom of a function that locates the host&#39;s global
+object by probing a sequence of candidates — `globalThis`, `global`, `window`, `self`, `this`, or
+closures returning them — validating each and returning the first that works. Because `globalThis` is
+the global object in every standard host, a call to such a finder evaluates to the same value as the
+identifier `globalThis`; rewriting the call as `globalThis` lets the surrounding reflection collapse and
+leaves the finder unreferenced for
+`refinery.lib.scripts.js.deobfuscation.unused.JsUnusedCodeRemoval` to drop.
+
+This recognition is a *trusted* judgment rather than a static proof: a finder&#39;s success depends on which
+globals the host defines, and its fallback path is not statically decidable, so &#34;returns the global
+object&#34; holds only under the standard-host assumption the obfuscator itself relies on. The trust is the
+same one `refinery.lib.scripts.js.deobfuscation.reflection.JsReflectionInlining` already applies when it
+rewrites the `Function(&#39;return this&#39;)()` idiom to `globalThis`. It is confined by strict gates: every
+return is global-object-valued, the function performs no observable write, every call it makes is rooted
+at one of its own locals (never `console.log` or any other external), and it actually references a
+global-object alias — so only a function that does nothing but compute the global object qualifies.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterator
+
+from refinery.lib.scripts import Node, _replace_in_parent
+from refinery.lib.scripts.js.analysis.cache import model_cache
+from refinery.lib.scripts.js.analysis.effects import EffectModel
+from refinery.lib.scripts.js.analysis.model import (
+    FUNCTION_NODES,
+    GLOBAL_OBJECT_ALIASES,
+    Binding,
+    SemanticModel,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    ScriptLevelTransformer,
+    rewrite_receiver_this_to_global,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsArrowFunctionExpression,
+    JsAssignmentExpression,
+    JsBlockStatement,
+    JsCallExpression,
+    JsConditionalExpression,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsLogicalExpression,
+    JsMemberExpression,
+    JsReturnStatement,
+    JsScript,
+    JsThisExpression,
+    JsVariableDeclarator,
+    strip_parens,
+    wraps_return,
+)
+
+_CLOSURE_NODES = (JsFunctionExpression, JsArrowFunctionExpression)
+
+
+class JsGlobalFinderInlining(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Replace each call to a recognized global-object-finder function with the identifier `globalThis`.
+    See the module documentation for the recognition criteria and the trust they rest on.
+    &#34;&#34;&#34;
+
+    self_converging = True
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        cache = model_cache(self, node)
+        model = cache.model
+        finders = _collect_finders(node, model, cache.effects)
+        if not finders:
+            return
+        if self._materialize_finder_receivers(model, finders):
+            self.mark_changed()
+            return
+        finder_ids = {id(f) for f in finders}
+        for call in list(node.walk()):
+            if not isinstance(call, JsCallExpression) or call.arguments:
+                continue
+            callee = strip_parens(call.callee)
+            if not isinstance(callee, JsIdentifier):
+                continue
+            target = cache.effects.function_of(model.resolve(callee))
+            if target is None or id(target) not in finder_ids or _within(call, target):
+                continue
+            if not cache.dominance.established_before(target, call):
+                continue
+            scope = model.scope_of(call)
+            if scope is not None and model.lookup(&#39;globalThis&#39;, scope) is not None:
+                continue
+            _replace_in_parent(call, JsIdentifier(name=&#39;globalThis&#39;))
+            self.mark_changed()
+
+    @staticmethod
+    def _materialize_finder_receivers(model: SemanticModel, finders: list[Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Rewrite the receiver `this` of each recognized finder that is stored as a namespace method
+        (`NS.f = function(){ … return r || this; }`) to `globalThis`, returning whether any finder was
+        changed. A finder invoked as `NS.f()` binds its object as `this`, so its `… || this` fallback
+        cannot be folded through the identifier-callee path and the namespace flattening declines to
+        detach the method while it observes a receiver. Materializing the belief the recognition already
+        rests on — that the finder yields the global object — makes the method `this`-free, so flattening
+        detaches it to a bare `f()` the fold path then resolves to `globalThis`. Only a non-arrow,
+        member-assigned finder is touched, and only where `globalThis` is not shadowed in its scope: a
+        name-bound finder is left to the fold path untouched (its body needs no rewrite), and an arrow
+        inherits `this` lexically rather than from the call, so neither is a receiver to materialize.
+        &#34;&#34;&#34;
+        changed = False
+        for finder in finders:
+            if isinstance(finder, JsArrowFunctionExpression):
+                continue
+            parent = finder.parent
+            if not (
+                isinstance(parent, JsAssignmentExpression)
+                and parent.operator == &#39;=&#39;
+                and parent.right is finder
+                and isinstance(parent.left, JsMemberExpression)
+            ):
+                continue
+            scope = model.function_scope(finder)
+            if scope is None or model.lookup(&#39;globalThis&#39;, scope) is not None:
+                continue
+            if rewrite_receiver_this_to_global(finder):
+                changed = True
+        return changed
+
+
+def _collect_finders(
+    root: JsScript,
+    model: SemanticModel,
+    effects: EffectModel,
+) -&gt; list[Node]:
+    finders: list[Node] = []
+    for node in root.walk():
+        if not isinstance(node, FUNCTION_NODES):
+            continue
+        parent = node.parent
+        named = (
+            (isinstance(node, JsFunctionDeclaration) and node.id is not None)
+            or (isinstance(parent, JsVariableDeclarator) and parent.init is node)
+            or (
+                isinstance(parent, JsAssignmentExpression)
+                and parent.operator == &#39;=&#39;
+                and parent.right is node
+            )
+        )
+        if named and _is_finder(node, model, effects):
+            finders.append(node)
+    return finders
+
+
+def _is_finder(func: Node, model: SemanticModel, effects: EffectModel) -&gt; bool:
+    summary = effects.summary_of(func)
+    if not summary.is_expression_replaceable:
+        return False
+    if not any(_is_global_alias(node, model) for node in func.walk()):
+        return False
+    for node in func.walk():
+        if isinstance(node, JsCallExpression) and not _root_is_local(node.callee, func, model):
+            return False
+    returns = [node for node in _own_nodes(func) if isinstance(node, JsReturnStatement)]
+    if not returns:
+        return False
+    taint = _global_taint(func, model)
+    return all(
+        ret.argument is not None and _is_global_valued(ret.argument, func, model, taint, set())
+        for ret in returns
+    )
+
+
+def _is_global_valued(
+    expr: Node | None, func: Node, model: SemanticModel, taint: set[int], visiting: set[int]
+) -&gt; bool:
+    expr = strip_parens(expr)
+    if isinstance(expr, JsThisExpression):
+        return True
+    if isinstance(expr, JsIdentifier):
+        if _is_global_alias(expr, model):
+            return True
+        binding = model.resolve(expr)
+        return binding is not None and id(binding) in taint
+    if isinstance(expr, JsLogicalExpression):
+        return (
+            _is_global_valued(expr.left, func, model, taint, visiting)
+            or _is_global_valued(expr.right, func, model, taint, visiting)
+        )
+    if isinstance(expr, JsConditionalExpression):
+        return (
+            _is_global_valued(expr.consequent, func, model, taint, visiting)
+            or _is_global_valued(expr.alternate, func, model, taint, visiting)
+        )
+    if isinstance(expr, JsCallExpression):
+        closures = _callee_closures(expr.callee, func, model)
+        return bool(closures) and all(
+            _closure_returns_global(closure, model, visiting) for closure in closures
+        )
+    return False
+
+
+def _global_taint(func: Node, model: SemanticModel) -&gt; set[int]:
+    defs: list[tuple[Binding | None, Node | None]] = []
+    for node in _own_nodes(func):
+        if (
+            isinstance(node, JsVariableDeclarator)
+            and node.init is not None
+            and isinstance(node.id, JsIdentifier)
+        ):
+            defs.append((model.binding_of(node.id), node.init))
+        elif (
+            isinstance(node, JsAssignmentExpression)
+            and node.operator == &#39;=&#39;
+            and isinstance(node.left, JsIdentifier)
+        ):
+            defs.append((model.resolve(node.left), node.right))
+    taint: set[int] = set()
+    changed = True
+    while changed:
+        changed = False
+        for binding, value in defs:
+            if binding is None or id(binding) in taint or not _binding_within(binding, func, model):
+                continue
+            if _is_global_valued(value, func, model, taint, set()):
+                taint.add(id(binding))
+                changed = True
+    return taint
+
+
+def _callee_closures(callee: Node | None, func: Node, model: SemanticModel) -&gt; list[Node]:
+    callee = strip_parens(callee)
+    if isinstance(callee, _CLOSURE_NODES):
+        return [callee]
+    if isinstance(callee, JsIdentifier):
+        return _function_declarations(model.resolve(callee))
+    if isinstance(callee, JsMemberExpression):
+        base = strip_parens(callee.object)
+        if isinstance(base, JsIdentifier):
+            return _array_closures(model.resolve(base), func, model)
+    return []
+
+
+def _array_closures(binding: Binding | None, func: Node, model: SemanticModel) -&gt; list[Node]:
+    value = strip_parens(_sole_value(binding, func, model))
+    if not isinstance(value, JsArrayExpression):
+        return []
+    closures: list[Node] = []
+    for element in value.elements:
+        element = strip_parens(element)
+        if not isinstance(element, _CLOSURE_NODES):
+            return []
+        closures.append(element)
+    return closures
+
+
+def _closure_returns_global(closure: Node, model: SemanticModel, visiting: set[int]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether calling *closure* answers the global object. What the body returns decides that only
+    where the call answers what the body returned: an `async` closure answers a promise and a
+    generator answers a generator object, neither of which is the global object however the body
+    ends. `_is_finder` asks `is_expression_replaceable` of the finder itself, which cannot cover
+    this — `refinery.lib.scripts.js.analysis.effects.EffectSummary.absorb` deliberately leaves
+    `wraps_return` out, so a callee&#39;s wrapping never reaches its caller&#39;s summary.
+    &#34;&#34;&#34;
+    if isinstance(closure, FUNCTION_NODES) and wraps_return(closure):
+        return False
+    if id(closure) in visiting:
+        return False
+    visiting = visiting | {id(closure)}
+    body = getattr(closure, &#39;body&#39;, None)
+    taint = _global_taint(closure, model)
+    if isinstance(closure, JsArrowFunctionExpression) and not isinstance(body, JsBlockStatement):
+        return _is_global_valued(body, closure, model, taint, visiting)
+    returns = [node for node in _own_nodes(closure) if isinstance(node, JsReturnStatement)]
+    return bool(returns) and all(
+        ret.argument is not None and _is_global_valued(ret.argument, closure, model, taint, visiting)
+        for ret in returns
+    )
+
+
+def _sole_value(binding: Binding | None, func: Node, model: SemanticModel) -&gt; Node | None:
+    if binding is None:
+        return None
+    values: list[Node] = []
+    for decl in binding.declarations:
+        parent = decl.parent
+        if isinstance(parent, JsVariableDeclarator) and parent.init is not None:
+            values.append(parent.init)
+    for node in _own_nodes(func):
+        if (
+            isinstance(node, JsAssignmentExpression)
+            and node.operator == &#39;=&#39;
+            and isinstance(node.left, JsIdentifier)
+            and node.right is not None
+            and model.resolve(node.left) is binding
+        ):
+            values.append(node.right)
+    return values[0] if len(values) == 1 else None
+
+
+def _root_is_local(expr: Node | None, func: Node, model: SemanticModel) -&gt; bool:
+    expr = strip_parens(expr)
+    if isinstance(expr, _CLOSURE_NODES):
+        return True
+    if isinstance(expr, JsIdentifier):
+        return _binding_within(model.resolve(expr), func, model)
+    if isinstance(expr, JsMemberExpression):
+        return _root_is_local(expr.object, func, model)
+    if isinstance(expr, JsCallExpression):
+        return _root_is_local(expr.callee, func, model)
+    return False
+
+
+def _binding_within(binding: Binding | None, func: Node, model: SemanticModel) -&gt; bool:
+    if binding is None:
+        return False
+    func_scope = model.function_scope(func)
+    return func_scope is not None and func_scope.contains(binding.scope)
+
+
+def _is_global_alias(node: Node, model: SemanticModel) -&gt; bool:
+    if not isinstance(node, JsIdentifier) or node.name not in GLOBAL_OBJECT_ALIASES:
+        return False
+    scope = model.scope_of(node)
+    return scope is not None and model.lookup(node.name, scope) is None
+
+
+def _function_declarations(binding: Binding | None) -&gt; list[Node]:
+    if binding is None:
+        return []
+    return [decl.parent for decl in binding.declarations if isinstance(decl.parent, FUNCTION_NODES)]
+
+
+def _own_nodes(func: Node) -&gt; Iterator[Node]:
+    body = getattr(func, &#39;body&#39;, None)
+    if not isinstance(body, JsBlockStatement):
+        return
+    stack: list[Node] = list(body.body)
+    while stack:
+        node = stack.pop()
+        yield node
+        if not isinstance(node, FUNCTION_NODES):
+            stack.extend(node.children())
+
+
+def _within(node: Node, ancestor: Node) -&gt; bool:
+    current = node.parent
+    while current is not None:
+        if current is ancestor:
+            return True
+        current = current.parent
+    return False</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.globalfinder.JsGlobalFinderInlining"><code class="flex name class">
+<span>class <span class="ident">JsGlobalFinderInlining</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Replace each call to a recognized global-object-finder function with the identifier <code>globalThis</code>.
+See the module documentation for the recognition criteria and the trust they rest on.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/globalfinder.py#L61-L127" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsGlobalFinderInlining(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Replace each call to a recognized global-object-finder function with the identifier `globalThis`.
+    See the module documentation for the recognition criteria and the trust they rest on.
+    &#34;&#34;&#34;
+
+    self_converging = True
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        cache = model_cache(self, node)
+        model = cache.model
+        finders = _collect_finders(node, model, cache.effects)
+        if not finders:
+            return
+        if self._materialize_finder_receivers(model, finders):
+            self.mark_changed()
+            return
+        finder_ids = {id(f) for f in finders}
+        for call in list(node.walk()):
+            if not isinstance(call, JsCallExpression) or call.arguments:
+                continue
+            callee = strip_parens(call.callee)
+            if not isinstance(callee, JsIdentifier):
+                continue
+            target = cache.effects.function_of(model.resolve(callee))
+            if target is None or id(target) not in finder_ids or _within(call, target):
+                continue
+            if not cache.dominance.established_before(target, call):
+                continue
+            scope = model.scope_of(call)
+            if scope is not None and model.lookup(&#39;globalThis&#39;, scope) is not None:
+                continue
+            _replace_in_parent(call, JsIdentifier(name=&#39;globalThis&#39;))
+            self.mark_changed()
+
+    @staticmethod
+    def _materialize_finder_receivers(model: SemanticModel, finders: list[Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Rewrite the receiver `this` of each recognized finder that is stored as a namespace method
+        (`NS.f = function(){ … return r || this; }`) to `globalThis`, returning whether any finder was
+        changed. A finder invoked as `NS.f()` binds its object as `this`, so its `… || this` fallback
+        cannot be folded through the identifier-callee path and the namespace flattening declines to
+        detach the method while it observes a receiver. Materializing the belief the recognition already
+        rests on — that the finder yields the global object — makes the method `this`-free, so flattening
+        detaches it to a bare `f()` the fold path then resolves to `globalThis`. Only a non-arrow,
+        member-assigned finder is touched, and only where `globalThis` is not shadowed in its scope: a
+        name-bound finder is left to the fold path untouched (its body needs no rewrite), and an arrow
+        inherits `this` lexically rather than from the call, so neither is a receiver to materialize.
+        &#34;&#34;&#34;
+        changed = False
+        for finder in finders:
+            if isinstance(finder, JsArrowFunctionExpression):
+                continue
+            parent = finder.parent
+            if not (
+                isinstance(parent, JsAssignmentExpression)
+                and parent.operator == &#39;=&#39;
+                and parent.right is finder
+                and isinstance(parent.left, JsMemberExpression)
+            ):
+                continue
+            scope = model.function_scope(finder)
+            if scope is None or model.lookup(&#39;globalThis&#39;, scope) is not None:
+                continue
+            if rewrite_receiver_this_to_global(finder):
+                changed = True
+        return changed</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.globalfinder.JsGlobalFinderInlining" href="#refinery.lib.scripts.js.deobfuscation.globalfinder.JsGlobalFinderInlining">JsGlobalFinderInlining</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

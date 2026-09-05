@@ -1,0 +1,2301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.faults documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.faults</code></h1>
+</header>
+<section id="section-intro">
+<p>Where a terminating error raised at a point in a PowerShell script goes.</p>
+<p>The routing itself is already in the control-flow graph:
+<code><a title="refinery.lib.scripts.ps1.analysis.cfg" href="cfg.html">refinery.lib.scripts.ps1.analysis.cfg</a></code> joins every statement of a guarded region to the handler
+that may be offered its errors, chains <code>catch</code> clauses and <code>trap</code> sets in the order the engine
+consults them, and edges to the body exit where the error gets past all of them. What is here is
+the reading of that graph — which handlers a point reaches, whether the error may leave the body,
+and the transpose, which points a handler is reachable from.</p>
+<p><strong>Three questions, and the difference between them is the whole of this module.</strong> <em>Does an error
+raised here reach a handler that acts</em> is a property of a <strong>position</strong>, and it is what a pass asks
+before it empties a guarded body. <em>Would deleting this statement change which handler runs</em> is a
+property of a <strong>statement</strong>, and it additionally needs to know whether the statement can raise at
+all — <code><a title="refinery.lib.scripts.ps1.analysis.effects.fault_is_observed" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.fault_is_observed">fault_is_observed()</a></code> asks that one, because the
+predicate that answers it lives there. <em>Is this handler still reachable from anything that raises</em>
+is the <strong>transpose</strong>, and it is what a pass asks before deleting a <code>trap</code>, where the statement being
+removed cannot itself raise and every error it re-routes belongs to something else.</p>
+<p>A body boundary is where this stops. The graphs are per body, so an error that leaves a function
+reaches whatever guards the <em>call</em>, and no graph here holds both. <code>leaves_the_body</code> reports that
+rather than guessing, and a caller reads it as <em>unknown</em> wherever a caller might be guarding.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L1-L962" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Where a terminating error raised at a point in a PowerShell script goes.
+
+The routing itself is already in the control-flow graph:
+`refinery.lib.scripts.ps1.analysis.cfg` joins every statement of a guarded region to the handler
+that may be offered its errors, chains `catch` clauses and `trap` sets in the order the engine
+consults them, and edges to the body exit where the error gets past all of them. What is here is
+the reading of that graph — which handlers a point reaches, whether the error may leave the body,
+and the transpose, which points a handler is reachable from.
+
+**Three questions, and the difference between them is the whole of this module.** *Does an error
+raised here reach a handler that acts* is a property of a **position**, and it is what a pass asks
+before it empties a guarded body. *Would deleting this statement change which handler runs* is a
+property of a **statement**, and it additionally needs to know whether the statement can raise at
+all — `refinery.lib.scripts.ps1.analysis.effects.fault_is_observed` asks that one, because the
+predicate that answers it lives there. *Is this handler still reachable from anything that raises*
+is the **transpose**, and it is what a pass asks before deleting a `trap`, where the statement being
+removed cannot itself raise and every error it re-routes belongs to something else.
+
+A body boundary is where this stops. The graphs are per body, so an error that leaves a function
+reaches whatever guards the *call*, and no graph here holds both. `leaves_the_body` reports that
+rather than guessing, and a caller reads it as *unknown* wherever a caller might be guarding.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterator, NamedTuple
+
+from refinery.lib.scripts import Node, tree_root
+from refinery.lib.scripts.analysis.cfg import (
+    CfgEdge,
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+)
+from refinery.lib.scripts.ps1.analysis.cfg import build_control_flow_model
+from refinery.lib.scripts.ps1.ast import (
+    STATEMENT_LIST_EXPRESSIONS,
+    argument_text,
+    assignment_target_variables,
+    binding_key,
+    binds_parameter,
+    bound_argument_value,
+    is_soft_error_source,
+    resolve_command_name,
+    string_value,
+)
+from refinery.lib.scripts.ps1.data import COMMON_PARAMETERS
+from refinery.lib.scripts.ps1.model import (
+    Ps1AssignmentExpression,
+    Ps1BreakStatement,
+    Ps1CatchClause,
+    Ps1CommandArgument,
+    Ps1CommandArgumentKind,
+    Ps1CommandInvocation,
+    Ps1ContinueStatement,
+    Ps1IntegerLiteral,
+    Ps1RealLiteral,
+    Ps1Script,
+    Ps1ThrowStatement,
+    Ps1TrapStatement,
+    Ps1Variable,
+)
+
+#: The names the `-ErrorAction` parameter answers to, lowercased and without the dash: the parameter
+#: itself and every alias the collected command data records for it. The alias is subscripted rather
+#: than defaulted, so that a collected surface which stops carrying this parameter fails the load
+#: rather than silently dropping the spelling, as `refinery.lib.scripts.ps1.data` does for its own
+#: derived sets.
+_ERROR_ACTION_NAME = &#39;erroraction&#39;
+_ERROR_ACTION = frozenset((_ERROR_ACTION_NAME, *COMMON_PARAMETERS[_ERROR_ACTION_NAME]))
+
+#: Every name a *common* parameter answers to, so that an abbreviation of one can be told from an
+#: abbreviation that reaches several. A command carrying `-ErrorAction` carries the whole set of
+#: them — that is what makes a command advanced — so a prefix reaching another member of this set
+#: reaches it on the very commands the question is about.
+_COMMON_SURFACES = frozenset(
+    surface
+    for parameter, aliases in COMMON_PARAMETERS.items()
+    for surface in (parameter, *aliases)
+)
+
+#: The `ActionPreference` member that makes an error terminating, and the number that member is.
+#: `Stop` and `1` are the two spellings the corpus measures directly.
+#:
+#: Neither is read literally. The ordinal is read as a *number* rather than as a numeral, because
+#: what selects the member is its value and `0x1`, `01` and `1` all denote it. The name is read by
+#: prefix, because 5.1 resolves `-ErrorAction St` to `Stop`.
+#:
+#: An **ambiguous** member prefix is a third thing, and the reading costs recall rather than
+#: correctness. `-ErrorAction S` reaches `SilentlyContinue`, `Stop` and `Suspend`, and 5.1 answers
+#: it with a `ParameterBindingException` — `CannotConvertArgumentNoMessage`, measured — so the
+#: command never runs at all and the error it reports instead is statement-terminating: the script
+#: carries on. Reading the prefix as `Stop` keeps a handler over that, which is the safe direction
+#: and is what `TestPs1AnAmbiguousActionPrefixKeepsTheTrapOverIt` records.
+_STOP = &#39;stop&#39;
+_STOP_ORDINAL = 1
+
+#: The automatic variable that decides what a command does with an error it reports. Set to `Stop`
+#: it makes every one of them terminating — a failing cast included, which is otherwise reported
+#: and stepped over.
+_ERROR_ACTION_PREFERENCE = &#39;erroractionpreference&#39;
+
+
+class Ps1FaultRouting(NamedTuple):
+    &#34;&#34;&#34;
+    Where a terminating error raised at one point may go: the handlers it may be offered to, in no
+    particular order, and whether it may get past all of them and leave the body.
+
+    `handlers` holds `Ps1CatchClause` and `Ps1TrapStatement` nodes and is a *may* set — a type
+    filter is matched by inheritance at run time, so a clause that cannot be shown to miss is
+    reported alongside the one after it.
+
+    The two fields answer different questions and a caller reads both. A handler that acts makes the
+    error observable however the rest of the routing looks; `leaves_the_body` beside a `trap` is the
+    escalation that ends the body, and beside nothing at all it is the ordinary unhandled error that
+    5.1 reports and steps over.
+    &#34;&#34;&#34;
+    handlers: tuple[Ps1CatchClause | Ps1TrapStatement, ...]
+    leaves_the_body: bool
+
+
+#: What the graphs place nothing for, and therefore claim nothing about. Every query answers `None`
+#: for a node it cannot place, and every caller reads that as *the error may go anywhere*.
+UNPLACED = None
+
+
+def _binds_the_error_action(written: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the parameter name *written* at a call site binds `-ErrorAction` and nothing else.
+
+    5.1 binds a parameter by any prefix of its name that no other parameter of the command answers
+    to, which `refinery.lib.scripts.ps1.ast.binds_parameter` reads. What it cannot read on its own
+    is the *ambiguity*, and here that is decidable: every command carrying `-ErrorAction` carries
+    every common parameter, so a prefix reaching a second common name reaches it on exactly the
+    commands this asks about. `-e`, `-er` and `-erro` all reach `-ErrorVariable` as well and are
+    measured not to stop; `-errora` reaches this one alone and is measured to stop.
+
+    Refusing an ambiguous prefix is also what keeps a native command out: `powershell.exe -e &lt;b64&gt;`
+    hands `-e` to a program rather than to a parameter binder, and reading it as an error action
+    pins every handler in the script around the commonest shape in this project&#39;s corpus.
+    &#34;&#34;&#34;
+    reached = {surface for surface in _COMMON_SURFACES if binds_parameter(written, surface)}
+    return bool(reached) and reached &lt;= _ERROR_ACTION
+
+
+def _rethrows(handler: Ps1TrapStatement) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *handler* disposes of an error by re-raising it, which a `trap` spells as an unlabelled
+    `break` — measured: `&amp; { trap { break }; [int]&#39;a&#39; }` ends the script where the same block
+    without the handler reports the cast and carries on.
+
+    A `break` written inside a loop of the trap&#39;s own body leaves that loop instead and is read here
+    as a rethrow all the same, because the statement list is read rather than the control flow. That
+    keeps a handler rather than dropping one, and the exact reading is the builder&#39;s
+    `refinery.lib.scripts.ps1.analysis.cfg` already makes for the block the `trap` is written in.
+    &#34;&#34;&#34;
+    body = handler.body.body if handler.body is not None else ()
+    return any(
+        isinstance(statement, Ps1BreakStatement) and statement.label is None
+        for statement in body
+    )
+
+
+def _selects_stop(value: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* selects `Stop`, as the argument of `-ErrorAction` or as what a write to
+    `$ErrorActionPreference` stores. A value this cannot read is read as selecting it: the question
+    decides whether a handler is load bearing, and a value computed at run time may be anything.
+
+    A numeral is read for the number it denotes rather than for the text it is written as, because
+    what selects the member is the ordinal and `0x1`, `01` and `1` all denote it.
+    `refinery.lib.scripts.ps1.ast.argument_text` deliberately answers a numeral&#39;s spelling, which
+    is the right reading where a bare word names something and the wrong one here. A name is
+    matched by prefix, for the same reason a parameter name is.
+    &#34;&#34;&#34;
+    if isinstance(value, (Ps1IntegerLiteral, Ps1RealLiteral)):
+        return value.value == _STOP_ORDINAL
+    text = argument_text(value)
+    if text is None:
+        return True
+    text = text.strip().lower()
+    return bool(text) and (text == str(_STOP_ORDINAL) or _STOP.startswith(text))
+
+
+def _stops_on_error(command: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *command* carries `-ErrorAction Stop`, which turns every error it reports into one that
+    ends the script wherever nothing handles it.
+
+    The parameter and its argument are two arguments rather than one: 5.1 binds a bare `-Name value`
+    pair by position and only the `-Name:value` spelling arrives as a single named argument, so both
+    shapes are read here. A parameter written last with nothing after it binds no value at all,
+    which 5.1 rejects, and is read as `Stop` for the same reason an unreadable value is.
+
+    Every occurrence is read rather than the first, so that a name bound by a prefix 5.1 would in
+    fact reject cannot hide the parameter written after it — reading such a name as this one is
+    then the over-approximation the name set claims it is, rather than a verdict on the command. A
+    command carrying a splat is read as carrying the parameter for the same reason: the names it
+    binds are in a table this cannot see into.
+    &#34;&#34;&#34;
+    arguments = [
+        argument for argument in command.arguments
+        if isinstance(argument, Ps1CommandArgument)
+    ]
+    for index, argument in enumerate(arguments):
+        value = argument.value
+        if isinstance(value, Ps1Variable) and value.splatted:
+            return True
+        if not _binds_the_error_action(argument.name):
+            continue
+        if argument.kind is not Ps1CommandArgumentKind.NAMED:
+            following = arguments[index + 1] if index + 1 &lt; len(arguments) else None
+            value = None
+            if following is not None and following.kind is Ps1CommandArgumentKind.POSITIONAL:
+                value = following.value
+        if _selects_stop(value):
+            return True
+    return False
+
+
+def _writes_stop_to_the_preference(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* assigns `$ErrorActionPreference` a value that may be `Stop`.
+
+    The target is read through `refinery.lib.scripts.ps1.ast.assignment_target_variables`, so that
+    a type-constrained, parenthesized or multi-assignment target is the same write as a bare one,
+    and keyed through `refinery.lib.scripts.ps1.ast.binding_key`, so that the unrelated
+    process-global `$env:ErrorActionPreference` is not read as this variable.
+    &#34;&#34;&#34;
+    if not isinstance(node, Ps1AssignmentExpression):
+        return False
+    if not any(
+        binding_key(variable) == _ERROR_ACTION_PREFERENCE
+        for variable in assignment_target_variables(node.target)
+    ):
+        return False
+    return _selects_stop(node.value)
+
+
+#: The commands that arm strict mode, in the spelling `resolve_command_name` answers with. Two
+#: rather than one, because two commands write the same engine slot: `Set-StrictMode -Version`
+#: writes the scope it stands in and `Set-PSDebug -Strict` writes the global scope, and 5.1
+#: documents the second as the first at version 1. Neither carries an alias in the collected
+#: surface, and every other way of arming either arrives as a string these are matched inside.
+_STRICT_MODE_COMMANDS = frozenset({
+    &#39;set-psdebug&#39;,
+    &#39;set-strictmode&#39;,
+})
+
+
+def _arms_strict_mode(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* may turn a read of a variable that was never set into an error.
+
+    A command is the spelling that matters, resolved the deny-list way through
+    `refinery.lib.scripts.ps1.ast.resolve_command_name`, so that a module- or scope-qualified
+    spelling of one arms strict mode as the bare word does. The argument is not read: a
+    `Set-StrictMode -Off` and a `Set-PSDebug -Trace 1` are armings here like every other spelling,
+    and what that costs is the recall of a script that names either command for another purpose.
+
+    A string value need only *contain* a name, which is the asymmetry
+    `refinery.lib.scripts.ps1.analysis.worldflow._names_own_path` makes and that
+    `a_stop_may_be_in_force` makes beside it. `Invoke-Expression &#39;Set-StrictMode -Version 1&#39;`
+    arms it as surely as writing the command does, and a script that spells either name anywhere is
+    read as arming it — the direction that refuses a removal rather than granting one.
+    &#34;&#34;&#34;
+    if (
+        isinstance(node, Ps1CommandInvocation)
+        and resolve_command_name(node) in _STRICT_MODE_COMMANDS
+    ):
+        return True
+    written = string_value(node)
+    if written is None:
+        return False
+    written = written.lower()
+    return any(command in written for command in _STRICT_MODE_COMMANDS)
+
+
+def _arms_strict_mode_v2(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* may arm strict mode at version 2 or above, under which the object adapter&#39;s
+    faked `Count` and `Length` on a scalar or `$null` become terminating errors rather than a
+    value. This is narrower than `_arms_strict_mode`: `Set-PSDebug -Strict` is documented as
+    `Set-StrictMode -Version 1`, where those fakes still read, so only `Set-StrictMode` can arm the
+    version this asks about.
+
+    The argument *is* read here, unlike in `_arms_strict_mode`, because version 1 and version 2 are
+    the two poles of the question. Only a `-Version` that is provably the integer `1` is read as
+    not arming version 2; every other spelling — a higher or non-constant version, `Latest`, `-Off`,
+    or no readable value — is read as arming it, the direction that refuses a fold rather than
+    granting one. A string value need only *contain* the command name, the way
+    `_arms_strict_mode` reads one, since the version inside it cannot be told apart.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1CommandInvocation):
+        if resolve_command_name(node) != &#39;set-strictmode&#39;:
+            return False
+        version = bound_argument_value(node, &#39;version&#39;)
+        return not (isinstance(version, Ps1IntegerLiteral) and version.value == 1)
+    written = string_value(node)
+    if written is None or &#39;set-strictmode&#39; not in written.lower():
+        return False
+    parent = node.parent
+    if isinstance(parent, Ps1CommandInvocation) and parent.name is node:
+        # A bareword command name parses as a string literal too, so a genuine `Set-StrictMode`
+        # invocation reaches this the way a concealed one does. Its version is read on the
+        # invocation above; reading the version-less name here would refuse every `-Version 1`.
+        return False
+    return True
+
+
+#: The automatic variables through which a `Stop` can be armed for commands that did not ask for
+#: one: the preference itself, and the table that binds `-ErrorAction` into every command that takes
+#: it. Spelled as names rather than as assignment shapes because `a_stop_may_be_in_force` asks
+#: whether either is *touched* at all, however it is spelled.
+_STOP_BEARING_NAMES = frozenset({
+    _ERROR_ACTION_PREFERENCE,
+    &#39;psdefaultparametervalues&#39;,
+})
+
+
+def a_stop_may_be_in_force(root: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether anything in *root* may make an error a command reports into a terminating one — the
+    strict counterpart of the whole-script question `Ps1FaultReach` asks itself, and a different
+    question from it.
+
+    That one reads an assignment of `Stop` to `$ErrorActionPreference`, and reads it *laxly* on
+    purpose: it decides whether a handler may be removed, where a missed arming keeps a handler that
+    could have gone and costs recall on junk. Two spellings it is known to miss are ledgered as
+    behaviour defects — `New-Variable ErrorActionPreference Stop -Force`, and a `-ErrorAction` entry
+    written into `$PSDefaultParameterValues`.
+
+    A caller asking whether a *statement completed* cannot inherit those. Reading a script as arming
+    nothing where it does says a command that in fact raised ran to its end, and a value it was going
+    to establish is then resolved through at every use below it — which rewrites calls a run never
+    makes. So this asks the wider question: does the script touch either name at all, in any way,
+    including naming one in a string that a command could set it through. What that costs is the
+    recall of every script that so much as mentions the preference, which is a shape worth refusing.
+
+    A variable occurrence must carry the name exactly; a string value need only *contain* one,
+    which is the same asymmetry `refinery.lib.scripts.ps1.analysis.worldflow._names_own_path`
+    makes, and for the same reason. A provider path spells the name inside a larger word, and
+    `Set-Item Variable:ErrorActionPreference Stop` arms it as surely as the assignment does — as
+    does a payload handed to `Invoke-Expression`. Matching the whole literal instead reads a script
+    that really arms `Stop` as arming nothing, which is the one direction that rewrites a call the
+    run does not make.
+    &#34;&#34;&#34;
+    for node in root.walk():
+        if isinstance(node, Ps1Variable) and binding_key(node) in _STOP_BEARING_NAMES:
+            return True
+        written = string_value(node)
+        if written is not None and any(
+            name in written.lower() for name in _STOP_BEARING_NAMES
+        ):
+            return True
+    return False
+
+
+def ends_the_script(element: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an error raised at *element* stops the script, rather than being reported and stepped
+    over, where no handler takes it.
+
+    PowerShell has two kinds of error a `trap` sees, and they are disposed of differently where
+    there is no `trap` — which is the whole reason this question is worth asking. A
+    **statement-terminating** error ends the statement it was raised in and the next statement runs:
+    a failing cast, a division by zero, a member access on `$null`, an exception out of a .NET
+    method, an unresolved command name. A **terminating** error ends the script, and only `throw`
+    and a command told to stop raise one. Both halves are measured.
+
+    `exit` is neither, and is deliberately absent: it ends the script by an exception no `trap`
+    catches, so a handler over one disposes of nothing and reading `exit` as a raise would keep a
+    handler no run reaches. `trap { &#39;T&#39; }; exit 3` writes neither `T` nor anything else, which the
+    executable corpus cannot hold as a row because a snippet that exits takes the measuring host
+    with it.
+
+    The whole subtree is read, because a construct raises wherever its parts do:
+
+        1..2 | ForEach-Object { throw }
+
+    ends the script although the `throw` stands in a body of its own. That reaches into a `function`
+    definition written inside the statement as well, whose `throw` runs only once something calls
+    it — an over-approximation, and one that keeps a handler rather than dropping it.
+
+    A `trap` inside the subtree that re-raises is read the same way, because it *converts*: an error
+    a nested block would have reported and stepped over ends the script once such a handler takes
+    it. See `_rethrows`.
+    &#34;&#34;&#34;
+    for node in element.walk():
+        if isinstance(node, Ps1ThrowStatement):
+            return True
+        if isinstance(node, Ps1TrapStatement) and _rethrows(node):
+            return True
+        if isinstance(node, Ps1CommandInvocation) and _stops_on_error(node):
+            return True
+    return False
+
+
+def handler_acts(handler: Ps1CatchClause | Ps1TrapStatement) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether running *handler* changes what the script does.
+
+    An empty `catch { }` swallows the error and lets execution resume after the construct, so a
+    script that never raises reaches the same next statement — which is why an obfuscator writes one
+    and why removing what it guards costs nothing. A `trap` is the same rule with one more spelling:
+    a body holding only an unlabelled `break` or `continue` decides how the error is disposed of and
+    emits nothing, while a body holding anything else — a call, an assignment, or a bare value the
+    engine writes to the output stream — is a handler whose running is observable.
+    &#34;&#34;&#34;
+    body = handler.body.body if handler.body is not None else ()
+    if isinstance(handler, Ps1CatchClause):
+        return bool(body)
+    for statement in body:
+        if isinstance(statement, (Ps1BreakStatement, Ps1ContinueStatement)):
+            if statement.label is not None:
+                return True
+            continue
+        return True
+    return False
+
+
+def _handled_in_the_body(routing: Ps1FaultRouting) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a handler of the body the error was raised in disposes of it in a way a run can see: a
+    `catch` or `trap` that acts, or a `trap` set the error may get past, which 5.1 answers by ending
+    the body rather than by reporting the error and stepping over it.
+
+    A `catch` that misses does not end the body — the sharp asymmetry between the two keywords — so
+    the escalation reading is keyed to the `trap` and not to the escape.
+    &#34;&#34;&#34;
+    if any(handler_acts(handler) for handler in routing.handlers):
+        return True
+    return routing.leaves_the_body and any(
+        isinstance(handler, Ps1TrapStatement) for handler in routing.handlers
+    )
+
+
+def _escapes(routing: Ps1FaultRouting) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an error routed like *routing* gets past every handler of the body it was raised in. A
+    handler set it cannot leave settles it there; an empty set settles nothing, which the graphs
+    spell as no handlers and no exceptional edge out of the body.
+    &#34;&#34;&#34;
+    return not routing.handlers or routing.leaves_the_body
+
+
+def _normal_successors(graph: ControlFlowGraph, node: CfgNode) -&gt; frozenset[CfgNode]:
+    &#34;&#34;&#34;
+    The nodes control reaches from *node* along a plain fall-through edge — where a soft error at
+    *node* steps over to, which is the same node its value flows to when it does not fail.
+    &#34;&#34;&#34;
+    return frozenset(
+        successor for successor in node.successors
+        if graph.edge_kind(node, successor) == CfgEdge.NORMAL
+    )
+
+
+def _resumption_slot(graph: ControlFlowGraph, node: CfgNode) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    The slot a resuming handler carries *node*&#39;s error to — the `CfgEdge.RESUMPTION_FORWARD`
+    successor — or `None` where nothing resumes this node.
+    &#34;&#34;&#34;
+    for successor in node.successors:
+        if graph.edge_kind(node, successor) &amp; CfgEdge.RESUMPTION_FORWARD:
+            return successor
+    return None
+
+
+class Ps1FaultReach:
+    &#34;&#34;&#34;
+    The fault routing of one script, read off its control-flow graphs.
+
+    Built over `refinery.lib.scripts.analysis.cfg.ControlFlowModel`: where an error goes is decided
+    by the graph the builder already wired, so this needs no semantic model, no call graph and no
+    world. It is a view rather than a solver — every answer is one walk over the exceptional edges,
+    memoized per node for the life of the model, and the model itself is discarded whenever the tree
+    moves. The trap-removal transpose reads one further graph — the same script at the sub-statement
+    granularity `refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model` draws with
+    `descend`, built here from this reader&#39;s own root on first demand — so that a soft error stepping
+    over inside a `$( )` or `@( )` is a path it can read. It builds that itself rather than taking it
+    from a caller, so no caller can hand it a reader that silently cannot see the step-over and
+    removes a load-bearing trap.
+    &#34;&#34;&#34;
+
+    def __init__(self, control_flow: ControlFlowModel):
+        self._control_flow = control_flow
+        self._fine: ControlFlowModel | None = None
+        self._descendable: bool | None = None
+        self._forward: dict[int, Ps1FaultRouting] = {}
+        self._backward: dict[int, bool] = {}
+        self._handled: set[int] | None = None
+        self._ending: dict[int, bool] = {}
+        self._stopping: bool | None = None
+        self._strict: bool | None = None
+        self._strict_v2: bool | None = None
+
+    def routing_at(self, node: Node) -&gt; Ps1FaultRouting | None:
+        &#34;&#34;&#34;
+        Where an error raised at *node* may go, or `None` when the graphs place *node* nowhere —
+        a body they do not descend into, or an expression evaluated at no point they model.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return UNPLACED
+        return self._routing(*located)
+
+    def points_in(self, node: Node) -&gt; Iterator[Node]:
+        &#34;&#34;&#34;
+        The points inside *node* at which the graphs say something is evaluated, *node* itself
+        included where it is one.
+
+        Deleting a construct deletes everything it holds, so the errors it stops raising are its
+        body&#39;s as well as its own — and each is at a position of its own, since a `try` nested in it
+        routes its body&#39;s errors to its own `catch`. What the graphs place is exactly the list of
+        such positions, which is why it is read off them rather than guessed from the node types: a
+        `for` loop is three points and a body, an `if` is one point per test, and neither construct
+        has a node standing for the statement as a whole.
+
+        A construct that yields nothing at all is one the graphs model nowhere, and a caller reads
+        that as a subtree it cannot judge rather than as one that raises nothing.
+        &#34;&#34;&#34;
+        for inner in node.walk():
+            if self._control_flow.node_of(inner) is not None:
+                yield inner
+
+    def escapes_the_body(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *node* gets past every handler written in the body *node* stands
+        in, so that where it goes next is decided by whatever ran that body and not by anything the
+        body itself says.
+
+        A position the graphs place nowhere settles nothing and escapes nothing; `False` is the
+        answer that leaves such a node to the position question, which reads an unplaced node as
+        observed.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return False
+        routing = self._routing(*located)
+        return not _handled_in_the_body(routing) and _escapes(routing)
+
+    def observed_at(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *node* changes which code runs: some handler it reaches acts, a
+        `trap` set may decline it and end the body, or the graphs place *node* nowhere.
+
+        This is the question about the **position** and not about the statement standing there —
+        it answers the same for a statement that cannot raise at all, which is what a caller
+        weighing whether a guarded body may be emptied wants to know.
+
+        What the body itself decides is `_handled_in_the_body`; what is left over once the error
+        gets past it is this.
+
+        **An error that gets past a function&#39;s own handlers is the caller&#39;s**, and no graph here
+        holds both ends of a call. Measured: the same function whose error is reported and stepped
+        over when called at script scope abandons its remaining statements and runs the `catch` of a
+        `try` written around the *call*, however many bodies deep the raise is. So a raise in a body
+        something may call is refused wherever the script holds a handler that acts — and granted
+        where it holds none, since a `catch` that is not written cannot be the one guarding the
+        call.
+
+        **A terminating error that escapes the script scope ends the run**, so deleting its raise
+        would start the tail that never ran. `_reading_is_observed` reads a raise escaping to the
+        script owner as unobserved — right for the statement-terminating errors 5.1 reports and steps
+        over, wrong for the terminating ones. So when the error gets past the body unhandled and
+        `_terminates` names the raise fatal, it is observed. This is the forward reading of the same
+        termination the transpose `_removal_matters` already weighs.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return True
+        graph, start = located
+        routing = self._routing(graph, start)
+        if self._reading_is_observed(graph, routing):
+            return True
+        return _escapes(routing) and self._terminates(node)
+
+    def _reading_is_observed(self, graph: ControlFlowGraph, routing: Ps1FaultRouting) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error routed like *routing* out of *graph* changes what runs. The one reading of
+        a routing there is, so that the position question, the arrival question `_observed_from`
+        asks of a fallback, and anything later that reads a routing cannot answer it three ways.
+        &#34;&#34;&#34;
+        if _handled_in_the_body(routing):
+            return True
+        if not _escapes(routing):
+            return False
+        return not isinstance(graph.owner, Ps1Script) and self._handled_elsewhere(graph)
+
+    def _handled_elsewhere(self, body: ControlFlowGraph) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script writes a handler that acts in some body other than *body*. What guards
+        a call is unknowable from the called body&#39;s graph, and this is what settles it in the
+        direction of a grant: a handler written in the very body that raises is one the error has
+        already got past, and a script with none anywhere else has no call site the raise could
+        matter at.
+
+        A named block is not a body of its own here, which is why the comparison is per graph: a
+        `trap` in `begin` and a raise in `process` share one script block, and neither guards the
+        other.
+        &#34;&#34;&#34;
+        if self._handled is None:
+            self._handled = {
+                id(graph)
+                for graph in self._control_flow.graphs.values()
+                if any(
+                    isinstance(node.element, (Ps1CatchClause, Ps1TrapStatement))
+                    and handler_acts(node.element)
+                    for node in graph.nodes
+                )
+            }
+        return bool(self._handled - {id(body)})
+
+    def leaves_the_body(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *node* may get past every handler of the body it is in, so that
+        where it goes next is a question about the caller. `True` for a node the graphs cannot
+        place, which is the same answer for the same reason.
+        &#34;&#34;&#34;
+        routing = self.routing_at(node)
+        return routing is None or routing.leaves_the_body
+
+    def removing_a_handler_is_observed(self, handler: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether deleting *handler* may change which code runs — the transpose, and the question
+        asked before a `trap` is deleted.
+
+        A `trap` cannot itself raise, so the forward question answers nothing about removing one:
+        what changes is where the errors of *other* statements go. Two things have to be true for
+        that to matter, and asking only one gets it wrong in either direction.
+
+        **Something has to still reach it.** Walking the exceptional edges backwards from the
+        handler&#39;s own node finds exactly the statements whose errors it may be offered, and a
+        handler nothing reaches is one whose deletion re-routes nothing — which is how a `trap` left
+        behind by the removal of the only raise in its block becomes removable in turn. The walk
+        crosses other handlers, because a `catch` that misses hands the error on and the statement
+        that raised it is behind that clause rather than at it.
+
+        **What the handler itself emits is deliberately not asked here**, and it is a hole: a body
+        that writes runs exactly when the handler is offered an error, so `trap { &#39;h&#39; }` beside a
+        raise puts `h` on the output stream where an unhandled error writes only its record — and
+        this reports it removable. Asking `handler_acts` of the handler under test closes it and
+        costs the injected-noise shape `refinery.lib.scripts.ps1.deobfuscation.deadcode`
+        deliberately drops, because `_raisers` counts every statement the block offers rather than
+        every statement that may raise. The two are one question and it is not settled here.
+
+        **And what it would fall back to has to act.** Deleting a handler sends its errors to
+        whatever the graph records as its fallback, so the question is asked again there: an empty
+        `catch` beside it swallows exactly as it did, and a `trap` at script scope with nothing
+        outside it lets an error be reported and stepped over, which is what an unhandled error
+        already did. A fallback the graph does not record is refused, because a handler whose
+        counterfactual is unknown is one whose removal cannot be judged.
+
+        **A `trap` set that may decline is load bearing for declining**, not only for handling. It
+        is what turns an error 5.1 would report and step over into one that ends the body, so
+        deleting it starts running everything written after the raise:
+
+            trap [System.IO.IOException] { }
+
+        guards nothing and is still the whole reason a script stops where it does.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(handler)
+        if located is None:
+            return True
+        graph, start = located
+        if start.element is not handler:
+            # The climb left the handler behind, so the node this would answer about stands for the
+            # statement around it and every question below reads the wrong element.
+            return True
+        remembered = self._backward.get(id(start))
+        if remembered is None:
+            remembered = self._backward[id(start)] = self._removal_matters(graph, start)
+        return remembered
+
+    def _removal_matters(self, graph: ControlFlowGraph, start: CfgNode) -&gt; bool:
+        raisers = self._raisers(graph, start)
+        if not raisers:
+            return False
+        if any(self._terminates(raiser) for raiser in raisers):
+            return True
+        element = start.element
+        routing = self._routing(graph, start)
+        if isinstance(element, Ps1TrapStatement) and routing.leaves_the_body:
+            return True
+        if any(handler_acts(handler) for handler in routing.handlers):
+            return True
+        if isinstance(element, Ps1TrapStatement) and self._soft_step_over_is_observed(element):
+            return True
+        fallback = graph.fallback_of(start)
+        if fallback is None:
+            return True
+        return self._observed_from(graph, fallback)
+
+    def _fine_model(self) -&gt; ControlFlowModel | None:
+        &#34;&#34;&#34;
+        The finer control-flow graph the trap-removal transpose reads, built once on first demand
+        from this reader&#39;s own root — the same tree the coarse model was built over, redrawn with
+        `descend`. `None` only where the graphs place no script at all (an empty model), which reaches
+        no trap to weigh. Building it here rather than taking it from a caller is what removes the
+        blind reader: there is no way to construct one that cannot see the step-over.
+        &#34;&#34;&#34;
+        if self._fine is None:
+            root = self._script
+            if isinstance(root, Ps1Script):
+                self._fine = build_control_flow_model(root, descend=True)
+        return self._fine
+
+    def _has_a_descendable_soft_source(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the script writes a soft-error source inside a `STATEMENT_LIST_EXPRESSIONS` construct
+        anywhere. A soft raiser standing at statement level steps over to the same statement a
+        resuming `trap` lands on, so it never makes the trap load bearing; only one inside such a
+        construct has a local step-over that differs from where the trap resumes. The finer graph is
+        therefore worth building only where this holds, which the common `trap { continue }` over a
+        bare cast or division does not — read before `_fine_model` so that shape pays for no second
+        whole-script graph.
+        &#34;&#34;&#34;
+        if self._descendable is None:
+            root = self._script
+            self._descendable = root is not None and any(
+                is_soft_error_source(statement)
+                for node in root.walk()
+                if isinstance(node, STATEMENT_LIST_EXPRESSIONS)
+                for statement in node.body
+            )
+        return self._descendable
+
+    def _soft_step_over_is_observed(self, handler: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether removing a resuming `trap` changes what runs because it catches a
+        statement-terminating error whose local step-over differs from where the trap resumes.
+
+        A failed cast inside `$( )` steps over to the next statement *within* the subexpression, and
+        the subexpression then yields that value; the trap instead resumes past the whole statement
+        the `$( )` sits in. Where those two land differently the trap is load-bearing, and the coarse
+        graph cannot tell them apart because the whole statement is one node there. Read on the finer
+        graph, the raiser has both edges: a `NORMAL` one to its local step-over and a
+        `RESUMPTION_FORWARD` one to the slot the trap resumes at. Existential over the soft raisers
+        the handler catches, because one redirected raiser is enough to keep the trap; equal
+        successors share all downstream behaviour, so this only ever keeps a trap — never removes a
+        load-bearing one — which is the sound direction for a may-analysis.
+        &#34;&#34;&#34;
+        if not self._has_a_descendable_soft_source():
+            return False
+        fine = self._fine_model()
+        if fine is None:
+            return False
+        located = fine.locate(handler)
+        if located is None or located[1].element is not handler:
+            return False
+        graph, start = located
+        for raiser in self._exceptional_closure(graph, start, forward=False):
+            element = raiser.element
+            if element is None or not is_soft_error_source(element):
+                continue
+            local = _normal_successors(graph, raiser)
+            slot = _resumption_slot(graph, raiser)
+            resumed = _normal_successors(graph, slot) if slot is not None else frozenset()
+            if local != resumed:
+                return True
+        return False
+
+    def _observed_from(self, graph: ControlFlowGraph, arrival: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error arriving at *arrival* changes what runs: *arrival* is a handler that acts,
+        or the routing onward from it is one `_reading_is_observed` calls observable — including the
+        body boundary, because an error that gets past *arrival* is the caller&#39;s exactly as one
+        raised at a position is.
+        &#34;&#34;&#34;
+        element = arrival.element
+        if isinstance(element, (Ps1CatchClause, Ps1TrapStatement)) and handler_acts(element):
+            return True
+        return self._reading_is_observed(graph, self._routing(graph, arrival))
+
+    def _routing(self, graph: ControlFlowGraph, start: CfgNode) -&gt; Ps1FaultRouting:
+        &#34;&#34;&#34;
+        The routing out of *start*, remembered for the life of this model. Every reader goes through
+        here so that a node&#39;s closure is walked once however many questions are asked about it.
+        &#34;&#34;&#34;
+        remembered = self._forward.get(id(start))
+        if remembered is None:
+            remembered = self._forward[id(start)] = self._route(graph, start)
+        return remembered
+
+    def _route(self, graph: ControlFlowGraph, start: CfgNode) -&gt; Ps1FaultRouting:
+        handlers: list[Ps1CatchClause | Ps1TrapStatement] = []
+        leaves = False
+        for node in self._exceptional_closure(graph, start, forward=True):
+            if node is graph.exit:
+                leaves = True
+            elif isinstance(node.element, (Ps1CatchClause, Ps1TrapStatement)):
+                handlers.append(node.element)
+        return Ps1FaultRouting(tuple(handlers), leaves)
+
+    def _raisers(self, graph: ControlFlowGraph, start: CfgNode) -&gt; list[Node]:
+        &#34;&#34;&#34;
+        The statements whose errors *start* may be offered, which is the backward walk over the
+        exceptional edges. They are reported rather than counted, because what would become of an
+        error if this handler were gone is a question about the statement that raises it.
+        &#34;&#34;&#34;
+        return [
+            node.element
+            for node in self._exceptional_closure(graph, start, forward=False)
+            if node.element is not None
+            and not isinstance(node.element, (Ps1CatchClause, Ps1TrapStatement))
+        ]
+
+    def _ends_the_script(self, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        `ends_the_script` for *element*, remembered for the life of this model. Every handler judged
+        against the same block is offered the same statements, so the subtree behind each one is
+        read once however many removals ask about it.
+        &#34;&#34;&#34;
+        remembered = self._ending.get(id(element))
+        if remembered is None:
+            remembered = self._ending[id(element)] = ends_the_script(element)
+        return remembered
+
+    def _terminates(self, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *element* ends the run rather than being reported and stepped
+        over: the script writes `Stop` to `$ErrorActionPreference` anywhere, or the raise is one of
+        the terminating shapes `_ends_the_script` names. The one predicate the position question and
+        the transpose both read, so a raise the trap-removal side reads as script-ending is read the
+        same way on the path that weighs deleting the raise itself.
+        &#34;&#34;&#34;
+        return self._stops_on_every_error() or self._ends_the_script(element)
+
+    @property
+    def _script(self) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The tree the graphs were built over, read off a graph&#39;s owner rather than taken as an
+        argument: a graph owner is a node of that tree, and a whole-script fact has to be asked of
+        the whole script rather than of the statements the graphs happen to place.
+        &#34;&#34;&#34;
+        for graph in self._control_flow.graphs.values():
+            return tree_root(graph.owner)
+        return None
+
+    def _stops_on_every_error(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script writes `Stop` to `$ErrorActionPreference` anywhere at all, which makes
+        every error a command reports a terminating one.
+
+        Position is deliberately not asked. The preference is a variable of the session rather than
+        of a block, so a write in one body governs a raise in another and a write inside a branch
+        governs everything that runs after it; a script that arms it at all is therefore read as
+        arming it throughout. That direction keeps handlers, and what it costs — junk `trap` beside
+        a script that arms `Stop` — is a shape an obfuscator has no reason to emit.
+
+        The tree is read rather than the graphs. What the graphs place is statements, and their
+        elements nest, so a walk per placed element reads an inner subtree once per level of
+        nesting around it and still misses what stands at no point they model — a `param` block
+        default among it.
+        &#34;&#34;&#34;
+        if self._stopping is None:
+            root = self._script
+            self._stopping = root is not None and any(
+                _writes_stop_to_the_preference(node) for node in root.walk()
+            )
+        return self._stopping
+
+    def strict_mode_may_be_in_force(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script may arm strict mode anywhere at all, which makes reading a variable that
+        was never set an error instead of a `$null`.
+
+        Two consumers, both reading it as the one model of whether the script arms strict mode.
+        `refinery.lib.scripts.ps1.analysis.effects.expression_cannot_fault` is the single place
+        deciding whether a bare variable read can raise before a removal site deletes it;
+        `refinery.lib.scripts.ps1.deobfuscation.constants.Ps1NullVariableInlining` stands its whole
+        pass down where this holds, because a never-assigned read it would rewrite to `$null` is a
+        terminating error under strict mode and the value would decide a branch the script never
+        reaches. Measured on 5.1: under the default semantics `$unset | ForEach-Object { [void]$_ }`
+        writes nothing and the script runs on, so removing it is invisible; under
+        `Set-StrictMode -Version 1` the same line raises a statement-terminating error that a
+        `catch` and a `trap` both take, so removing it is exactly what
+        `refinery.lib.scripts.ps1.analysis.effects.fault_is_observed` exists to refuse.
+
+        Position is not asked, and the reason is not the one `_stops_on_every_error` gives. Which
+        scopes an arming covers is not one rule: `Set-StrictMode` writes the scope it stands in and
+        `Set-PSDebug -Strict` writes the global one, so the first arms nothing outside the function
+        it is written in and the second arms everything that runs anywhere afterwards. Reading the
+        whole script is what covers both without deciding which was meant. `Set-StrictMode -Off` is
+        not distinguished from an arming either, since reading the argument buys back only the
+        recall of a script that turns strict mode off again.
+
+        **What this cannot see is an arming that is not in the script.** Strict mode is resolved by
+        walking the scope chain to the global scope, so a script dot-sourced from a session that
+        armed it — a profile, a stage-1 loader, an analyst&#39;s console — runs strict while spelling
+        nothing. Nothing readable says whether that happened, so the grant this feeds assumes the
+        entry scope runs the default semantics, the way
+        `refinery.lib.scripts.ps1.analysis.worldflow` assumes a leak does not re-run the statements
+        above it. A fragment carved out of a larger script is the case where the assumption is worth
+        doubting.
+
+        **The empty pole is the opposite of the sibling&#39;s, and it is why this is not a copy of it.**
+        `_stops_on_every_error` answers `False` where the graphs place no script, which is safe
+        because a missed arming there only keeps a handler. This one grants a *removal*, so a script
+        the graphs hold nothing of has to refuse it rather than read as running under the lax
+        default.
+        &#34;&#34;&#34;
+        if self._strict is None:
+            root = self._script
+            self._strict = root is None or any(
+                _arms_strict_mode(node) for node in root.walk()
+            )
+        return self._strict
+
+    def strict_mode_v2_may_be_in_force(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script may arm strict mode at version 2 or above, under which the `Count` and
+        `Length` the object adapter fakes onto a scalar or `$null` raise `PropertyNotFoundStrict`
+        rather than answering. Folding one of those to its value would stand a number where the
+        script terminated and decide a branch it never reaches, so the fold in
+        `refinery.lib.scripts.ps1.deobfuscation.folding` stands down where this holds and keeps the
+        real members — a `String`&#39;s own `Length`, an array&#39;s own `Count` — that read on regardless.
+
+        This is the version-sensitive sibling of `strict_mode_may_be_in_force`: that one refuses a
+        removal wherever any strict mode is armed, because reading an unset variable raises under
+        version 1 too, and so treats `Set-PSDebug -Strict` and every `-Version` alike. The fake
+        adapter members survive version 1, so this asks the narrower question, and everything the
+        two share — position not asked, an arming outside the script not seen, an empty script
+        refusing — is shared for the reasons written there.
+        &#34;&#34;&#34;
+        if self._strict_v2 is None:
+            root = self._script
+            self._strict_v2 = root is None or any(
+                _arms_strict_mode_v2(node) for node in root.walk()
+            )
+        return self._strict_v2
+
+    @staticmethod
+    def _exceptional_closure(
+        graph: ControlFlowGraph, start: CfgNode, *, forward: bool,
+    ) -&gt; Iterator[CfgNode]:
+        &#34;&#34;&#34;
+        The nodes reachable from *start* over exceptional edges alone, in either direction, without
+        *start* itself. One sweep rather than a walk per edge kind: the graph marks an edge by the
+        pair of nodes it joins, so the direction decides only which end of the pair the walk holds.
+        &#34;&#34;&#34;
+        seen = {id(start)}
+        stack = [start]
+        while stack:
+            current = stack.pop()
+            adjacent = current.successors if forward else current.predecessors
+            for node in adjacent:
+                edge = (current, node) if forward else (node, current)
+                if not graph.is_exceptional(*edge) or id(node) in seen:
+                    continue
+                seen.add(id(node))
+                yield node
+                stack.append(node)
+
+
+def build_fault_reach(control_flow: ControlFlowModel) -&gt; Ps1FaultReach:
+    &#34;&#34;&#34;
+    The `Ps1FaultReach` over one script&#39;s control-flow graphs. The finer graph the trap-removal
+    transpose also reads is drawn by the reader itself from the same root, so nothing is passed here
+    but the coarse model.
+    &#34;&#34;&#34;
+    return Ps1FaultReach(control_flow)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.UNPLACED"><code class="name">var <span class="ident">UNPLACED</span></code></dt>
+<dd>
+<section class="desc"><p>What the graphs place nothing for, and therefore claim nothing about. Every query answers <code>None</code>
+for a node it cannot place, and every caller reads that as <em>the error may go anywhere</em>.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.a_stop_may_be_in_force"><code class="name flex">
+<span>def <span class="ident">a_stop_may_be_in_force</span></span>(<span>root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether anything in <em>root</em> may make an error a command reports into a terminating one — the
+strict counterpart of the whole-script question <code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach">Ps1FaultReach</a></code> asks itself, and a different
+question from it.</p>
+<p>That one reads an assignment of <code>Stop</code> to <code>$ErrorActionPreference</code>, and reads it <em>laxly</em> on
+purpose: it decides whether a handler may be removed, where a missed arming keeps a handler that
+could have gone and costs recall on junk. Two spellings it is known to miss are ledgered as
+behaviour defects — <code>New-Variable ErrorActionPreference Stop -Force</code>, and a <code>-ErrorAction</code> entry
+written into <code>$PSDefaultParameterValues</code>.</p>
+<p>A caller asking whether a <em>statement completed</em> cannot inherit those. Reading a script as arming
+nothing where it does says a command that in fact raised ran to its end, and a value it was going
+to establish is then resolved through at every use below it — which rewrites calls a run never
+makes. So this asks the wider question: does the script touch either name at all, in any way,
+including naming one in a string that a command could set it through. What that costs is the
+recall of every script that so much as mentions the preference, which is a shape worth refusing.</p>
+<p>A variable occurrence must carry the name exactly; a string value need only <em>contain</em> one,
+which is the same asymmetry <code>refinery.lib.scripts.ps1.analysis.worldflow._names_own_path</code>
+makes, and for the same reason. A provider path spells the name inside a larger word, and
+<code>Set-Item Variable:ErrorActionPreference Stop</code> arms it as surely as the assignment does — as
+does a payload handed to <code>Invoke-Expression</code>. Matching the whole literal instead reads a script
+that really arms <code>Stop</code> as arming nothing, which is the one direction that rewrites a call the
+run does not make.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L321-L356" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def a_stop_may_be_in_force(root: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether anything in *root* may make an error a command reports into a terminating one — the
+    strict counterpart of the whole-script question `Ps1FaultReach` asks itself, and a different
+    question from it.
+
+    That one reads an assignment of `Stop` to `$ErrorActionPreference`, and reads it *laxly* on
+    purpose: it decides whether a handler may be removed, where a missed arming keeps a handler that
+    could have gone and costs recall on junk. Two spellings it is known to miss are ledgered as
+    behaviour defects — `New-Variable ErrorActionPreference Stop -Force`, and a `-ErrorAction` entry
+    written into `$PSDefaultParameterValues`.
+
+    A caller asking whether a *statement completed* cannot inherit those. Reading a script as arming
+    nothing where it does says a command that in fact raised ran to its end, and a value it was going
+    to establish is then resolved through at every use below it — which rewrites calls a run never
+    makes. So this asks the wider question: does the script touch either name at all, in any way,
+    including naming one in a string that a command could set it through. What that costs is the
+    recall of every script that so much as mentions the preference, which is a shape worth refusing.
+
+    A variable occurrence must carry the name exactly; a string value need only *contain* one,
+    which is the same asymmetry `refinery.lib.scripts.ps1.analysis.worldflow._names_own_path`
+    makes, and for the same reason. A provider path spells the name inside a larger word, and
+    `Set-Item Variable:ErrorActionPreference Stop` arms it as surely as the assignment does — as
+    does a payload handed to `Invoke-Expression`. Matching the whole literal instead reads a script
+    that really arms `Stop` as arming nothing, which is the one direction that rewrites a call the
+    run does not make.
+    &#34;&#34;&#34;
+    for node in root.walk():
+        if isinstance(node, Ps1Variable) and binding_key(node) in _STOP_BEARING_NAMES:
+            return True
+        written = string_value(node)
+        if written is not None and any(
+            name in written.lower() for name in _STOP_BEARING_NAMES
+        ):
+            return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.ends_the_script"><code class="name flex">
+<span>def <span class="ident">ends_the_script</span></span>(<span>element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether an error raised at <em>element</em> stops the script, rather than being reported and stepped
+over, where no handler takes it.</p>
+<p>PowerShell has two kinds of error a <code>trap</code> sees, and they are disposed of differently where
+there is no <code>trap</code> — which is the whole reason this question is worth asking. A
+<strong>statement-terminating</strong> error ends the statement it was raised in and the next statement runs:
+a failing cast, a division by zero, a member access on <code>$null</code>, an exception out of a .NET
+method, an unresolved command name. A <strong>terminating</strong> error ends the script, and only <code>throw</code>
+and a command told to stop raise one. Both halves are measured.</p>
+<p><code>exit</code> is neither, and is deliberately absent: it ends the script by an exception no <code>trap</code>
+catches, so a handler over one disposes of nothing and reading <code>exit</code> as a raise would keep a
+handler no run reaches. <code>trap { 'T' }; exit 3</code> writes neither <code>T</code> nor anything else, which the
+executable corpus cannot hold as a row because a snippet that exits takes the measuring host
+with it.</p>
+<p>The whole subtree is read, because a construct raises wherever its parts do:</p>
+<pre><code>1..2 | ForEach-Object { throw }
+</code></pre>
+<p>ends the script although the <code>throw</code> stands in a body of its own. That reaches into a <code>function</code>
+definition written inside the statement as well, whose <code>throw</code> runs only once something calls
+it — an over-approximation, and one that keeps a handler rather than dropping it.</p>
+<p>A <code>trap</code> inside the subtree that re-raises is read the same way, because it <em>converts</em>: an error
+a nested block would have reported and stepped over ends the script once such a handler takes
+it. See <code>_rethrows</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L359-L396" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def ends_the_script(element: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an error raised at *element* stops the script, rather than being reported and stepped
+    over, where no handler takes it.
+
+    PowerShell has two kinds of error a `trap` sees, and they are disposed of differently where
+    there is no `trap` — which is the whole reason this question is worth asking. A
+    **statement-terminating** error ends the statement it was raised in and the next statement runs:
+    a failing cast, a division by zero, a member access on `$null`, an exception out of a .NET
+    method, an unresolved command name. A **terminating** error ends the script, and only `throw`
+    and a command told to stop raise one. Both halves are measured.
+
+    `exit` is neither, and is deliberately absent: it ends the script by an exception no `trap`
+    catches, so a handler over one disposes of nothing and reading `exit` as a raise would keep a
+    handler no run reaches. `trap { &#39;T&#39; }; exit 3` writes neither `T` nor anything else, which the
+    executable corpus cannot hold as a row because a snippet that exits takes the measuring host
+    with it.
+
+    The whole subtree is read, because a construct raises wherever its parts do:
+
+        1..2 | ForEach-Object { throw }
+
+    ends the script although the `throw` stands in a body of its own. That reaches into a `function`
+    definition written inside the statement as well, whose `throw` runs only once something calls
+    it — an over-approximation, and one that keeps a handler rather than dropping it.
+
+    A `trap` inside the subtree that re-raises is read the same way, because it *converts*: an error
+    a nested block would have reported and stepped over ends the script once such a handler takes
+    it. See `_rethrows`.
+    &#34;&#34;&#34;
+    for node in element.walk():
+        if isinstance(node, Ps1ThrowStatement):
+            return True
+        if isinstance(node, Ps1TrapStatement) and _rethrows(node):
+            return True
+        if isinstance(node, Ps1CommandInvocation) and _stops_on_error(node):
+            return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.handler_acts"><code class="name flex">
+<span>def <span class="ident">handler_acts</span></span>(<span>handler)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether running <em>handler</em> changes what the script does.</p>
+<p>An empty <code>catch { }</code> swallows the error and lets execution resume after the construct, so a
+script that never raises reaches the same next statement — which is why an obfuscator writes one
+and why removing what it guards costs nothing. A <code>trap</code> is the same rule with one more spelling:
+a body holding only an unlabelled <code>break</code> or <code>continue</code> decides how the error is disposed of and
+emits nothing, while a body holding anything else — a call, an assignment, or a bare value the
+engine writes to the output stream — is a handler whose running is observable.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L399-L419" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def handler_acts(handler: Ps1CatchClause | Ps1TrapStatement) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether running *handler* changes what the script does.
+
+    An empty `catch { }` swallows the error and lets execution resume after the construct, so a
+    script that never raises reaches the same next statement — which is why an obfuscator writes one
+    and why removing what it guards costs nothing. A `trap` is the same rule with one more spelling:
+    a body holding only an unlabelled `break` or `continue` decides how the error is disposed of and
+    emits nothing, while a body holding anything else — a call, an assignment, or a bare value the
+    engine writes to the output stream — is a handler whose running is observable.
+    &#34;&#34;&#34;
+    body = handler.body.body if handler.body is not None else ()
+    if isinstance(handler, Ps1CatchClause):
+        return bool(body)
+    for statement in body:
+        if isinstance(statement, (Ps1BreakStatement, Ps1ContinueStatement)):
+            if statement.label is not None:
+                return True
+            continue
+        return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.build_fault_reach"><code class="name flex">
+<span>def <span class="ident">build_fault_reach</span></span>(<span>control_flow)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The <code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach">Ps1FaultReach</a></code> over one script's control-flow graphs. The finer graph the trap-removal
+transpose also reads is drawn by the reader itself from the same root, so nothing is passed here
+but the coarse model.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L956-L962" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_fault_reach(control_flow: ControlFlowModel) -&gt; Ps1FaultReach:
+    &#34;&#34;&#34;
+    The `Ps1FaultReach` over one script&#39;s control-flow graphs. The finer graph the trap-removal
+    transpose also reads is drawn by the reader itself from the same root, so nothing is passed here
+    but the coarse model.
+    &#34;&#34;&#34;
+    return Ps1FaultReach(control_flow)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultRouting"><code class="flex name class">
+<span>class <span class="ident">Ps1FaultRouting</span></span>
+<span>(</span><span>handlers, leaves_the_body)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Where a terminating error raised at one point may go: the handlers it may be offered to, in no
+particular order, and whether it may get past all of them and leave the body.</p>
+<p><code>handlers</code> holds <code>Ps1CatchClause</code> and <code>Ps1TrapStatement</code> nodes and is a <em>may</em> set — a type
+filter is matched by inheritance at run time, so a clause that cannot be shown to miss is
+reported alongside the one after it.</p>
+<p>The two fields answer different questions and a caller reads both. A handler that acts makes the
+error observable however the rest of the routing looks; <code>leaves_the_body</code> beside a <code>trap</code> is the
+escalation that ends the body, and beside nothing at all it is the ordinary unhandled error that
+5.1 reports and steps over.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L104-L119" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1FaultRouting(NamedTuple):
+    &#34;&#34;&#34;
+    Where a terminating error raised at one point may go: the handlers it may be offered to, in no
+    particular order, and whether it may get past all of them and leave the body.
+
+    `handlers` holds `Ps1CatchClause` and `Ps1TrapStatement` nodes and is a *may* set — a type
+    filter is matched by inheritance at run time, so a clause that cannot be shown to miss is
+    reported alongside the one after it.
+
+    The two fields answer different questions and a caller reads both. A handler that acts makes the
+    error observable however the rest of the routing looks; `leaves_the_body` beside a `trap` is the
+    escalation that ends the body, and beside nothing at all it is the ordinary unhandled error that
+    5.1 reports and steps over.
+    &#34;&#34;&#34;
+    handlers: tuple[Ps1CatchClause | Ps1TrapStatement, ...]
+    leaves_the_body: bool</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultRouting.handlers"><code class="name">var <span class="ident">handlers</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L104-L119" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1FaultRouting(NamedTuple):
+    &#34;&#34;&#34;
+    Where a terminating error raised at one point may go: the handlers it may be offered to, in no
+    particular order, and whether it may get past all of them and leave the body.
+
+    `handlers` holds `Ps1CatchClause` and `Ps1TrapStatement` nodes and is a *may* set — a type
+    filter is matched by inheritance at run time, so a clause that cannot be shown to miss is
+    reported alongside the one after it.
+
+    The two fields answer different questions and a caller reads both. A handler that acts makes the
+    error observable however the rest of the routing looks; `leaves_the_body` beside a `trap` is the
+    escalation that ends the body, and beside nothing at all it is the ordinary unhandled error that
+    5.1 reports and steps over.
+    &#34;&#34;&#34;
+    handlers: tuple[Ps1CatchClause | Ps1TrapStatement, ...]
+    leaves_the_body: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultRouting.leaves_the_body"><code class="name">var <span class="ident">leaves_the_body</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L104-L119" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1FaultRouting(NamedTuple):
+    &#34;&#34;&#34;
+    Where a terminating error raised at one point may go: the handlers it may be offered to, in no
+    particular order, and whether it may get past all of them and leave the body.
+
+    `handlers` holds `Ps1CatchClause` and `Ps1TrapStatement` nodes and is a *may* set — a type
+    filter is matched by inheritance at run time, so a clause that cannot be shown to miss is
+    reported alongside the one after it.
+
+    The two fields answer different questions and a caller reads both. A handler that acts makes the
+    error observable however the rest of the routing looks; `leaves_the_body` beside a `trap` is the
+    escalation that ends the body, and beside nothing at all it is the ordinary unhandled error that
+    5.1 reports and steps over.
+    &#34;&#34;&#34;
+    handlers: tuple[Ps1CatchClause | Ps1TrapStatement, ...]
+    leaves_the_body: bool</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach"><code class="flex name class">
+<span>class <span class="ident">Ps1FaultReach</span></span>
+<span>(</span><span>control_flow)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The fault routing of one script, read off its control-flow graphs.</p>
+<p>Built over <code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code>: where an error goes is decided
+by the graph the builder already wired, so this needs no semantic model, no call graph and no
+world. It is a view rather than a solver — every answer is one walk over the exceptional edges,
+memoized per node for the life of the model, and the model itself is discarded whenever the tree
+moves. The trap-removal transpose reads one further graph — the same script at the sub-statement
+granularity <code><a title="refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model" href="cfg.html#refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model">build_control_flow_model()</a></code> draws with
+<code>descend</code>, built here from this reader's own root on first demand — so that a soft error stepping
+over inside a <code>$( )</code> or <code>@( )</code> is a path it can read. It builds that itself rather than taking it
+from a caller, so no caller can hand it a reader that silently cannot see the step-over and
+removes a load-bearing trap.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L469-L953" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1FaultReach:
+    &#34;&#34;&#34;
+    The fault routing of one script, read off its control-flow graphs.
+
+    Built over `refinery.lib.scripts.analysis.cfg.ControlFlowModel`: where an error goes is decided
+    by the graph the builder already wired, so this needs no semantic model, no call graph and no
+    world. It is a view rather than a solver — every answer is one walk over the exceptional edges,
+    memoized per node for the life of the model, and the model itself is discarded whenever the tree
+    moves. The trap-removal transpose reads one further graph — the same script at the sub-statement
+    granularity `refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model` draws with
+    `descend`, built here from this reader&#39;s own root on first demand — so that a soft error stepping
+    over inside a `$( )` or `@( )` is a path it can read. It builds that itself rather than taking it
+    from a caller, so no caller can hand it a reader that silently cannot see the step-over and
+    removes a load-bearing trap.
+    &#34;&#34;&#34;
+
+    def __init__(self, control_flow: ControlFlowModel):
+        self._control_flow = control_flow
+        self._fine: ControlFlowModel | None = None
+        self._descendable: bool | None = None
+        self._forward: dict[int, Ps1FaultRouting] = {}
+        self._backward: dict[int, bool] = {}
+        self._handled: set[int] | None = None
+        self._ending: dict[int, bool] = {}
+        self._stopping: bool | None = None
+        self._strict: bool | None = None
+        self._strict_v2: bool | None = None
+
+    def routing_at(self, node: Node) -&gt; Ps1FaultRouting | None:
+        &#34;&#34;&#34;
+        Where an error raised at *node* may go, or `None` when the graphs place *node* nowhere —
+        a body they do not descend into, or an expression evaluated at no point they model.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return UNPLACED
+        return self._routing(*located)
+
+    def points_in(self, node: Node) -&gt; Iterator[Node]:
+        &#34;&#34;&#34;
+        The points inside *node* at which the graphs say something is evaluated, *node* itself
+        included where it is one.
+
+        Deleting a construct deletes everything it holds, so the errors it stops raising are its
+        body&#39;s as well as its own — and each is at a position of its own, since a `try` nested in it
+        routes its body&#39;s errors to its own `catch`. What the graphs place is exactly the list of
+        such positions, which is why it is read off them rather than guessed from the node types: a
+        `for` loop is three points and a body, an `if` is one point per test, and neither construct
+        has a node standing for the statement as a whole.
+
+        A construct that yields nothing at all is one the graphs model nowhere, and a caller reads
+        that as a subtree it cannot judge rather than as one that raises nothing.
+        &#34;&#34;&#34;
+        for inner in node.walk():
+            if self._control_flow.node_of(inner) is not None:
+                yield inner
+
+    def escapes_the_body(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *node* gets past every handler written in the body *node* stands
+        in, so that where it goes next is decided by whatever ran that body and not by anything the
+        body itself says.
+
+        A position the graphs place nowhere settles nothing and escapes nothing; `False` is the
+        answer that leaves such a node to the position question, which reads an unplaced node as
+        observed.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return False
+        routing = self._routing(*located)
+        return not _handled_in_the_body(routing) and _escapes(routing)
+
+    def observed_at(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *node* changes which code runs: some handler it reaches acts, a
+        `trap` set may decline it and end the body, or the graphs place *node* nowhere.
+
+        This is the question about the **position** and not about the statement standing there —
+        it answers the same for a statement that cannot raise at all, which is what a caller
+        weighing whether a guarded body may be emptied wants to know.
+
+        What the body itself decides is `_handled_in_the_body`; what is left over once the error
+        gets past it is this.
+
+        **An error that gets past a function&#39;s own handlers is the caller&#39;s**, and no graph here
+        holds both ends of a call. Measured: the same function whose error is reported and stepped
+        over when called at script scope abandons its remaining statements and runs the `catch` of a
+        `try` written around the *call*, however many bodies deep the raise is. So a raise in a body
+        something may call is refused wherever the script holds a handler that acts — and granted
+        where it holds none, since a `catch` that is not written cannot be the one guarding the
+        call.
+
+        **A terminating error that escapes the script scope ends the run**, so deleting its raise
+        would start the tail that never ran. `_reading_is_observed` reads a raise escaping to the
+        script owner as unobserved — right for the statement-terminating errors 5.1 reports and steps
+        over, wrong for the terminating ones. So when the error gets past the body unhandled and
+        `_terminates` names the raise fatal, it is observed. This is the forward reading of the same
+        termination the transpose `_removal_matters` already weighs.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return True
+        graph, start = located
+        routing = self._routing(graph, start)
+        if self._reading_is_observed(graph, routing):
+            return True
+        return _escapes(routing) and self._terminates(node)
+
+    def _reading_is_observed(self, graph: ControlFlowGraph, routing: Ps1FaultRouting) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error routed like *routing* out of *graph* changes what runs. The one reading of
+        a routing there is, so that the position question, the arrival question `_observed_from`
+        asks of a fallback, and anything later that reads a routing cannot answer it three ways.
+        &#34;&#34;&#34;
+        if _handled_in_the_body(routing):
+            return True
+        if not _escapes(routing):
+            return False
+        return not isinstance(graph.owner, Ps1Script) and self._handled_elsewhere(graph)
+
+    def _handled_elsewhere(self, body: ControlFlowGraph) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script writes a handler that acts in some body other than *body*. What guards
+        a call is unknowable from the called body&#39;s graph, and this is what settles it in the
+        direction of a grant: a handler written in the very body that raises is one the error has
+        already got past, and a script with none anywhere else has no call site the raise could
+        matter at.
+
+        A named block is not a body of its own here, which is why the comparison is per graph: a
+        `trap` in `begin` and a raise in `process` share one script block, and neither guards the
+        other.
+        &#34;&#34;&#34;
+        if self._handled is None:
+            self._handled = {
+                id(graph)
+                for graph in self._control_flow.graphs.values()
+                if any(
+                    isinstance(node.element, (Ps1CatchClause, Ps1TrapStatement))
+                    and handler_acts(node.element)
+                    for node in graph.nodes
+                )
+            }
+        return bool(self._handled - {id(body)})
+
+    def leaves_the_body(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *node* may get past every handler of the body it is in, so that
+        where it goes next is a question about the caller. `True` for a node the graphs cannot
+        place, which is the same answer for the same reason.
+        &#34;&#34;&#34;
+        routing = self.routing_at(node)
+        return routing is None or routing.leaves_the_body
+
+    def removing_a_handler_is_observed(self, handler: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether deleting *handler* may change which code runs — the transpose, and the question
+        asked before a `trap` is deleted.
+
+        A `trap` cannot itself raise, so the forward question answers nothing about removing one:
+        what changes is where the errors of *other* statements go. Two things have to be true for
+        that to matter, and asking only one gets it wrong in either direction.
+
+        **Something has to still reach it.** Walking the exceptional edges backwards from the
+        handler&#39;s own node finds exactly the statements whose errors it may be offered, and a
+        handler nothing reaches is one whose deletion re-routes nothing — which is how a `trap` left
+        behind by the removal of the only raise in its block becomes removable in turn. The walk
+        crosses other handlers, because a `catch` that misses hands the error on and the statement
+        that raised it is behind that clause rather than at it.
+
+        **What the handler itself emits is deliberately not asked here**, and it is a hole: a body
+        that writes runs exactly when the handler is offered an error, so `trap { &#39;h&#39; }` beside a
+        raise puts `h` on the output stream where an unhandled error writes only its record — and
+        this reports it removable. Asking `handler_acts` of the handler under test closes it and
+        costs the injected-noise shape `refinery.lib.scripts.ps1.deobfuscation.deadcode`
+        deliberately drops, because `_raisers` counts every statement the block offers rather than
+        every statement that may raise. The two are one question and it is not settled here.
+
+        **And what it would fall back to has to act.** Deleting a handler sends its errors to
+        whatever the graph records as its fallback, so the question is asked again there: an empty
+        `catch` beside it swallows exactly as it did, and a `trap` at script scope with nothing
+        outside it lets an error be reported and stepped over, which is what an unhandled error
+        already did. A fallback the graph does not record is refused, because a handler whose
+        counterfactual is unknown is one whose removal cannot be judged.
+
+        **A `trap` set that may decline is load bearing for declining**, not only for handling. It
+        is what turns an error 5.1 would report and step over into one that ends the body, so
+        deleting it starts running everything written after the raise:
+
+            trap [System.IO.IOException] { }
+
+        guards nothing and is still the whole reason a script stops where it does.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(handler)
+        if located is None:
+            return True
+        graph, start = located
+        if start.element is not handler:
+            # The climb left the handler behind, so the node this would answer about stands for the
+            # statement around it and every question below reads the wrong element.
+            return True
+        remembered = self._backward.get(id(start))
+        if remembered is None:
+            remembered = self._backward[id(start)] = self._removal_matters(graph, start)
+        return remembered
+
+    def _removal_matters(self, graph: ControlFlowGraph, start: CfgNode) -&gt; bool:
+        raisers = self._raisers(graph, start)
+        if not raisers:
+            return False
+        if any(self._terminates(raiser) for raiser in raisers):
+            return True
+        element = start.element
+        routing = self._routing(graph, start)
+        if isinstance(element, Ps1TrapStatement) and routing.leaves_the_body:
+            return True
+        if any(handler_acts(handler) for handler in routing.handlers):
+            return True
+        if isinstance(element, Ps1TrapStatement) and self._soft_step_over_is_observed(element):
+            return True
+        fallback = graph.fallback_of(start)
+        if fallback is None:
+            return True
+        return self._observed_from(graph, fallback)
+
+    def _fine_model(self) -&gt; ControlFlowModel | None:
+        &#34;&#34;&#34;
+        The finer control-flow graph the trap-removal transpose reads, built once on first demand
+        from this reader&#39;s own root — the same tree the coarse model was built over, redrawn with
+        `descend`. `None` only where the graphs place no script at all (an empty model), which reaches
+        no trap to weigh. Building it here rather than taking it from a caller is what removes the
+        blind reader: there is no way to construct one that cannot see the step-over.
+        &#34;&#34;&#34;
+        if self._fine is None:
+            root = self._script
+            if isinstance(root, Ps1Script):
+                self._fine = build_control_flow_model(root, descend=True)
+        return self._fine
+
+    def _has_a_descendable_soft_source(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the script writes a soft-error source inside a `STATEMENT_LIST_EXPRESSIONS` construct
+        anywhere. A soft raiser standing at statement level steps over to the same statement a
+        resuming `trap` lands on, so it never makes the trap load bearing; only one inside such a
+        construct has a local step-over that differs from where the trap resumes. The finer graph is
+        therefore worth building only where this holds, which the common `trap { continue }` over a
+        bare cast or division does not — read before `_fine_model` so that shape pays for no second
+        whole-script graph.
+        &#34;&#34;&#34;
+        if self._descendable is None:
+            root = self._script
+            self._descendable = root is not None and any(
+                is_soft_error_source(statement)
+                for node in root.walk()
+                if isinstance(node, STATEMENT_LIST_EXPRESSIONS)
+                for statement in node.body
+            )
+        return self._descendable
+
+    def _soft_step_over_is_observed(self, handler: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether removing a resuming `trap` changes what runs because it catches a
+        statement-terminating error whose local step-over differs from where the trap resumes.
+
+        A failed cast inside `$( )` steps over to the next statement *within* the subexpression, and
+        the subexpression then yields that value; the trap instead resumes past the whole statement
+        the `$( )` sits in. Where those two land differently the trap is load-bearing, and the coarse
+        graph cannot tell them apart because the whole statement is one node there. Read on the finer
+        graph, the raiser has both edges: a `NORMAL` one to its local step-over and a
+        `RESUMPTION_FORWARD` one to the slot the trap resumes at. Existential over the soft raisers
+        the handler catches, because one redirected raiser is enough to keep the trap; equal
+        successors share all downstream behaviour, so this only ever keeps a trap — never removes a
+        load-bearing one — which is the sound direction for a may-analysis.
+        &#34;&#34;&#34;
+        if not self._has_a_descendable_soft_source():
+            return False
+        fine = self._fine_model()
+        if fine is None:
+            return False
+        located = fine.locate(handler)
+        if located is None or located[1].element is not handler:
+            return False
+        graph, start = located
+        for raiser in self._exceptional_closure(graph, start, forward=False):
+            element = raiser.element
+            if element is None or not is_soft_error_source(element):
+                continue
+            local = _normal_successors(graph, raiser)
+            slot = _resumption_slot(graph, raiser)
+            resumed = _normal_successors(graph, slot) if slot is not None else frozenset()
+            if local != resumed:
+                return True
+        return False
+
+    def _observed_from(self, graph: ControlFlowGraph, arrival: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error arriving at *arrival* changes what runs: *arrival* is a handler that acts,
+        or the routing onward from it is one `_reading_is_observed` calls observable — including the
+        body boundary, because an error that gets past *arrival* is the caller&#39;s exactly as one
+        raised at a position is.
+        &#34;&#34;&#34;
+        element = arrival.element
+        if isinstance(element, (Ps1CatchClause, Ps1TrapStatement)) and handler_acts(element):
+            return True
+        return self._reading_is_observed(graph, self._routing(graph, arrival))
+
+    def _routing(self, graph: ControlFlowGraph, start: CfgNode) -&gt; Ps1FaultRouting:
+        &#34;&#34;&#34;
+        The routing out of *start*, remembered for the life of this model. Every reader goes through
+        here so that a node&#39;s closure is walked once however many questions are asked about it.
+        &#34;&#34;&#34;
+        remembered = self._forward.get(id(start))
+        if remembered is None:
+            remembered = self._forward[id(start)] = self._route(graph, start)
+        return remembered
+
+    def _route(self, graph: ControlFlowGraph, start: CfgNode) -&gt; Ps1FaultRouting:
+        handlers: list[Ps1CatchClause | Ps1TrapStatement] = []
+        leaves = False
+        for node in self._exceptional_closure(graph, start, forward=True):
+            if node is graph.exit:
+                leaves = True
+            elif isinstance(node.element, (Ps1CatchClause, Ps1TrapStatement)):
+                handlers.append(node.element)
+        return Ps1FaultRouting(tuple(handlers), leaves)
+
+    def _raisers(self, graph: ControlFlowGraph, start: CfgNode) -&gt; list[Node]:
+        &#34;&#34;&#34;
+        The statements whose errors *start* may be offered, which is the backward walk over the
+        exceptional edges. They are reported rather than counted, because what would become of an
+        error if this handler were gone is a question about the statement that raises it.
+        &#34;&#34;&#34;
+        return [
+            node.element
+            for node in self._exceptional_closure(graph, start, forward=False)
+            if node.element is not None
+            and not isinstance(node.element, (Ps1CatchClause, Ps1TrapStatement))
+        ]
+
+    def _ends_the_script(self, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        `ends_the_script` for *element*, remembered for the life of this model. Every handler judged
+        against the same block is offered the same statements, so the subtree behind each one is
+        read once however many removals ask about it.
+        &#34;&#34;&#34;
+        remembered = self._ending.get(id(element))
+        if remembered is None:
+            remembered = self._ending[id(element)] = ends_the_script(element)
+        return remembered
+
+    def _terminates(self, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether an error raised at *element* ends the run rather than being reported and stepped
+        over: the script writes `Stop` to `$ErrorActionPreference` anywhere, or the raise is one of
+        the terminating shapes `_ends_the_script` names. The one predicate the position question and
+        the transpose both read, so a raise the trap-removal side reads as script-ending is read the
+        same way on the path that weighs deleting the raise itself.
+        &#34;&#34;&#34;
+        return self._stops_on_every_error() or self._ends_the_script(element)
+
+    @property
+    def _script(self) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The tree the graphs were built over, read off a graph&#39;s owner rather than taken as an
+        argument: a graph owner is a node of that tree, and a whole-script fact has to be asked of
+        the whole script rather than of the statements the graphs happen to place.
+        &#34;&#34;&#34;
+        for graph in self._control_flow.graphs.values():
+            return tree_root(graph.owner)
+        return None
+
+    def _stops_on_every_error(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script writes `Stop` to `$ErrorActionPreference` anywhere at all, which makes
+        every error a command reports a terminating one.
+
+        Position is deliberately not asked. The preference is a variable of the session rather than
+        of a block, so a write in one body governs a raise in another and a write inside a branch
+        governs everything that runs after it; a script that arms it at all is therefore read as
+        arming it throughout. That direction keeps handlers, and what it costs — junk `trap` beside
+        a script that arms `Stop` — is a shape an obfuscator has no reason to emit.
+
+        The tree is read rather than the graphs. What the graphs place is statements, and their
+        elements nest, so a walk per placed element reads an inner subtree once per level of
+        nesting around it and still misses what stands at no point they model — a `param` block
+        default among it.
+        &#34;&#34;&#34;
+        if self._stopping is None:
+            root = self._script
+            self._stopping = root is not None and any(
+                _writes_stop_to_the_preference(node) for node in root.walk()
+            )
+        return self._stopping
+
+    def strict_mode_may_be_in_force(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script may arm strict mode anywhere at all, which makes reading a variable that
+        was never set an error instead of a `$null`.
+
+        Two consumers, both reading it as the one model of whether the script arms strict mode.
+        `refinery.lib.scripts.ps1.analysis.effects.expression_cannot_fault` is the single place
+        deciding whether a bare variable read can raise before a removal site deletes it;
+        `refinery.lib.scripts.ps1.deobfuscation.constants.Ps1NullVariableInlining` stands its whole
+        pass down where this holds, because a never-assigned read it would rewrite to `$null` is a
+        terminating error under strict mode and the value would decide a branch the script never
+        reaches. Measured on 5.1: under the default semantics `$unset | ForEach-Object { [void]$_ }`
+        writes nothing and the script runs on, so removing it is invisible; under
+        `Set-StrictMode -Version 1` the same line raises a statement-terminating error that a
+        `catch` and a `trap` both take, so removing it is exactly what
+        `refinery.lib.scripts.ps1.analysis.effects.fault_is_observed` exists to refuse.
+
+        Position is not asked, and the reason is not the one `_stops_on_every_error` gives. Which
+        scopes an arming covers is not one rule: `Set-StrictMode` writes the scope it stands in and
+        `Set-PSDebug -Strict` writes the global one, so the first arms nothing outside the function
+        it is written in and the second arms everything that runs anywhere afterwards. Reading the
+        whole script is what covers both without deciding which was meant. `Set-StrictMode -Off` is
+        not distinguished from an arming either, since reading the argument buys back only the
+        recall of a script that turns strict mode off again.
+
+        **What this cannot see is an arming that is not in the script.** Strict mode is resolved by
+        walking the scope chain to the global scope, so a script dot-sourced from a session that
+        armed it — a profile, a stage-1 loader, an analyst&#39;s console — runs strict while spelling
+        nothing. Nothing readable says whether that happened, so the grant this feeds assumes the
+        entry scope runs the default semantics, the way
+        `refinery.lib.scripts.ps1.analysis.worldflow` assumes a leak does not re-run the statements
+        above it. A fragment carved out of a larger script is the case where the assumption is worth
+        doubting.
+
+        **The empty pole is the opposite of the sibling&#39;s, and it is why this is not a copy of it.**
+        `_stops_on_every_error` answers `False` where the graphs place no script, which is safe
+        because a missed arming there only keeps a handler. This one grants a *removal*, so a script
+        the graphs hold nothing of has to refuse it rather than read as running under the lax
+        default.
+        &#34;&#34;&#34;
+        if self._strict is None:
+            root = self._script
+            self._strict = root is None or any(
+                _arms_strict_mode(node) for node in root.walk()
+            )
+        return self._strict
+
+    def strict_mode_v2_may_be_in_force(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script may arm strict mode at version 2 or above, under which the `Count` and
+        `Length` the object adapter fakes onto a scalar or `$null` raise `PropertyNotFoundStrict`
+        rather than answering. Folding one of those to its value would stand a number where the
+        script terminated and decide a branch it never reaches, so the fold in
+        `refinery.lib.scripts.ps1.deobfuscation.folding` stands down where this holds and keeps the
+        real members — a `String`&#39;s own `Length`, an array&#39;s own `Count` — that read on regardless.
+
+        This is the version-sensitive sibling of `strict_mode_may_be_in_force`: that one refuses a
+        removal wherever any strict mode is armed, because reading an unset variable raises under
+        version 1 too, and so treats `Set-PSDebug -Strict` and every `-Version` alike. The fake
+        adapter members survive version 1, so this asks the narrower question, and everything the
+        two share — position not asked, an arming outside the script not seen, an empty script
+        refusing — is shared for the reasons written there.
+        &#34;&#34;&#34;
+        if self._strict_v2 is None:
+            root = self._script
+            self._strict_v2 = root is None or any(
+                _arms_strict_mode_v2(node) for node in root.walk()
+            )
+        return self._strict_v2
+
+    @staticmethod
+    def _exceptional_closure(
+        graph: ControlFlowGraph, start: CfgNode, *, forward: bool,
+    ) -&gt; Iterator[CfgNode]:
+        &#34;&#34;&#34;
+        The nodes reachable from *start* over exceptional edges alone, in either direction, without
+        *start* itself. One sweep rather than a walk per edge kind: the graph marks an edge by the
+        pair of nodes it joins, so the direction decides only which end of the pair the walk holds.
+        &#34;&#34;&#34;
+        seen = {id(start)}
+        stack = [start]
+        while stack:
+            current = stack.pop()
+            adjacent = current.successors if forward else current.predecessors
+            for node in adjacent:
+                edge = (current, node) if forward else (node, current)
+                if not graph.is_exceptional(*edge) or id(node) in seen:
+                    continue
+                seen.add(id(node))
+                yield node
+                stack.append(node)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.routing_at"><code class="name flex">
+<span>def <span class="ident">routing_at</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Where an error raised at <em>node</em> may go, or <code>None</code> when the graphs place <em>node</em> nowhere —
+a body they do not descend into, or an expression evaluated at no point they model.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L497-L505" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def routing_at(self, node: Node) -&gt; Ps1FaultRouting | None:
+    &#34;&#34;&#34;
+    Where an error raised at *node* may go, or `None` when the graphs place *node* nowhere —
+    a body they do not descend into, or an expression evaluated at no point they model.
+    &#34;&#34;&#34;
+    located = self._control_flow.locate(node)
+    if located is None:
+        return UNPLACED
+    return self._routing(*located)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.points_in"><code class="name flex">
+<span>def <span class="ident">points_in</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The points inside <em>node</em> at which the graphs say something is evaluated, <em>node</em> itself
+included where it is one.</p>
+<p>Deleting a construct deletes everything it holds, so the errors it stops raising are its
+body's as well as its own — and each is at a position of its own, since a <code>try</code> nested in it
+routes its body's errors to its own <code>catch</code>. What the graphs place is exactly the list of
+such positions, which is why it is read off them rather than guessed from the node types: a
+<code>for</code> loop is three points and a body, an <code>if</code> is one point per test, and neither construct
+has a node standing for the statement as a whole.</p>
+<p>A construct that yields nothing at all is one the graphs model nowhere, and a caller reads
+that as a subtree it cannot judge rather than as one that raises nothing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L507-L524" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def points_in(self, node: Node) -&gt; Iterator[Node]:
+    &#34;&#34;&#34;
+    The points inside *node* at which the graphs say something is evaluated, *node* itself
+    included where it is one.
+
+    Deleting a construct deletes everything it holds, so the errors it stops raising are its
+    body&#39;s as well as its own — and each is at a position of its own, since a `try` nested in it
+    routes its body&#39;s errors to its own `catch`. What the graphs place is exactly the list of
+    such positions, which is why it is read off them rather than guessed from the node types: a
+    `for` loop is three points and a body, an `if` is one point per test, and neither construct
+    has a node standing for the statement as a whole.
+
+    A construct that yields nothing at all is one the graphs model nowhere, and a caller reads
+    that as a subtree it cannot judge rather than as one that raises nothing.
+    &#34;&#34;&#34;
+    for inner in node.walk():
+        if self._control_flow.node_of(inner) is not None:
+            yield inner</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.escapes_the_body"><code class="name flex">
+<span>def <span class="ident">escapes_the_body</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether an error raised at <em>node</em> gets past every handler written in the body <em>node</em> stands
+in, so that where it goes next is decided by whatever ran that body and not by anything the
+body itself says.</p>
+<p>A position the graphs place nowhere settles nothing and escapes nothing; <code>False</code> is the
+answer that leaves such a node to the position question, which reads an unplaced node as
+observed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L526-L540" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def escapes_the_body(self, node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an error raised at *node* gets past every handler written in the body *node* stands
+    in, so that where it goes next is decided by whatever ran that body and not by anything the
+    body itself says.
+
+    A position the graphs place nowhere settles nothing and escapes nothing; `False` is the
+    answer that leaves such a node to the position question, which reads an unplaced node as
+    observed.
+    &#34;&#34;&#34;
+    located = self._control_flow.locate(node)
+    if located is None:
+        return False
+    routing = self._routing(*located)
+    return not _handled_in_the_body(routing) and _escapes(routing)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.observed_at"><code class="name flex">
+<span>def <span class="ident">observed_at</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether an error raised at <em>node</em> changes which code runs: some handler it reaches acts, a
+<code>trap</code> set may decline it and end the body, or the graphs place <em>node</em> nowhere.</p>
+<p>This is the question about the <strong>position</strong> and not about the statement standing there —
+it answers the same for a statement that cannot raise at all, which is what a caller
+weighing whether a guarded body may be emptied wants to know.</p>
+<p>What the body itself decides is <code>_handled_in_the_body</code>; what is left over once the error
+gets past it is this.</p>
+<p><strong>An error that gets past a function's own handlers is the caller's</strong>, and no graph here
+holds both ends of a call. Measured: the same function whose error is reported and stepped
+over when called at script scope abandons its remaining statements and runs the <code>catch</code> of a
+<code>try</code> written around the <em>call</em>, however many bodies deep the raise is. So a raise in a body
+something may call is refused wherever the script holds a handler that acts — and granted
+where it holds none, since a <code>catch</code> that is not written cannot be the one guarding the
+call.</p>
+<p><strong>A terminating error that escapes the script scope ends the run</strong>, so deleting its raise
+would start the tail that never ran. <code>_reading_is_observed</code> reads a raise escaping to the
+script owner as unobserved — right for the statement-terminating errors 5.1 reports and steps
+over, wrong for the terminating ones. So when the error gets past the body unhandled and
+<code>_terminates</code> names the raise fatal, it is observed. This is the forward reading of the same
+termination the transpose <code>_removal_matters</code> already weighs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L542-L576" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def observed_at(self, node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an error raised at *node* changes which code runs: some handler it reaches acts, a
+    `trap` set may decline it and end the body, or the graphs place *node* nowhere.
+
+    This is the question about the **position** and not about the statement standing there —
+    it answers the same for a statement that cannot raise at all, which is what a caller
+    weighing whether a guarded body may be emptied wants to know.
+
+    What the body itself decides is `_handled_in_the_body`; what is left over once the error
+    gets past it is this.
+
+    **An error that gets past a function&#39;s own handlers is the caller&#39;s**, and no graph here
+    holds both ends of a call. Measured: the same function whose error is reported and stepped
+    over when called at script scope abandons its remaining statements and runs the `catch` of a
+    `try` written around the *call*, however many bodies deep the raise is. So a raise in a body
+    something may call is refused wherever the script holds a handler that acts — and granted
+    where it holds none, since a `catch` that is not written cannot be the one guarding the
+    call.
+
+    **A terminating error that escapes the script scope ends the run**, so deleting its raise
+    would start the tail that never ran. `_reading_is_observed` reads a raise escaping to the
+    script owner as unobserved — right for the statement-terminating errors 5.1 reports and steps
+    over, wrong for the terminating ones. So when the error gets past the body unhandled and
+    `_terminates` names the raise fatal, it is observed. This is the forward reading of the same
+    termination the transpose `_removal_matters` already weighs.
+    &#34;&#34;&#34;
+    located = self._control_flow.locate(node)
+    if located is None:
+        return True
+    graph, start = located
+    routing = self._routing(graph, start)
+    if self._reading_is_observed(graph, routing):
+        return True
+    return _escapes(routing) and self._terminates(node)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.leaves_the_body"><code class="name flex">
+<span>def <span class="ident">leaves_the_body</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether an error raised at <em>node</em> may get past every handler of the body it is in, so that
+where it goes next is a question about the caller. <code>True</code> for a node the graphs cannot
+place, which is the same answer for the same reason.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L614-L621" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def leaves_the_body(self, node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an error raised at *node* may get past every handler of the body it is in, so that
+    where it goes next is a question about the caller. `True` for a node the graphs cannot
+    place, which is the same answer for the same reason.
+    &#34;&#34;&#34;
+    routing = self.routing_at(node)
+    return routing is None or routing.leaves_the_body</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.removing_a_handler_is_observed"><code class="name flex">
+<span>def <span class="ident">removing_a_handler_is_observed</span></span>(<span>self, handler)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether deleting <em>handler</em> may change which code runs — the transpose, and the question
+asked before a <code>trap</code> is deleted.</p>
+<p>A <code>trap</code> cannot itself raise, so the forward question answers nothing about removing one:
+what changes is where the errors of <em>other</em> statements go. Two things have to be true for
+that to matter, and asking only one gets it wrong in either direction.</p>
+<p><strong>Something has to still reach it.</strong> Walking the exceptional edges backwards from the
+handler's own node finds exactly the statements whose errors it may be offered, and a
+handler nothing reaches is one whose deletion re-routes nothing — which is how a <code>trap</code> left
+behind by the removal of the only raise in its block becomes removable in turn. The walk
+crosses other handlers, because a <code>catch</code> that misses hands the error on and the statement
+that raised it is behind that clause rather than at it.</p>
+<p><strong>What the handler itself emits is deliberately not asked here</strong>, and it is a hole: a body
+that writes runs exactly when the handler is offered an error, so <code>trap { 'h' }</code> beside a
+raise puts <code>h</code> on the output stream where an unhandled error writes only its record — and
+this reports it removable. Asking <code><a title="refinery.lib.scripts.ps1.analysis.faults.handler_acts" href="#refinery.lib.scripts.ps1.analysis.faults.handler_acts">handler_acts()</a></code> of the handler under test closes it and
+costs the injected-noise shape <code><a title="refinery.lib.scripts.ps1.deobfuscation.deadcode" href="../deobfuscation/deadcode.html">refinery.lib.scripts.ps1.deobfuscation.deadcode</a></code>
+deliberately drops, because <code>_raisers</code> counts every statement the block offers rather than
+every statement that may raise. The two are one question and it is not settled here.</p>
+<p><strong>And what it would fall back to has to act.</strong> Deleting a handler sends its errors to
+whatever the graph records as its fallback, so the question is asked again there: an empty
+<code>catch</code> beside it swallows exactly as it did, and a <code>trap</code> at script scope with nothing
+outside it lets an error be reported and stepped over, which is what an unhandled error
+already did. A fallback the graph does not record is refused, because a handler whose
+counterfactual is unknown is one whose removal cannot be judged.</p>
+<p><strong>A <code>trap</code> set that may decline is load bearing for declining</strong>, not only for handling. It
+is what turns an error 5.1 would report and step over into one that ends the body, so
+deleting it starts running everything written after the raise:</p>
+<pre><code>trap [System.IO.IOException] { }
+</code></pre>
+<p>guards nothing and is still the whole reason a script stops where it does.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L623-L673" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def removing_a_handler_is_observed(self, handler: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether deleting *handler* may change which code runs — the transpose, and the question
+    asked before a `trap` is deleted.
+
+    A `trap` cannot itself raise, so the forward question answers nothing about removing one:
+    what changes is where the errors of *other* statements go. Two things have to be true for
+    that to matter, and asking only one gets it wrong in either direction.
+
+    **Something has to still reach it.** Walking the exceptional edges backwards from the
+    handler&#39;s own node finds exactly the statements whose errors it may be offered, and a
+    handler nothing reaches is one whose deletion re-routes nothing — which is how a `trap` left
+    behind by the removal of the only raise in its block becomes removable in turn. The walk
+    crosses other handlers, because a `catch` that misses hands the error on and the statement
+    that raised it is behind that clause rather than at it.
+
+    **What the handler itself emits is deliberately not asked here**, and it is a hole: a body
+    that writes runs exactly when the handler is offered an error, so `trap { &#39;h&#39; }` beside a
+    raise puts `h` on the output stream where an unhandled error writes only its record — and
+    this reports it removable. Asking `handler_acts` of the handler under test closes it and
+    costs the injected-noise shape `refinery.lib.scripts.ps1.deobfuscation.deadcode`
+    deliberately drops, because `_raisers` counts every statement the block offers rather than
+    every statement that may raise. The two are one question and it is not settled here.
+
+    **And what it would fall back to has to act.** Deleting a handler sends its errors to
+    whatever the graph records as its fallback, so the question is asked again there: an empty
+    `catch` beside it swallows exactly as it did, and a `trap` at script scope with nothing
+    outside it lets an error be reported and stepped over, which is what an unhandled error
+    already did. A fallback the graph does not record is refused, because a handler whose
+    counterfactual is unknown is one whose removal cannot be judged.
+
+    **A `trap` set that may decline is load bearing for declining**, not only for handling. It
+    is what turns an error 5.1 would report and step over into one that ends the body, so
+    deleting it starts running everything written after the raise:
+
+        trap [System.IO.IOException] { }
+
+    guards nothing and is still the whole reason a script stops where it does.
+    &#34;&#34;&#34;
+    located = self._control_flow.locate(handler)
+    if located is None:
+        return True
+    graph, start = located
+    if start.element is not handler:
+        # The climb left the handler behind, so the node this would answer about stands for the
+        # statement around it and every question below reads the wrong element.
+        return True
+    remembered = self._backward.get(id(start))
+    if remembered is None:
+        remembered = self._backward[id(start)] = self._removal_matters(graph, start)
+    return remembered</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.strict_mode_may_be_in_force"><code class="name flex">
+<span>def <span class="ident">strict_mode_may_be_in_force</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether this script may arm strict mode anywhere at all, which makes reading a variable that
+was never set an error instead of a <code>$null</code>.</p>
+<p>Two consumers, both reading it as the one model of whether the script arms strict mode.
+<code><a title="refinery.lib.scripts.ps1.analysis.effects.expression_cannot_fault" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.expression_cannot_fault">expression_cannot_fault()</a></code> is the single place
+deciding whether a bare variable read can raise before a removal site deletes it;
+<code><a title="refinery.lib.scripts.ps1.deobfuscation.constants.Ps1NullVariableInlining" href="../deobfuscation/constants.html#refinery.lib.scripts.ps1.deobfuscation.constants.Ps1NullVariableInlining">Ps1NullVariableInlining</a></code> stands its whole
+pass down where this holds, because a never-assigned read it would rewrite to <code>$null</code> is a
+terminating error under strict mode and the value would decide a branch the script never
+reaches. Measured on 5.1: under the default semantics <code>$unset | ForEach-Object { [void]$_ }</code>
+writes nothing and the script runs on, so removing it is invisible; under
+<code>Set-StrictMode -Version 1</code> the same line raises a statement-terminating error that a
+<code>catch</code> and a <code>trap</code> both take, so removing it is exactly what
+<code><a title="refinery.lib.scripts.ps1.analysis.effects.fault_is_observed" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.fault_is_observed">fault_is_observed()</a></code> exists to refuse.</p>
+<p>Position is not asked, and the reason is not the one <code>_stops_on_every_error</code> gives. Which
+scopes an arming covers is not one rule: <code>Set-StrictMode</code> writes the scope it stands in and
+<code>Set-PSDebug -Strict</code> writes the global one, so the first arms nothing outside the function
+it is written in and the second arms everything that runs anywhere afterwards. Reading the
+whole script is what covers both without deciding which was meant. <code>Set-StrictMode -Off</code> is
+not distinguished from an arming either, since reading the argument buys back only the
+recall of a script that turns strict mode off again.</p>
+<p><strong>What this cannot see is an arming that is not in the script.</strong> Strict mode is resolved by
+walking the scope chain to the global scope, so a script dot-sourced from a session that
+armed it — a profile, a stage-1 loader, an analyst's console — runs strict while spelling
+nothing. Nothing readable says whether that happened, so the grant this feeds assumes the
+entry scope runs the default semantics, the way
+<code><a title="refinery.lib.scripts.ps1.analysis.worldflow" href="worldflow.html">refinery.lib.scripts.ps1.analysis.worldflow</a></code> assumes a leak does not re-run the statements
+above it. A fragment carved out of a larger script is the case where the assumption is worth
+doubting.</p>
+<p><strong>The empty pole is the opposite of the sibling's, and it is why this is not a copy of it.</strong>
+<code>_stops_on_every_error</code> answers <code>False</code> where the graphs place no script, which is safe
+because a missed arming there only keeps a handler. This one grants a <em>removal</em>, so a script
+the graphs hold nothing of has to refuse it rather than read as running under the lax
+default.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L863-L908" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def strict_mode_may_be_in_force(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether this script may arm strict mode anywhere at all, which makes reading a variable that
+    was never set an error instead of a `$null`.
+
+    Two consumers, both reading it as the one model of whether the script arms strict mode.
+    `refinery.lib.scripts.ps1.analysis.effects.expression_cannot_fault` is the single place
+    deciding whether a bare variable read can raise before a removal site deletes it;
+    `refinery.lib.scripts.ps1.deobfuscation.constants.Ps1NullVariableInlining` stands its whole
+    pass down where this holds, because a never-assigned read it would rewrite to `$null` is a
+    terminating error under strict mode and the value would decide a branch the script never
+    reaches. Measured on 5.1: under the default semantics `$unset | ForEach-Object { [void]$_ }`
+    writes nothing and the script runs on, so removing it is invisible; under
+    `Set-StrictMode -Version 1` the same line raises a statement-terminating error that a
+    `catch` and a `trap` both take, so removing it is exactly what
+    `refinery.lib.scripts.ps1.analysis.effects.fault_is_observed` exists to refuse.
+
+    Position is not asked, and the reason is not the one `_stops_on_every_error` gives. Which
+    scopes an arming covers is not one rule: `Set-StrictMode` writes the scope it stands in and
+    `Set-PSDebug -Strict` writes the global one, so the first arms nothing outside the function
+    it is written in and the second arms everything that runs anywhere afterwards. Reading the
+    whole script is what covers both without deciding which was meant. `Set-StrictMode -Off` is
+    not distinguished from an arming either, since reading the argument buys back only the
+    recall of a script that turns strict mode off again.
+
+    **What this cannot see is an arming that is not in the script.** Strict mode is resolved by
+    walking the scope chain to the global scope, so a script dot-sourced from a session that
+    armed it — a profile, a stage-1 loader, an analyst&#39;s console — runs strict while spelling
+    nothing. Nothing readable says whether that happened, so the grant this feeds assumes the
+    entry scope runs the default semantics, the way
+    `refinery.lib.scripts.ps1.analysis.worldflow` assumes a leak does not re-run the statements
+    above it. A fragment carved out of a larger script is the case where the assumption is worth
+    doubting.
+
+    **The empty pole is the opposite of the sibling&#39;s, and it is why this is not a copy of it.**
+    `_stops_on_every_error` answers `False` where the graphs place no script, which is safe
+    because a missed arming there only keeps a handler. This one grants a *removal*, so a script
+    the graphs hold nothing of has to refuse it rather than read as running under the lax
+    default.
+    &#34;&#34;&#34;
+    if self._strict is None:
+        root = self._script
+        self._strict = root is None or any(
+            _arms_strict_mode(node) for node in root.walk()
+        )
+    return self._strict</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.strict_mode_v2_may_be_in_force"><code class="name flex">
+<span>def <span class="ident">strict_mode_v2_may_be_in_force</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether this script may arm strict mode at version 2 or above, under which the <code>Count</code> and
+<code>Length</code> the object adapter fakes onto a scalar or <code>$null</code> raise <code>PropertyNotFoundStrict</code>
+rather than answering. Folding one of those to its value would stand a number where the
+script terminated and decide a branch it never reaches, so the fold in
+<code><a title="refinery.lib.scripts.ps1.deobfuscation.folding" href="../deobfuscation/folding.html">refinery.lib.scripts.ps1.deobfuscation.folding</a></code> stands down where this holds and keeps the
+real members — a <code>String</code>'s own <code>Length</code>, an array's own <code>Count</code> — that read on regardless.</p>
+<p>This is the version-sensitive sibling of <code>strict_mode_may_be_in_force</code>: that one refuses a
+removal wherever any strict mode is armed, because reading an unset variable raises under
+version 1 too, and so treats <code>Set-PSDebug -Strict</code> and every <code>-Version</code> alike. The fake
+adapter members survive version 1, so this asks the narrower question, and everything the
+two share — position not asked, an arming outside the script not seen, an empty script
+refusing — is shared for the reasons written there.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/faults.py#L910-L931" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def strict_mode_v2_may_be_in_force(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether this script may arm strict mode at version 2 or above, under which the `Count` and
+    `Length` the object adapter fakes onto a scalar or `$null` raise `PropertyNotFoundStrict`
+    rather than answering. Folding one of those to its value would stand a number where the
+    script terminated and decide a branch it never reaches, so the fold in
+    `refinery.lib.scripts.ps1.deobfuscation.folding` stands down where this holds and keeps the
+    real members — a `String`&#39;s own `Length`, an array&#39;s own `Count` — that read on regardless.
+
+    This is the version-sensitive sibling of `strict_mode_may_be_in_force`: that one refuses a
+    removal wherever any strict mode is armed, because reading an unset variable raises under
+    version 1 too, and so treats `Set-PSDebug -Strict` and every `-Version` alike. The fake
+    adapter members survive version 1, so this asks the narrower question, and everything the
+    two share — position not asked, an arming outside the script not seen, an empty script
+    refusing — is shared for the reasons written there.
+    &#34;&#34;&#34;
+    if self._strict_v2 is None:
+        root = self._script
+        self._strict_v2 = root is None or any(
+            _arms_strict_mode_v2(node) for node in root.walk()
+        )
+    return self._strict_v2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.UNPLACED" href="#refinery.lib.scripts.ps1.analysis.faults.UNPLACED">UNPLACED</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.a_stop_may_be_in_force" href="#refinery.lib.scripts.ps1.analysis.faults.a_stop_may_be_in_force">a_stop_may_be_in_force</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.ends_the_script" href="#refinery.lib.scripts.ps1.analysis.faults.ends_the_script">ends_the_script</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.handler_acts" href="#refinery.lib.scripts.ps1.analysis.faults.handler_acts">handler_acts</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.build_fault_reach" href="#refinery.lib.scripts.ps1.analysis.faults.build_fault_reach">build_fault_reach</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultRouting" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultRouting">Ps1FaultRouting</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach">Ps1FaultReach</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.routing_at" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.routing_at">routing_at</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.points_in" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.points_in">points_in</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.escapes_the_body" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.escapes_the_body">escapes_the_body</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.observed_at" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.observed_at">observed_at</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.leaves_the_body" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.leaves_the_body">leaves_the_body</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.removing_a_handler_is_observed" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.removing_a_handler_is_observed">removing_a_handler_is_observed</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.strict_mode_may_be_in_force" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.strict_mode_may_be_in_force">strict_mode_may_be_in_force</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.strict_mode_v2_may_be_in_force" href="#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach.strict_mode_v2_may_be_in_force">strict_mode_v2_may_be_in_force</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.analysis.reaching documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.analysis.reaching</code></h1>
+</header>
+<section id="section-intro">
+<p>The path-between query — does anything in a given set of control-flow nodes lie on a path from one
+node to another — and the definition selection built on it.</p>
+<p>This is what a reaching-value question reduces to once dominance has ordered the two ends. The value
+established at a definition still holds at a use when the definition runs first on every path — which
+is dominance — and nothing that could change it runs in between. "In between" is the intersection of
+what is reachable forward from the definition with what is reachable backward from the use, and a
+kill outside that intersection cannot be on any path joining them.</p>
+<p>What is a <em>kill</em> is entirely the caller's question and is not asked here: a language names the sites
+at which the thing it tracks may change, or says it cannot enumerate them. The graph half is this
+module's, and it is the same for every language.</p>
+<p><strong>Between is asked by reachability, never by position.</strong> A definition written after a use in the
+source still reaches it when a back edge carries control around, and one written before it may be
+re-executed by the same edge. Ordering the two by where they were typed answers both wrongly, and
+answers them wrongly in the direction that keeps a stale value.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/reaching.py#L1-L159" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The path-between query — does anything in a given set of control-flow nodes lie on a path from one
+node to another — and the definition selection built on it.
+
+This is what a reaching-value question reduces to once dominance has ordered the two ends. The value
+established at a definition still holds at a use when the definition runs first on every path — which
+is dominance — and nothing that could change it runs in between. &#34;In between&#34; is the intersection of
+what is reachable forward from the definition with what is reachable backward from the use, and a
+kill outside that intersection cannot be on any path joining them.
+
+What is a *kill* is entirely the caller&#39;s question and is not asked here: a language names the sites
+at which the thing it tracks may change, or says it cannot enumerate them. The graph half is this
+module&#39;s, and it is the same for every language.
+
+**Between is asked by reachability, never by position.** A definition written after a use in the
+source still reaches it when a back edge carries control around, and one written before it may be
+re-executed by the same edge. Ordering the two by where they were typed answers both wrongly, and
+answers them wrongly in the direction that keeps a stale value.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterable, Sequence, TypeVar
+
+from refinery.lib.scripts.analysis.cfg import CfgNode, ControlFlowGraph, Projection
+from refinery.lib.scripts.analysis.dominance import DominatorModel
+
+_D = TypeVar(&#39;_D&#39;)
+
+
+class ReachabilityQuery:
+    &#34;&#34;&#34;
+    Memoized forward and backward reachability over one `DominatorModel` under one
+    `refinery.lib.scripts.analysis.cfg.Projection`, the path-between question asked from them, and the
+    `reaching_definition` selection asked from that.
+
+    The memo is the reason this is an object rather than a function. One definition is asked against
+    many uses, so the forward set from the definition is computed once and reused; the graphs do not
+    change for as long as the model lives, so nothing invalidates it.
+
+    **The projection belongs to the instance and not to the call.** Every set this holds was computed
+    under one reading of the graph, and the memo is keyed by node and direction with no room for a
+    third dimension; a caller allowed to name a projection per call would be served whichever reading
+    happened to be computed first. A consumer wanting the other reading builds a query of its own,
+    which costs it its own memo and nothing else.
+    &#34;&#34;&#34;
+
+    def __init__(self, dominators: DominatorModel, projection: Projection):
+        self._dominators = dominators
+        self._projection = projection
+        self._reach: dict[tuple[int, bool], frozenset[int]] = {}
+
+    def reachable(self, node: CfgNode, *, forward: bool) -&gt; frozenset[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes reachable from *node* in the given direction, including *node*.
+
+        Frozen because it is the memo itself and not a copy of it: a caller that intersected or
+        discarded in place would corrupt the answer every later query against *node* receives.
+        &#34;&#34;&#34;
+        key = (id(node), forward)
+        cached = self._reach.get(key)
+        if cached is None:
+            cached = frozenset(self._dominators.reachable(
+                node, forward=forward, projection=self._projection))
+            self._reach[key] = cached
+        return cached
+
+    def any_between(
+        self,
+        graph: ControlFlowGraph,
+        source: CfgNode,
+        target: CfgNode,
+        candidates: Iterable[int],
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any node in *candidates* — given as node ids of *graph* — lies on some path from
+        *source* to *target*.
+
+        Asked as two walks rather than one path enumeration: a node lies between the two exactly when
+        it is reachable forward from *source* and *target* is reachable forward from it, and the
+        second half is the same as it being reachable backward from *target*. The forward set is
+        intersected first and the backward walk is skipped entirely when that comes back empty, which
+        is the common case for a caller whose candidate set is small.
+
+        Candidates stay *ids* rather than becoming nodes, which is why *graph* is asked for. Every
+        layer above builds these sets as ids and memoizes them that way, and a signature taking nodes
+        would be satisfied by whatever a caller could still name — quietly dropping the candidates it
+        had only ids for, which is the fail-open direction and one nothing would report.
+
+        **Under `Projection.FORWARD` the backward walk is not the transpose of the forward one**, and
+        a candidate the graph calls hub-bound counts as between as soon as it is reachable forward
+        from *source*. Such a candidate stands inside a handler body that resumes the block around
+        it; where the run carries on afterwards is exactly what the forward edges do not draw, so the
+        backward walk from *target* will not find it however certainly the real run passes through
+        it. Answering from the walk alone would say a binder written in a `trap` body does not lie
+        between a definition and a use it in fact rebinds.
+        &#34;&#34;&#34;
+        candidates = frozenset(candidates)
+        if not candidates:
+            return False
+        downstream = self.reachable(source, forward=True) &amp; candidates
+        if not downstream:
+            return False
+        if self._projection.declines_the_hub and downstream &amp; graph.hub_bound:
+            return True
+        return bool(downstream &amp; self.reachable(target, forward=False))
+
+    def reaching_definition(
+        self,
+        graph: ControlFlowGraph,
+        use: CfgNode,
+        definitions: Sequence[tuple[_D, CfgNode]],
+        kills: Iterable[int] = (),
+    ) -&gt; _D | None:
+        &#34;&#34;&#34;
+        The one definition among *definitions* whose value is observed at *use*, or `None` when no
+        single definition is.
+
+        *definitions* pairs each of the caller&#39;s own definition objects with the control-flow node
+        that evaluates it, and the caller&#39;s object is what comes back — the graph cannot say which of
+        several definitions sharing a node is meant, and does not have to. *kills* names further
+        nodes that may change the value without defining it, as ids.
+
+        A definition qualifies when it strictly dominates *use*: it runs first on every path there,
+        and does not merely share *use*&#39;s statement, which this granularity cannot order. Of those,
+        the *nearest* is the one every other qualifying definition dominates — they form a chain,
+        because the dominators of any node are the path from it to the root of the dominance tree —
+        and it is the only one whose value can survive, since each of the others is overwritten by
+        it. Two qualifying definitions sharing one node are refused before the scan, because nothing
+        orders them and the scan would return whichever the caller listed first.
+
+        **Every definition other than the chosen one is a kill, and the caller cannot opt out.** That
+        is what makes an earlier definition re-entered by a back edge, and a definition on a branch
+        that rejoins, both count against the answer. A caller that knows the language orders a
+        particular write after the read in the same statement leaves that write out of *definitions*
+        rather than being given a switch here, because the safe default has to be the one you get by
+        saying nothing.
+        &#34;&#34;&#34;
+        qualifying: list[tuple[_D, CfgNode]] = []
+        seen: set[int] = set()
+        for value, node in definitions:
+            if node is use or not self._dominators.dominates_node(
+                graph, node, use, self._projection
+            ):
+                continue
+            if id(node) in seen:
+                return None
+            seen.add(id(node))
+            qualifying.append((value, node))
+        if not qualifying:
+            return None
+        nearest, nearest_node = qualifying[0]
+        for value, node in qualifying[1:]:
+            if self._dominators.dominates_node(graph, nearest_node, node, self._projection):
+                nearest, nearest_node = value, node
+        blocking = {id(node) for _, node in definitions if node is not nearest_node}
+        blocking.update(kills)
+        if self.any_between(graph, nearest_node, use, blocking):
+            return None
+        return nearest</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.analysis.reaching.ReachabilityQuery"><code class="flex name class">
+<span>class <span class="ident">ReachabilityQuery</span></span>
+<span>(</span><span>dominators, projection)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Memoized forward and backward reachability over one <code>DominatorModel</code> under one
+<code><a title="refinery.lib.scripts.analysis.cfg.Projection" href="cfg.html#refinery.lib.scripts.analysis.cfg.Projection">Projection</a></code>, the path-between question asked from them, and the
+<code>reaching_definition</code> selection asked from that.</p>
+<p>The memo is the reason this is an object rather than a function. One definition is asked against
+many uses, so the forward set from the definition is computed once and reused; the graphs do not
+change for as long as the model lives, so nothing invalidates it.</p>
+<p><strong>The projection belongs to the instance and not to the call.</strong> Every set this holds was computed
+under one reading of the graph, and the memo is keyed by node and direction with no room for a
+third dimension; a caller allowed to name a projection per call would be served whichever reading
+happened to be computed first. A consumer wanting the other reading builds a query of its own,
+which costs it its own memo and nothing else.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/reaching.py#L30-L159" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ReachabilityQuery:
+    &#34;&#34;&#34;
+    Memoized forward and backward reachability over one `DominatorModel` under one
+    `refinery.lib.scripts.analysis.cfg.Projection`, the path-between question asked from them, and the
+    `reaching_definition` selection asked from that.
+
+    The memo is the reason this is an object rather than a function. One definition is asked against
+    many uses, so the forward set from the definition is computed once and reused; the graphs do not
+    change for as long as the model lives, so nothing invalidates it.
+
+    **The projection belongs to the instance and not to the call.** Every set this holds was computed
+    under one reading of the graph, and the memo is keyed by node and direction with no room for a
+    third dimension; a caller allowed to name a projection per call would be served whichever reading
+    happened to be computed first. A consumer wanting the other reading builds a query of its own,
+    which costs it its own memo and nothing else.
+    &#34;&#34;&#34;
+
+    def __init__(self, dominators: DominatorModel, projection: Projection):
+        self._dominators = dominators
+        self._projection = projection
+        self._reach: dict[tuple[int, bool], frozenset[int]] = {}
+
+    def reachable(self, node: CfgNode, *, forward: bool) -&gt; frozenset[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes reachable from *node* in the given direction, including *node*.
+
+        Frozen because it is the memo itself and not a copy of it: a caller that intersected or
+        discarded in place would corrupt the answer every later query against *node* receives.
+        &#34;&#34;&#34;
+        key = (id(node), forward)
+        cached = self._reach.get(key)
+        if cached is None:
+            cached = frozenset(self._dominators.reachable(
+                node, forward=forward, projection=self._projection))
+            self._reach[key] = cached
+        return cached
+
+    def any_between(
+        self,
+        graph: ControlFlowGraph,
+        source: CfgNode,
+        target: CfgNode,
+        candidates: Iterable[int],
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any node in *candidates* — given as node ids of *graph* — lies on some path from
+        *source* to *target*.
+
+        Asked as two walks rather than one path enumeration: a node lies between the two exactly when
+        it is reachable forward from *source* and *target* is reachable forward from it, and the
+        second half is the same as it being reachable backward from *target*. The forward set is
+        intersected first and the backward walk is skipped entirely when that comes back empty, which
+        is the common case for a caller whose candidate set is small.
+
+        Candidates stay *ids* rather than becoming nodes, which is why *graph* is asked for. Every
+        layer above builds these sets as ids and memoizes them that way, and a signature taking nodes
+        would be satisfied by whatever a caller could still name — quietly dropping the candidates it
+        had only ids for, which is the fail-open direction and one nothing would report.
+
+        **Under `Projection.FORWARD` the backward walk is not the transpose of the forward one**, and
+        a candidate the graph calls hub-bound counts as between as soon as it is reachable forward
+        from *source*. Such a candidate stands inside a handler body that resumes the block around
+        it; where the run carries on afterwards is exactly what the forward edges do not draw, so the
+        backward walk from *target* will not find it however certainly the real run passes through
+        it. Answering from the walk alone would say a binder written in a `trap` body does not lie
+        between a definition and a use it in fact rebinds.
+        &#34;&#34;&#34;
+        candidates = frozenset(candidates)
+        if not candidates:
+            return False
+        downstream = self.reachable(source, forward=True) &amp; candidates
+        if not downstream:
+            return False
+        if self._projection.declines_the_hub and downstream &amp; graph.hub_bound:
+            return True
+        return bool(downstream &amp; self.reachable(target, forward=False))
+
+    def reaching_definition(
+        self,
+        graph: ControlFlowGraph,
+        use: CfgNode,
+        definitions: Sequence[tuple[_D, CfgNode]],
+        kills: Iterable[int] = (),
+    ) -&gt; _D | None:
+        &#34;&#34;&#34;
+        The one definition among *definitions* whose value is observed at *use*, or `None` when no
+        single definition is.
+
+        *definitions* pairs each of the caller&#39;s own definition objects with the control-flow node
+        that evaluates it, and the caller&#39;s object is what comes back — the graph cannot say which of
+        several definitions sharing a node is meant, and does not have to. *kills* names further
+        nodes that may change the value without defining it, as ids.
+
+        A definition qualifies when it strictly dominates *use*: it runs first on every path there,
+        and does not merely share *use*&#39;s statement, which this granularity cannot order. Of those,
+        the *nearest* is the one every other qualifying definition dominates — they form a chain,
+        because the dominators of any node are the path from it to the root of the dominance tree —
+        and it is the only one whose value can survive, since each of the others is overwritten by
+        it. Two qualifying definitions sharing one node are refused before the scan, because nothing
+        orders them and the scan would return whichever the caller listed first.
+
+        **Every definition other than the chosen one is a kill, and the caller cannot opt out.** That
+        is what makes an earlier definition re-entered by a back edge, and a definition on a branch
+        that rejoins, both count against the answer. A caller that knows the language orders a
+        particular write after the read in the same statement leaves that write out of *definitions*
+        rather than being given a switch here, because the safe default has to be the one you get by
+        saying nothing.
+        &#34;&#34;&#34;
+        qualifying: list[tuple[_D, CfgNode]] = []
+        seen: set[int] = set()
+        for value, node in definitions:
+            if node is use or not self._dominators.dominates_node(
+                graph, node, use, self._projection
+            ):
+                continue
+            if id(node) in seen:
+                return None
+            seen.add(id(node))
+            qualifying.append((value, node))
+        if not qualifying:
+            return None
+        nearest, nearest_node = qualifying[0]
+        for value, node in qualifying[1:]:
+            if self._dominators.dominates_node(graph, nearest_node, node, self._projection):
+                nearest, nearest_node = value, node
+        blocking = {id(node) for _, node in definitions if node is not nearest_node}
+        blocking.update(kills)
+        if self.any_between(graph, nearest_node, use, blocking):
+            return None
+        return nearest</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.analysis.reaching.ReachabilityQuery.reachable"><code class="name flex">
+<span>def <span class="ident">reachable</span></span>(<span>self, node, *, forward)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The ids of the nodes reachable from <em>node</em> in the given direction, including <em>node</em>.</p>
+<p>Frozen because it is the memo itself and not a copy of it: a caller that intersected or
+discarded in place would corrupt the answer every later query against <em>node</em> receives.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/reaching.py#L52-L65" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reachable(self, node: CfgNode, *, forward: bool) -&gt; frozenset[int]:
+    &#34;&#34;&#34;
+    The ids of the nodes reachable from *node* in the given direction, including *node*.
+
+    Frozen because it is the memo itself and not a copy of it: a caller that intersected or
+    discarded in place would corrupt the answer every later query against *node* receives.
+    &#34;&#34;&#34;
+    key = (id(node), forward)
+    cached = self._reach.get(key)
+    if cached is None:
+        cached = frozenset(self._dominators.reachable(
+            node, forward=forward, projection=self._projection))
+        self._reach[key] = cached
+    return cached</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.reaching.ReachabilityQuery.any_between"><code class="name flex">
+<span>def <span class="ident">any_between</span></span>(<span>self, graph, source, target, candidates)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether any node in <em>candidates</em> — given as node ids of <em>graph</em> — lies on some path from
+<em>source</em> to <em>target</em>.</p>
+<p>Asked as two walks rather than one path enumeration: a node lies between the two exactly when
+it is reachable forward from <em>source</em> and <em>target</em> is reachable forward from it, and the
+second half is the same as it being reachable backward from <em>target</em>. The forward set is
+intersected first and the backward walk is skipped entirely when that comes back empty, which
+is the common case for a caller whose candidate set is small.</p>
+<p>Candidates stay <em>ids</em> rather than becoming nodes, which is why <em>graph</em> is asked for. Every
+layer above builds these sets as ids and memoizes them that way, and a signature taking nodes
+would be satisfied by whatever a caller could still name — quietly dropping the candidates it
+had only ids for, which is the fail-open direction and one nothing would report.</p>
+<p><strong>Under <code>Projection.FORWARD</code> the backward walk is not the transpose of the forward one</strong>, and
+a candidate the graph calls hub-bound counts as between as soon as it is reachable forward
+from <em>source</em>. Such a candidate stands inside a handler body that resumes the block around
+it; where the run carries on afterwards is exactly what the forward edges do not draw, so the
+backward walk from <em>target</em> will not find it however certainly the real run passes through
+it. Answering from the walk alone would say a binder written in a <code>trap</code> body does not lie
+between a definition and a use it in fact rebinds.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/reaching.py#L67-L105" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def any_between(
+    self,
+    graph: ControlFlowGraph,
+    source: CfgNode,
+    target: CfgNode,
+    candidates: Iterable[int],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether any node in *candidates* — given as node ids of *graph* — lies on some path from
+    *source* to *target*.
+
+    Asked as two walks rather than one path enumeration: a node lies between the two exactly when
+    it is reachable forward from *source* and *target* is reachable forward from it, and the
+    second half is the same as it being reachable backward from *target*. The forward set is
+    intersected first and the backward walk is skipped entirely when that comes back empty, which
+    is the common case for a caller whose candidate set is small.
+
+    Candidates stay *ids* rather than becoming nodes, which is why *graph* is asked for. Every
+    layer above builds these sets as ids and memoizes them that way, and a signature taking nodes
+    would be satisfied by whatever a caller could still name — quietly dropping the candidates it
+    had only ids for, which is the fail-open direction and one nothing would report.
+
+    **Under `Projection.FORWARD` the backward walk is not the transpose of the forward one**, and
+    a candidate the graph calls hub-bound counts as between as soon as it is reachable forward
+    from *source*. Such a candidate stands inside a handler body that resumes the block around
+    it; where the run carries on afterwards is exactly what the forward edges do not draw, so the
+    backward walk from *target* will not find it however certainly the real run passes through
+    it. Answering from the walk alone would say a binder written in a `trap` body does not lie
+    between a definition and a use it in fact rebinds.
+    &#34;&#34;&#34;
+    candidates = frozenset(candidates)
+    if not candidates:
+        return False
+    downstream = self.reachable(source, forward=True) &amp; candidates
+    if not downstream:
+        return False
+    if self._projection.declines_the_hub and downstream &amp; graph.hub_bound:
+        return True
+    return bool(downstream &amp; self.reachable(target, forward=False))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.reaching.ReachabilityQuery.reaching_definition"><code class="name flex">
+<span>def <span class="ident">reaching_definition</span></span>(<span>self, graph, use, definitions, kills=())</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The one definition among <em>definitions</em> whose value is observed at <em>use</em>, or <code>None</code> when no
+single definition is.</p>
+<p><em>definitions</em> pairs each of the caller's own definition objects with the control-flow node
+that evaluates it, and the caller's object is what comes back — the graph cannot say which of
+several definitions sharing a node is meant, and does not have to. <em>kills</em> names further
+nodes that may change the value without defining it, as ids.</p>
+<p>A definition qualifies when it strictly dominates <em>use</em>: it runs first on every path there,
+and does not merely share <em>use</em>'s statement, which this granularity cannot order. Of those,
+the <em>nearest</em> is the one every other qualifying definition dominates — they form a chain,
+because the dominators of any node are the path from it to the root of the dominance tree —
+and it is the only one whose value can survive, since each of the others is overwritten by
+it. Two qualifying definitions sharing one node are refused before the scan, because nothing
+orders them and the scan would return whichever the caller listed first.</p>
+<p><strong>Every definition other than the chosen one is a kill, and the caller cannot opt out.</strong> That
+is what makes an earlier definition re-entered by a back edge, and a definition on a branch
+that rejoins, both count against the answer. A caller that knows the language orders a
+particular write after the read in the same statement leaves that write out of <em>definitions</em>
+rather than being given a switch here, because the safe default has to be the one you get by
+saying nothing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/reaching.py#L107-L159" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reaching_definition(
+    self,
+    graph: ControlFlowGraph,
+    use: CfgNode,
+    definitions: Sequence[tuple[_D, CfgNode]],
+    kills: Iterable[int] = (),
+) -&gt; _D | None:
+    &#34;&#34;&#34;
+    The one definition among *definitions* whose value is observed at *use*, or `None` when no
+    single definition is.
+
+    *definitions* pairs each of the caller&#39;s own definition objects with the control-flow node
+    that evaluates it, and the caller&#39;s object is what comes back — the graph cannot say which of
+    several definitions sharing a node is meant, and does not have to. *kills* names further
+    nodes that may change the value without defining it, as ids.
+
+    A definition qualifies when it strictly dominates *use*: it runs first on every path there,
+    and does not merely share *use*&#39;s statement, which this granularity cannot order. Of those,
+    the *nearest* is the one every other qualifying definition dominates — they form a chain,
+    because the dominators of any node are the path from it to the root of the dominance tree —
+    and it is the only one whose value can survive, since each of the others is overwritten by
+    it. Two qualifying definitions sharing one node are refused before the scan, because nothing
+    orders them and the scan would return whichever the caller listed first.
+
+    **Every definition other than the chosen one is a kill, and the caller cannot opt out.** That
+    is what makes an earlier definition re-entered by a back edge, and a definition on a branch
+    that rejoins, both count against the answer. A caller that knows the language orders a
+    particular write after the read in the same statement leaves that write out of *definitions*
+    rather than being given a switch here, because the safe default has to be the one you get by
+    saying nothing.
+    &#34;&#34;&#34;
+    qualifying: list[tuple[_D, CfgNode]] = []
+    seen: set[int] = set()
+    for value, node in definitions:
+        if node is use or not self._dominators.dominates_node(
+            graph, node, use, self._projection
+        ):
+            continue
+        if id(node) in seen:
+            return None
+        seen.add(id(node))
+        qualifying.append((value, node))
+    if not qualifying:
+        return None
+    nearest, nearest_node = qualifying[0]
+    for value, node in qualifying[1:]:
+        if self._dominators.dominates_node(graph, nearest_node, node, self._projection):
+            nearest, nearest_node = value, node
+    blocking = {id(node) for _, node in definitions if node is not nearest_node}
+    blocking.update(kills)
+    if self.any_between(graph, nearest_node, use, blocking):
+        return None
+    return nearest</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.analysis" href="index.html">refinery.lib.scripts.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.analysis.reaching.ReachabilityQuery" href="#refinery.lib.scripts.analysis.reaching.ReachabilityQuery">ReachabilityQuery</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.analysis.reaching.ReachabilityQuery.reachable" href="#refinery.lib.scripts.analysis.reaching.ReachabilityQuery.reachable">reachable</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.reaching.ReachabilityQuery.any_between" href="#refinery.lib.scripts.analysis.reaching.ReachabilityQuery.any_between">any_between</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.reaching.ReachabilityQuery.reaching_definition" href="#refinery.lib.scripts.analysis.reaching.ReachabilityQuery.reaching_definition">reaching_definition</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

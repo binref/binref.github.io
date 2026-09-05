@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.liveness documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.liveness</code></h1>
+</header>
+<section id="section-intro">
+<p>Flow-sensitive live-variable analysis for JavaScript, computed over the per-function control-flow
+graphs and the resolved bindings of the <code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>. For
+each program point it answers which local bindings are <em>live</em> — may still be read before being
+overwritten — and from that derives a <em>dead-store</em> query: a write whose value no execution can
+observe.</p>
+<p>This is the flow-sensitive layer of the analysis substrate. It sharpens the model's flow-insensitive
+<code><a title="refinery.lib.scripts.js.analysis.model.Binding.is_dead" href="model.html#refinery.lib.scripts.js.analysis.model.Binding.is_dead">Binding.is_dead</a></code> (a binding never read anywhere) into
+<code>is_dead_store</code> (this particular write is never read on any path). Where the model must keep a
+binding that is written, then read, then written again, the liveness solution sees that the first
+write is dead even though the binding is read elsewhere.</p>
+<p>Soundness is the governing concern, because a later pass removes the stores this layer reports: the
+analysis over-approximates liveness, so the reported dead stores are a <em>subset</em> of the truly dead ones.
+Two rules secure that direction. Intra-statement evaluation order is not modelled, so every read is
+treated as observing the value of any earlier write in the same statement, keeping such a write live. And
+a write counts as killing a binding only when it is unconditional and the statement completes normally;
+a conditional write, or one on a path that may throw before it runs (an exceptional edge out of a <code>try</code>),
+does not mask an earlier live store. Only a function's own, uncaptured <code>var</code>/<code>let</code> bindings are analysed
+— anything a closure or another scope might read is conservatively kept.</p>
+<p>Beyond the dead-store query, the same liveness answers a scope-tightening question. A script-scope
+<code>var</code> whose every reference is owned by one function, and which that function overwrites before reading,
+behaves as a local of it: no value carried into the call from a previous invocation or from load is ever
+observed, so the declaration can be relocated into the function. <code>localization_target</code> reports that
+function. The tracking this needs is kept separate from <code>is_dead_store</code>, which retains its strict
+function-local candidacy, so widening the dataflow never widens what counts as a removable dead store.</p>
+<p>The public surface — <code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_in" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_in">LivenessModel.live_in()</a></code>, <code>live_out</code>, <code>node_of</code>, <code>is_dead_store</code>, <code>dead_stores</code>,
+<code>is_dead_on_entry</code>, <code>localization_target</code>, <code>localizable_bindings</code>, <code><a title="refinery.lib.scripts.js.analysis.liveness.build_liveness" href="#refinery.lib.scripts.js.analysis.liveness.build_liveness">build_liveness()</a></code> — is keyed to AST
+node identity, matching the contract of the model and effect layers.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L1-L443" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Flow-sensitive live-variable analysis for JavaScript, computed over the per-function control-flow
+graphs and the resolved bindings of the `refinery.lib.scripts.js.analysis.model.SemanticModel`. For
+each program point it answers which local bindings are *live* — may still be read before being
+overwritten — and from that derives a *dead-store* query: a write whose value no execution can
+observe.
+
+This is the flow-sensitive layer of the analysis substrate. It sharpens the model&#39;s flow-insensitive
+`refinery.lib.scripts.js.analysis.model.Binding.is_dead` (a binding never read anywhere) into
+`is_dead_store` (this particular write is never read on any path). Where the model must keep a
+binding that is written, then read, then written again, the liveness solution sees that the first
+write is dead even though the binding is read elsewhere.
+
+Soundness is the governing concern, because a later pass removes the stores this layer reports: the
+analysis over-approximates liveness, so the reported dead stores are a *subset* of the truly dead ones.
+Two rules secure that direction. Intra-statement evaluation order is not modelled, so every read is
+treated as observing the value of any earlier write in the same statement, keeping such a write live. And
+a write counts as killing a binding only when it is unconditional and the statement completes normally;
+a conditional write, or one on a path that may throw before it runs (an exceptional edge out of a `try`),
+does not mask an earlier live store. Only a function&#39;s own, uncaptured `var`/`let` bindings are analysed
+— anything a closure or another scope might read is conservatively kept.
+
+Beyond the dead-store query, the same liveness answers a scope-tightening question. A script-scope
+`var` whose every reference is owned by one function, and which that function overwrites before reading,
+behaves as a local of it: no value carried into the call from a previous invocation or from load is ever
+observed, so the declaration can be relocated into the function. `localization_target` reports that
+function. The tracking this needs is kept separate from `is_dead_store`, which retains its strict
+function-local candidacy, so widening the dataflow never widens what counts as a removable dead store.
+
+The public surface — `LivenessModel.live_in`, `live_out`, `node_of`, `is_dead_store`, `dead_stores`,
+`is_dead_on_entry`, `localization_target`, `localizable_bindings`, `build_liveness` — is keyed to AST
+node identity, matching the contract of the model and effect layers.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterator
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.liveness import solve_liveness
+from refinery.lib.scripts.js.analysis.cfg import (
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+    build_control_flow_model,
+)
+from refinery.lib.scripts.js.analysis.model import (
+    FUNCTION_NODES,
+    Binding,
+    BindingKind,
+    Role,
+    Scope,
+    ScopeKind,
+    SemanticModel,
+    _governing_target,
+    enclosing_function,
+    is_use_position,
+    reference_role,
+)
+from refinery.lib.scripts.js.model import (
+    JsAssignmentExpression,
+    JsAssignmentPattern,
+    JsConditionalExpression,
+    JsIdentifier,
+    JsLogicalExpression,
+    JsVariableDeclarator,
+)
+
+_CANDIDATE_KINDS = (BindingKind.VAR, BindingKind.LET)
+
+
+class LivenessModel:
+    &#34;&#34;&#34;
+    Flow-sensitive live-variable sets and dead-store verdicts for one script, built over a
+    `refinery.lib.scripts.js.analysis.model.SemanticModel`. Query a control-flow node&#39;s live sets
+    with `live_in` and `live_out`, find the node standing for an AST element with `node_of`, and ask
+    whether a write is dead with `is_dead_store`. Build through `build_liveness`.
+    &#34;&#34;&#34;
+
+    def __init__(self, model: SemanticModel, control_flow: ControlFlowModel | None = None):
+        self.model = model
+        self._flow = control_flow if control_flow is not None else build_control_flow_model(model.root)
+        self._live_in: dict[int, frozenset[Binding]] = {}
+        self._live_out: dict[int, frozenset[Binding]] = {}
+        self._pseudo_locals: dict[int, frozenset[Binding]] = {}
+        self._index_pseudo_locals()
+        for graph in self._flow.graphs.values():
+            self._compute_graph(graph)
+
+    def live_in(self, node: CfgNode) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The bindings live on entry to *node* — those that may be read before being overwritten on some
+        path that begins at *node*.
+        &#34;&#34;&#34;
+        return self._live_in.get(id(node), frozenset())
+
+    def live_out(self, node: CfgNode) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The bindings live on exit from *node* — those that may be read on some path that leaves it,
+        including the path taken if *node* throws.
+        &#34;&#34;&#34;
+        return self._live_out.get(id(node), frozenset())
+
+    def node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The control-flow node standing for *element* in whichever function graph owns it, or `None` if
+        *element* is not a node the graphs represent.
+        &#34;&#34;&#34;
+        return self._flow.node_of(element)
+
+    def is_dead_store(self, write: JsIdentifier) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the value written to a binding at *write* is never read on any execution. Only an
+        unconditional store to an uncaptured function-local `var`/`let` qualifies; a read, a compound or
+        conditional write, a captured or outer binding, or a store whose value may still be read all
+        return `False`, the conservative verdict. The verdict concerns the stored *value* alone: a
+        caller removing the store must still preserve any side effect of the expression producing it.
+
+        No store is reported while a `with` or direct `eval` lexically inside the owning function could
+        read the local by name without a reference the model sees. A reflective surface elsewhere in the
+        program runs in the global scope and cannot reach a local, so it does not suppress the report.
+        &#34;&#34;&#34;
+        located = self._flow.locate(write)
+        if located is None:
+            return False
+        graph, node = located
+        owner_scope = self.model.function_scope(graph.owner)
+        binding, construct = self._store_target(write)
+        if binding is None or construct is None:
+            return False
+        if not self._trackable(binding, owner_scope):
+            return False
+        if self.model.reflection_can_reach(binding):
+            return False
+        if binding in self.live_out(node):
+            return False
+        return self._unobserved_within(graph, node, write, binding, construct)
+
+    def dead_stores(self) -&gt; list[JsIdentifier]:
+        &#34;&#34;&#34;
+        Every write identifier in the script whose stored value is dead, in source order.
+        &#34;&#34;&#34;
+        result: list[JsIdentifier] = []
+        for node in self.model.root.walk_in_order():
+            if isinstance(node, JsIdentifier) and self._is_candidate_write(node):
+                if self.is_dead_store(node):
+                    result.append(node)
+        return result
+
+    def is_dead_on_entry(self, binding: Binding, function: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *function* writes *binding* before reading it on every path, so no value carried into the
+        call — from a previous invocation or from load — is ever observed. Answered from the liveness at
+        the function&#39;s control-flow entry; a binding not tracked in *function* returns `False`.
+        &#34;&#34;&#34;
+        graph = self._flow.graph_of(function)
+        if graph is None:
+            return False
+        return binding not in self.live_in(graph.entry)
+
+    def localization_target(self, binding: Binding) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The function into which *binding*, a script-scope `var`, can be soundly relocated, or `None`. A
+        binding qualifies when every reference is owned by one function, that function writes it before
+        any read (so a value carried across calls or from load is never observed), it has no initializer
+        whose load-time effect the move would strand, no reference reaches it through a global-object
+        alias member (`globalThis.x`, which would no longer find it once it leaves the global object),
+        it is not exported (an importer reads its value where the module leaves it, which a body local
+        cannot answer), and the program keeps no reflection surface that could read it by name.
+        Relocating it tightens a pseudo-global into the local it behaves as.
+        &#34;&#34;&#34;
+        if self.model.has_reflection_surface():
+            return None
+        if binding.kind is not BindingKind.VAR or binding.scope is not self.model.root_scope:
+            return None
+        if binding.exported or binding.has_member_reference:
+            return None
+        if self._has_initializer(binding):
+            return None
+        function = self._sole_owning_function(binding)
+        if function is None:
+            return None
+        if not self.is_dead_on_entry(binding, function):
+            return None
+        return function
+
+    def localizable_bindings(self) -&gt; list[tuple[Binding, Node]]:
+        &#34;&#34;&#34;
+        Every script-scope `var` binding that can be relocated into a function, each paired with that
+        function, in the order the script declares them.
+        &#34;&#34;&#34;
+        result: list[tuple[Binding, Node]] = []
+        for binding in self.model.root_scope.bindings.values():
+            function = self.localization_target(binding)
+            if function is not None:
+                result.append((binding, function))
+        return result
+
+    def _index_pseudo_locals(self):
+        &#34;&#34;&#34;
+        Group the script-scope `var` bindings that each behave as a single function&#39;s locals, keyed by
+        that function, so the dataflow can track them inside it. A binding qualifies when every reference
+        lies in one function and none at script scope or in a function nested below it.
+        &#34;&#34;&#34;
+        grouped: dict[int, set[Binding]] = {}
+        for binding in self.model.root_scope.bindings.values():
+            if binding.kind is not BindingKind.VAR:
+                continue
+            function = self._sole_owning_function(binding)
+            if function is not None:
+                grouped.setdefault(id(function), set()).add(binding)
+        self._pseudo_locals = {owner: frozenset(bindings) for owner, bindings in grouped.items()}
+
+    def _compute_graph(self, graph: ControlFlowGraph):
+        owner_scope = self.model.function_scope(graph.owner)
+
+        def node_sets(_graph: ControlFlowGraph, node: CfgNode) -&gt; tuple[set[Binding], set[Binding]]:
+            return self._node_sets(_graph, node, owner_scope)
+
+        live_in, live_out = solve_liveness(graph, node_sets)
+        self._live_in.update(live_in)
+        self._live_out.update(live_out)
+
+    def _node_sets(
+        self, graph: ControlFlowGraph, node: CfgNode, owner_scope: Scope | None,
+    ) -&gt; tuple[set[Binding], set[Binding]]:
+        use: set[Binding] = set()
+        kill: set[Binding] = set()
+        if node.element is None:
+            return use, kill
+        for ident in self._shallow_idents(graph, node.element):
+            declared = self.model.binding_of(ident)
+            if declared is not None:
+                if self._trackable(declared, owner_scope) and self._declarator_has_init(ident):
+                    kill.add(declared)
+                continue
+            if not is_use_position(ident):
+                continue
+            binding = self.model.resolve(ident)
+            if binding is None or not self._analysable(graph, binding, owner_scope):
+                continue
+            role = reference_role(ident)
+            if role is not Role.WRITE:
+                use.add(binding)
+            elif self._is_assignment_kill(ident, node.element):
+                kill.add(binding)
+        return use, kill
+
+    def _unobserved_within(
+        self,
+        graph: ControlFlowGraph,
+        node: CfgNode,
+        write: JsIdentifier,
+        binding: Binding,
+        construct: Node,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether no reference to *binding* other than *write* within *node* can observe *write*&#39;s value.
+        A read nested in *construct* (the assignment or declarator performing the write) consumes the
+        prior value, so it is ignored; any other reference — a later read or a second write in the same
+        statement — is treated conservatively as observing the store, since intra-statement order is not
+        modelled.
+        &#34;&#34;&#34;
+        assert node.element is not None
+        for ident in self._shallow_idents(graph, node.element):
+            if ident is write:
+                continue
+            if self._reference_binding(ident) is not binding:
+                continue
+            if self._is_read(ident) and ident.is_descendant_of(construct):
+                continue
+            return False
+        return True
+
+    def _shallow_idents(self, graph: ControlFlowGraph, element: Node) -&gt; Iterator[JsIdentifier]:
+        &#34;&#34;&#34;
+        Yield the identifiers belonging to *element*&#39;s own control-flow node: those in its subtree that
+        are not inside a nested function or a descendant that is itself a separate control-flow node
+        (whose identifiers are accounted there). This keeps a loop or branch head from double-counting
+        the body that follows it.
+        &#34;&#34;&#34;
+        stack: list[Node] = list(element.children())
+        while stack:
+            current = stack.pop()
+            if isinstance(current, FUNCTION_NODES):
+                continue
+            if graph.node_of(current) is not None:
+                continue
+            if isinstance(current, JsIdentifier):
+                yield current
+            stack.extend(current.children())
+
+    def _store_target(self, write: JsIdentifier) -&gt; tuple[Binding | None, Node | None]:
+        &#34;&#34;&#34;
+        The binding *write* stores into and the construct whose completion performs the store, or
+        `(None, None)` if *write* is not an unconditional value store: a `var`/`let`/`const` declarator
+        with an initializer, or the target of a plain `=` assignment.
+        &#34;&#34;&#34;
+        declared = self.model.binding_of(write)
+        if declared is not None:
+            if not self._declarator_has_init(write):
+                return None, None
+            return declared, self._enclosing_declarator(write)
+        if not is_use_position(write):
+            return None, None
+        binding = self.model.resolve(write)
+        if binding is None or reference_role(write) is not Role.WRITE:
+            return None, None
+        governor = self._governor(write)
+        if not isinstance(governor, JsAssignmentExpression) or governor.operator != &#39;=&#39;:
+            return None, None
+        return binding, governor
+
+    def _is_candidate_write(self, ident: JsIdentifier) -&gt; bool:
+        if self.model.binding_of(ident) is not None:
+            return self._declarator_has_init(ident)
+        if not is_use_position(ident):
+            return False
+        return reference_role(ident) is Role.WRITE
+
+    def _is_assignment_kill(self, ident: JsIdentifier, element: Node) -&gt; bool:
+        governor = self._governor(ident)
+        if not isinstance(governor, JsAssignmentExpression) or governor.operator != &#39;=&#39;:
+            return False
+        return self._is_unconditional(ident, element)
+
+    def _is_read(self, ident: JsIdentifier) -&gt; bool:
+        if not self.model.is_reference(ident):
+            return False
+        return reference_role(ident) is not Role.WRITE
+
+    def _reference_binding(self, ident: JsIdentifier) -&gt; Binding | None:
+        declared = self.model.binding_of(ident)
+        if declared is not None:
+            return declared
+        if not is_use_position(ident):
+            return None
+        return self.model.resolve(ident)
+
+    def _declarator_has_init(self, ident: JsIdentifier) -&gt; bool:
+        declarator = self._enclosing_declarator(ident)
+        return declarator is not None and declarator.init is not None
+
+    def _enclosing_declarator(self, ident: JsIdentifier) -&gt; JsVariableDeclarator | None:
+        governor, target = _governing_target(ident)
+        if isinstance(governor, JsVariableDeclarator) and governor.id is target:
+            return governor
+        return None
+
+    def _governor(self, ident: JsIdentifier) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The construct that governs the binding target *ident* sits in — the assignment, declarator, or
+        loop head reached by climbing out through any destructuring containers and parentheses around
+        it, or `None` past the top of the tree.
+        &#34;&#34;&#34;
+        governor, _ = _governing_target(ident)
+        return governor
+
+    @staticmethod
+    def _is_unconditional(ident: JsIdentifier, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *ident* is written every time its control-flow node *element* runs, i.e. its position is
+        not guarded by a short-circuit operand, a conditional branch, or a destructuring default.
+        &#34;&#34;&#34;
+        cursor: Node = ident
+        while cursor is not element:
+            parent = cursor.parent
+            if parent is None:
+                return True
+            if isinstance(parent, JsLogicalExpression) and parent.right is cursor:
+                return False
+            if isinstance(parent, JsConditionalExpression) and cursor in (
+                parent.consequent, parent.alternate,
+            ):
+                return False
+            if isinstance(parent, JsAssignmentPattern) and parent.right is cursor:
+                return False
+            cursor = parent
+        return True
+
+    def _trackable(self, binding: Binding, owner_scope: Scope | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *binding* is a local of the function *owner_scope* is the body scope of, so that the
+        graph built for that function sees every store to it.
+
+        The parameters of a function whose parameter list holds an expression are bound in a scope
+        of their own standing outside the body&#39;s, so their variable scope is that one rather than
+        the body&#39;s; `Scope.closure_home` says the two belong to one call, and is what this asks.
+        &#34;&#34;&#34;
+        return (
+            binding.kind in _CANDIDATE_KINDS
+            and not binding.captured
+            and owner_scope is not None
+            and owner_scope.kind is ScopeKind.FUNCTION
+            and binding.scope.closure_home is owner_scope
+        )
+
+    def _analysable(
+        self, graph: ControlFlowGraph, binding: Binding, owner_scope: Scope | None,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *binding* is tracked in *graph*: either an uncaptured function-local of the graph&#39;s own
+        function (the strict store candidate) or a script-scope `var` whose every reference is owned by
+        that function and so behaves as one of its locals. The second case feeds only the entry-liveness
+        `localization_target` reads; it never reaches `is_dead_store`, which keeps the strict candidacy.
+        &#34;&#34;&#34;
+        if self._trackable(binding, owner_scope):
+            return True
+        return binding in self._pseudo_locals.get(id(graph.owner), frozenset())
+
+    def _sole_owning_function(self, binding: Binding) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The one function whose body lexically contains every reference to *binding*, or `None` when the
+        references span more than one function, include one at script scope, or do not exist. A reference
+        inside a function nested below the candidate counts as a separate owner, so a binding captured by
+        such a nested closure is rejected.
+        &#34;&#34;&#34;
+        owner: Node | None = None
+        for ref in (*binding.reads, *binding.writes):
+            function = enclosing_function(ref)
+            if function is None:
+                return None
+            if owner is None:
+                owner = function
+            elif function is not owner:
+                return None
+        return owner
+
+    def _has_initializer(self, binding: Binding) -&gt; bool:
+        for declaration in binding.declarations:
+            declarator = self._enclosing_declarator(declaration)
+            if declarator is not None and declarator.init is not None:
+                return True
+        return False
+
+
+def build_liveness(
+    model: SemanticModel, control_flow: ControlFlowModel | None = None,
+) -&gt; LivenessModel:
+    &#34;&#34;&#34;
+    Build the `LivenessModel` for a script&#39;s `refinery.lib.scripts.js.analysis.model.SemanticModel`,
+    reusing *control_flow* when the caller has one to share, or building a fresh one when it is `None`.
+    &#34;&#34;&#34;
+    return LivenessModel(model, control_flow)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.liveness.build_liveness"><code class="name flex">
+<span>def <span class="ident">build_liveness</span></span>(<span>model, control_flow=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel">LivenessModel</a></code> for a script's <code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>,
+reusing <em>control_flow</em> when the caller has one to share, or building a fresh one when it is <code>None</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L436-L443" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_liveness(
+    model: SemanticModel, control_flow: ControlFlowModel | None = None,
+) -&gt; LivenessModel:
+    &#34;&#34;&#34;
+    Build the `LivenessModel` for a script&#39;s `refinery.lib.scripts.js.analysis.model.SemanticModel`,
+    reusing *control_flow* when the caller has one to share, or building a fresh one when it is `None`.
+    &#34;&#34;&#34;
+    return LivenessModel(model, control_flow)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel"><code class="flex name class">
+<span>class <span class="ident">LivenessModel</span></span>
+<span>(</span><span>model, control_flow=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Flow-sensitive live-variable sets and dead-store verdicts for one script, built over a
+<code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>. Query a control-flow node's live sets
+with <code>live_in</code> and <code>live_out</code>, find the node standing for an AST element with <code>node_of</code>, and ask
+whether a write is dead with <code>is_dead_store</code>. Build through <code><a title="refinery.lib.scripts.js.analysis.liveness.build_liveness" href="#refinery.lib.scripts.js.analysis.liveness.build_liveness">build_liveness()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L71-L433" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class LivenessModel:
+    &#34;&#34;&#34;
+    Flow-sensitive live-variable sets and dead-store verdicts for one script, built over a
+    `refinery.lib.scripts.js.analysis.model.SemanticModel`. Query a control-flow node&#39;s live sets
+    with `live_in` and `live_out`, find the node standing for an AST element with `node_of`, and ask
+    whether a write is dead with `is_dead_store`. Build through `build_liveness`.
+    &#34;&#34;&#34;
+
+    def __init__(self, model: SemanticModel, control_flow: ControlFlowModel | None = None):
+        self.model = model
+        self._flow = control_flow if control_flow is not None else build_control_flow_model(model.root)
+        self._live_in: dict[int, frozenset[Binding]] = {}
+        self._live_out: dict[int, frozenset[Binding]] = {}
+        self._pseudo_locals: dict[int, frozenset[Binding]] = {}
+        self._index_pseudo_locals()
+        for graph in self._flow.graphs.values():
+            self._compute_graph(graph)
+
+    def live_in(self, node: CfgNode) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The bindings live on entry to *node* — those that may be read before being overwritten on some
+        path that begins at *node*.
+        &#34;&#34;&#34;
+        return self._live_in.get(id(node), frozenset())
+
+    def live_out(self, node: CfgNode) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The bindings live on exit from *node* — those that may be read on some path that leaves it,
+        including the path taken if *node* throws.
+        &#34;&#34;&#34;
+        return self._live_out.get(id(node), frozenset())
+
+    def node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The control-flow node standing for *element* in whichever function graph owns it, or `None` if
+        *element* is not a node the graphs represent.
+        &#34;&#34;&#34;
+        return self._flow.node_of(element)
+
+    def is_dead_store(self, write: JsIdentifier) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the value written to a binding at *write* is never read on any execution. Only an
+        unconditional store to an uncaptured function-local `var`/`let` qualifies; a read, a compound or
+        conditional write, a captured or outer binding, or a store whose value may still be read all
+        return `False`, the conservative verdict. The verdict concerns the stored *value* alone: a
+        caller removing the store must still preserve any side effect of the expression producing it.
+
+        No store is reported while a `with` or direct `eval` lexically inside the owning function could
+        read the local by name without a reference the model sees. A reflective surface elsewhere in the
+        program runs in the global scope and cannot reach a local, so it does not suppress the report.
+        &#34;&#34;&#34;
+        located = self._flow.locate(write)
+        if located is None:
+            return False
+        graph, node = located
+        owner_scope = self.model.function_scope(graph.owner)
+        binding, construct = self._store_target(write)
+        if binding is None or construct is None:
+            return False
+        if not self._trackable(binding, owner_scope):
+            return False
+        if self.model.reflection_can_reach(binding):
+            return False
+        if binding in self.live_out(node):
+            return False
+        return self._unobserved_within(graph, node, write, binding, construct)
+
+    def dead_stores(self) -&gt; list[JsIdentifier]:
+        &#34;&#34;&#34;
+        Every write identifier in the script whose stored value is dead, in source order.
+        &#34;&#34;&#34;
+        result: list[JsIdentifier] = []
+        for node in self.model.root.walk_in_order():
+            if isinstance(node, JsIdentifier) and self._is_candidate_write(node):
+                if self.is_dead_store(node):
+                    result.append(node)
+        return result
+
+    def is_dead_on_entry(self, binding: Binding, function: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *function* writes *binding* before reading it on every path, so no value carried into the
+        call — from a previous invocation or from load — is ever observed. Answered from the liveness at
+        the function&#39;s control-flow entry; a binding not tracked in *function* returns `False`.
+        &#34;&#34;&#34;
+        graph = self._flow.graph_of(function)
+        if graph is None:
+            return False
+        return binding not in self.live_in(graph.entry)
+
+    def localization_target(self, binding: Binding) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The function into which *binding*, a script-scope `var`, can be soundly relocated, or `None`. A
+        binding qualifies when every reference is owned by one function, that function writes it before
+        any read (so a value carried across calls or from load is never observed), it has no initializer
+        whose load-time effect the move would strand, no reference reaches it through a global-object
+        alias member (`globalThis.x`, which would no longer find it once it leaves the global object),
+        it is not exported (an importer reads its value where the module leaves it, which a body local
+        cannot answer), and the program keeps no reflection surface that could read it by name.
+        Relocating it tightens a pseudo-global into the local it behaves as.
+        &#34;&#34;&#34;
+        if self.model.has_reflection_surface():
+            return None
+        if binding.kind is not BindingKind.VAR or binding.scope is not self.model.root_scope:
+            return None
+        if binding.exported or binding.has_member_reference:
+            return None
+        if self._has_initializer(binding):
+            return None
+        function = self._sole_owning_function(binding)
+        if function is None:
+            return None
+        if not self.is_dead_on_entry(binding, function):
+            return None
+        return function
+
+    def localizable_bindings(self) -&gt; list[tuple[Binding, Node]]:
+        &#34;&#34;&#34;
+        Every script-scope `var` binding that can be relocated into a function, each paired with that
+        function, in the order the script declares them.
+        &#34;&#34;&#34;
+        result: list[tuple[Binding, Node]] = []
+        for binding in self.model.root_scope.bindings.values():
+            function = self.localization_target(binding)
+            if function is not None:
+                result.append((binding, function))
+        return result
+
+    def _index_pseudo_locals(self):
+        &#34;&#34;&#34;
+        Group the script-scope `var` bindings that each behave as a single function&#39;s locals, keyed by
+        that function, so the dataflow can track them inside it. A binding qualifies when every reference
+        lies in one function and none at script scope or in a function nested below it.
+        &#34;&#34;&#34;
+        grouped: dict[int, set[Binding]] = {}
+        for binding in self.model.root_scope.bindings.values():
+            if binding.kind is not BindingKind.VAR:
+                continue
+            function = self._sole_owning_function(binding)
+            if function is not None:
+                grouped.setdefault(id(function), set()).add(binding)
+        self._pseudo_locals = {owner: frozenset(bindings) for owner, bindings in grouped.items()}
+
+    def _compute_graph(self, graph: ControlFlowGraph):
+        owner_scope = self.model.function_scope(graph.owner)
+
+        def node_sets(_graph: ControlFlowGraph, node: CfgNode) -&gt; tuple[set[Binding], set[Binding]]:
+            return self._node_sets(_graph, node, owner_scope)
+
+        live_in, live_out = solve_liveness(graph, node_sets)
+        self._live_in.update(live_in)
+        self._live_out.update(live_out)
+
+    def _node_sets(
+        self, graph: ControlFlowGraph, node: CfgNode, owner_scope: Scope | None,
+    ) -&gt; tuple[set[Binding], set[Binding]]:
+        use: set[Binding] = set()
+        kill: set[Binding] = set()
+        if node.element is None:
+            return use, kill
+        for ident in self._shallow_idents(graph, node.element):
+            declared = self.model.binding_of(ident)
+            if declared is not None:
+                if self._trackable(declared, owner_scope) and self._declarator_has_init(ident):
+                    kill.add(declared)
+                continue
+            if not is_use_position(ident):
+                continue
+            binding = self.model.resolve(ident)
+            if binding is None or not self._analysable(graph, binding, owner_scope):
+                continue
+            role = reference_role(ident)
+            if role is not Role.WRITE:
+                use.add(binding)
+            elif self._is_assignment_kill(ident, node.element):
+                kill.add(binding)
+        return use, kill
+
+    def _unobserved_within(
+        self,
+        graph: ControlFlowGraph,
+        node: CfgNode,
+        write: JsIdentifier,
+        binding: Binding,
+        construct: Node,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether no reference to *binding* other than *write* within *node* can observe *write*&#39;s value.
+        A read nested in *construct* (the assignment or declarator performing the write) consumes the
+        prior value, so it is ignored; any other reference — a later read or a second write in the same
+        statement — is treated conservatively as observing the store, since intra-statement order is not
+        modelled.
+        &#34;&#34;&#34;
+        assert node.element is not None
+        for ident in self._shallow_idents(graph, node.element):
+            if ident is write:
+                continue
+            if self._reference_binding(ident) is not binding:
+                continue
+            if self._is_read(ident) and ident.is_descendant_of(construct):
+                continue
+            return False
+        return True
+
+    def _shallow_idents(self, graph: ControlFlowGraph, element: Node) -&gt; Iterator[JsIdentifier]:
+        &#34;&#34;&#34;
+        Yield the identifiers belonging to *element*&#39;s own control-flow node: those in its subtree that
+        are not inside a nested function or a descendant that is itself a separate control-flow node
+        (whose identifiers are accounted there). This keeps a loop or branch head from double-counting
+        the body that follows it.
+        &#34;&#34;&#34;
+        stack: list[Node] = list(element.children())
+        while stack:
+            current = stack.pop()
+            if isinstance(current, FUNCTION_NODES):
+                continue
+            if graph.node_of(current) is not None:
+                continue
+            if isinstance(current, JsIdentifier):
+                yield current
+            stack.extend(current.children())
+
+    def _store_target(self, write: JsIdentifier) -&gt; tuple[Binding | None, Node | None]:
+        &#34;&#34;&#34;
+        The binding *write* stores into and the construct whose completion performs the store, or
+        `(None, None)` if *write* is not an unconditional value store: a `var`/`let`/`const` declarator
+        with an initializer, or the target of a plain `=` assignment.
+        &#34;&#34;&#34;
+        declared = self.model.binding_of(write)
+        if declared is not None:
+            if not self._declarator_has_init(write):
+                return None, None
+            return declared, self._enclosing_declarator(write)
+        if not is_use_position(write):
+            return None, None
+        binding = self.model.resolve(write)
+        if binding is None or reference_role(write) is not Role.WRITE:
+            return None, None
+        governor = self._governor(write)
+        if not isinstance(governor, JsAssignmentExpression) or governor.operator != &#39;=&#39;:
+            return None, None
+        return binding, governor
+
+    def _is_candidate_write(self, ident: JsIdentifier) -&gt; bool:
+        if self.model.binding_of(ident) is not None:
+            return self._declarator_has_init(ident)
+        if not is_use_position(ident):
+            return False
+        return reference_role(ident) is Role.WRITE
+
+    def _is_assignment_kill(self, ident: JsIdentifier, element: Node) -&gt; bool:
+        governor = self._governor(ident)
+        if not isinstance(governor, JsAssignmentExpression) or governor.operator != &#39;=&#39;:
+            return False
+        return self._is_unconditional(ident, element)
+
+    def _is_read(self, ident: JsIdentifier) -&gt; bool:
+        if not self.model.is_reference(ident):
+            return False
+        return reference_role(ident) is not Role.WRITE
+
+    def _reference_binding(self, ident: JsIdentifier) -&gt; Binding | None:
+        declared = self.model.binding_of(ident)
+        if declared is not None:
+            return declared
+        if not is_use_position(ident):
+            return None
+        return self.model.resolve(ident)
+
+    def _declarator_has_init(self, ident: JsIdentifier) -&gt; bool:
+        declarator = self._enclosing_declarator(ident)
+        return declarator is not None and declarator.init is not None
+
+    def _enclosing_declarator(self, ident: JsIdentifier) -&gt; JsVariableDeclarator | None:
+        governor, target = _governing_target(ident)
+        if isinstance(governor, JsVariableDeclarator) and governor.id is target:
+            return governor
+        return None
+
+    def _governor(self, ident: JsIdentifier) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The construct that governs the binding target *ident* sits in — the assignment, declarator, or
+        loop head reached by climbing out through any destructuring containers and parentheses around
+        it, or `None` past the top of the tree.
+        &#34;&#34;&#34;
+        governor, _ = _governing_target(ident)
+        return governor
+
+    @staticmethod
+    def _is_unconditional(ident: JsIdentifier, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *ident* is written every time its control-flow node *element* runs, i.e. its position is
+        not guarded by a short-circuit operand, a conditional branch, or a destructuring default.
+        &#34;&#34;&#34;
+        cursor: Node = ident
+        while cursor is not element:
+            parent = cursor.parent
+            if parent is None:
+                return True
+            if isinstance(parent, JsLogicalExpression) and parent.right is cursor:
+                return False
+            if isinstance(parent, JsConditionalExpression) and cursor in (
+                parent.consequent, parent.alternate,
+            ):
+                return False
+            if isinstance(parent, JsAssignmentPattern) and parent.right is cursor:
+                return False
+            cursor = parent
+        return True
+
+    def _trackable(self, binding: Binding, owner_scope: Scope | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *binding* is a local of the function *owner_scope* is the body scope of, so that the
+        graph built for that function sees every store to it.
+
+        The parameters of a function whose parameter list holds an expression are bound in a scope
+        of their own standing outside the body&#39;s, so their variable scope is that one rather than
+        the body&#39;s; `Scope.closure_home` says the two belong to one call, and is what this asks.
+        &#34;&#34;&#34;
+        return (
+            binding.kind in _CANDIDATE_KINDS
+            and not binding.captured
+            and owner_scope is not None
+            and owner_scope.kind is ScopeKind.FUNCTION
+            and binding.scope.closure_home is owner_scope
+        )
+
+    def _analysable(
+        self, graph: ControlFlowGraph, binding: Binding, owner_scope: Scope | None,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *binding* is tracked in *graph*: either an uncaptured function-local of the graph&#39;s own
+        function (the strict store candidate) or a script-scope `var` whose every reference is owned by
+        that function and so behaves as one of its locals. The second case feeds only the entry-liveness
+        `localization_target` reads; it never reaches `is_dead_store`, which keeps the strict candidacy.
+        &#34;&#34;&#34;
+        if self._trackable(binding, owner_scope):
+            return True
+        return binding in self._pseudo_locals.get(id(graph.owner), frozenset())
+
+    def _sole_owning_function(self, binding: Binding) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The one function whose body lexically contains every reference to *binding*, or `None` when the
+        references span more than one function, include one at script scope, or do not exist. A reference
+        inside a function nested below the candidate counts as a separate owner, so a binding captured by
+        such a nested closure is rejected.
+        &#34;&#34;&#34;
+        owner: Node | None = None
+        for ref in (*binding.reads, *binding.writes):
+            function = enclosing_function(ref)
+            if function is None:
+                return None
+            if owner is None:
+                owner = function
+            elif function is not owner:
+                return None
+        return owner
+
+    def _has_initializer(self, binding: Binding) -&gt; bool:
+        for declaration in binding.declarations:
+            declarator = self._enclosing_declarator(declaration)
+            if declarator is not None and declarator.init is not None:
+                return True
+        return False</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_in"><code class="name flex">
+<span>def <span class="ident">live_in</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The bindings live on entry to <em>node</em> — those that may be read before being overwritten on some
+path that begins at <em>node</em>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L89-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def live_in(self, node: CfgNode) -&gt; frozenset[Binding]:
+    &#34;&#34;&#34;
+    The bindings live on entry to *node* — those that may be read before being overwritten on some
+    path that begins at *node*.
+    &#34;&#34;&#34;
+    return self._live_in.get(id(node), frozenset())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_out"><code class="name flex">
+<span>def <span class="ident">live_out</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The bindings live on exit from <em>node</em> — those that may be read on some path that leaves it,
+including the path taken if <em>node</em> throws.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L96-L101" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def live_out(self, node: CfgNode) -&gt; frozenset[Binding]:
+    &#34;&#34;&#34;
+    The bindings live on exit from *node* — those that may be read on some path that leaves it,
+    including the path taken if *node* throws.
+    &#34;&#34;&#34;
+    return self._live_out.get(id(node), frozenset())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.node_of"><code class="name flex">
+<span>def <span class="ident">node_of</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow node standing for <em>element</em> in whichever function graph owns it, or <code>None</code> if
+<em>element</em> is not a node the graphs represent.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L103-L108" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def node_of(self, element: Node) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    The control-flow node standing for *element* in whichever function graph owns it, or `None` if
+    *element* is not a node the graphs represent.
+    &#34;&#34;&#34;
+    return self._flow.node_of(element)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.is_dead_store"><code class="name flex">
+<span>def <span class="ident">is_dead_store</span></span>(<span>self, write)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the value written to a binding at <em>write</em> is never read on any execution. Only an
+unconditional store to an uncaptured function-local <code>var</code>/<code>let</code> qualifies; a read, a compound or
+conditional write, a captured or outer binding, or a store whose value may still be read all
+return <code>False</code>, the conservative verdict. The verdict concerns the stored <em>value</em> alone: a
+caller removing the store must still preserve any side effect of the expression producing it.</p>
+<p>No store is reported while a <code>with</code> or direct <code>eval</code> lexically inside the owning function could
+read the local by name without a reference the model sees. A reflective surface elsewhere in the
+program runs in the global scope and cannot reach a local, so it does not suppress the report.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L110-L136" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_dead_store(self, write: JsIdentifier) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the value written to a binding at *write* is never read on any execution. Only an
+    unconditional store to an uncaptured function-local `var`/`let` qualifies; a read, a compound or
+    conditional write, a captured or outer binding, or a store whose value may still be read all
+    return `False`, the conservative verdict. The verdict concerns the stored *value* alone: a
+    caller removing the store must still preserve any side effect of the expression producing it.
+
+    No store is reported while a `with` or direct `eval` lexically inside the owning function could
+    read the local by name without a reference the model sees. A reflective surface elsewhere in the
+    program runs in the global scope and cannot reach a local, so it does not suppress the report.
+    &#34;&#34;&#34;
+    located = self._flow.locate(write)
+    if located is None:
+        return False
+    graph, node = located
+    owner_scope = self.model.function_scope(graph.owner)
+    binding, construct = self._store_target(write)
+    if binding is None or construct is None:
+        return False
+    if not self._trackable(binding, owner_scope):
+        return False
+    if self.model.reflection_can_reach(binding):
+        return False
+    if binding in self.live_out(node):
+        return False
+    return self._unobserved_within(graph, node, write, binding, construct)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.dead_stores"><code class="name flex">
+<span>def <span class="ident">dead_stores</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every write identifier in the script whose stored value is dead, in source order.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L138-L147" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dead_stores(self) -&gt; list[JsIdentifier]:
+    &#34;&#34;&#34;
+    Every write identifier in the script whose stored value is dead, in source order.
+    &#34;&#34;&#34;
+    result: list[JsIdentifier] = []
+    for node in self.model.root.walk_in_order():
+        if isinstance(node, JsIdentifier) and self._is_candidate_write(node):
+            if self.is_dead_store(node):
+                result.append(node)
+    return result</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.is_dead_on_entry"><code class="name flex">
+<span>def <span class="ident">is_dead_on_entry</span></span>(<span>self, binding, function)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>function</em> writes <em>binding</em> before reading it on every path, so no value carried into the
+call — from a previous invocation or from load — is ever observed. Answered from the liveness at
+the function's control-flow entry; a binding not tracked in <em>function</em> returns <code>False</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L149-L158" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_dead_on_entry(self, binding: Binding, function: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *function* writes *binding* before reading it on every path, so no value carried into the
+    call — from a previous invocation or from load — is ever observed. Answered from the liveness at
+    the function&#39;s control-flow entry; a binding not tracked in *function* returns `False`.
+    &#34;&#34;&#34;
+    graph = self._flow.graph_of(function)
+    if graph is None:
+        return False
+    return binding not in self.live_in(graph.entry)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.localization_target"><code class="name flex">
+<span>def <span class="ident">localization_target</span></span>(<span>self, binding)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The function into which <em>binding</em>, a script-scope <code>var</code>, can be soundly relocated, or <code>None</code>. A
+binding qualifies when every reference is owned by one function, that function writes it before
+any read (so a value carried across calls or from load is never observed), it has no initializer
+whose load-time effect the move would strand, no reference reaches it through a global-object
+alias member (<code>globalThis.x</code>, which would no longer find it once it leaves the global object),
+it is not exported (an importer reads its value where the module leaves it, which a body local
+cannot answer), and the program keeps no reflection surface that could read it by name.
+Relocating it tightens a pseudo-global into the local it behaves as.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L160-L184" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def localization_target(self, binding: Binding) -&gt; Node | None:
+    &#34;&#34;&#34;
+    The function into which *binding*, a script-scope `var`, can be soundly relocated, or `None`. A
+    binding qualifies when every reference is owned by one function, that function writes it before
+    any read (so a value carried across calls or from load is never observed), it has no initializer
+    whose load-time effect the move would strand, no reference reaches it through a global-object
+    alias member (`globalThis.x`, which would no longer find it once it leaves the global object),
+    it is not exported (an importer reads its value where the module leaves it, which a body local
+    cannot answer), and the program keeps no reflection surface that could read it by name.
+    Relocating it tightens a pseudo-global into the local it behaves as.
+    &#34;&#34;&#34;
+    if self.model.has_reflection_surface():
+        return None
+    if binding.kind is not BindingKind.VAR or binding.scope is not self.model.root_scope:
+        return None
+    if binding.exported or binding.has_member_reference:
+        return None
+    if self._has_initializer(binding):
+        return None
+    function = self._sole_owning_function(binding)
+    if function is None:
+        return None
+    if not self.is_dead_on_entry(binding, function):
+        return None
+    return function</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.liveness.LivenessModel.localizable_bindings"><code class="name flex">
+<span>def <span class="ident">localizable_bindings</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every script-scope <code>var</code> binding that can be relocated into a function, each paired with that
+function, in the order the script declares them.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/liveness.py#L186-L196" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def localizable_bindings(self) -&gt; list[tuple[Binding, Node]]:
+    &#34;&#34;&#34;
+    Every script-scope `var` binding that can be relocated into a function, each paired with that
+    function, in the order the script declares them.
+    &#34;&#34;&#34;
+    result: list[tuple[Binding, Node]] = []
+    for binding in self.model.root_scope.bindings.values():
+        function = self.localization_target(binding)
+        if function is not None:
+            result.append((binding, function))
+    return result</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.build_liveness" href="#refinery.lib.scripts.js.analysis.liveness.build_liveness">build_liveness</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel">LivenessModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_in" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_in">live_in</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_out" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.live_out">live_out</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.node_of" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.node_of">node_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.is_dead_store" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.is_dead_store">is_dead_store</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.dead_stores" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.dead_stores">dead_stores</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.is_dead_on_entry" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.is_dead_on_entry">is_dead_on_entry</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.localization_target" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.localization_target">localization_target</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel.localizable_bindings" href="#refinery.lib.scripts.js.analysis.liveness.LivenessModel.localizable_bindings">localizable_bindings</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

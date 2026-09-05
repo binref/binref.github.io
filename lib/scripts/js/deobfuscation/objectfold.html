@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.objectfold documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.objectfold</code></h1>
+</header>
+<section id="section-intro">
+<p>Inline properties of locally-defined constant object literals.</p>
+<p>When the obfuscator lifts string literals and operator wrappers into a local object, this
+transformer detects the pattern and replaces all member-access reads with the inlined property
+values. Function-valued properties that are trivial wrappers (single return statement whose body is
+an expression using only parameters) are inlined at the call site.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/objectfold.py#L1-L501" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Inline properties of locally-defined constant object literals.
+
+When the obfuscator lifts string literals and operator wrappers into a local object, this
+transformer detects the pattern and replaces all member-access reads with the inlined property
+values. Function-valued properties that are trivial wrappers (single return statement whose body is
+an expression using only parameters) are inlined at the call site.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Callable, Iterator
+
+from refinery.lib.scripts import (
+    Node,
+    Statement,
+    Transformer,
+    _clone_node,
+    _replace_in_parent,
+)
+from refinery.lib.scripts.js.analysis.cache import model_cache
+from refinery.lib.scripts.js.analysis.dominance import DominanceModel
+from refinery.lib.scripts.js.analysis.effects import EffectModel, object_sets_prototype
+from refinery.lib.scripts.js.analysis.model import (
+    Binding,
+    Scope,
+    SemanticModel,
+    is_use_position,
+    walk_receiver_scope,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    ScopeProcessingTransformer,
+    a_host_reaches_the_binding,
+    access_key,
+    make_undefined_expression,
+    property_key,
+    property_provably_absent,
+    references_receiver_this,
+    remove_declarator,
+    spelled_for_the_callee_position,
+    try_inline_trivial_function,
+    walk_scope,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsArrowFunctionExpression,
+    JsCallExpression,
+    JsClassExpression,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsMemberExpression,
+    JsNewExpression,
+    JsObjectExpression,
+    JsProperty,
+    JsPropertyKind,
+    JsRegExpLiteral,
+    JsScript,
+    JsTaggedTemplateExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+    strip_parens,
+)
+
+
+def _build_property_map(
+    obj: JsObjectExpression,
+) -&gt; dict[str, Node] | None:
+    &#34;&#34;&#34;
+    Build a map from string key to value node for every property in the object literal.
+    Returns `None` if any property cannot be statically keyed (computed key, spread, etc.). Each value
+    is stripped of enclosing parentheses so the fold guards inspect the expression itself: a
+    parenthesized function value (`{ f: (function(){}) }`) must reach the identity guard as the function
+    it wraps, or a bare `o.f` read would fold to a fresh clone and break `o.f === o.f`.
+    &#34;&#34;&#34;
+    result: dict[str, Node] = {}
+    for prop in obj.properties:
+        if not isinstance(prop, JsProperty):
+            return None
+        if prop.kind is not JsPropertyKind.INIT:
+            return None
+        key = property_key(prop)
+        value = strip_parens(prop.value)
+        if key is None or value is None:
+            return None
+        result[key] = value
+    return result
+
+
+def _object_binds_this(prop_map: dict[str, Node]) -&gt; bool:
+    &#34;&#34;&#34;
+    Return whether any property value depends on `this` being supplied by the object, so that
+    folding the object away (detaching the value from its receiver) would change its meaning.
+    &#34;&#34;&#34;
+    return any(references_receiver_this(value) for value in prop_map.values())
+
+
+def _function_observes_its_identity(func: JsFunctionExpression) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a call to *func* can tell one copy of the function from another: the body reads the
+    function expression&#39;s own name, or reaches `arguments.callee` — through its own `arguments`
+    binding, which an arrow inside the body shares and a nested regular function does not. Cloning
+    such a function into each call site answers a different object at each, so `o.m() === o.m()`
+    flips where the original compared one function against itself. A computed `arguments[k]` whose
+    key is not statically known counts, since `k` may name `callee` at runtime.
+    &#34;&#34;&#34;
+    name = func.id.name if func.id is not None else None
+    if name is not None and any(
+        isinstance(node, JsIdentifier)
+        and node.name == name
+        and node is not func.id
+        and is_use_position(node)
+        for node in func.walk()
+    ):
+        return True
+    for node in walk_receiver_scope(func):
+        if not isinstance(node, JsMemberExpression) or node.object is None:
+            continue
+        base = strip_parens(node.object)
+        if not isinstance(base, JsIdentifier) or base.name != &#39;arguments&#39;:
+            continue
+        key = access_key(node)
+        if key is None or key == &#39;callee&#39;:
+            return True
+    return False
+
+
+def _binding_inside(binding: Binding, value: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *binding* is declared inside *value* — its scope is introduced by *value* or a node nested
+    within it — so that a clone of *value* carries the binding along and a reference to it stays bound
+    to the same declaration wherever the clone lands.
+    &#34;&#34;&#34;
+    node = binding.scope.node
+    return node is value or node.is_descendant_of(value)
+
+
+def _free_external_bindings(
+    model: SemanticModel, value: Node
+) -&gt; Iterator[tuple[JsIdentifier, Binding | None]]:
+    &#34;&#34;&#34;
+    Yield each free identifier in *value* that is in a use position, paired with the binding it
+    resolves to (or `None` for an unresolved external name) — every reference a clone of *value*
+    would re-resolve at its destination, excluding the ones bound inside *value* itself, which the
+    clone carries along. The shared traversal behind `_value_is_stable` (does any such binding get
+    reassigned) and `_resolves_consistently` (does any such name rebind at the fold site).
+    &#34;&#34;&#34;
+    for node in value.walk():
+        if not isinstance(node, JsIdentifier) or not model.is_reference(node):
+            continue
+        binding = model.resolve(node)
+        if binding is not None and _binding_inside(binding, value):
+            continue
+        yield node, binding
+
+
+def _resolves_consistently(
+    model: SemanticModel,
+    value: Node,
+    dest: Scope | None,
+    free: list[tuple[JsIdentifier, Binding | None]] | None = None,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether every free identifier in *value* resolves, from *dest* — the scope the value would be
+    folded into — to the same binding it reads at the object literal. A value moved into a use site
+    that binds one of its free names anew (a parameter, a block-scoped `let`, or the per-call
+    `arguments` of a nested function) would silently rebind there and read a different value than the
+    object captured. This is the spatial counterpart to the temporal `_value_is_stable`; an identifier
+    bound inside *value* itself places no constraint, since the clone carries its binding with it.
+
+    *free* is the precomputed `_free_external_bindings` list for *value*; it does not depend on *dest*,
+    so a caller checking one value against several destinations passes it once to avoid re-walking.
+    &#34;&#34;&#34;
+    if free is None:
+        free = list(_free_external_bindings(model, value))
+    return all(binding is model.lookup(node.name, dest) for node, binding in free)
+
+
+class JsObjectFold(ScopeProcessingTransformer):
+    &#34;&#34;&#34;
+    Inline properties of locally-defined constant objects. Processes at function-scope and
+    script-scope boundaries because JavaScript `var` declarations are function-scoped.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self._root: JsScript | None = None
+
+    def visit_JsScript(self, node: JsScript):
+        self._root = node
+        return super().visit_JsScript(node)
+
+    def _process_scope_body(self, scope: Node, body: list[Statement]) -&gt; None:
+        assert self._root is not None
+        cache = model_cache(self, self._root)
+        for declarator in list(self._find_candidates(body)):
+            name = declarator.id
+            init = declarator.init
+            if not isinstance(name, JsIdentifier) or not isinstance(init, JsObjectExpression):
+                continue
+            prop_map = _build_property_map(init)
+            if prop_map is None or _object_binds_this(prop_map) or object_sets_prototype(init):
+                continue
+            model = cache.model
+            binding = model.binding_of(name)
+            if binding is None or binding.writes or model.singular_value(binding) is not init:
+                continue
+            if a_host_reaches_the_binding(model, binding, self.options):
+                continue
+            if self._has_freshly_allocating_value(prop_map):
+                continue
+            if not cache.effects.is_side_effect_free(init, {name.name}):
+                continue
+            if not cache.effects.binding_is_immutable_container(binding, member_calls_mutate=False):
+                continue
+            if self._self_referential(model, binding, init):
+                continue
+            if any(not self._value_is_stable(model, value) for value in prop_map.values()):
+                continue
+            if any(
+                self._eagerly_reads_mutable_container(model, cache.effects, value)
+                for value in prop_map.values()
+            ):
+                continue
+            if any(
+                self._reads_lexical_in_dead_zone(model, cache.dominance, value)
+                for value in prop_map.values()
+            ):
+                continue
+            changed, can_remove = self._inline_references(
+                model, cache.effects, binding, prop_map, self, cache.assignment.read_established
+            )
+            if changed:
+                if can_remove:
+                    remove_declarator(declarator)
+                self.mark_changed()
+
+    @staticmethod
+    def _find_candidates(body: list[Statement]) -&gt; Iterator[JsVariableDeclarator]:
+        &#34;&#34;&#34;
+        Yield each variable declarator in *body* that initializes a variable to an object literal — the
+        syntactic precondition for folding. Whether the literal is actually foldable (every key static,
+        the name a single immutable binding) is decided per candidate by the caller against a model
+        rebuilt after any earlier fold in the same body, and its property map is read from the live
+        initializer at that point, so an earlier fold into this initializer is reflected.
+        &#34;&#34;&#34;
+        for stmt in body:
+            if not isinstance(stmt, JsVariableDeclaration):
+                continue
+            for decl in stmt.declarations:
+                if isinstance(decl, JsVariableDeclarator) and isinstance(decl.init, JsObjectExpression):
+                    yield decl
+
+    @staticmethod
+    def _value_is_stable(model: SemanticModel, value: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *value* evaluates to the same result wherever it is inlined — the precondition for
+        moving a property value from the object literal to each access site. It holds when every
+        binding the value reads as a free variable keeps its value: a property whose value reads a
+        local that is reassigned (`{ p: x }` where `x` is later written) would, once inlined past
+        the reassignment, read the new value instead of the one the object captured at the literal.
+        A reassignment through a dynamic scope — a `with` body that names the binding, or a direct
+        `eval` in its function — counts too, since it rebinds the name without leaving a static
+        write; the model answers this over the binding&#39;s dynamic references. Identifiers bound
+        inside *value* itself (a function&#39;s own parameters) and free references that resolve to no
+        binding (external globals) place no constraint, so a string, a numeric literal, a `const`
+        reference, or a self-contained function wrapper all remain foldable.
+        &#34;&#34;&#34;
+        return all(
+            binding is None or model.binding_never_reassigned(binding)
+            for _, binding in _free_external_bindings(model, value)
+        )
+
+    @staticmethod
+    def _eagerly_reads_mutable_container(
+        model: SemanticModel, effects: EffectModel, value: Node,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *value* eagerly reads the contents of a mutable container — a binding holding an object
+        or array whose contents are not stable after construction (`{ p: arr + &#39;&#39; }` followed by a later
+        `arr.push(9)`). Folding clones the value into every access site, re-evaluating the read there, so
+        a mutation made between the object&#39;s construction and a later read would be observed at the read
+        but not at the literal. A bare-identifier value is exempt: folding it relocates a reference to the
+        same binding, so the container&#39;s identity — and every mutation through it — stays equally visible
+        at each site. A read inside a nested function is not eager: it runs only when the function is
+        later called, resolving the container by reference then, so `walk_scope` does not enter one.
+        Immutability is judged with the value&#39;s own read excluded, so coercing a primitive, or a container
+        never mutated elsewhere — whose binding carries no other mutating reference — stays stable and
+        still folds. This is the state-reading counterpart to `_value_is_stable`, which guards only against
+        the binding being rebound, not against its container&#39;s contents being mutated in place.
+        &#34;&#34;&#34;
+        if isinstance(value, JsIdentifier):
+            return False
+        for node in walk_scope(value):
+            if not isinstance(node, JsIdentifier) or not model.is_reference(node):
+                continue
+            binding = model.resolve(node)
+            if binding is None or _binding_inside(binding, value):
+                continue
+            if not effects.binding_is_immutable_container(binding, member_calls_mutate=True, exclude=value):
+                return True
+        return False
+
+    @staticmethod
+    def _reads_lexical_in_dead_zone(
+        model: SemanticModel, dominance: DominanceModel, value: Node,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *value*, evaluated eagerly when the object literal is built, reads a `let`, `const`, or
+        `class` binding not yet established there — a read in the binding&#39;s temporal dead zone, a
+        `ReferenceError` at runtime. Folding clones the value into each access site, which may lie past
+        the binding&#39;s declaration, so the read would move out of the dead zone and observe the declared
+        value instead of throwing. A read inside a nested function is not eager — it runs at call time,
+        where folding a called wrapper preserves its position — so `walk_scope` does not enter one. Only
+        a lexical binding has a dead zone; a `var`, a parameter, or an external global places no
+        constraint. This is the temporal-dead-zone counterpart to `_value_is_stable`, which guards only
+        against the binding being rebound, not against the value reading it before its declaration runs.
+        &#34;&#34;&#34;
+        for node in walk_scope(value):
+            if not isinstance(node, JsIdentifier) or not model.is_reference(node):
+                continue
+            binding = model.resolve(node)
+            if binding is None or _binding_inside(binding, value):
+                continue
+            if binding.is_lexical and not dominance.binding_established_before(binding, node):
+                return True
+        return False
+
+    @staticmethod
+    def _has_freshly_allocating_value(prop_map: dict[str, Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any property value, when evaluated, may allocate a fresh object whose identity folding
+        would duplicate. Folding clones the value into every access site, so a value that builds a new
+        array or object — directly as a container literal, or by returning one from a call or `new`
+        (only a side-effect-free, hence pure, one reaches this far) — would become a distinct object at
+        each site: two `o.arr` reads that name one shared array become two arrays, diverging on identity
+        (`o.arr === o.arr` flips from true to false), on a mutation made through one access (or an alias,
+        argument, or method call that reaches it) and observed through another, and on element identity
+        one level down. Deciding precisely which such folds are safe is the nested-container escape
+        analysis the model does not yet provide, so such an object is left unfolded. A function or arrow
+        literal value is judged per reference instead — folded only where it is immediately called, so
+        its identity is never observed — and a primitive, a binding, a member read, or an operator over
+        them duplicates without a fresh identity, so none of those constrains the fold.
+        &#34;&#34;&#34;
+        return any(JsObjectFold._value_allocates(value) for value in prop_map.values())
+
+    @staticmethod
+    def _value_allocates(value: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether evaluating *value* may allocate a fresh object — a container literal it builds directly,
+        a regular-expression or class literal (each evaluation mints a new object), or one a call,
+        `new`, or tagged template in its evaluation may return. A function or arrow literal value is
+        excluded, since its own identity is handled where it is folded; a nested function inside the
+        value is not entered, as its body runs only when the function is later called, not when the
+        value the object captured is evaluated.
+
+        This is a *may*-allocate question and must not be merged with `EffectModel._fresh_kind`, which is a
+        *must*-allocate one. The two answer about different rewrites: this one about identity duplication
+        under cloning (`o.arr === o.arr` flipping if the fold mints two arrays), that one about whether a
+        write through a base can be observed. They are not even monotone in one another — a bare call counts
+        as allocating here and as `NOT_FRESH` there — so neither implies the other in either direction.
+        &#34;&#34;&#34;
+        if isinstance(value, (JsFunctionExpression, JsArrowFunctionExpression)):
+            return False
+        return any(
+            isinstance(node, (
+                JsArrayExpression,
+                JsObjectExpression,
+                JsCallExpression,
+                JsClassExpression,
+                JsNewExpression,
+                JsRegExpLiteral,
+                JsTaggedTemplateExpression,
+            ))
+            for node in walk_scope(value)
+        )
+
+    @staticmethod
+    def _self_referential(model: SemanticModel, binding: Binding, init: JsObjectExpression) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any reference to *binding* lies within its own initializer *init* — the object names
+        itself in one of its property values (`var o = { f: function() { return o.x; } }`). Inlining
+        such a value into a use site re-introduces a reference to the object there, so removing the
+        declaration would leave it dangling; the caller skips folding the object rather than fold it
+        into invalid code.
+        &#34;&#34;&#34;
+        return any(ref.is_descendant_of(init) for ref in model.references(binding))
+
+    @staticmethod
+    def _inline_references(
+        model: SemanticModel,
+        effects: EffectModel,
+        binding: Binding,
+        prop_map: dict[str, Node],
+        transformer: Transformer,
+        read_established: Callable[[JsIdentifier], bool],
+    ) -&gt; tuple[bool, bool]:
+        &#34;&#34;&#34;
+        Replace each `obj[&#39;key&#39;]` access through *binding* with the corresponding property value. For
+        function-valued properties called as `obj[&#39;key&#39;](args)`, inline the call. A key the property
+        map does not hold is read off the prototype chain instead, so what it evaluates to is
+        `property_provably_absent`&#39;s to say and not this transform&#39;s: an inherited member is left
+        intact because folding `o.toString` to `undefined` turns `o.toString()` into `undefined()`,
+        and every key at all is left intact once the file has written to a prototype the read walks,
+        because then `undefined` is not what the read answers. Iterating the binding&#39;s resolved
+        references (not every textual occurrence of the name) keeps a shadowing inner binding of the
+        same name untouched.
+
+        Two per-reference conditions block a fold that would change meaning at the destination, leaving
+        the access intact. A function-valued property is folded only where it is immediately called
+        (the value&#39;s identity never escapes); a bare read of it is kept, since cloning it into two sites
+        would make `o.f === o.f` two distinct functions. And a value is folded into a use site only when
+        each of its free identifiers resolves to the same binding there as at the literal, so a value
+        read inside a nested function that rebinds one of those names — a parameter, a block `let`, or
+        that function&#39;s own `arguments` — is not silently recaptured.
+
+        Returns a pair `(changed, can_remove)` where *changed* is True when any replacement was made and
+        *can_remove* is True when every reference was folded away, so no use of the binding survives — a
+        bare reference (an alias such as `var b = obj`), a retained inherited-member access, or a
+        reference one of the two conditions above kept leaves *can_remove* False so the declaration is
+        kept. A reference a dynamic scope resolves at runtime — a name inside a `with` body, held in the
+        binding&#39;s dynamic references and never folded here — likewise keeps the declaration, so it is not
+        removed out from under a use the fold left in place. A reference performed through a global-object
+        alias (`globalThis.o`, a member node rather than an identifier) also keeps the declaration and is
+        not folded: folding through it (`globalThis.o.x` to the property value) holds only under the script
+        execution model, where a top-level `var` becomes a global property, not when the global is
+        module-scoped.
+
+        A property no access reads is dropped with the declaration when it is removed, so a value
+        whose read may throw a `ReferenceError` no completed write establishes keeps the
+        declaration: building the object read that value, and dropping the declaration would mute
+        the throw. A read the *read_established* proof vouches for, and every value accessed at
+        least once (relocated to its use, its read still performed there), places no such
+        constraint. Relocating that read does move it past any statement between the literal and the
+        use, so a throw it carries is reordered past those statements&#39; effects — a separate,
+        unpinned defect (`test_unfixed_defects.TestARelocatedMayThrowReadIsReorderedPastAnEffect`).
+        &#34;&#34;&#34;
+        changed = False
+        can_remove = not binding.dynamic_refs
+        consistent: dict[tuple[int, int], bool] = {}
+        free_external: dict[int, list[tuple[JsIdentifier, Binding | None]]] = {}
+        accessed_keys: set[str] = set()
+        for ref in list(model.references(binding)):
+            if not isinstance(ref, JsIdentifier):
+                can_remove = False
+                continue
+            member = ref.parent
+            if not isinstance(member, JsMemberExpression) or member.object is not ref:
+                can_remove = False
+                continue
+            key = access_key(member)
+            if key is None:
+                can_remove = False
+                continue
+            if key not in prop_map:
+                if not property_provably_absent(effects, dict, key):
+                    can_remove = False
+                    continue
+                _replace_in_parent(member, make_undefined_expression())
+                changed = True
+                continue
+            value = prop_map[key]
+            accessed_keys.add(key)
+            parent = member.parent
+            call = parent if isinstance(parent, JsCallExpression) and parent.callee is member else None
+            if call is not None and isinstance(value, JsFunctionExpression):
+                replacement = try_inline_trivial_function(
+                    value, call.arguments, transformer=transformer
+                )
+                if replacement is not None:
+                    _replace_in_parent(
+                        call, spelled_for_the_callee_position(call, replacement))
+                    changed = True
+                    continue
+                if _function_observes_its_identity(value):
+                    can_remove = False
+                    continue
+            if isinstance(value, (JsFunctionExpression, JsArrowFunctionExpression)) and call is None:
+                can_remove = False
+                continue
+            dest = model.scope_of(member)
+            ckey = (id(value), id(dest))
+            cached = consistent.get(ckey)
+            if cached is None:
+                free = free_external.get(id(value))
+                if free is None:
+                    free = list(_free_external_bindings(model, value))
+                    free_external[id(value)] = free
+                cached = _resolves_consistently(model, value, dest, free)
+                consistent[ckey] = cached
+            if not cached:
+                can_remove = False
+                continue
+            _replace_in_parent(member, _clone_node(value))
+            changed = True
+        if can_remove and any(
+            key not in accessed_keys
+            and not effects.is_side_effect_free(
+                value, reads_may_throw=True, read_established=read_established)
+            for key, value in prop_map.items()
+        ):
+            can_remove = False
+        return changed, can_remove</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.objectfold.JsObjectFold"><code class="flex name class">
+<span>class <span class="ident">JsObjectFold</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Inline properties of locally-defined constant objects. Processes at function-scope and
+script-scope boundaries because JavaScript <code>var</code> declarations are function-scoped.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/objectfold.py#L177-L501" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsObjectFold(ScopeProcessingTransformer):
+    &#34;&#34;&#34;
+    Inline properties of locally-defined constant objects. Processes at function-scope and
+    script-scope boundaries because JavaScript `var` declarations are function-scoped.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self._root: JsScript | None = None
+
+    def visit_JsScript(self, node: JsScript):
+        self._root = node
+        return super().visit_JsScript(node)
+
+    def _process_scope_body(self, scope: Node, body: list[Statement]) -&gt; None:
+        assert self._root is not None
+        cache = model_cache(self, self._root)
+        for declarator in list(self._find_candidates(body)):
+            name = declarator.id
+            init = declarator.init
+            if not isinstance(name, JsIdentifier) or not isinstance(init, JsObjectExpression):
+                continue
+            prop_map = _build_property_map(init)
+            if prop_map is None or _object_binds_this(prop_map) or object_sets_prototype(init):
+                continue
+            model = cache.model
+            binding = model.binding_of(name)
+            if binding is None or binding.writes or model.singular_value(binding) is not init:
+                continue
+            if a_host_reaches_the_binding(model, binding, self.options):
+                continue
+            if self._has_freshly_allocating_value(prop_map):
+                continue
+            if not cache.effects.is_side_effect_free(init, {name.name}):
+                continue
+            if not cache.effects.binding_is_immutable_container(binding, member_calls_mutate=False):
+                continue
+            if self._self_referential(model, binding, init):
+                continue
+            if any(not self._value_is_stable(model, value) for value in prop_map.values()):
+                continue
+            if any(
+                self._eagerly_reads_mutable_container(model, cache.effects, value)
+                for value in prop_map.values()
+            ):
+                continue
+            if any(
+                self._reads_lexical_in_dead_zone(model, cache.dominance, value)
+                for value in prop_map.values()
+            ):
+                continue
+            changed, can_remove = self._inline_references(
+                model, cache.effects, binding, prop_map, self, cache.assignment.read_established
+            )
+            if changed:
+                if can_remove:
+                    remove_declarator(declarator)
+                self.mark_changed()
+
+    @staticmethod
+    def _find_candidates(body: list[Statement]) -&gt; Iterator[JsVariableDeclarator]:
+        &#34;&#34;&#34;
+        Yield each variable declarator in *body* that initializes a variable to an object literal — the
+        syntactic precondition for folding. Whether the literal is actually foldable (every key static,
+        the name a single immutable binding) is decided per candidate by the caller against a model
+        rebuilt after any earlier fold in the same body, and its property map is read from the live
+        initializer at that point, so an earlier fold into this initializer is reflected.
+        &#34;&#34;&#34;
+        for stmt in body:
+            if not isinstance(stmt, JsVariableDeclaration):
+                continue
+            for decl in stmt.declarations:
+                if isinstance(decl, JsVariableDeclarator) and isinstance(decl.init, JsObjectExpression):
+                    yield decl
+
+    @staticmethod
+    def _value_is_stable(model: SemanticModel, value: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *value* evaluates to the same result wherever it is inlined — the precondition for
+        moving a property value from the object literal to each access site. It holds when every
+        binding the value reads as a free variable keeps its value: a property whose value reads a
+        local that is reassigned (`{ p: x }` where `x` is later written) would, once inlined past
+        the reassignment, read the new value instead of the one the object captured at the literal.
+        A reassignment through a dynamic scope — a `with` body that names the binding, or a direct
+        `eval` in its function — counts too, since it rebinds the name without leaving a static
+        write; the model answers this over the binding&#39;s dynamic references. Identifiers bound
+        inside *value* itself (a function&#39;s own parameters) and free references that resolve to no
+        binding (external globals) place no constraint, so a string, a numeric literal, a `const`
+        reference, or a self-contained function wrapper all remain foldable.
+        &#34;&#34;&#34;
+        return all(
+            binding is None or model.binding_never_reassigned(binding)
+            for _, binding in _free_external_bindings(model, value)
+        )
+
+    @staticmethod
+    def _eagerly_reads_mutable_container(
+        model: SemanticModel, effects: EffectModel, value: Node,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *value* eagerly reads the contents of a mutable container — a binding holding an object
+        or array whose contents are not stable after construction (`{ p: arr + &#39;&#39; }` followed by a later
+        `arr.push(9)`). Folding clones the value into every access site, re-evaluating the read there, so
+        a mutation made between the object&#39;s construction and a later read would be observed at the read
+        but not at the literal. A bare-identifier value is exempt: folding it relocates a reference to the
+        same binding, so the container&#39;s identity — and every mutation through it — stays equally visible
+        at each site. A read inside a nested function is not eager: it runs only when the function is
+        later called, resolving the container by reference then, so `walk_scope` does not enter one.
+        Immutability is judged with the value&#39;s own read excluded, so coercing a primitive, or a container
+        never mutated elsewhere — whose binding carries no other mutating reference — stays stable and
+        still folds. This is the state-reading counterpart to `_value_is_stable`, which guards only against
+        the binding being rebound, not against its container&#39;s contents being mutated in place.
+        &#34;&#34;&#34;
+        if isinstance(value, JsIdentifier):
+            return False
+        for node in walk_scope(value):
+            if not isinstance(node, JsIdentifier) or not model.is_reference(node):
+                continue
+            binding = model.resolve(node)
+            if binding is None or _binding_inside(binding, value):
+                continue
+            if not effects.binding_is_immutable_container(binding, member_calls_mutate=True, exclude=value):
+                return True
+        return False
+
+    @staticmethod
+    def _reads_lexical_in_dead_zone(
+        model: SemanticModel, dominance: DominanceModel, value: Node,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *value*, evaluated eagerly when the object literal is built, reads a `let`, `const`, or
+        `class` binding not yet established there — a read in the binding&#39;s temporal dead zone, a
+        `ReferenceError` at runtime. Folding clones the value into each access site, which may lie past
+        the binding&#39;s declaration, so the read would move out of the dead zone and observe the declared
+        value instead of throwing. A read inside a nested function is not eager — it runs at call time,
+        where folding a called wrapper preserves its position — so `walk_scope` does not enter one. Only
+        a lexical binding has a dead zone; a `var`, a parameter, or an external global places no
+        constraint. This is the temporal-dead-zone counterpart to `_value_is_stable`, which guards only
+        against the binding being rebound, not against the value reading it before its declaration runs.
+        &#34;&#34;&#34;
+        for node in walk_scope(value):
+            if not isinstance(node, JsIdentifier) or not model.is_reference(node):
+                continue
+            binding = model.resolve(node)
+            if binding is None or _binding_inside(binding, value):
+                continue
+            if binding.is_lexical and not dominance.binding_established_before(binding, node):
+                return True
+        return False
+
+    @staticmethod
+    def _has_freshly_allocating_value(prop_map: dict[str, Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any property value, when evaluated, may allocate a fresh object whose identity folding
+        would duplicate. Folding clones the value into every access site, so a value that builds a new
+        array or object — directly as a container literal, or by returning one from a call or `new`
+        (only a side-effect-free, hence pure, one reaches this far) — would become a distinct object at
+        each site: two `o.arr` reads that name one shared array become two arrays, diverging on identity
+        (`o.arr === o.arr` flips from true to false), on a mutation made through one access (or an alias,
+        argument, or method call that reaches it) and observed through another, and on element identity
+        one level down. Deciding precisely which such folds are safe is the nested-container escape
+        analysis the model does not yet provide, so such an object is left unfolded. A function or arrow
+        literal value is judged per reference instead — folded only where it is immediately called, so
+        its identity is never observed — and a primitive, a binding, a member read, or an operator over
+        them duplicates without a fresh identity, so none of those constrains the fold.
+        &#34;&#34;&#34;
+        return any(JsObjectFold._value_allocates(value) for value in prop_map.values())
+
+    @staticmethod
+    def _value_allocates(value: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether evaluating *value* may allocate a fresh object — a container literal it builds directly,
+        a regular-expression or class literal (each evaluation mints a new object), or one a call,
+        `new`, or tagged template in its evaluation may return. A function or arrow literal value is
+        excluded, since its own identity is handled where it is folded; a nested function inside the
+        value is not entered, as its body runs only when the function is later called, not when the
+        value the object captured is evaluated.
+
+        This is a *may*-allocate question and must not be merged with `EffectModel._fresh_kind`, which is a
+        *must*-allocate one. The two answer about different rewrites: this one about identity duplication
+        under cloning (`o.arr === o.arr` flipping if the fold mints two arrays), that one about whether a
+        write through a base can be observed. They are not even monotone in one another — a bare call counts
+        as allocating here and as `NOT_FRESH` there — so neither implies the other in either direction.
+        &#34;&#34;&#34;
+        if isinstance(value, (JsFunctionExpression, JsArrowFunctionExpression)):
+            return False
+        return any(
+            isinstance(node, (
+                JsArrayExpression,
+                JsObjectExpression,
+                JsCallExpression,
+                JsClassExpression,
+                JsNewExpression,
+                JsRegExpLiteral,
+                JsTaggedTemplateExpression,
+            ))
+            for node in walk_scope(value)
+        )
+
+    @staticmethod
+    def _self_referential(model: SemanticModel, binding: Binding, init: JsObjectExpression) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any reference to *binding* lies within its own initializer *init* — the object names
+        itself in one of its property values (`var o = { f: function() { return o.x; } }`). Inlining
+        such a value into a use site re-introduces a reference to the object there, so removing the
+        declaration would leave it dangling; the caller skips folding the object rather than fold it
+        into invalid code.
+        &#34;&#34;&#34;
+        return any(ref.is_descendant_of(init) for ref in model.references(binding))
+
+    @staticmethod
+    def _inline_references(
+        model: SemanticModel,
+        effects: EffectModel,
+        binding: Binding,
+        prop_map: dict[str, Node],
+        transformer: Transformer,
+        read_established: Callable[[JsIdentifier], bool],
+    ) -&gt; tuple[bool, bool]:
+        &#34;&#34;&#34;
+        Replace each `obj[&#39;key&#39;]` access through *binding* with the corresponding property value. For
+        function-valued properties called as `obj[&#39;key&#39;](args)`, inline the call. A key the property
+        map does not hold is read off the prototype chain instead, so what it evaluates to is
+        `property_provably_absent`&#39;s to say and not this transform&#39;s: an inherited member is left
+        intact because folding `o.toString` to `undefined` turns `o.toString()` into `undefined()`,
+        and every key at all is left intact once the file has written to a prototype the read walks,
+        because then `undefined` is not what the read answers. Iterating the binding&#39;s resolved
+        references (not every textual occurrence of the name) keeps a shadowing inner binding of the
+        same name untouched.
+
+        Two per-reference conditions block a fold that would change meaning at the destination, leaving
+        the access intact. A function-valued property is folded only where it is immediately called
+        (the value&#39;s identity never escapes); a bare read of it is kept, since cloning it into two sites
+        would make `o.f === o.f` two distinct functions. And a value is folded into a use site only when
+        each of its free identifiers resolves to the same binding there as at the literal, so a value
+        read inside a nested function that rebinds one of those names — a parameter, a block `let`, or
+        that function&#39;s own `arguments` — is not silently recaptured.
+
+        Returns a pair `(changed, can_remove)` where *changed* is True when any replacement was made and
+        *can_remove* is True when every reference was folded away, so no use of the binding survives — a
+        bare reference (an alias such as `var b = obj`), a retained inherited-member access, or a
+        reference one of the two conditions above kept leaves *can_remove* False so the declaration is
+        kept. A reference a dynamic scope resolves at runtime — a name inside a `with` body, held in the
+        binding&#39;s dynamic references and never folded here — likewise keeps the declaration, so it is not
+        removed out from under a use the fold left in place. A reference performed through a global-object
+        alias (`globalThis.o`, a member node rather than an identifier) also keeps the declaration and is
+        not folded: folding through it (`globalThis.o.x` to the property value) holds only under the script
+        execution model, where a top-level `var` becomes a global property, not when the global is
+        module-scoped.
+
+        A property no access reads is dropped with the declaration when it is removed, so a value
+        whose read may throw a `ReferenceError` no completed write establishes keeps the
+        declaration: building the object read that value, and dropping the declaration would mute
+        the throw. A read the *read_established* proof vouches for, and every value accessed at
+        least once (relocated to its use, its read still performed there), places no such
+        constraint. Relocating that read does move it past any statement between the literal and the
+        use, so a throw it carries is reordered past those statements&#39; effects — a separate,
+        unpinned defect (`test_unfixed_defects.TestARelocatedMayThrowReadIsReorderedPastAnEffect`).
+        &#34;&#34;&#34;
+        changed = False
+        can_remove = not binding.dynamic_refs
+        consistent: dict[tuple[int, int], bool] = {}
+        free_external: dict[int, list[tuple[JsIdentifier, Binding | None]]] = {}
+        accessed_keys: set[str] = set()
+        for ref in list(model.references(binding)):
+            if not isinstance(ref, JsIdentifier):
+                can_remove = False
+                continue
+            member = ref.parent
+            if not isinstance(member, JsMemberExpression) or member.object is not ref:
+                can_remove = False
+                continue
+            key = access_key(member)
+            if key is None:
+                can_remove = False
+                continue
+            if key not in prop_map:
+                if not property_provably_absent(effects, dict, key):
+                    can_remove = False
+                    continue
+                _replace_in_parent(member, make_undefined_expression())
+                changed = True
+                continue
+            value = prop_map[key]
+            accessed_keys.add(key)
+            parent = member.parent
+            call = parent if isinstance(parent, JsCallExpression) and parent.callee is member else None
+            if call is not None and isinstance(value, JsFunctionExpression):
+                replacement = try_inline_trivial_function(
+                    value, call.arguments, transformer=transformer
+                )
+                if replacement is not None:
+                    _replace_in_parent(
+                        call, spelled_for_the_callee_position(call, replacement))
+                    changed = True
+                    continue
+                if _function_observes_its_identity(value):
+                    can_remove = False
+                    continue
+            if isinstance(value, (JsFunctionExpression, JsArrowFunctionExpression)) and call is None:
+                can_remove = False
+                continue
+            dest = model.scope_of(member)
+            ckey = (id(value), id(dest))
+            cached = consistent.get(ckey)
+            if cached is None:
+                free = free_external.get(id(value))
+                if free is None:
+                    free = list(_free_external_bindings(model, value))
+                    free_external[id(value)] = free
+                cached = _resolves_consistently(model, value, dest, free)
+                consistent[ckey] = cached
+            if not cached:
+                can_remove = False
+                continue
+            _replace_in_parent(member, _clone_node(value))
+            changed = True
+        if can_remove and any(
+            key not in accessed_keys
+            and not effects.is_side_effect_free(
+                value, reads_may_throw=True, read_established=read_established)
+            for key, value in prop_map.items()
+        ):
+            can_remove = False
+        return changed, can_remove</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer">ScopeProcessingTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.objectfold.JsObjectFold.visit_JsScript"><code class="name flex">
+<span>def <span class="ident">visit_JsScript</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/objectfold.py#L187-L189" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_JsScript(self, node: JsScript):
+    self._root = node
+    return super().visit_JsScript(node)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer">ScopeProcessingTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScopeProcessingTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.objectfold.JsObjectFold" href="#refinery.lib.scripts.js.deobfuscation.objectfold.JsObjectFold">JsObjectFold</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.objectfold.JsObjectFold.visit_JsScript" href="#refinery.lib.scripts.js.deobfuscation.objectfold.JsObjectFold.visit_JsScript">visit_JsScript</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

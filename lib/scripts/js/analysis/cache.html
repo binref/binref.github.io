@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.cache documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.cache</code></h1>
+</header>
+<section id="section-intro">
+<p>A per-run cache of the JavaScript analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across every transform in a run, rebuilding the models
+only after that script's tree changes — whether a transform announces the change through
+<code><a title="refinery.lib.scripts.Transformer.changed" href="../../index.html#refinery.lib.scripts.Transformer.changed">Transformer.changed</a></code> or an in-pass mutation advances the script's
+<code><a title="refinery.lib.scripts.tree_version" href="../../index.html#refinery.lib.scripts.tree_version">tree_version()</a></code> counter — instead of each transform rebuilding from scratch on
+every pass. The version tracking, invalidation, and transformer-reuse mechanism live in
+<code><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></code>; this module only declares the JavaScript model
+slots and their <code>build_*</code> wiring.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L1-L132" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+A per-run cache of the JavaScript analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across every transform in a run, rebuilding the models
+only after that script&#39;s tree changes — whether a transform announces the change through
+`refinery.lib.scripts.Transformer.changed` or an in-pass mutation advances the script&#39;s
+`refinery.lib.scripts.tree_version` counter — instead of each transform rebuilding from scratch on
+every pass. The version tracking, invalidation, and transformer-reuse mechanism live in
+`refinery.lib.scripts.modelcache.ModelCacheBase`; this module only declares the JavaScript model
+slots and their `build_*` wiring.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Transformer
+from refinery.lib.scripts.js.analysis.assignment import (
+    DefiniteAssignmentModel,
+    build_definite_assignment,
+)
+from refinery.lib.scripts.js.analysis.cfg import ControlFlowModel, build_control_flow_model
+from refinery.lib.scripts.js.analysis.dominance import DominanceModel, build_dominance
+from refinery.lib.scripts.js.analysis.effects import EffectModel, build_effects
+from refinery.lib.scripts.js.analysis.liveness import LivenessModel, build_liveness
+from refinery.lib.scripts.js.analysis.model import SemanticModel, build_semantic_model
+from refinery.lib.scripts.js.analysis.reaching import ReachingModel, build_reaching
+from refinery.lib.scripts.js.model import JsCallExpression, JsNewExpression, JsScript
+from refinery.lib.scripts.js.options import is_host_entrypoint, module_execution
+from refinery.lib.scripts.modelcache import ModelCacheBase
+
+
+class ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the `refinery.lib.scripts.js.analysis.model.SemanticModel`, the
+    `refinery.lib.scripts.js.analysis.effects.EffectModel`, the
+    `refinery.lib.scripts.js.analysis.cfg.ControlFlowModel` shared by the
+    `refinery.lib.scripts.js.analysis.liveness.LivenessModel` and
+    `refinery.lib.scripts.js.analysis.dominance.DominanceModel`, the
+    `refinery.lib.scripts.js.analysis.reaching.ReachingModel` layered on them, and the
+    `refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel` built under the run&#39;s
+    execution model, for one root script.
+    The memoized models are dropped whenever this root&#39;s AST-mutation counter advances past the
+    value they were built at, so a transform that reads the cache after an earlier mutation in the
+    same pass — even one not yet announced through `refinery.lib.scripts.Transformer.changed` —
+    observes models consistent with the current tree. The derived models are always built on the
+    current semantic model, so dropping them together keeps them consistent.
+
+    A transform may hold the models for the length of one pass through `pinned`, which suppresses both
+    drops until the pass ends. The obligation is the one
+    `refinery.lib.scripts.modelcache.ModelCacheBase.pinned` states: the transform&#39;s own rewrites must
+    never make the models it reads more permissive. A rewrite that only restricts what the models would
+    answer makes the held answer the stricter one, so the pass declines where it could have proceeded;
+    one that could reveal a fact the held models predate would act on the stale, more permissive answer
+    and must not read them pinned. The `--no-pin` differential (`test/conftest.py`) is the mechanical
+    check: the whole suite must pass identically with every pin neutralized.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_model&#39;,
+        &#39;_control_flow&#39;,
+        &#39;_effects&#39;,
+        &#39;_liveness&#39;,
+        &#39;_dominance&#39;,
+        &#39;_reaching&#39;,
+        &#39;_assignment&#39;,
+    )
+
+    root: JsScript
+    _model: SemanticModel | None
+    _control_flow: ControlFlowModel | None
+    _effects: EffectModel | None
+    _liveness: LivenessModel | None
+    _dominance: DominanceModel | None
+    _reaching: ReachingModel | None
+    _assignment: DefiniteAssignmentModel | None
+
+    @property
+    def model(self) -&gt; SemanticModel:
+        return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))
+
+    @property
+    def effects(self) -&gt; EffectModel:
+        return self._lazy(&#39;_effects&#39;, lambda: build_effects(self.model))
+
+    @property
+    def control_flow(self) -&gt; ControlFlowModel:
+        return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))
+
+    @property
+    def liveness(self) -&gt; LivenessModel:
+        return self._lazy(&#39;_liveness&#39;, lambda: build_liveness(self.model, self.control_flow))
+
+    @property
+    def dominance(self) -&gt; DominanceModel:
+        return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.model, self.control_flow))
+
+    @property
+    def reaching(self) -&gt; ReachingModel:
+        return self._lazy(&#39;_reaching&#39;, lambda: build_reaching(self.dominance, self.effects))
+
+    @property
+    def assignment(self) -&gt; DefiniteAssignmentModel:
+        &#34;&#34;&#34;
+        The `refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel` for this root,
+        built under the execution model and the host entrypoints the run&#39;s options select. It is the
+        one establishment answer for implicit-global reads: every consumer in a run reads this slot,
+        so no tree is ever judged under two establishment answers at once.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_assignment&#39;, lambda: build_definite_assignment(
+            self.model,
+            self.control_flow,
+            module_scope=module_execution(self.options),
+            host_entrypoint=lambda name: is_host_entrypoint(self.options, name),
+        ))
+
+    def call_established(self, call: JsCallExpression | JsNewExpression) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *call* may be cleared by the purity oracle at all: its callee is a trusted
+        intrinsic, or a local function whose definition reaches the call, so a call textually before
+        a not-yet-established function keeps its runtime throw. This is the one composition of the
+        effect and dominance models every consumer shares, so no pass can pair a purity verdict with
+        a weaker establishment reading than another.
+        &#34;&#34;&#34;
+        return self.effects.call_clearable(
+            call, lambda func: self.dominance.established_before(func, call)
+        )
+
+
+def model_cache(transformer: Transformer, root: JsScript) -&gt; ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `ModelCache` for *root* when one is attached to *transformer* and built
+    over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse within
+    its single-pass lifetime. See `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cache.model_cache"><code class="name flex">
+<span>def <span class="ident">model_cache</span></span>(<span>transformer, root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The pipeline's shared <code><a title="refinery.lib.scripts.js.analysis.cache.ModelCache" href="#refinery.lib.scripts.js.analysis.cache.ModelCache">ModelCache</a></code> for <em>root</em> when one is attached to <em>transformer</em> and built
+over that same root, otherwise a fresh cache stashed back onto <em>transformer</em> for reuse within
+its single-pass lifetime. See <code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">ModelCacheBase.for_transformer()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L126-L132" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def model_cache(transformer: Transformer, root: JsScript) -&gt; ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `ModelCache` for *root* when one is attached to *transformer* and built
+    over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse within
+    its single-pass lifetime. See `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache"><code class="flex name class">
+<span>class <span class="ident">ModelCache</span></span>
+<span>(</span><span>root, options=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Lazily builds and memoizes the <code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>, the
+<code><a title="refinery.lib.scripts.js.analysis.effects.EffectModel" href="effects.html#refinery.lib.scripts.js.analysis.effects.EffectModel">EffectModel</a></code>, the
+<code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel" href="cfg.html#refinery.lib.scripts.js.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code> shared by the
+<code><a title="refinery.lib.scripts.js.analysis.liveness.LivenessModel" href="liveness.html#refinery.lib.scripts.js.analysis.liveness.LivenessModel">LivenessModel</a></code> and
+<code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel" href="dominance.html#refinery.lib.scripts.js.analysis.dominance.DominanceModel">DominanceModel</a></code>, the
+<code><a title="refinery.lib.scripts.js.analysis.reaching.ReachingModel" href="reaching.html#refinery.lib.scripts.js.analysis.reaching.ReachingModel">ReachingModel</a></code> layered on them, and the
+<code><a title="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel" href="assignment.html#refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel">DefiniteAssignmentModel</a></code> built under the run's
+execution model, for one root script.
+The memoized models are dropped whenever this root's AST-mutation counter advances past the
+value they were built at, so a transform that reads the cache after an earlier mutation in the
+same pass — even one not yet announced through <code><a title="refinery.lib.scripts.Transformer.changed" href="../../index.html#refinery.lib.scripts.Transformer.changed">Transformer.changed</a></code> —
+observes models consistent with the current tree. The derived models are always built on the
+current semantic model, so dropping them together keeps them consistent.</p>
+<p>A transform may hold the models for the length of one pass through <code>pinned</code>, which suppresses both
+drops until the pass ends. The obligation is the one
+<code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.pinned" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.pinned">ModelCacheBase.pinned()</a></code> states: the transform's own rewrites must
+never make the models it reads more permissive. A rewrite that only restricts what the models would
+answer makes the held answer the stricter one, so the pass declines where it could have proceeded;
+one that could reveal a fact the held models predate would act on the stale, more permissive answer
+and must not read them pinned. The <code>--no-pin</code> differential (<code>test/conftest.py</code>) is the mechanical
+check: the whole suite must pass identically with every pin neutralized.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L29-L123" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the `refinery.lib.scripts.js.analysis.model.SemanticModel`, the
+    `refinery.lib.scripts.js.analysis.effects.EffectModel`, the
+    `refinery.lib.scripts.js.analysis.cfg.ControlFlowModel` shared by the
+    `refinery.lib.scripts.js.analysis.liveness.LivenessModel` and
+    `refinery.lib.scripts.js.analysis.dominance.DominanceModel`, the
+    `refinery.lib.scripts.js.analysis.reaching.ReachingModel` layered on them, and the
+    `refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel` built under the run&#39;s
+    execution model, for one root script.
+    The memoized models are dropped whenever this root&#39;s AST-mutation counter advances past the
+    value they were built at, so a transform that reads the cache after an earlier mutation in the
+    same pass — even one not yet announced through `refinery.lib.scripts.Transformer.changed` —
+    observes models consistent with the current tree. The derived models are always built on the
+    current semantic model, so dropping them together keeps them consistent.
+
+    A transform may hold the models for the length of one pass through `pinned`, which suppresses both
+    drops until the pass ends. The obligation is the one
+    `refinery.lib.scripts.modelcache.ModelCacheBase.pinned` states: the transform&#39;s own rewrites must
+    never make the models it reads more permissive. A rewrite that only restricts what the models would
+    answer makes the held answer the stricter one, so the pass declines where it could have proceeded;
+    one that could reveal a fact the held models predate would act on the stale, more permissive answer
+    and must not read them pinned. The `--no-pin` differential (`test/conftest.py`) is the mechanical
+    check: the whole suite must pass identically with every pin neutralized.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_model&#39;,
+        &#39;_control_flow&#39;,
+        &#39;_effects&#39;,
+        &#39;_liveness&#39;,
+        &#39;_dominance&#39;,
+        &#39;_reaching&#39;,
+        &#39;_assignment&#39;,
+    )
+
+    root: JsScript
+    _model: SemanticModel | None
+    _control_flow: ControlFlowModel | None
+    _effects: EffectModel | None
+    _liveness: LivenessModel | None
+    _dominance: DominanceModel | None
+    _reaching: ReachingModel | None
+    _assignment: DefiniteAssignmentModel | None
+
+    @property
+    def model(self) -&gt; SemanticModel:
+        return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))
+
+    @property
+    def effects(self) -&gt; EffectModel:
+        return self._lazy(&#39;_effects&#39;, lambda: build_effects(self.model))
+
+    @property
+    def control_flow(self) -&gt; ControlFlowModel:
+        return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))
+
+    @property
+    def liveness(self) -&gt; LivenessModel:
+        return self._lazy(&#39;_liveness&#39;, lambda: build_liveness(self.model, self.control_flow))
+
+    @property
+    def dominance(self) -&gt; DominanceModel:
+        return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.model, self.control_flow))
+
+    @property
+    def reaching(self) -&gt; ReachingModel:
+        return self._lazy(&#39;_reaching&#39;, lambda: build_reaching(self.dominance, self.effects))
+
+    @property
+    def assignment(self) -&gt; DefiniteAssignmentModel:
+        &#34;&#34;&#34;
+        The `refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel` for this root,
+        built under the execution model and the host entrypoints the run&#39;s options select. It is the
+        one establishment answer for implicit-global reads: every consumer in a run reads this slot,
+        so no tree is ever judged under two establishment answers at once.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_assignment&#39;, lambda: build_definite_assignment(
+            self.model,
+            self.control_flow,
+            module_scope=module_execution(self.options),
+            host_entrypoint=lambda name: is_host_entrypoint(self.options, name),
+        ))
+
+    def call_established(self, call: JsCallExpression | JsNewExpression) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *call* may be cleared by the purity oracle at all: its callee is a trusted
+        intrinsic, or a local function whose definition reaches the call, so a call textually before
+        a not-yet-established function keeps its runtime throw. This is the one composition of the
+        effect and dominance models every consumer shares, so no pass can pair a purity verdict with
+        a weaker establishment reading than another.
+        &#34;&#34;&#34;
+        return self.effects.call_clearable(
+            call, lambda func: self.dominance.established_before(func, call)
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.model"><code class="name">var <span class="ident">model</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L74-L76" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def model(self) -&gt; SemanticModel:
+    return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.effects"><code class="name">var <span class="ident">effects</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L78-L80" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def effects(self) -&gt; EffectModel:
+    return self._lazy(&#39;_effects&#39;, lambda: build_effects(self.model))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.control_flow"><code class="name">var <span class="ident">control_flow</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L82-L84" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def control_flow(self) -&gt; ControlFlowModel:
+    return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.liveness"><code class="name">var <span class="ident">liveness</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L86-L88" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def liveness(self) -&gt; LivenessModel:
+    return self._lazy(&#39;_liveness&#39;, lambda: build_liveness(self.model, self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.dominance"><code class="name">var <span class="ident">dominance</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L90-L92" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def dominance(self) -&gt; DominanceModel:
+    return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.model, self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.reaching"><code class="name">var <span class="ident">reaching</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L94-L96" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def reaching(self) -&gt; ReachingModel:
+    return self._lazy(&#39;_reaching&#39;, lambda: build_reaching(self.dominance, self.effects))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.assignment"><code class="name">var <span class="ident">assignment</span></code></dt>
+<dd>
+<section class="desc"><p>The <code><a title="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel" href="assignment.html#refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel">DefiniteAssignmentModel</a></code> for this root,
+built under the execution model and the host entrypoints the run's options select. It is the
+one establishment answer for implicit-global reads: every consumer in a run reads this slot,
+so no tree is ever judged under two establishment answers at once.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L98-L111" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def assignment(self) -&gt; DefiniteAssignmentModel:
+    &#34;&#34;&#34;
+    The `refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel` for this root,
+    built under the execution model and the host entrypoints the run&#39;s options select. It is the
+    one establishment answer for implicit-global reads: every consumer in a run reads this slot,
+    so no tree is ever judged under two establishment answers at once.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_assignment&#39;, lambda: build_definite_assignment(
+        self.model,
+        self.control_flow,
+        module_scope=module_execution(self.options),
+        host_entrypoint=lambda name: is_host_entrypoint(self.options, name),
+    ))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cache.ModelCache.call_established"><code class="name flex">
+<span>def <span class="ident">call_established</span></span>(<span>self, call)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>call</em> may be cleared by the purity oracle at all: its callee is a trusted
+intrinsic, or a local function whose definition reaches the call, so a call textually before
+a not-yet-established function keeps its runtime throw. This is the one composition of the
+effect and dominance models every consumer shares, so no pass can pair a purity verdict with
+a weaker establishment reading than another.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cache.py#L113-L123" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call_established(self, call: JsCallExpression | JsNewExpression) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *call* may be cleared by the purity oracle at all: its callee is a trusted
+    intrinsic, or a local function whose definition reaches the call, so a call textually before
+    a not-yet-established function keeps its runtime throw. This is the one composition of the
+    effect and dominance models every consumer shares, so no pass can pair a purity verdict with
+    a weaker establishment reading than another.
+    &#34;&#34;&#34;
+    return self.effects.call_clearable(
+        call, lambda func: self.dominance.established_before(func, call)
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">for_transformer</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.options" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.options">options</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.pinned" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.pinned">pinned</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.root" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.root">root</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.cache.model_cache" href="#refinery.lib.scripts.js.analysis.cache.model_cache">model_cache</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.cache.ModelCache" href="#refinery.lib.scripts.js.analysis.cache.ModelCache">ModelCache</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.cache.ModelCache.call_established" href="#refinery.lib.scripts.js.analysis.cache.ModelCache.call_established">call_established</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

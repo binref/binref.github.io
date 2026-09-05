@@ -1,0 +1,1312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.blocks documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.blocks</code></h1>
+</header>
+<section id="section-intro">
+<p>Where a PowerShell script block runs: at what point, in whose scope, and how many times.</p>
+<p>Three places in this package already answer part of this privately, each drawing the line somewhere
+else — <code><a title="refinery.lib.scripts.analysis.cycles.CycleModel.repeats" href="../../analysis/cycles.html#refinery.lib.scripts.analysis.cycles.CycleModel.repeats">CycleModel.repeats()</a></code> walks lexically and says so in its
+own docstring, <code><a title="refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel" href="model.html#refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel">Ps1SemanticModel</a></code> binds every bare write to
+the scope it is written in, and <code><a title="refinery.lib.scripts.ps1.analysis.effects" href="effects.html">refinery.lib.scripts.ps1.analysis.effects</a></code> draws the
+stored-versus-invoked line a third time. A block is a value, so the code around it is where it was
+<em>written</em>, which is a different question from where it runs, and every pass that has needed the
+second has had to guess it from the first.</p>
+<p><strong>The answers here come from real PowerShell 5.1, not from the shape of the syntax.</strong> <code>. { }</code> runs in
+the caller's scope and <code>&amp; { }</code> opens a child one, which is the pair the whole question turns on; a
+<code>ForEach-Object</code> or <code>Where-Object</code> body also runs in the caller's scope, including when the block
+reaches the cmdlet through a variable, and so does a <code>catch</code> or <code>finally</code> body; a <code>function</code> body, an
+<code>Invoke-Command -ScriptBlock</code> without <code>-NoNewScope</code>, and a calculated property's block all open a
+child scope. A <code>trap</code> body opens a child scope too, which
+<code><a title="refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel" href="model.html#refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel">Ps1SemanticModel</a></code> does not model — its body is a <code>Block</code>
+rather than a <code>Ps1ScriptBlock</code>, so no block here stands for it.</p>
+<p><strong><code>CHILD</code> is the answer that has to be earned.</strong> Calling a body <code>CALLER</code> that is really <code>CHILD</code> adds a
+kill nobody performs, which only ever loses an inlining; calling one <code>CHILD</code> that is really <code>CALLER</code>
+drops a kill somebody does perform, which silently keeps a stale value. So <code>UNKNOWN</code> is projected
+exactly as <code>CALLER</code> is by <code>writes_reaching_caller</code>, and only a position that <em>proves</em> a child scope
+answers <code>CHILD</code>.</p>
+<p><strong><code>.</code> is the invoker's scope, not the writer's.</strong> <code>function TakeDot([scriptblock] $b) { . $b }</code>
+dot-sources into <code>TakeDot</code>'s scope, so <code>TakeDot { $x = 'b' }</code> leaves the original caller's <code>$x</code> alone.
+That is why a literal <code>. { }</code> is decidable from where it sits and a block handed anywhere else is not.</p>
+<p><code>ForEach-Object -Begin { }</code> and <code>-End { }</code> run once where <code>-Process { }</code> runs per input object, and
+every one of them is reported <code>REPEATED</code> here anyway. The parser does not bind a parameter name to
+the value that follows it — <code>-Begin</code> arrives as a switch argument and its block as the next
+positional one — so telling them apart means inferring the association from argument order, and
+inferring it wrongly reports a body that iterates as running once, which is the direction that keeps
+a stale value. The precision is not worth depending on that shape; a begin block loses an inlining
+and nothing else.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L1-L512" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Where a PowerShell script block runs: at what point, in whose scope, and how many times.
+
+Three places in this package already answer part of this privately, each drawing the line somewhere
+else — `refinery.lib.scripts.analysis.cycles.CycleModel.repeats` walks lexically and says so in its
+own docstring, `refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel` binds every bare write to
+the scope it is written in, and `refinery.lib.scripts.ps1.analysis.effects` draws the
+stored-versus-invoked line a third time. A block is a value, so the code around it is where it was
+*written*, which is a different question from where it runs, and every pass that has needed the
+second has had to guess it from the first.
+
+**The answers here come from real PowerShell 5.1, not from the shape of the syntax.** `. { }` runs in
+the caller&#39;s scope and `&amp; { }` opens a child one, which is the pair the whole question turns on; a
+`ForEach-Object` or `Where-Object` body also runs in the caller&#39;s scope, including when the block
+reaches the cmdlet through a variable, and so does a `catch` or `finally` body; a `function` body, an
+`Invoke-Command -ScriptBlock` without `-NoNewScope`, and a calculated property&#39;s block all open a
+child scope. A `trap` body opens a child scope too, which
+`refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel` does not model — its body is a `Block`
+rather than a `Ps1ScriptBlock`, so no block here stands for it.
+
+**`CHILD` is the answer that has to be earned.** Calling a body `CALLER` that is really `CHILD` adds a
+kill nobody performs, which only ever loses an inlining; calling one `CHILD` that is really `CALLER`
+drops a kill somebody does perform, which silently keeps a stale value. So `UNKNOWN` is projected
+exactly as `CALLER` is by `writes_reaching_caller`, and only a position that *proves* a child scope
+answers `CHILD`.
+
+**`.` is the invoker&#39;s scope, not the writer&#39;s.** `function TakeDot([scriptblock] $b) { . $b }`
+dot-sources into `TakeDot`&#39;s scope, so `TakeDot { $x = &#39;b&#39; }` leaves the original caller&#39;s `$x` alone.
+That is why a literal `. { }` is decidable from where it sits and a block handed anywhere else is not.
+
+`ForEach-Object -Begin { }` and `-End { }` run once where `-Process { }` runs per input object, and
+every one of them is reported `REPEATED` here anyway. The parser does not bind a parameter name to
+the value that follows it — `-Begin` arrives as a switch argument and its block as the next
+positional one — so telling them apart means inferring the association from argument order, and
+inferring it wrongly reports a body that iterates as running once, which is the direction that keeps
+a stale value. The precision is not worth depending on that shape; a begin block loses an inlining
+and nothing else.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import enum
+
+from dataclasses import dataclass
+from typing import Iterator
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.ps1.analysis.model import (
+    NAME_ROLES,
+    Occurrence,
+    is_write_occurrence,
+    occurrence_role,
+)
+from refinery.lib.scripts.ps1.analysis.naming import (
+    Ps1NameRole,
+    Ps1NameTarget,
+    named_references,
+)
+from refinery.lib.scripts.ps1.analysis.opaque import writes_nobody_can_attribute
+from refinery.lib.scripts.ps1.ast import (
+    binding_key,
+    binds_parameter,
+    bound_argument_value,
+    free_positional_values,
+    resolve_command_name,
+)
+from refinery.lib.scripts.ps1.data import (
+    EVERY_PARAMETER_SET,
+    parameter_sets,
+    positional_scriptblock_sets,
+    scriptblock_parameters,
+)
+from refinery.lib.scripts.ps1.model import (
+    Ps1CommandArgument,
+    Ps1CommandArgumentKind,
+    Ps1CommandInvocation,
+    Ps1FunctionDefinition,
+    Ps1ScopeModifier,
+    Ps1Script,
+    Ps1ScriptBlock,
+    Ps1Variable,
+)
+
+#: The commands that run a scriptblock argument once per input object. A hit *withholds* the
+#: single-visit reading a caller would otherwise take, so this is a deny-list and is read through
+#: `refinery.lib.scripts.ps1.ast.resolve_command_name`, which follows `%` and `?` to the full names —
+#: the opposite of what a grant table may do. It is deliberately not floored against the collected
+#: command metadata for the same reason: a spelling the capture host never reported must still be
+#: allowed to match.
+_ITERATING_COMMANDS = frozenset({
+    &#39;foreach-object&#39;,
+    &#39;where-object&#39;,
+})
+
+
+def names_an_intact_iterating_command(
+    cmd: Ps1CommandInvocation,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    The enumerating cmdlet *cmd* names — `foreach-object` or `where-object`, following `%`,
+    `foreach` and `?` to the full name — when the script has not taken it over, or `None`.
+
+    *shadowed* is the whole-run set of redefined command names (`Ps1TypeWorld.shadowed_names`). A
+    name in it runs the script&#39;s own body rather than the cmdlet, so a block handed to it is data:
+    measured on 5.1, `function ForEach-Object { &#39;H&#39; }` makes `1, 2 | % { $_ }` run `H`, and `%`
+    follows the redefinition because it resolves to `foreach-object`. A `function foreach` binds
+    the separate `foreach` name the built-in keyword outranks and leaves `foreach-object` alone,
+    which is why the resolved name, not the written spelling, is what the set is asked about.
+    &#34;&#34;&#34;
+    name = resolve_command_name(cmd)
+    if name in _ITERATING_COMMANDS and name not in shadowed:
+        return name
+    return None
+
+
+class Ps1BlockReach(enum.Enum):
+    &#34;&#34;&#34;
+    When the body runs relative to the point it is written at.
+
+    `IMMEDIATE` — the statement that mentions the block runs it.
+    `FUNCTION` — it is a named function&#39;s body, run by that function&#39;s call sites.
+    `STORED` — its value is kept rather than run, so when it runs is not a question this layer holds.
+    `UNKNOWN` — it is handed to something that may or may not run it.
+    &#34;&#34;&#34;
+    IMMEDIATE = &#39;immediate&#39;
+    FUNCTION  = &#39;function&#39;   # noqa
+    STORED    = &#39;stored&#39;     # noqa
+    UNKNOWN   = &#39;unknown&#39;    # noqa
+
+
+class Ps1BlockScope(enum.Enum):
+    &#34;&#34;&#34;
+    Whose variables the body&#39;s bare writes land in.
+
+    `CALLER` — the scope of the code that runs it, so its writes are the caller&#39;s writes.
+    `CHILD` — a fresh scope, so its writes are invisible outside and a name it assigns shadows.
+    `UNKNOWN` — not decidable here, and treated as `CALLER` everywhere the difference is a kill.
+    &#34;&#34;&#34;
+    CALLER  = &#39;caller&#39;   # noqa
+    CHILD   = &#39;child&#39;    # noqa
+    UNKNOWN = &#39;unknown&#39;  # noqa
+
+
+class Ps1BlockIteration(enum.Enum):
+    &#34;&#34;&#34;
+    How often the site runs the body.
+
+    `ONCE` — one invocation per visit to the site.
+    `REPEATED` — the site runs it per input object, so a fact taken from one visit is not a fact.
+    `UNKNOWN` — not decidable here.
+    &#34;&#34;&#34;
+    ONCE     = &#39;once&#39;     # noqa
+    REPEATED = &#39;repeated&#39;  # noqa
+    UNKNOWN  = &#39;unknown&#39;  # noqa
+
+
+@dataclass(frozen=True)
+class Ps1BlockFacts:
+    &#34;&#34;&#34;
+    What is known about one `refinery.lib.scripts.ps1.model.Ps1ScriptBlock`. `site` is the element
+    whose evaluation runs the body, and is `None` whenever that element is not in this script or is
+    not decidable — a function body&#39;s callers, a stored block&#39;s eventual invocation.
+    &#34;&#34;&#34;
+    reach: Ps1BlockReach
+    scope: Ps1BlockScope
+    iteration: Ps1BlockIteration
+    site: Node | None
+
+
+_UNPLACED = Ps1BlockFacts(
+    reach=Ps1BlockReach.UNKNOWN,
+    scope=Ps1BlockScope.UNKNOWN,
+    iteration=Ps1BlockIteration.UNKNOWN,
+    site=None,
+)
+
+
+def _invoked_directly(block: Ps1ScriptBlock) -&gt; Ps1CommandInvocation | None:
+    &#34;&#34;&#34;
+    The invocation that runs *block* by naming it, as `&amp; { }` and `. { }` do, or `None`.
+    &#34;&#34;&#34;
+    parent = block.parent
+    if isinstance(parent, Ps1CommandInvocation) and parent.name is block:
+        return parent
+    return None
+
+
+def _handed_to_command(block: Ps1ScriptBlock) -&gt; Ps1CommandInvocation | None:
+    &#34;&#34;&#34;
+    The invocation *block* is an argument of, named or positional, or `None`. The block reaching a
+    command as an argument says nothing about whether the command runs it — `f { }`,
+    `Invoke-Command -ScriptBlock { }` and `ForEach-Object { }` are one shape — so the caller still
+    has to recognise the command.
+    &#34;&#34;&#34;
+    parent = block.parent
+    if isinstance(parent, Ps1CommandArgument):
+        parent = parent.parent
+    if isinstance(parent, Ps1CommandInvocation) and parent.name is not block:
+        return parent
+    return None
+
+
+def _named_writes(cmd: Ps1CommandInvocation) -&gt; Iterator[Occurrence]:
+    &#34;&#34;&#34;
+    The names *cmd* writes as strings into the scope it is written in.
+
+    A read is not one of them: it changes no value, so it is no fact about what the block leaves
+    behind. Neither is a write that names its target scope outright, whose landing place does not
+    depend on where the command sits, nor one aimed at a scope the lexical chain cannot name — for
+    the latter there is no key to report, and `unattributable_writes_reaching_caller` is what
+    carries it.
+    &#34;&#34;&#34;
+    for reference in named_references(cmd):
+        if reference.role is Ps1NameRole.READS:
+            continue
+        if reference.target is not Ps1NameTarget.LOCAL:
+            continue
+        yield Occurrence(node=cmd, role=NAME_ROLES[reference.role], key=reference.key)
+
+
+#: The scriptblock parameters of `_ITERATING_COMMANDS` that run their body once per input object,
+#: which is what binds `$_`. `-Begin` and `-End` run once beside them and leave `$_` at whatever the
+#: scope around the pipeline holds, so a block in either binds nothing.
+_PER_OBJECT_PARAMETERS = frozenset({
+    &#39;filterscript&#39;,
+    &#39;process&#39;,
+})
+
+
+def _selects_a_scriptblock_set(cmd: Ps1CommandInvocation, command: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether every parameter *cmd* names leaves the call in a parameter set whose first positional
+    argument is a script block the command runs.
+
+    5.1 picks one set from the arguments a call writes, and the same position means a different
+    thing in each. Measured: `1, 2 | ForEach-Object -MemberName ToString { Write-Host &#39;X&#39; }` writes
+    the block&#39;s own text twice, because `-MemberName` selects the set in which the argument after it
+    is the method&#39;s argument list rather than a body. `ForEach-Object -InputObject 5 { Write-Host
+    &#34;P:$_&#34; }` writes `P:5`, because `-InputObject` belongs to the scriptblock set as well.
+
+    A parameter that belongs to every set decides nothing, which is what every common parameter is.
+    A name the collected surface does not carry, and a prefix reaching any parameter that excludes
+    the set, both refuse: a wrong grant here calls a value the command passes on a body it runs.
+    &#34;&#34;&#34;
+    wanted = positional_scriptblock_sets(command)
+    if not wanted:
+        return False
+    table = parameter_sets(command)
+    for argument in cmd.arguments:
+        if not isinstance(argument, Ps1CommandArgument):
+            continue
+        if argument.kind is Ps1CommandArgumentKind.POSITIONAL:
+            continue
+        reached = [
+            sets for parameter, sets in table.items()
+            if binds_parameter(argument.name, parameter)
+        ]
+        if not reached:
+            return False
+        if any(
+            EVERY_PARAMETER_SET not in sets and sets.isdisjoint(wanted)
+            for sets in reached
+        ):
+            return False
+    return True
+
+
+def binds_the_pipeline_variable(
+    block: Ps1ScriptBlock,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; Ps1CommandInvocation | None:
+    &#34;&#34;&#34;
+    The invocation whose input `$_` ranges over inside *block*, or `None` where *block* is not a
+    body run once per input object.
+
+    The slot is read by name where it is written by name, and otherwise from position: a lone free
+    positional block is the per-object body, where three of them are `begin`, `process` and `end` in
+    that order — so a positional block beside another is refused rather than guessed at.
+
+    *shadowed* is the whole-run set of command names the script has taken over. A name in it no
+    longer denotes the enumerating cmdlet, so its body is not run once per object and `$_` inside it
+    is whatever the surrounding scope holds — see `Ps1TypeWorld.shadowed_names`.
+    &#34;&#34;&#34;
+    command = _handed_to_command(block)
+    if command is None:
+        return None
+    name = names_an_intact_iterating_command(command, shadowed)
+    if name is None:
+        return None
+    for parameter in scriptblock_parameters(name) &amp; _PER_OBJECT_PARAMETERS:
+        if bound_argument_value(command, parameter) is block:
+            return command
+    positional = free_positional_values(command, name)
+    if len(positional) == 1 and positional[0] is block and _selects_a_scriptblock_set(command, name):
+        return command
+    return None
+
+
+def _fills_a_scriptblock_slot(
+    cmd: Ps1CommandInvocation,
+    block: Ps1ScriptBlock,
+    command: str,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *block* sits in a slot of *cmd* that the command runs, rather than one it takes as data.
+    `ForEach-Object -Process { }` runs the block, `ForEach-Object -InputObject { }` hands it on
+    untouched, and a `site` is a claim about the first only.
+
+    A named slot is decided by the declared parameter type. A positional one is granted to the
+    *first* free positional argument alone, and only where the parameters the call names leave it
+    in a set whose first positional argument is a body — `_selects_a_scriptblock_set`. Three
+    positional blocks are `begin`, `process` and `end`, so a later one is not the first slot; and
+    a call that writes `-MemberName` is in the set where the first slot is a method name.
+    &#34;&#34;&#34;
+    for parameter in scriptblock_parameters(command):
+        if bound_argument_value(cmd, parameter) is block:
+            return True
+    positional = free_positional_values(cmd, command)
+    return (
+        bool(positional)
+        and positional[0] is block
+        and _selects_a_scriptblock_set(cmd, command)
+    )
+
+
+def classify_block(
+    block: Ps1ScriptBlock,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; Ps1BlockFacts:
+    &#34;&#34;&#34;
+    The facts readable from where *block* sits.
+
+    *shadowed* is the whole-run set of command names the script has taken over
+    (`Ps1TypeWorld.shadowed_names`). An enumerating command whose name is in it runs the script&#39;s
+    own definition rather than the cmdlet, so a block handed to it is data this cannot place, and
+    the iterating branch below falls through to `_UNPLACED`. The default is empty for a caller that
+    reads the name at face value and applies its own trust; `Ps1WorldReach` does that positionally.
+    &#34;&#34;&#34;
+    parent = block.parent
+    if isinstance(parent, Ps1FunctionDefinition) and parent.body is block:
+        return Ps1BlockFacts(
+            reach=Ps1BlockReach.FUNCTION,
+            scope=Ps1BlockScope.CHILD,
+            iteration=Ps1BlockIteration.UNKNOWN,
+            site=None,
+        )
+    invocation = _invoked_directly(block)
+    if invocation is not None:
+        scope = {
+            &#39;.&#39;: Ps1BlockScope.CALLER,
+            &#39;&amp;&#39;: Ps1BlockScope.CHILD,
+        }.get(invocation.invocation_operator, Ps1BlockScope.UNKNOWN)
+        return Ps1BlockFacts(
+            reach=Ps1BlockReach.IMMEDIATE,
+            scope=scope,
+            iteration=Ps1BlockIteration.ONCE,
+            site=invocation,
+        )
+    command = _handed_to_command(block)
+    if command is not None:
+        name = names_an_intact_iterating_command(command, shadowed)
+        if name is not None and _fills_a_scriptblock_slot(command, block, name):
+            return Ps1BlockFacts(
+                reach=Ps1BlockReach.IMMEDIATE,
+                scope=Ps1BlockScope.CALLER,
+                iteration=Ps1BlockIteration.REPEATED,
+                site=command,
+            )
+        return _UNPLACED
+    return Ps1BlockFacts(
+        reach=Ps1BlockReach.STORED,
+        scope=Ps1BlockScope.UNKNOWN,
+        iteration=Ps1BlockIteration.UNKNOWN,
+        site=None,
+    )
+
+
+class Ps1BlockModel:
+    &#34;&#34;&#34;
+    Where each script block of one root runs. Facts are read off the tree on first request and kept,
+    since the tree is fixed for as long as this model lives.
+    &#34;&#34;&#34;
+
+    def __init__(self, root: Ps1Script, shadowed: frozenset[str] = frozenset()):
+        self.root = root
+        self._shadowed = shadowed
+        self._facts: dict[int, Ps1BlockFacts] = {}
+        self._caller_writes: dict[int, tuple[Occurrence, ...]] = {}
+        self._caller_unattributable: dict[int, bool] = {}
+
+    def facts(self, block: Ps1ScriptBlock) -&gt; Ps1BlockFacts:
+        &#34;&#34;&#34;
+        What is known about where *block* runs.
+        &#34;&#34;&#34;
+        found = self._facts.get(id(block))
+        if found is None:
+            found = self._facts[id(block)] = classify_block(block, self._shadowed)
+        return found
+
+    def may_write_caller_scope(self, block: Ps1ScriptBlock) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a bare write inside *block* may land in the scope of the code that runs it. True for
+        everything but a proven child scope — see the module docstring for why that asymmetry is the
+        safe one.
+        &#34;&#34;&#34;
+        return self.facts(block).scope is not Ps1BlockScope.CHILD
+
+    def writes_reaching_caller(self, block: Ps1ScriptBlock) -&gt; tuple[Occurrence, ...]:
+        &#34;&#34;&#34;
+        The write occurrences inside *block* that land in the scope of whatever runs it — the ones
+        written directly in its body, and those of any nested block that reaches its own caller in
+        turn. Empty for a proven child scope, since nothing a child scope writes outlives it.
+
+        A name addressed as a *string* is a write here exactly as a bare `$x =` is. `Remove-Variable
+        x`, `New-Variable x &#39;b&#39;` and `Get-Process -OutVariable x` each write the scope they are
+        written in and each contains no occurrence of the name, so a caller reading only the
+        variables of the body sees `. { Remove-Variable x }` touch nothing at all. That the answer
+        is an `Occurrence` rather than a `Ps1Variable` is what lets the two arrive as one kind of
+        thing.
+
+        That the recursion stops at a child scope is what makes `&amp; { . { $x = &#39;b&#39; } }` write nothing
+        outside: the inner dot writes the `&amp;` block&#39;s scope, and that scope ends with it. Qualified
+        writes are left out because a `$script:` or `$global:` write names its scope outright and
+        reaches the same binding whichever body it sits in, so it is not a fact about where the block
+        runs — and a `Set-Variable -Scope Global x` is left out for that same reason.
+        &#34;&#34;&#34;
+        found = self._caller_writes.get(id(block))
+        if found is None:
+            if not self.may_write_caller_scope(block):
+                found = ()
+            else:
+                found = tuple(self._collect_writes(block))
+            self._caller_writes[id(block)] = found
+        return found
+
+    def unattributable_writes_reaching_caller(self, block: Ps1ScriptBlock) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *block* runs a write whose name this cannot read — `Set-Variable $n &#39;v&#39;` — into the
+        scope of whatever runs it. The name is unknown, so the write may have landed on any binding
+        of that scope, and a caller can place *when* it happened without knowing *what* it hit.
+
+        Only the writes a command places in its own scope are reported. One that names a scope
+        outright reaches the same binding whichever body it sits in, so it is not a fact about where
+        this block runs, and reporting it here would have it stop at a child scope that does not
+        stop it — the same reason `writes_reaching_caller` leaves a `$script:` write out.
+        &#34;&#34;&#34;
+        found = self._caller_unattributable.get(id(block))
+        if found is None:
+            found = self._caller_unattributable[id(block)] = (
+                self.may_write_caller_scope(block)
+                and self._runs_unattributable_write(block)
+            )
+        return found
+
+    def _runs_unattributable_write(self, block: Ps1ScriptBlock) -&gt; bool:
+        stack: list[Node] = list(block.children())
+        while stack:
+            node = stack.pop()
+            if isinstance(node, Ps1ScriptBlock):
+                if self.unattributable_writes_reaching_caller(node):
+                    return True
+                continue
+            if writes_nobody_can_attribute(node):
+                return True
+            stack.extend(node.children())
+        return False
+
+    def _collect_writes(self, block: Ps1ScriptBlock) -&gt; Iterator[Occurrence]:
+        stack: list[Node] = list(block.children())
+        while stack:
+            node = stack.pop()
+            if isinstance(node, Ps1ScriptBlock):
+                yield from self.writes_reaching_caller(node)
+                continue
+            if (
+                isinstance(node, Ps1Variable)
+                and node.scope is Ps1ScopeModifier.NONE
+                and is_write_occurrence(node)
+            ):
+                yield Occurrence(node=node, role=occurrence_role(node), key=binding_key(node))
+            elif isinstance(node, Ps1CommandInvocation):
+                yield from _named_writes(node)
+            stack.extend(node.children())
+
+    def body_site(self, owner: Node) -&gt; tuple[Node, bool] | None:
+        &#34;&#34;&#34;
+        The `refinery.lib.scripts.analysis.cycles.BodySite` answer for a body: the element that runs
+        *owner*, and whether it runs it more than once.
+
+        `None` for the script root, which nothing in the script runs, and for any block whose site is
+        not decidable — a stored block, a function body, a block handed to a command that may or may
+        not invoke it. The cycle walk reads that as *fall back to where the block is written*, which
+        is what it did everywhere before this model existed, so answering nothing changes nothing.
+        &#34;&#34;&#34;
+        if not isinstance(owner, Ps1ScriptBlock):
+            return None
+        facts = self.facts(owner)
+        if facts.site is None:
+            return None
+        return facts.site, facts.iteration is Ps1BlockIteration.REPEATED
+
+
+def build_block_model(
+    root: Ps1Script,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; Ps1BlockModel:
+    &#34;&#34;&#34;
+    Build the `Ps1BlockModel` for a script. *shadowed* is the whole-run set of command names the
+    script takes over (`Ps1TypeWorld.shadowed_names`), so a body handed to a `ForEach-Object` or
+    `Where-Object` the script has redefined is placed as data rather than as a body it runs.
+    &#34;&#34;&#34;
+    return Ps1BlockModel(root, shadowed)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.names_an_intact_iterating_command"><code class="name flex">
+<span>def <span class="ident">names_an_intact_iterating_command</span></span>(<span>cmd, shadowed=frozenset())</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The enumerating cmdlet <em>cmd</em> names — <code>foreach-object</code> or <code>where-object</code>, following <code>%</code>,
+<code>foreach</code> and <code>?</code> to the full name — when the script has not taken it over, or <code>None</code>.</p>
+<p><em>shadowed</em> is the whole-run set of redefined command names (<code>Ps1TypeWorld.shadowed_names</code>). A
+name in it runs the script's own body rather than the cmdlet, so a block handed to it is data:
+measured on 5.1, <code>function ForEach-Object { 'H' }</code> makes <code>1, 2 | % { $_ }</code> run <code>H</code>, and <code>%</code>
+follows the redefinition because it resolves to <code>foreach-object</code>. A <code>function foreach</code> binds
+the separate <code>foreach</code> name the built-in keyword outranks and leaves <code>foreach-object</code> alone,
+which is why the resolved name, not the written spelling, is what the set is asked about.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L95-L113" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def names_an_intact_iterating_command(
+    cmd: Ps1CommandInvocation,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    The enumerating cmdlet *cmd* names — `foreach-object` or `where-object`, following `%`,
+    `foreach` and `?` to the full name — when the script has not taken it over, or `None`.
+
+    *shadowed* is the whole-run set of redefined command names (`Ps1TypeWorld.shadowed_names`). A
+    name in it runs the script&#39;s own body rather than the cmdlet, so a block handed to it is data:
+    measured on 5.1, `function ForEach-Object { &#39;H&#39; }` makes `1, 2 | % { $_ }` run `H`, and `%`
+    follows the redefinition because it resolves to `foreach-object`. A `function foreach` binds
+    the separate `foreach` name the built-in keyword outranks and leaves `foreach-object` alone,
+    which is why the resolved name, not the written spelling, is what the set is asked about.
+    &#34;&#34;&#34;
+    name = resolve_command_name(cmd)
+    if name in _ITERATING_COMMANDS and name not in shadowed:
+        return name
+    return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.binds_the_pipeline_variable"><code class="name flex">
+<span>def <span class="ident">binds_the_pipeline_variable</span></span>(<span>block, shadowed=frozenset())</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The invocation whose input <code>$_</code> ranges over inside <em>block</em>, or <code>None</code> where <em>block</em> is not a
+body run once per input object.</p>
+<p>The slot is read by name where it is written by name, and otherwise from position: a lone free
+positional block is the per-object body, where three of them are <code>begin</code>, <code>process</code> and <code>end</code> in
+that order — so a positional block beside another is refused rather than guessed at.</p>
+<p><em>shadowed</em> is the whole-run set of command names the script has taken over. A name in it no
+longer denotes the enumerating cmdlet, so its body is not run once per object and <code>$_</code> inside it
+is whatever the surrounding scope holds — see <code>Ps1TypeWorld.shadowed_names</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L268-L296" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def binds_the_pipeline_variable(
+    block: Ps1ScriptBlock,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; Ps1CommandInvocation | None:
+    &#34;&#34;&#34;
+    The invocation whose input `$_` ranges over inside *block*, or `None` where *block* is not a
+    body run once per input object.
+
+    The slot is read by name where it is written by name, and otherwise from position: a lone free
+    positional block is the per-object body, where three of them are `begin`, `process` and `end` in
+    that order — so a positional block beside another is refused rather than guessed at.
+
+    *shadowed* is the whole-run set of command names the script has taken over. A name in it no
+    longer denotes the enumerating cmdlet, so its body is not run once per object and `$_` inside it
+    is whatever the surrounding scope holds — see `Ps1TypeWorld.shadowed_names`.
+    &#34;&#34;&#34;
+    command = _handed_to_command(block)
+    if command is None:
+        return None
+    name = names_an_intact_iterating_command(command, shadowed)
+    if name is None:
+        return None
+    for parameter in scriptblock_parameters(name) &amp; _PER_OBJECT_PARAMETERS:
+        if bound_argument_value(command, parameter) is block:
+            return command
+    positional = free_positional_values(command, name)
+    if len(positional) == 1 and positional[0] is block and _selects_a_scriptblock_set(command, name):
+        return command
+    return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.classify_block"><code class="name flex">
+<span>def <span class="ident">classify_block</span></span>(<span>block, shadowed=frozenset())</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The facts readable from where <em>block</em> sits.</p>
+<p><em>shadowed</em> is the whole-run set of command names the script has taken over
+(<code>Ps1TypeWorld.shadowed_names</code>). An enumerating command whose name is in it runs the script's
+own definition rather than the cmdlet, so a block handed to it is data this cannot place, and
+the iterating branch below falls through to <code>_UNPLACED</code>. The default is empty for a caller that
+reads the name at face value and applies its own trust; <code>Ps1WorldReach</code> does that positionally.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L326-L375" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def classify_block(
+    block: Ps1ScriptBlock,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; Ps1BlockFacts:
+    &#34;&#34;&#34;
+    The facts readable from where *block* sits.
+
+    *shadowed* is the whole-run set of command names the script has taken over
+    (`Ps1TypeWorld.shadowed_names`). An enumerating command whose name is in it runs the script&#39;s
+    own definition rather than the cmdlet, so a block handed to it is data this cannot place, and
+    the iterating branch below falls through to `_UNPLACED`. The default is empty for a caller that
+    reads the name at face value and applies its own trust; `Ps1WorldReach` does that positionally.
+    &#34;&#34;&#34;
+    parent = block.parent
+    if isinstance(parent, Ps1FunctionDefinition) and parent.body is block:
+        return Ps1BlockFacts(
+            reach=Ps1BlockReach.FUNCTION,
+            scope=Ps1BlockScope.CHILD,
+            iteration=Ps1BlockIteration.UNKNOWN,
+            site=None,
+        )
+    invocation = _invoked_directly(block)
+    if invocation is not None:
+        scope = {
+            &#39;.&#39;: Ps1BlockScope.CALLER,
+            &#39;&amp;&#39;: Ps1BlockScope.CHILD,
+        }.get(invocation.invocation_operator, Ps1BlockScope.UNKNOWN)
+        return Ps1BlockFacts(
+            reach=Ps1BlockReach.IMMEDIATE,
+            scope=scope,
+            iteration=Ps1BlockIteration.ONCE,
+            site=invocation,
+        )
+    command = _handed_to_command(block)
+    if command is not None:
+        name = names_an_intact_iterating_command(command, shadowed)
+        if name is not None and _fills_a_scriptblock_slot(command, block, name):
+            return Ps1BlockFacts(
+                reach=Ps1BlockReach.IMMEDIATE,
+                scope=Ps1BlockScope.CALLER,
+                iteration=Ps1BlockIteration.REPEATED,
+                site=command,
+            )
+        return _UNPLACED
+    return Ps1BlockFacts(
+        reach=Ps1BlockReach.STORED,
+        scope=Ps1BlockScope.UNKNOWN,
+        iteration=Ps1BlockIteration.UNKNOWN,
+        site=None,
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.build_block_model"><code class="name flex">
+<span>def <span class="ident">build_block_model</span></span>(<span>root, shadowed=frozenset())</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel">Ps1BlockModel</a></code> for a script. <em>shadowed</em> is the whole-run set of command names the
+script takes over (<code>Ps1TypeWorld.shadowed_names</code>), so a body handed to a <code>ForEach-Object</code> or
+<code>Where-Object</code> the script has redefined is placed as data rather than as a body it runs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L503-L512" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_block_model(
+    root: Ps1Script,
+    shadowed: frozenset[str] = frozenset(),
+) -&gt; Ps1BlockModel:
+    &#34;&#34;&#34;
+    Build the `Ps1BlockModel` for a script. *shadowed* is the whole-run set of command names the
+    script takes over (`Ps1TypeWorld.shadowed_names`), so a body handed to a `ForEach-Object` or
+    `Where-Object` the script has redefined is placed as data rather than as a body it runs.
+    &#34;&#34;&#34;
+    return Ps1BlockModel(root, shadowed)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach"><code class="flex name class">
+<span>class <span class="ident">Ps1BlockReach</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>When the body runs relative to the point it is written at.</p>
+<p><code>IMMEDIATE</code> — the statement that mentions the block runs it.
+<code>FUNCTION</code> — it is a named function's body, run by that function's call sites.
+<code>STORED</code> — its value is kept rather than run, so when it runs is not a question this layer holds.
+<code>UNKNOWN</code> — it is handed to something that may or may not run it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L116-L128" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1BlockReach(enum.Enum):
+    &#34;&#34;&#34;
+    When the body runs relative to the point it is written at.
+
+    `IMMEDIATE` — the statement that mentions the block runs it.
+    `FUNCTION` — it is a named function&#39;s body, run by that function&#39;s call sites.
+    `STORED` — its value is kept rather than run, so when it runs is not a question this layer holds.
+    `UNKNOWN` — it is handed to something that may or may not run it.
+    &#34;&#34;&#34;
+    IMMEDIATE = &#39;immediate&#39;
+    FUNCTION  = &#39;function&#39;   # noqa
+    STORED    = &#39;stored&#39;     # noqa
+    UNKNOWN   = &#39;unknown&#39;    # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach.IMMEDIATE"><code class="name">var <span class="ident">IMMEDIATE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach.FUNCTION"><code class="name">var <span class="ident">FUNCTION</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach.STORED"><code class="name">var <span class="ident">STORED</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockScope"><code class="flex name class">
+<span>class <span class="ident">Ps1BlockScope</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whose variables the body's bare writes land in.</p>
+<p><code>CALLER</code> — the scope of the code that runs it, so its writes are the caller's writes.
+<code>CHILD</code> — a fresh scope, so its writes are invisible outside and a name it assigns shadows.
+<code>UNKNOWN</code> — not decidable here, and treated as <code>CALLER</code> everywhere the difference is a kill.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L131-L141" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1BlockScope(enum.Enum):
+    &#34;&#34;&#34;
+    Whose variables the body&#39;s bare writes land in.
+
+    `CALLER` — the scope of the code that runs it, so its writes are the caller&#39;s writes.
+    `CHILD` — a fresh scope, so its writes are invisible outside and a name it assigns shadows.
+    `UNKNOWN` — not decidable here, and treated as `CALLER` everywhere the difference is a kill.
+    &#34;&#34;&#34;
+    CALLER  = &#39;caller&#39;   # noqa
+    CHILD   = &#39;child&#39;    # noqa
+    UNKNOWN = &#39;unknown&#39;  # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockScope.CALLER"><code class="name">var <span class="ident">CALLER</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockScope.CHILD"><code class="name">var <span class="ident">CHILD</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockScope.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockIteration"><code class="flex name class">
+<span>class <span class="ident">Ps1BlockIteration</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>How often the site runs the body.</p>
+<p><code>ONCE</code> — one invocation per visit to the site.
+<code>REPEATED</code> — the site runs it per input object, so a fact taken from one visit is not a fact.
+<code>UNKNOWN</code> — not decidable here.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L144-L154" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1BlockIteration(enum.Enum):
+    &#34;&#34;&#34;
+    How often the site runs the body.
+
+    `ONCE` — one invocation per visit to the site.
+    `REPEATED` — the site runs it per input object, so a fact taken from one visit is not a fact.
+    `UNKNOWN` — not decidable here.
+    &#34;&#34;&#34;
+    ONCE     = &#39;once&#39;     # noqa
+    REPEATED = &#39;repeated&#39;  # noqa
+    UNKNOWN  = &#39;unknown&#39;  # noqa</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockIteration.ONCE"><code class="name">var <span class="ident">ONCE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockIteration.REPEATED"><code class="name">var <span class="ident">REPEATED</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockIteration.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts"><code class="flex name class">
+<span>class <span class="ident">Ps1BlockFacts</span></span>
+<span>(</span><span>reach, scope, iteration, site)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What is known about one <code><a title="refinery.lib.scripts.ps1.model.Ps1ScriptBlock" href="../model.html#refinery.lib.scripts.ps1.model.Ps1ScriptBlock">Ps1ScriptBlock</a></code>. <code>site</code> is the element
+whose evaluation runs the body, and is <code>None</code> whenever that element is not in this script or is
+not decidable — a function body's callers, a stored block's eventual invocation.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L157-L167" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(frozen=True)
+class Ps1BlockFacts:
+    &#34;&#34;&#34;
+    What is known about one `refinery.lib.scripts.ps1.model.Ps1ScriptBlock`. `site` is the element
+    whose evaluation runs the body, and is `None` whenever that element is not in this script or is
+    not decidable — a function body&#39;s callers, a stored block&#39;s eventual invocation.
+    &#34;&#34;&#34;
+    reach: Ps1BlockReach
+    scope: Ps1BlockScope
+    iteration: Ps1BlockIteration
+    site: Node | None</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts.reach"><code class="name">var <span class="ident">reach</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts.scope"><code class="name">var <span class="ident">scope</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts.iteration"><code class="name">var <span class="ident">iteration</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts.site"><code class="name">var <span class="ident">site</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel"><code class="flex name class">
+<span>class <span class="ident">Ps1BlockModel</span></span>
+<span>(</span><span>root, shadowed=frozenset())</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Where each script block of one root runs. Facts are read off the tree on first request and kept,
+since the tree is fixed for as long as this model lives.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L378-L500" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1BlockModel:
+    &#34;&#34;&#34;
+    Where each script block of one root runs. Facts are read off the tree on first request and kept,
+    since the tree is fixed for as long as this model lives.
+    &#34;&#34;&#34;
+
+    def __init__(self, root: Ps1Script, shadowed: frozenset[str] = frozenset()):
+        self.root = root
+        self._shadowed = shadowed
+        self._facts: dict[int, Ps1BlockFacts] = {}
+        self._caller_writes: dict[int, tuple[Occurrence, ...]] = {}
+        self._caller_unattributable: dict[int, bool] = {}
+
+    def facts(self, block: Ps1ScriptBlock) -&gt; Ps1BlockFacts:
+        &#34;&#34;&#34;
+        What is known about where *block* runs.
+        &#34;&#34;&#34;
+        found = self._facts.get(id(block))
+        if found is None:
+            found = self._facts[id(block)] = classify_block(block, self._shadowed)
+        return found
+
+    def may_write_caller_scope(self, block: Ps1ScriptBlock) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a bare write inside *block* may land in the scope of the code that runs it. True for
+        everything but a proven child scope — see the module docstring for why that asymmetry is the
+        safe one.
+        &#34;&#34;&#34;
+        return self.facts(block).scope is not Ps1BlockScope.CHILD
+
+    def writes_reaching_caller(self, block: Ps1ScriptBlock) -&gt; tuple[Occurrence, ...]:
+        &#34;&#34;&#34;
+        The write occurrences inside *block* that land in the scope of whatever runs it — the ones
+        written directly in its body, and those of any nested block that reaches its own caller in
+        turn. Empty for a proven child scope, since nothing a child scope writes outlives it.
+
+        A name addressed as a *string* is a write here exactly as a bare `$x =` is. `Remove-Variable
+        x`, `New-Variable x &#39;b&#39;` and `Get-Process -OutVariable x` each write the scope they are
+        written in and each contains no occurrence of the name, so a caller reading only the
+        variables of the body sees `. { Remove-Variable x }` touch nothing at all. That the answer
+        is an `Occurrence` rather than a `Ps1Variable` is what lets the two arrive as one kind of
+        thing.
+
+        That the recursion stops at a child scope is what makes `&amp; { . { $x = &#39;b&#39; } }` write nothing
+        outside: the inner dot writes the `&amp;` block&#39;s scope, and that scope ends with it. Qualified
+        writes are left out because a `$script:` or `$global:` write names its scope outright and
+        reaches the same binding whichever body it sits in, so it is not a fact about where the block
+        runs — and a `Set-Variable -Scope Global x` is left out for that same reason.
+        &#34;&#34;&#34;
+        found = self._caller_writes.get(id(block))
+        if found is None:
+            if not self.may_write_caller_scope(block):
+                found = ()
+            else:
+                found = tuple(self._collect_writes(block))
+            self._caller_writes[id(block)] = found
+        return found
+
+    def unattributable_writes_reaching_caller(self, block: Ps1ScriptBlock) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *block* runs a write whose name this cannot read — `Set-Variable $n &#39;v&#39;` — into the
+        scope of whatever runs it. The name is unknown, so the write may have landed on any binding
+        of that scope, and a caller can place *when* it happened without knowing *what* it hit.
+
+        Only the writes a command places in its own scope are reported. One that names a scope
+        outright reaches the same binding whichever body it sits in, so it is not a fact about where
+        this block runs, and reporting it here would have it stop at a child scope that does not
+        stop it — the same reason `writes_reaching_caller` leaves a `$script:` write out.
+        &#34;&#34;&#34;
+        found = self._caller_unattributable.get(id(block))
+        if found is None:
+            found = self._caller_unattributable[id(block)] = (
+                self.may_write_caller_scope(block)
+                and self._runs_unattributable_write(block)
+            )
+        return found
+
+    def _runs_unattributable_write(self, block: Ps1ScriptBlock) -&gt; bool:
+        stack: list[Node] = list(block.children())
+        while stack:
+            node = stack.pop()
+            if isinstance(node, Ps1ScriptBlock):
+                if self.unattributable_writes_reaching_caller(node):
+                    return True
+                continue
+            if writes_nobody_can_attribute(node):
+                return True
+            stack.extend(node.children())
+        return False
+
+    def _collect_writes(self, block: Ps1ScriptBlock) -&gt; Iterator[Occurrence]:
+        stack: list[Node] = list(block.children())
+        while stack:
+            node = stack.pop()
+            if isinstance(node, Ps1ScriptBlock):
+                yield from self.writes_reaching_caller(node)
+                continue
+            if (
+                isinstance(node, Ps1Variable)
+                and node.scope is Ps1ScopeModifier.NONE
+                and is_write_occurrence(node)
+            ):
+                yield Occurrence(node=node, role=occurrence_role(node), key=binding_key(node))
+            elif isinstance(node, Ps1CommandInvocation):
+                yield from _named_writes(node)
+            stack.extend(node.children())
+
+    def body_site(self, owner: Node) -&gt; tuple[Node, bool] | None:
+        &#34;&#34;&#34;
+        The `refinery.lib.scripts.analysis.cycles.BodySite` answer for a body: the element that runs
+        *owner*, and whether it runs it more than once.
+
+        `None` for the script root, which nothing in the script runs, and for any block whose site is
+        not decidable — a stored block, a function body, a block handed to a command that may or may
+        not invoke it. The cycle walk reads that as *fall back to where the block is written*, which
+        is what it did everywhere before this model existed, so answering nothing changes nothing.
+        &#34;&#34;&#34;
+        if not isinstance(owner, Ps1ScriptBlock):
+            return None
+        facts = self.facts(owner)
+        if facts.site is None:
+            return None
+        return facts.site, facts.iteration is Ps1BlockIteration.REPEATED</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.facts"><code class="name flex">
+<span>def <span class="ident">facts</span></span>(<span>self, block)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What is known about where <em>block</em> runs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L391-L398" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def facts(self, block: Ps1ScriptBlock) -&gt; Ps1BlockFacts:
+    &#34;&#34;&#34;
+    What is known about where *block* runs.
+    &#34;&#34;&#34;
+    found = self._facts.get(id(block))
+    if found is None:
+        found = self._facts[id(block)] = classify_block(block, self._shadowed)
+    return found</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.may_write_caller_scope"><code class="name flex">
+<span>def <span class="ident">may_write_caller_scope</span></span>(<span>self, block)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a bare write inside <em>block</em> may land in the scope of the code that runs it. True for
+everything but a proven child scope — see the module docstring for why that asymmetry is the
+safe one.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L400-L406" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def may_write_caller_scope(self, block: Ps1ScriptBlock) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a bare write inside *block* may land in the scope of the code that runs it. True for
+    everything but a proven child scope — see the module docstring for why that asymmetry is the
+    safe one.
+    &#34;&#34;&#34;
+    return self.facts(block).scope is not Ps1BlockScope.CHILD</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.writes_reaching_caller"><code class="name flex">
+<span>def <span class="ident">writes_reaching_caller</span></span>(<span>self, block)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The write occurrences inside <em>block</em> that land in the scope of whatever runs it — the ones
+written directly in its body, and those of any nested block that reaches its own caller in
+turn. Empty for a proven child scope, since nothing a child scope writes outlives it.</p>
+<p>A name addressed as a <em>string</em> is a write here exactly as a bare <code>$x =</code> is. <code>Remove-Variable
+x&lt;code&gt;, &lt;/code&gt;New-Variable x 'b'&lt;code&gt; and &lt;/code&gt;Get-Process -OutVariable x</code> each write the scope they are
+written in and each contains no occurrence of the name, so a caller reading only the
+variables of the body sees <code>. { Remove-Variable x }</code> touch nothing at all. That the answer
+is an <code>Occurrence</code> rather than a <code>Ps1Variable</code> is what lets the two arrive as one kind of
+thing.</p>
+<p>That the recursion stops at a child scope is what makes <code>&amp; { . { $x = 'b' } }</code> write nothing
+outside: the inner dot writes the <code>&amp;</code> block's scope, and that scope ends with it. Qualified
+writes are left out because a <code>$script:</code> or <code>$global:</code> write names its scope outright and
+reaches the same binding whichever body it sits in, so it is not a fact about where the block
+runs — and a <code>Set-Variable -Scope Global x</code> is left out for that same reason.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L408-L434" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def writes_reaching_caller(self, block: Ps1ScriptBlock) -&gt; tuple[Occurrence, ...]:
+    &#34;&#34;&#34;
+    The write occurrences inside *block* that land in the scope of whatever runs it — the ones
+    written directly in its body, and those of any nested block that reaches its own caller in
+    turn. Empty for a proven child scope, since nothing a child scope writes outlives it.
+
+    A name addressed as a *string* is a write here exactly as a bare `$x =` is. `Remove-Variable
+    x`, `New-Variable x &#39;b&#39;` and `Get-Process -OutVariable x` each write the scope they are
+    written in and each contains no occurrence of the name, so a caller reading only the
+    variables of the body sees `. { Remove-Variable x }` touch nothing at all. That the answer
+    is an `Occurrence` rather than a `Ps1Variable` is what lets the two arrive as one kind of
+    thing.
+
+    That the recursion stops at a child scope is what makes `&amp; { . { $x = &#39;b&#39; } }` write nothing
+    outside: the inner dot writes the `&amp;` block&#39;s scope, and that scope ends with it. Qualified
+    writes are left out because a `$script:` or `$global:` write names its scope outright and
+    reaches the same binding whichever body it sits in, so it is not a fact about where the block
+    runs — and a `Set-Variable -Scope Global x` is left out for that same reason.
+    &#34;&#34;&#34;
+    found = self._caller_writes.get(id(block))
+    if found is None:
+        if not self.may_write_caller_scope(block):
+            found = ()
+        else:
+            found = tuple(self._collect_writes(block))
+        self._caller_writes[id(block)] = found
+    return found</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.unattributable_writes_reaching_caller"><code class="name flex">
+<span>def <span class="ident">unattributable_writes_reaching_caller</span></span>(<span>self, block)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>block</em> runs a write whose name this cannot read — <code>Set-Variable $n 'v'</code> — into the
+scope of whatever runs it. The name is unknown, so the write may have landed on any binding
+of that scope, and a caller can place <em>when</em> it happened without knowing <em>what</em> it hit.</p>
+<p>Only the writes a command places in its own scope are reported. One that names a scope
+outright reaches the same binding whichever body it sits in, so it is not a fact about where
+this block runs, and reporting it here would have it stop at a child scope that does not
+stop it — the same reason <code>writes_reaching_caller</code> leaves a <code>$script:</code> write out.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L436-L453" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unattributable_writes_reaching_caller(self, block: Ps1ScriptBlock) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *block* runs a write whose name this cannot read — `Set-Variable $n &#39;v&#39;` — into the
+    scope of whatever runs it. The name is unknown, so the write may have landed on any binding
+    of that scope, and a caller can place *when* it happened without knowing *what* it hit.
+
+    Only the writes a command places in its own scope are reported. One that names a scope
+    outright reaches the same binding whichever body it sits in, so it is not a fact about where
+    this block runs, and reporting it here would have it stop at a child scope that does not
+    stop it — the same reason `writes_reaching_caller` leaves a `$script:` write out.
+    &#34;&#34;&#34;
+    found = self._caller_unattributable.get(id(block))
+    if found is None:
+        found = self._caller_unattributable[id(block)] = (
+            self.may_write_caller_scope(block)
+            and self._runs_unattributable_write(block)
+        )
+    return found</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.body_site"><code class="name flex">
+<span>def <span class="ident">body_site</span></span>(<span>self, owner)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The <code><a title="refinery.lib.scripts.analysis.cycles.BodySite" href="../../analysis/cycles.html#refinery.lib.scripts.analysis.cycles.BodySite">BodySite</a></code> answer for a body: the element that runs
+<em>owner</em>, and whether it runs it more than once.</p>
+<p><code>None</code> for the script root, which nothing in the script runs, and for any block whose site is
+not decidable — a stored block, a function body, a block handed to a command that may or may
+not invoke it. The cycle walk reads that as <em>fall back to where the block is written</em>, which
+is what it did everywhere before this model existed, so answering nothing changes nothing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/blocks.py#L485-L500" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def body_site(self, owner: Node) -&gt; tuple[Node, bool] | None:
+    &#34;&#34;&#34;
+    The `refinery.lib.scripts.analysis.cycles.BodySite` answer for a body: the element that runs
+    *owner*, and whether it runs it more than once.
+
+    `None` for the script root, which nothing in the script runs, and for any block whose site is
+    not decidable — a stored block, a function body, a block handed to a command that may or may
+    not invoke it. The cycle walk reads that as *fall back to where the block is written*, which
+    is what it did everywhere before this model existed, so answering nothing changes nothing.
+    &#34;&#34;&#34;
+    if not isinstance(owner, Ps1ScriptBlock):
+        return None
+    facts = self.facts(owner)
+    if facts.site is None:
+        return None
+    return facts.site, facts.iteration is Ps1BlockIteration.REPEATED</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.names_an_intact_iterating_command" href="#refinery.lib.scripts.ps1.analysis.blocks.names_an_intact_iterating_command">names_an_intact_iterating_command</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.binds_the_pipeline_variable" href="#refinery.lib.scripts.ps1.analysis.blocks.binds_the_pipeline_variable">binds_the_pipeline_variable</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.classify_block" href="#refinery.lib.scripts.ps1.analysis.blocks.classify_block">classify_block</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.build_block_model" href="#refinery.lib.scripts.ps1.analysis.blocks.build_block_model">build_block_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockReach">Ps1BlockReach</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockScope" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockScope">Ps1BlockScope</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockIteration" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockIteration">Ps1BlockIteration</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockFacts">Ps1BlockFacts</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel">Ps1BlockModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.facts" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.facts">facts</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.may_write_caller_scope" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.may_write_caller_scope">may_write_caller_scope</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.writes_reaching_caller" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.writes_reaching_caller">writes_reaching_caller</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.unattributable_writes_reaching_caller" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.unattributable_writes_reaching_caller">unattributable_writes_reaching_caller</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.body_site" href="#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel.body_site">body_site</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

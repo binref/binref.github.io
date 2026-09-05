@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.analysis.cycles documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.analysis.cycles</code></h1>
+</header>
+<section id="section-intro">
+<p>Whether a point in a script can be reached more than once, over the control-flow graphs of one
+script.</p>
+<p>This is the question every loop-awareness check in a transform is really asking. A value established
+at a point holds until something changes it — but if control can come back to that point, the value
+it establishes on the second visit is not the one an earlier reader saw, and a fact derived from a
+single visit is not a fact about the program. Loops are the obvious way that happens and the reason
+the check is usually written as a walk up the ancestors looking for loop node types, which is a
+guess at the graph rather than a reading of it: it misses a construct that iterates without being
+spelled as a loop, and it claims one for a body that runs once.</p>
+<p>Read off the graph, the question is exactly whether the node lies on a cycle, which is whether it
+belongs to a strongly connected component with more than one member or carries an edge to itself.
+Nothing else in the shape of the source matters.</p>
+<p>Exceptional edges take part like any other edge. A body a handler resumes into is genuinely reached
+again — <code>trap { continue }</code> is a loop spelled as error handling — and a caller asking whether a
+single-visit fact still holds must be told so. The cost is that a cycle closed only by a throw is
+reported as one, which over-approximates in the safe direction here but is the wrong reading for a
+caller that would take <code>on_a_cycle</code> as licence to rotate or unroll.</p>
+<p><strong>One body's graph only answers for one invocation of that body.</strong> A block written inside a loop is
+invoked once per iteration, so everything in it repeats even though its own graph is acyclic — the
+repetition is the <em>owner's</em>, and <code><a title="refinery.lib.scripts.analysis.cycles.CycleModel.repeats" href="#refinery.lib.scripts.analysis.cycles.CycleModel.repeats">CycleModel.repeats()</a></code> asks the owner in turn.</p>
+<p>That walk is lexical by default: it follows a body to where its value is <em>written</em>, not to where it
+is called, so a body repeated by something other than the code around it reads as running once. A
+language closes that gap by supplying a <code><a title="refinery.lib.scripts.analysis.cycles.BodySite" href="#refinery.lib.scripts.analysis.cycles.BodySite">BodySite</a></code>, which names the element that actually runs a body
+and says whether that site runs it more than once — the <code>ForEach-Object</code> a PowerShell pipeline is
+mostly made of runs its block once per input element while the statement handing it over runs once.
+What no <code><a title="refinery.lib.scripts.analysis.cycles.BodySite" href="#refinery.lib.scripts.analysis.cycles.BodySite">BodySite</a></code> can answer from a tree alone is a block stored in a variable and invoked from a
+loop somewhere else; that is a call-graph question, and these graphs do not hold it.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cycles.py#L1-L176" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Whether a point in a script can be reached more than once, over the control-flow graphs of one
+script.
+
+This is the question every loop-awareness check in a transform is really asking. A value established
+at a point holds until something changes it — but if control can come back to that point, the value
+it establishes on the second visit is not the one an earlier reader saw, and a fact derived from a
+single visit is not a fact about the program. Loops are the obvious way that happens and the reason
+the check is usually written as a walk up the ancestors looking for loop node types, which is a
+guess at the graph rather than a reading of it: it misses a construct that iterates without being
+spelled as a loop, and it claims one for a body that runs once.
+
+Read off the graph, the question is exactly whether the node lies on a cycle, which is whether it
+belongs to a strongly connected component with more than one member or carries an edge to itself.
+Nothing else in the shape of the source matters.
+
+Exceptional edges take part like any other edge. A body a handler resumes into is genuinely reached
+again — `trap { continue }` is a loop spelled as error handling — and a caller asking whether a
+single-visit fact still holds must be told so. The cost is that a cycle closed only by a throw is
+reported as one, which over-approximates in the safe direction here but is the wrong reading for a
+caller that would take `on_a_cycle` as licence to rotate or unroll.
+
+**One body&#39;s graph only answers for one invocation of that body.** A block written inside a loop is
+invoked once per iteration, so everything in it repeats even though its own graph is acyclic — the
+repetition is the *owner&#39;s*, and `CycleModel.repeats` asks the owner in turn.
+
+That walk is lexical by default: it follows a body to where its value is *written*, not to where it
+is called, so a body repeated by something other than the code around it reads as running once. A
+language closes that gap by supplying a `BodySite`, which names the element that actually runs a body
+and says whether that site runs it more than once — the `ForEach-Object` a PowerShell pipeline is
+mostly made of runs its block once per input element while the statement handing it over runs once.
+What no `BodySite` can answer from a tree alone is a block stored in a variable and invoked from a
+loop somewhere else; that is a call-graph question, and these graphs do not hold it.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Callable
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.cfg import CfgNode, ControlFlowGraph, ControlFlowModel
+
+#: What a language may answer about the body a control-flow graph belongs to: the element whose
+#: evaluation runs that body, and whether the site runs it more than once. `None` means the language
+#: has nothing to say and the walk falls back to where the body is *written*, which is the lexical
+#: reading the module docstring describes. A site given here replaces that reading, so answering is
+#: how a language reports a body run by something other than the code around it.
+BodySite = Callable[[Node], &#39;tuple[Node, bool] | None&#39;]
+
+
+def strongly_connected_components(graph: ControlFlowGraph) -&gt; list[list[CfgNode]]:
+    &#34;&#34;&#34;
+    The strongly connected components of *graph*, each a list of the nodes that can all reach one
+    another. Tarjan&#39;s algorithm, driven by an explicit stack rather than by recursion: the graphs
+    are as deep as the script is long and a deeply nested body would otherwise exhaust the
+    interpreter&#39;s stack on a script that parses fine.
+    &#34;&#34;&#34;
+    index: dict[int, int] = {}
+    lowlink: dict[int, int] = {}
+    stacked: set[int] = set()
+    pending: list[CfgNode] = []
+    components: list[list[CfgNode]] = []
+    counter = 0
+    for start in graph.nodes:
+        if id(start) in index:
+            continue
+        work: list[tuple[CfgNode, int]] = [(start, 0)]
+        while work:
+            node, position = work[-1]
+            if position == 0:
+                index[id(node)] = lowlink[id(node)] = counter
+                counter += 1
+                pending.append(node)
+                stacked.add(id(node))
+            descended = False
+            for offset in range(position, len(node.successors)):
+                successor = node.successors[offset]
+                if id(successor) not in index:
+                    work[-1] = (node, offset + 1)
+                    work.append((successor, 0))
+                    descended = True
+                    break
+                if id(successor) in stacked:
+                    lowlink[id(node)] = min(lowlink[id(node)], index[id(successor)])
+            if descended:
+                continue
+            work.pop()
+            if work:
+                parent = work[-1][0]
+                lowlink[id(parent)] = min(lowlink[id(parent)], lowlink[id(node)])
+            if lowlink[id(node)] == index[id(node)]:
+                component: list[CfgNode] = []
+                while True:
+                    member = pending.pop()
+                    stacked.discard(id(member))
+                    component.append(member)
+                    if member is node:
+                        break
+                components.append(component)
+    return components
+
+
+def nodes_on_a_cycle(graph: ControlFlowGraph) -&gt; frozenset[int]:
+    &#34;&#34;&#34;
+    The ids of the nodes of *graph* that control can return to: those in a strongly connected
+    component of more than one node, and those carrying an edge to themselves.
+
+    A component of one node is not a cycle unless that edge is there, which is the case a plain
+    component-size test gets wrong — a construct that iterates over nothing but its own head, such as
+    a dispatch whose every arm is empty, is one node reaching only itself.
+    &#34;&#34;&#34;
+    found: set[int] = set()
+    for component in strongly_connected_components(graph):
+        if len(component) &gt; 1:
+            found.update(id(node) for node in component)
+            continue
+        node = component[0]
+        if any(successor is node for successor in node.successors):
+            found.add(id(node))
+    return frozenset(found)
+
+
+class CycleModel:
+    &#34;&#34;&#34;
+    Which points of one script can be reached more than once. A graph&#39;s cycle set is computed once,
+    on the first question asked about that graph, and kept for as long as this model lives: a caller
+    that asks about one node almost always asks about many and the sets are fixed for as long as the
+    tree is. Computing them all on construction instead would charge every caller for the whole
+    script — the graph of one obfuscated body can carry hundreds of thousands of edges — including
+    the caller that ends up asking nothing.
+    &#34;&#34;&#34;
+
+    def __init__(self, flow: ControlFlowModel, body_site: BodySite | None = None):
+        self._flow = flow
+        self._body_site = body_site
+        self._on_a_cycle: dict[int, frozenset[int]] = {}
+
+    def on_a_cycle(self, graph: ControlFlowGraph, node: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether control can return to *node* within one invocation of the body *graph* is the graph
+        of. The node-level counterpart of `repeats`, for a caller that has already located it.
+        &#34;&#34;&#34;
+        found = self._on_a_cycle.get(id(graph))
+        if found is None:
+            found = self._on_a_cycle[id(graph)] = nodes_on_a_cycle(graph)
+        return id(node) in found
+
+    def repeats(self, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *element* can be evaluated more than once by one run of the script — because the
+        statement evaluating it lies on a cycle, because the body it is written in does, or because
+        the graphs do not place it at all.
+
+        That last answer is the conservative one, and it is the reason this reports *may repeat*
+        rather than *does*: an element no node stands for — the default of a parameter, an attribute
+        on a body — is evaluated when its body is invoked, which is a point these graphs do not
+        hold. A caller asks this to find out whether a fact taken from one visit still holds, and
+        the answer to that question over an unplaced element is no. See the module docstring for
+        what the walk out through the enclosing bodies does and does not see.
+        &#34;&#34;&#34;
+        located = self._flow.locate(element)
+        if located is None:
+            return True
+        while located is not None:
+            graph, node = located
+            if self.on_a_cycle(graph, node):
+                return True
+            owner = graph.owner
+            site = self._body_site(owner) if self._body_site is not None else None
+            if site is None:
+                located = self._flow.locate(owner)
+                continue
+            invoked_at, repeatedly = site
+            if repeatedly:
+                return True
+            located = self._flow.locate(invoked_at)
+        return False</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.analysis.cycles.BodySite"><code class="name">var <span class="ident">BodySite</span></code></dt>
+<dd>
+<section class="desc"><p>What a language may answer about the body a control-flow graph belongs to: the element whose
+evaluation runs that body, and whether the site runs it more than once. <code>None</code> means the language
+has nothing to say and the walk falls back to where the body is <em>written</em>, which is the lexical
+reading the module docstring describes. A site given here replaces that reading, so answering is
+how a language reports a body run by something other than the code around it.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.analysis.cycles.strongly_connected_components"><code class="name flex">
+<span>def <span class="ident">strongly_connected_components</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The strongly connected components of <em>graph</em>, each a list of the nodes that can all reach one
+another. Tarjan's algorithm, driven by an explicit stack rather than by recursion: the graphs
+are as deep as the script is long and a deeply nested body would otherwise exhaust the
+interpreter's stack on a script that parses fine.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cycles.py#L50-L99" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def strongly_connected_components(graph: ControlFlowGraph) -&gt; list[list[CfgNode]]:
+    &#34;&#34;&#34;
+    The strongly connected components of *graph*, each a list of the nodes that can all reach one
+    another. Tarjan&#39;s algorithm, driven by an explicit stack rather than by recursion: the graphs
+    are as deep as the script is long and a deeply nested body would otherwise exhaust the
+    interpreter&#39;s stack on a script that parses fine.
+    &#34;&#34;&#34;
+    index: dict[int, int] = {}
+    lowlink: dict[int, int] = {}
+    stacked: set[int] = set()
+    pending: list[CfgNode] = []
+    components: list[list[CfgNode]] = []
+    counter = 0
+    for start in graph.nodes:
+        if id(start) in index:
+            continue
+        work: list[tuple[CfgNode, int]] = [(start, 0)]
+        while work:
+            node, position = work[-1]
+            if position == 0:
+                index[id(node)] = lowlink[id(node)] = counter
+                counter += 1
+                pending.append(node)
+                stacked.add(id(node))
+            descended = False
+            for offset in range(position, len(node.successors)):
+                successor = node.successors[offset]
+                if id(successor) not in index:
+                    work[-1] = (node, offset + 1)
+                    work.append((successor, 0))
+                    descended = True
+                    break
+                if id(successor) in stacked:
+                    lowlink[id(node)] = min(lowlink[id(node)], index[id(successor)])
+            if descended:
+                continue
+            work.pop()
+            if work:
+                parent = work[-1][0]
+                lowlink[id(parent)] = min(lowlink[id(parent)], lowlink[id(node)])
+            if lowlink[id(node)] == index[id(node)]:
+                component: list[CfgNode] = []
+                while True:
+                    member = pending.pop()
+                    stacked.discard(id(member))
+                    component.append(member)
+                    if member is node:
+                        break
+                components.append(component)
+    return components</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.cycles.nodes_on_a_cycle"><code class="name flex">
+<span>def <span class="ident">nodes_on_a_cycle</span></span>(<span>graph)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The ids of the nodes of <em>graph</em> that control can return to: those in a strongly connected
+component of more than one node, and those carrying an edge to themselves.</p>
+<p>A component of one node is not a cycle unless that edge is there, which is the case a plain
+component-size test gets wrong — a construct that iterates over nothing but its own head, such as
+a dispatch whose every arm is empty, is one node reaching only itself.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cycles.py#L102-L119" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def nodes_on_a_cycle(graph: ControlFlowGraph) -&gt; frozenset[int]:
+    &#34;&#34;&#34;
+    The ids of the nodes of *graph* that control can return to: those in a strongly connected
+    component of more than one node, and those carrying an edge to themselves.
+
+    A component of one node is not a cycle unless that edge is there, which is the case a plain
+    component-size test gets wrong — a construct that iterates over nothing but its own head, such as
+    a dispatch whose every arm is empty, is one node reaching only itself.
+    &#34;&#34;&#34;
+    found: set[int] = set()
+    for component in strongly_connected_components(graph):
+        if len(component) &gt; 1:
+            found.update(id(node) for node in component)
+            continue
+        node = component[0]
+        if any(successor is node for successor in node.successors):
+            found.add(id(node))
+    return frozenset(found)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.analysis.cycles.CycleModel"><code class="flex name class">
+<span>class <span class="ident">CycleModel</span></span>
+<span>(</span><span>flow, body_site=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Which points of one script can be reached more than once. A graph's cycle set is computed once,
+on the first question asked about that graph, and kept for as long as this model lives: a caller
+that asks about one node almost always asks about many and the sets are fixed for as long as the
+tree is. Computing them all on construction instead would charge every caller for the whole
+script — the graph of one obfuscated body can carry hundreds of thousands of edges — including
+the caller that ends up asking nothing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cycles.py#L122-L176" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class CycleModel:
+    &#34;&#34;&#34;
+    Which points of one script can be reached more than once. A graph&#39;s cycle set is computed once,
+    on the first question asked about that graph, and kept for as long as this model lives: a caller
+    that asks about one node almost always asks about many and the sets are fixed for as long as the
+    tree is. Computing them all on construction instead would charge every caller for the whole
+    script — the graph of one obfuscated body can carry hundreds of thousands of edges — including
+    the caller that ends up asking nothing.
+    &#34;&#34;&#34;
+
+    def __init__(self, flow: ControlFlowModel, body_site: BodySite | None = None):
+        self._flow = flow
+        self._body_site = body_site
+        self._on_a_cycle: dict[int, frozenset[int]] = {}
+
+    def on_a_cycle(self, graph: ControlFlowGraph, node: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether control can return to *node* within one invocation of the body *graph* is the graph
+        of. The node-level counterpart of `repeats`, for a caller that has already located it.
+        &#34;&#34;&#34;
+        found = self._on_a_cycle.get(id(graph))
+        if found is None:
+            found = self._on_a_cycle[id(graph)] = nodes_on_a_cycle(graph)
+        return id(node) in found
+
+    def repeats(self, element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *element* can be evaluated more than once by one run of the script — because the
+        statement evaluating it lies on a cycle, because the body it is written in does, or because
+        the graphs do not place it at all.
+
+        That last answer is the conservative one, and it is the reason this reports *may repeat*
+        rather than *does*: an element no node stands for — the default of a parameter, an attribute
+        on a body — is evaluated when its body is invoked, which is a point these graphs do not
+        hold. A caller asks this to find out whether a fact taken from one visit still holds, and
+        the answer to that question over an unplaced element is no. See the module docstring for
+        what the walk out through the enclosing bodies does and does not see.
+        &#34;&#34;&#34;
+        located = self._flow.locate(element)
+        if located is None:
+            return True
+        while located is not None:
+            graph, node = located
+            if self.on_a_cycle(graph, node):
+                return True
+            owner = graph.owner
+            site = self._body_site(owner) if self._body_site is not None else None
+            if site is None:
+                located = self._flow.locate(owner)
+                continue
+            invoked_at, repeatedly = site
+            if repeatedly:
+                return True
+            located = self._flow.locate(invoked_at)
+        return False</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.analysis.cycles.CycleModel.on_a_cycle"><code class="name flex">
+<span>def <span class="ident">on_a_cycle</span></span>(<span>self, graph, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether control can return to <em>node</em> within one invocation of the body <em>graph</em> is the graph
+of. The node-level counterpart of <code>repeats</code>, for a caller that has already located it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cycles.py#L137-L145" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def on_a_cycle(self, graph: ControlFlowGraph, node: CfgNode) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether control can return to *node* within one invocation of the body *graph* is the graph
+    of. The node-level counterpart of `repeats`, for a caller that has already located it.
+    &#34;&#34;&#34;
+    found = self._on_a_cycle.get(id(graph))
+    if found is None:
+        found = self._on_a_cycle[id(graph)] = nodes_on_a_cycle(graph)
+    return id(node) in found</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.cycles.CycleModel.repeats"><code class="name flex">
+<span>def <span class="ident">repeats</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>element</em> can be evaluated more than once by one run of the script — because the
+statement evaluating it lies on a cycle, because the body it is written in does, or because
+the graphs do not place it at all.</p>
+<p>That last answer is the conservative one, and it is the reason this reports <em>may repeat</em>
+rather than <em>does</em>: an element no node stands for — the default of a parameter, an attribute
+on a body — is evaluated when its body is invoked, which is a point these graphs do not
+hold. A caller asks this to find out whether a fact taken from one visit still holds, and
+the answer to that question over an unplaced element is no. See the module docstring for
+what the walk out through the enclosing bodies does and does not see.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cycles.py#L147-L176" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def repeats(self, element: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *element* can be evaluated more than once by one run of the script — because the
+    statement evaluating it lies on a cycle, because the body it is written in does, or because
+    the graphs do not place it at all.
+
+    That last answer is the conservative one, and it is the reason this reports *may repeat*
+    rather than *does*: an element no node stands for — the default of a parameter, an attribute
+    on a body — is evaluated when its body is invoked, which is a point these graphs do not
+    hold. A caller asks this to find out whether a fact taken from one visit still holds, and
+    the answer to that question over an unplaced element is no. See the module docstring for
+    what the walk out through the enclosing bodies does and does not see.
+    &#34;&#34;&#34;
+    located = self._flow.locate(element)
+    if located is None:
+        return True
+    while located is not None:
+        graph, node = located
+        if self.on_a_cycle(graph, node):
+            return True
+        owner = graph.owner
+        site = self._body_site(owner) if self._body_site is not None else None
+        if site is None:
+            located = self._flow.locate(owner)
+            continue
+        invoked_at, repeatedly = site
+        if repeatedly:
+            return True
+        located = self._flow.locate(invoked_at)
+    return False</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.analysis" href="index.html">refinery.lib.scripts.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.analysis.cycles.BodySite" href="#refinery.lib.scripts.analysis.cycles.BodySite">BodySite</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.analysis.cycles.strongly_connected_components" href="#refinery.lib.scripts.analysis.cycles.strongly_connected_components">strongly_connected_components</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cycles.nodes_on_a_cycle" href="#refinery.lib.scripts.analysis.cycles.nodes_on_a_cycle">nodes_on_a_cycle</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.analysis.cycles.CycleModel" href="#refinery.lib.scripts.analysis.cycles.CycleModel">CycleModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.analysis.cycles.CycleModel.on_a_cycle" href="#refinery.lib.scripts.analysis.cycles.CycleModel.on_a_cycle">on_a_cycle</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cycles.CycleModel.repeats" href="#refinery.lib.scripts.analysis.cycles.CycleModel.repeats">repeats</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

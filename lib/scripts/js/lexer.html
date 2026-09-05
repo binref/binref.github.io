@@ -1,0 +1,1749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L1-L850" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import re
+import unicodedata
+
+from dataclasses import dataclass, field
+from typing import Generator
+
+from refinery.lib.scripts.js.token import (
+    KEYWORDS,
+    LINE_TERMINATORS,
+    WHITESPACE,
+    JsToken,
+    JsTokenKind,
+)
+from refinery.lib.scripts.js.utf16 import (
+    code_units,
+    to_code_units,
+)
+
+_ESCAPE_MAP: dict[str, str] = {
+    &#39;b&#39;  : &#39;\b&#39;,
+    &#39;f&#39;  : &#39;\f&#39;,
+    &#39;n&#39;  : &#39;\n&#39;,
+    &#39;r&#39;  : &#39;\r&#39;,
+    &#39;t&#39;  : &#39;\t&#39;,
+    &#39;v&#39;  : &#39;\v&#39;,
+    &#39;\\&#39; : &#39;\\&#39;,
+    &#34;&#39;&#34;  : &#34;&#39;&#34;,
+    &#39;&#34;&#39;  : &#39;&#34;&#39;,
+    &#39;`&#39;  : &#39;`&#39;,
+}
+
+_HEX = frozenset(&#39;0123456789abcdefABCDEF&#39;)
+_OCTAL = frozenset(&#39;01234567&#39;)
+_DECIMAL = frozenset(&#39;0123456789&#39;)
+
+_WHITESPACE = frozenset(WHITESPACE)
+_LINE_TERMINATOR = re.compile(F&#39;[{re.escape(LINE_TERMINATORS)}]&#39;)
+&#34;&#34;&#34;
+The two productions `refinery.lib.scripts.js.token` spells, in the shapes this scan reads them. The
+spelling stays a string there because `refinery.lib.scripts.js.numbers.TRIMMABLE_WHITESPACE` is the
+concatenation of the two, and neither shape here is the right one for the other: whitespace is asked
+about one character at a time, where a comment asks only where the next terminator is.
+&#34;&#34;&#34;
+
+_MAX_CODE_POINT = 0x10FFFF
+&#34;&#34;&#34;
+The largest code point a `\\u{...}` escape may name. A larger one is no escape at all, and it is
+asked about here rather than left to `chr`, which raises: the scan runs inside a generator that the
+parser reads statement by statement, so an exception raised in it is not a diagnostic but the end
+of the token stream, and every statement behind the escape disappears with it.
+&#34;&#34;&#34;
+
+_IDENTIFIER_JOINERS = frozenset(&#39;\u200c\u200d&#39;)
+&#34;&#34;&#34;
+The zero width non-joiner and the zero width joiner, which are IdentifierPart and nothing else: they
+may stand inside a name but not open one. They carry no width, so a name written with one reads as
+the same name, which is exactly what makes them worth writing in an obfuscated file.
+&#34;&#34;&#34;
+
+
+def _begins_unicode_escape(src: str, pos: int) -&gt; bool:
+    return src[pos:pos + 2] == &#39;\\u&#39;
+
+
+_ASCII_NAME_START = frozenset(&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$&#39;)
+_ASCII_NAME_PART = _ASCII_NAME_START | _DECIMAL
+&#34;&#34;&#34;
+The characters almost every name is written with, asked first because asking the Unicode database
+per character is what the scan spends its time on otherwise. These two are the whole of ASCII that
+a name may hold — `_` is the one Pc below the eighth bit and `$` is in no category IdentifierStart
+names at all — so an ASCII character that is in neither is in no name, and the character that ends
+a name is the one the scan asks about most.
+&#34;&#34;&#34;
+
+_ID_START_CATEGORIES = frozenset({&#39;Lu&#39;, &#39;Ll&#39;, &#39;Lt&#39;, &#39;Lm&#39;, &#39;Lo&#39;, &#39;Nl&#39;})
+_ID_CONTINUE_CATEGORIES = _ID_START_CATEGORIES | frozenset({&#39;Mn&#39;, &#39;Mc&#39;, &#39;Nd&#39;, &#39;Pc&#39;})
+_OTHER_ID_START = frozenset(&#39;\u1885\u1886\u2118\u212e\u309b\u309c&#39;)
+_OTHER_ID_CONTINUE = frozenset(
+    &#39;\u00b7\u0387\u1369\u136a\u136b\u136c\u136d\u136e\u136f\u1370\u1371\u19da\u30fb\uff65&#39;
+)
+&#34;&#34;&#34;
+ID_Start and ID_Continue as UAX #31 defines them and ECMA-262 11.6 adopts them, with the two lists
+of characters those properties name outright because their category alone would leave them out. A
+name is written with these and not with what a locale calls a letter: an accent written as its own
+combining character, the middle dot of a Catalan `l·l`, the katakana middle dot, and an undertie
+are all IdentifierPart, and reading a name as though they were not ends it early and reads what
+follows as an operator.
+
+Other_ID_Continue is a list Unicode extends, and the two lists here are the ones Unicode 15.1
+names, which is what `unicodedata` on this interpreter answers the categories from. A database
+holding a different revision than these lists were written against disagrees with the categories
+beside them rather than with anything stated here.
+&#34;&#34;&#34;
+
+_EXTRA_NAME_PART = _IDENTIFIER_JOINERS | _OTHER_ID_START | _OTHER_ID_CONTINUE
+&#34;&#34;&#34;
+Every character IdentifierPart takes beyond what its categories give it, asked as one membership
+so that the tail of the scan&#39;s per-character question is a single lookup.
+&#34;&#34;&#34;
+
+
+def _opens_a_name(c: str) -&gt; bool:
+    if c in _ASCII_NAME_START:
+        return True
+    if c.isascii():
+        return False
+    return unicodedata.category(c) in _ID_START_CATEGORIES or c in _OTHER_ID_START
+
+
+def _continues_a_name(c: str) -&gt; bool:
+    if c in _ASCII_NAME_PART:
+        return True
+    if c.isascii():
+        return False
+    return unicodedata.category(c) in _ID_CONTINUE_CATEGORIES or c in _EXTRA_NAME_PART
+
+
+def _at_identifier_start(src: str, pos: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an IdentifierName begins at *pos*. A backslash opens one only where it opens a
+    unicode escape; one that begins no escape is a character no name may hold, and reading it as
+    the start of a name is how a scan that consumed nothing yielded empty identifiers for as long
+    as anything read them.
+    &#34;&#34;&#34;
+    c = src[pos:pos + 1]
+    if not c:
+        return False
+    return _opens_a_name(c) or _begins_unicode_escape(src, pos)
+
+
+class _EscapeUse(enum.Enum):
+    &#34;&#34;&#34;
+    Which literals accept an escape. Every escape a template accepts a string accepts too, so the
+    three are ordered: one a template has, one only a string keeps, and one no literal has at all. A
+    literal carrying an escape it does not accept denotes nothing.
+
+    `STRING` is the legacy octal escape and `\\8`/`\\9` Annex B holds open for sloppy code, which a
+    template refuses and a string reads as the character it names. `NEITHER` is a `\\x` or `\\u`
+    naming no character, which neither literal has: the reading that answers with the letters behind
+    the backslash reports a value for a file that has none.
+    &#34;&#34;&#34;
+    EITHER = enum.auto()
+    STRING = enum.auto()
+    NEITHER = enum.auto()
+
+
+def _decode_one_escape(src: str, pos: int, length: int) -&gt; tuple[str, int, _EscapeUse]:
+    &#34;&#34;&#34;
+    What the escape opened at *pos* denotes, where it ends, and which literals accept it. The third
+    answer is what the two literals disagree about: a string keeps the escapes Annex B holds open
+    for sloppy code and reads anything else as the character behind the backslash, while a template
+    admits neither; and an escape naming no character is one no literal has.
+
+    Refusal is reported here rather than scanned for again, because the classification is this
+    decode: which spellings of `\\x` and `\\u` are malformed is a fact about the escape grammar, and
+    a second reader of the same text would be a second statement of it.
+    &#34;&#34;&#34;
+    if pos &gt;= length:
+        return &#39;&#39;, pos, _EscapeUse.NEITHER
+    c = src[pos]
+    pos += 1
+    mapped = _ESCAPE_MAP.get(c)
+    if mapped is not None:
+        return mapped, pos, _EscapeUse.EITHER
+    if c in _OCTAL:
+        value = int(c, 8)
+        remaining = 2 if c in &#39;0123&#39; else 1
+        legacy = c != &#39;0&#39;
+        while remaining &gt; 0 and pos &lt; length and src[pos] in _OCTAL:
+            value = value * 8 + int(src[pos], 8)
+            pos += 1
+            remaining -= 1
+            legacy = True
+        if not legacy and pos &lt; length and src[pos] in _DECIMAL:
+            legacy = True
+        return chr(value), pos, _EscapeUse.STRING if legacy else _EscapeUse.EITHER
+    if c in &#39;89&#39;:
+        return c, pos, _EscapeUse.STRING
+    if c == &#39;x&#39;:
+        hexstr = src[pos:pos + 2]
+        if len(hexstr) == 2 and _HEX.issuperset(hexstr):
+            return chr(int(hexstr, 16)), pos + 2, _EscapeUse.EITHER
+        return &#39;x&#39;, pos, _EscapeUse.NEITHER
+    if c == &#39;u&#39;:
+        if pos &lt; length and src[pos] == &#39;{&#39;:
+            end = pos + 1
+            while end &lt; length and src[end] in _HEX:
+                end += 1
+            if end &gt; pos + 1 and end &lt; length and src[end] == &#39;}&#39;:
+                value = int(src[pos + 1:end], 16)
+                if value &lt;= _MAX_CODE_POINT:
+                    return code_units(value), end + 1, _EscapeUse.EITHER
+                return &#39;u&#39;, end + 1, _EscapeUse.NEITHER
+        else:
+            hexstr = src[pos:pos + 4]
+            if len(hexstr) == 4 and _HEX.issuperset(hexstr):
+                return chr(int(hexstr, 16)), pos + 4, _EscapeUse.EITHER
+        return &#39;u&#39;, pos, _EscapeUse.NEITHER
+    if c in LINE_TERMINATORS:
+        if c == &#39;\r&#39; and pos &lt; length and src[pos] == &#39;\n&#39;:
+            pos += 1
+        return &#39;&#39;, pos, _EscapeUse.EITHER
+    return c, pos, _EscapeUse.EITHER
+
+
+_FOUR_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;&gt;&gt;&gt;=&#39; : JsTokenKind.GT3_ASSIGN,
+}
+
+_THREE_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;===&#39; : JsTokenKind.EQ3,
+    &#39;!==&#39; : JsTokenKind.BANG_EQ2,
+    &#39;&gt;&gt;&gt;&#39; : JsTokenKind.GT3,
+    &#39;**=&#39; : JsTokenKind.STAR2_ASSIGN,
+    &#39;&lt;&lt;=&#39; : JsTokenKind.LT2_ASSIGN,
+    &#39;&gt;&gt;=&#39; : JsTokenKind.GT2_ASSIGN,
+    &#39;&amp;&amp;=&#39; : JsTokenKind.AND_ASSIGN,
+    &#39;||=&#39; : JsTokenKind.OR_ASSIGN,
+    &#39;??=&#39; : JsTokenKind.NULLISH_ASSIGN,
+    &#39;...&#39; : JsTokenKind.ELLIPSIS,
+}
+
+_TWO_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;==&#39; : JsTokenKind.EQ2,
+    &#39;!=&#39; : JsTokenKind.BANG_EQ,
+    &#39;&lt;=&#39; : JsTokenKind.LT_EQ,
+    &#39;&gt;=&#39; : JsTokenKind.GT_EQ,
+    &#39;+=&#39; : JsTokenKind.PLUS_ASSIGN,
+    &#39;-=&#39; : JsTokenKind.MINUS_ASSIGN,
+    &#39;*=&#39; : JsTokenKind.STAR_ASSIGN,
+    &#39;/=&#39; : JsTokenKind.SLASH_ASSIGN,
+    &#39;%=&#39; : JsTokenKind.PERCENT_ASSIGN,
+    &#39;&amp;=&#39; : JsTokenKind.AMP_ASSIGN,
+    &#39;|=&#39; : JsTokenKind.PIPE_ASSIGN,
+    &#39;^=&#39; : JsTokenKind.CARET_ASSIGN,
+    &#39;**&#39; : JsTokenKind.STAR2,
+    &#39;++&#39; : JsTokenKind.INC,
+    &#39;--&#39; : JsTokenKind.DEC,
+    &#39;&amp;&amp;&#39; : JsTokenKind.AND,
+    &#39;||&#39; : JsTokenKind.OR,
+    &#39;??&#39; : JsTokenKind.QQ,
+    &#39;?.&#39; : JsTokenKind.QUESTION_DOT,
+    &#39;=&gt;&#39; : JsTokenKind.ARROW,
+    &#39;&lt;&lt;&#39; : JsTokenKind.LT2,
+    &#39;&gt;&gt;&#39; : JsTokenKind.GT2,
+}
+
+_ONE_CHAR_OPS: dict[str, JsTokenKind] = {
+    &#39;+&#39; : JsTokenKind.PLUS,
+    &#39;-&#39; : JsTokenKind.MINUS,
+    &#39;*&#39; : JsTokenKind.STAR,
+    &#39;/&#39; : JsTokenKind.SLASH,
+    &#39;%&#39; : JsTokenKind.PERCENT,
+    &#39;=&#39; : JsTokenKind.EQUALS,
+    &#39;!&#39; : JsTokenKind.BANG,
+    &#39;&lt;&#39; : JsTokenKind.LT,
+    &#39;&gt;&#39; : JsTokenKind.GT,
+    &#39;&amp;&#39; : JsTokenKind.AMP,
+    &#39;|&#39; : JsTokenKind.PIPE,
+    &#39;^&#39; : JsTokenKind.CARET,
+    &#39;~&#39; : JsTokenKind.TILDE,
+    &#39;.&#39; : JsTokenKind.DOT,
+    &#39;?&#39; : JsTokenKind.QUESTION,
+    &#39;:&#39; : JsTokenKind.COLON,
+    &#39;(&#39; : JsTokenKind.LPAREN,
+    &#39;)&#39; : JsTokenKind.RPAREN,
+    &#39;{&#39; : JsTokenKind.LBRACE,
+    &#39;}&#39; : JsTokenKind.RBRACE,
+    &#39;[&#39; : JsTokenKind.LBRACKET,
+    &#39;]&#39; : JsTokenKind.RBRACKET,
+    &#39;;&#39; : JsTokenKind.SEMICOLON,
+    &#39;,&#39; : JsTokenKind.COMMA,
+    &#39;@&#39; : JsTokenKind.AT,
+}
+
+
+@dataclass(frozen=True)
+class JsLexerState:
+    &#34;&#34;&#34;
+    What a rewind has to put back. The position is not part of it, because a rewind always goes to
+    the start of a token the parser is already holding: it is the template nesting alone that no
+    longer follows from that offset once scanning has moved past it.
+    &#34;&#34;&#34;
+    template_depth: int
+    brace_stack: tuple[int, ...]
+
+
+@dataclass
+class JsLexer:
+    source: str
+    pos: int = 0
+    _template_depth: int = 0
+    _brace_stack: list[int] = field(default_factory=list)
+
+    def capture(self) -&gt; JsLexerState:
+        return JsLexerState(self._template_depth, tuple(self._brace_stack))
+
+    def rewind(self, pos: int, state: JsLexerState) -&gt; None:
+        self.pos = pos
+        self._template_depth = state.template_depth
+        self._brace_stack = list(state.brace_stack)
+
+    def scan_regexp(self) -&gt; JsToken | None:
+        &#34;&#34;&#34;
+        Read a regular expression literal where scanning currently stands. ECMA-262 clause 12 picks
+        the lexical goal symbol from the syntactic grammar context, which only the parser knows, so
+        no path through `JsLexer.tokenize` reaches this scan: a slash is spelled as the operator it
+        looks like until someone who is expecting an expression asks for it again.
+
+        The answer is `None` where no literal stands here, which is what makes asking affordable:
+        a RegularExpressionLiteral holds no line terminator, so a scan that reaches the end of its
+        line has read something that is not one, and the position it started from is given back
+        untouched for the caller to read as the operator it already looked like.
+        &#34;&#34;&#34;
+        start = self.pos
+        if self._peek() != &#39;/&#39;:
+            return None
+        text = self._read_regexp()
+        if text is None:
+            return None
+        return JsToken(JsTokenKind.REGEXP, text, start)
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Consume the ECMA-262 WhiteSpace between two tokens. It is the whole production and not the
+        space and the tab alone, because every other character in it separates tokens just as they
+        do: a file that opens with a byte order mark is ordinary, and reading that mark as a token
+        of its own splits one program into two statements.
+
+        Line terminators are deliberately not consumed here. They separate tokens too, but they also
+        end a line, and the parser reads the end of a line as a place a semicolon may be inserted.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in _WHITESPACE:
+            self.pos += 1
+        return self.pos &gt; start
+
+    def _read_line_comment(self) -&gt; str:
+        &#34;&#34;&#34;
+        Consume a comment that runs to the end of its line, and the `#!` line, which is one. The end
+        is looked for at once rather than one character at a time, because a comment is the longest
+        run of characters this scan ever walks and the run is over as soon as a terminator is
+        anywhere in it.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        end = _LINE_TERMINATOR.search(src, self.pos + 2)
+        self.pos = end.start() if end else len(src)
+        return src[start:self.pos]
+
+    def _read_block_comment(self) -&gt; tuple[str, bool]:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        has_newline = False
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;*&#39; and src[self.pos + 1] == &#39;/&#39;:
+                self.pos += 2
+                return src[start:self.pos], has_newline
+            if src[self.pos] in LINE_TERMINATORS:
+                has_newline = True
+            self.pos += 1
+        self.pos = length
+        return src[start:self.pos], has_newline
+
+    def _read_string_escape(self) -&gt; str:
+        self.pos += 1
+        result, self.pos, _ = _decode_one_escape(
+            self.source, self.pos, len(self.source))
+        return result
+
+    def _read_string(self, quote: str) -&gt; tuple[str, bool]:
+        &#34;&#34;&#34;
+        The string literal that begins here, and whether the closing quote was there. A literal ends
+        at a line feed or a carriage return and at no other line terminator — `U+2028` and `U+2029`
+        stand inside one since ES2019 — and the terminator that ends it is left unread, so the line
+        still ends where the source ended it and a semicolon may be inserted there.
+
+        The escape is consumed before that check rather than after it, which is what lets a
+        backslash continue a literal onto the next line.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c in &#39;\r\n&#39;:
+                break
+            self.pos += 1
+            if c == quote:
+                return src[start:self.pos], True
+        return src[start:self.pos], False
+
+    def _scan_template_content(
+        self,
+        start: int,
+        close_kind: JsTokenKind,
+        interp_kind: JsTokenKind,
+        depth_delta: int,
+    ) -&gt; JsToken:
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c == &#39;`&#39;:
+                self.pos += 1
+                self._template_depth += depth_delta
+                return JsToken(close_kind, src[start:self.pos], start)
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;{&#39;:
+                self.pos += 2
+                if depth_delta == 0:
+                    self._template_depth += 1
+                self._brace_stack.append(0)
+                return JsToken(interp_kind, src[start:self.pos], start)
+            self.pos += 1
+        self._template_depth += depth_delta
+        return JsToken(close_kind, src[start:self.pos], start, False)
+
+    def _read_template(self) -&gt; JsToken:
+        start = self.pos
+        self.pos += 1
+        return self._scan_template_content(
+            start, JsTokenKind.TEMPLATE_FULL, JsTokenKind.TEMPLATE_HEAD, 0)
+
+    def _resume_template(self) -&gt; JsToken:
+        start = self.pos
+        self.pos += 1
+        return self._scan_template_content(
+            start, JsTokenKind.TEMPLATE_TAIL, JsTokenKind.TEMPLATE_MIDDLE, -1)
+
+    def _read_regexp(self) -&gt; str | None:
+        &#34;&#34;&#34;
+        The RegularExpressionLiteral that begins here, or `None` where the text spells none. A
+        backslash escapes the character after it but never a line terminator, so a literal that
+        reaches the end of its line is unterminated rather than continued, and the position is
+        restored so that the same text can be read again as whatever else it may be.
+
+        RegularExpressionFirstChar admits neither a slash nor a star, which is what leaves `//` and
+        `/*` to spell the two comments and nothing else.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        if self._peek() in (&#39;*&#39;, &#39;/&#39;):
+            self.pos = start
+            return None
+        in_class = False
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39; and self.pos + 1 &lt; length and src[self.pos + 1] not in LINE_TERMINATORS:
+                self.pos += 2
+                continue
+            if c == &#39;[&#39;:
+                in_class = True
+                self.pos += 1
+                continue
+            if c == &#39;]&#39; and in_class:
+                in_class = False
+                self.pos += 1
+                continue
+            if c == &#39;/&#39; and not in_class:
+                self.pos += 1
+                while self.pos &lt; length and src[self.pos].isalpha():
+                    self.pos += 1
+                return src[start:self.pos]
+            if c in LINE_TERMINATORS:
+                break
+            self.pos += 1
+        self.pos = start
+        return None
+
+    def _read_prefixed_int(self, start: int, valid_digits: str) -&gt; JsToken:
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in valid_digits:
+            self.pos += 1
+        if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+            self.pos += 1
+            return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+        return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+
+    def _read_number(self) -&gt; JsToken:
+        &#34;&#34;&#34;
+        The numeric literal that begins here. The digits after the point are optional where there
+        are digits in front of it — `3.` is the number three — which is what makes `1..toString()`
+        a call on a numeral rather than a member of a member. The point belongs to the numeral
+        whenever it can, so `1.toString()` is a numeral with a name behind it and no program at all.
+
+        A literal that opens with the point has no such option: `.5` needs its digits, and the
+        point that would follow them belongs to whatever comes next. Neither has a prefixed literal,
+        which ends at its digits.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+
+        if src[self.pos] == &#39;0&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in &#39;xX&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(start, &#39;0123456789abcdefABCDEF_&#39;)
+            if nc in &#39;oO&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(start, &#39;01234567_&#39;)
+            if nc in &#39;bB&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(start, &#39;01_&#39;)
+
+        while self.pos &lt; length and (src[self.pos] in _DECIMAL or src[self.pos] == &#39;_&#39;):
+            self.pos += 1
+        has_integer_part = self.pos &gt; start
+
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39;:
+            next_pos = self.pos + 1
+            if next_pos &lt; length and src[next_pos] in _DECIMAL:
+                is_float = True
+                self.pos += 1
+                while self.pos &lt; length and (
+                    src[self.pos] in _DECIMAL or src[self.pos] == &#39;_&#39;
+                ):
+                    self.pos += 1
+            elif has_integer_part:
+                is_float = True
+                self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            is_float = True
+            self.pos += 1
+            if self.pos &lt; length and src[self.pos] in &#39;+-&#39;:
+                self.pos += 1
+            while self.pos &lt; length and (
+                src[self.pos] in _DECIMAL or src[self.pos] == &#39;_&#39;
+            ):
+                self.pos += 1
+
+        if not is_float and self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+            self.pos += 1
+            return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+
+        kind = JsTokenKind.FLOAT if is_float else JsTokenKind.INTEGER
+        return JsToken(kind, src[start:self.pos], start)
+
+    def _read_identifier_or_keyword(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if _continues_a_name(c):
+                self.pos += 1
+            elif _begins_unicode_escape(src, self.pos):
+                self._read_string_escape()
+            else:
+                break
+        word = src[start:self.pos]
+        kw = KEYWORDS.get(word)
+        if kw is not None:
+            return JsToken(kw, word, start)
+        return JsToken(JsTokenKind.IDENTIFIER, word, start)
+
+    def tokenize(self) -&gt; Generator[JsToken, None, None]:
+        src = self.source
+        length = len(src)
+
+        if self.pos == 0 and src.startswith(&#39;#!&#39;):
+            self._read_line_comment()
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield JsToken(JsTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+                yield JsToken(JsTokenKind.NEWLINE, &#39;\r\n&#39;, start)
+                continue
+            if c in LINE_TERMINATORS:
+                self.pos += 1
+                yield JsToken(JsTokenKind.NEWLINE, c, start)
+                continue
+
+            if c2 == &#39;//&#39;:
+                text = self._read_line_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                continue
+            if c2 == &#39;/*&#39;:
+                text, has_newline = self._read_block_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                if has_newline:
+                    yield JsToken(JsTokenKind.NEWLINE, &#39;&#39;, self.pos)
+                continue
+
+            if c == &#34;&#39;&#34;:
+                text, terminated = self._read_string(&#34;&#39;&#34;)
+                yield JsToken(JsTokenKind.STRING_SINGLE, text, start, terminated)
+                continue
+            if c == &#39;&#34;&#39;:
+                text, terminated = self._read_string(&#39;&#34;&#39;)
+                yield JsToken(JsTokenKind.STRING_DOUBLE, text, start, terminated)
+                continue
+            if c == &#39;`&#39;:
+                yield self._read_template()
+                continue
+
+            if c == &#39;}&#39; and self._template_depth &gt; 0 and self._brace_stack:
+                if self._brace_stack[-1] == 0:
+                    self._brace_stack.pop()
+                    yield self._resume_template()
+                    continue
+                else:
+                    self._brace_stack[-1] -= 1
+
+            if c in _DECIMAL or (
+                c == &#39;.&#39; and src[self.pos + 1:self.pos + 2] in _DECIMAL
+            ):
+                yield self._read_number()
+                continue
+
+            if _at_identifier_start(src, self.pos):
+                yield self._read_identifier_or_keyword()
+                continue
+
+            if c == &#39;#&#39;:
+                if _at_identifier_start(src, self.pos + 1):
+                    self.pos += 1
+                    name = self._read_identifier_or_keyword()
+                    yield JsToken(JsTokenKind.PRIVATE_IDENTIFIER, &#39;#&#39; + name.value, start)
+                    continue
+
+            c4 = src[self.pos:self.pos + 4]
+            if c4 in _FOUR_CHAR_OPS:
+                self.pos += 4
+                yield JsToken(_FOUR_CHAR_OPS[c4], c4, start)
+                continue
+
+            c3 = src[self.pos:self.pos + 3]
+            if c3 in _THREE_CHAR_OPS:
+                self.pos += 3
+                yield JsToken(_THREE_CHAR_OPS[c3], c3, start)
+                continue
+
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                yield JsToken(_TWO_CHAR_OPS[c2], c2, start)
+                continue
+
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                kind = _ONE_CHAR_OPS[c]
+                if kind == JsTokenKind.LBRACE and self._brace_stack:
+                    self._brace_stack[-1] += 1
+                yield JsToken(kind, c, start)
+                continue
+
+            self.pos += 1
+            yield JsToken(JsTokenKind.ERROR, c, start)
+
+
+def _decode_body(text: str) -&gt; tuple[str, bool, bool]:
+    &#34;&#34;&#34;
+    The text a literal body denotes, whether a string may carry it, and whether a template may. A
+    string may carry every escape but the ones naming no character; a template may carry only the
+    escapes a string and a template share, so its answer implies the other.
+
+    The text is the code units the string is made of. A character above the basic plane is two of
+    them however it was written — as itself, as one `\\u{...}` escape, or as the two `\\uXXXX`
+    escapes naming its surrogates — so the three spellings denote one string here as they do in an
+    engine, and a program asking how long that string is, what stands at either half of it, or
+    whether it equals a string written the other way, is answered with what it would be answered.
+
+    A lone surrogate is left standing, because JavaScript admits one in a string and no pairing rule
+    may invent the partner it lacks.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return to_code_units(text), True, True
+    parts: list[str] = []
+    string_valid = True
+    template_valid = True
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c != &#39;\\&#39; or i + 1 &gt;= length:
+            parts.append(c)
+            i += 1
+            continue
+        decoded, i, use = _decode_one_escape(text, i + 1, length)
+        string_valid = string_valid and use is not _EscapeUse.NEITHER
+        template_valid = template_valid and use is _EscapeUse.EITHER
+        if decoded:
+            parts.append(decoded)
+    return to_code_units(&#39;&#39;.join(parts)), string_valid, template_valid
+
+
+def _read_unicode_escape(text: str, pos: int) -&gt; tuple[int, int] | None:
+    &#34;&#34;&#34;
+    The code point the escape at *pos* names and where it ends, or `None` where the text at *pos*
+    is no unicode escape at all. A name admits this escape and no other, so this reads for it alone
+    rather than through `_decode_one_escape`, which answers for every escape a string has and
+    reports a malformed one as the character behind the backslash. That reading is the right one
+    inside a literal and the wrong one here: `\\u061` is a string holding `u061` and is no name.
+
+    What comes back is the code point rather than the units that spell it, because the rule the
+    caller applies is about the code point: `\\ud801\\udc00` names two of them, each half of a pair
+    and neither a character any name may hold, where `\\u{10400}` names the one they would have
+    spelled together.
+    &#34;&#34;&#34;
+    if text[pos:pos + 1] != &#39;u&#39;:
+        return None
+    pos += 1
+    if text[pos:pos + 1] == &#39;{&#39;:
+        end = pos + 1
+        while end &lt; len(text) and text[end] in _HEX:
+            end += 1
+        if end == pos + 1 or text[end:end + 1] != &#39;}&#39;:
+            return None
+        value = int(text[pos + 1:end], 16)
+        return None if value &gt; _MAX_CODE_POINT else (value, end + 1)
+    digits = text[pos:pos + 4]
+    if len(digits) != 4 or not _HEX.issuperset(digits):
+        return None
+    return int(digits, 16), pos + 4
+
+
+def identifier_string_value(text: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    The name *text* spells, or `None` where it spells no name at all. An escape and the character it
+    names are one name written two ways, so this is what says that `\\u0061bc` and `abc` are the
+    same binding, and it is the only reading of an identifier that any question about names may be
+    asked of.
+
+    The answer is code units, like every other string this package holds, so that a name written
+    with a `\\u{...}` escape and the same name written with the character itself compare equal.
+    Validity is decided one escape at a time and before that joining happens, which is the whole of
+    the difference between the two spellings of an astral character: the pair `\\ud801\\udc00`
+    names two lone surrogates, neither of which any name may hold, while `\\u{10400}` names the
+    character they encode.
+
+    Text holding no escape is answered as itself. What the scan read as a name is a name, and
+    this is asked only of what it read: a text no scan produced, `0a`, would come back as
+    itself here and as nothing at all written `\\u0030a`.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return to_code_units(text) or None
+    parts: list[str] = []
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c == &#39;\\&#39;:
+            escape = _read_unicode_escape(text, i + 1)
+            if escape is None:
+                return None
+            value, i = escape
+            c = chr(value)
+        else:
+            i += 1
+        if not (_opens_a_name(c) if not parts else _continues_a_name(c)):
+            return None
+        parts.append(code_units(ord(c)))
+    return &#39;&#39;.join(parts) or None
+
+
+def decode_js_string_body(text: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    The text a string literal body denotes, or `None` where it denotes nothing. A string keeps the
+    legacy escapes Annex B holds open for sloppy code, reading each as the character it names, so
+    the one spelling it has no rule for is a `\\x` or `\\u` naming no character; the reading a
+    template gives the same text is `decode_js_template_body`.
+    &#34;&#34;&#34;
+    text_value, string_valid, _ = _decode_body(text)
+    return text_value if string_valid else None
+
+
+def has_legacy_numeric_escape(text: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the body of a literal was written with a legacy octal or non-octal-decimal escape: a
+    backslash followed by `1` through `9`, or by `0` with another decimal digit behind it. A plain
+    `\\0` is the NUL escape and is none of these, and a backslash that escapes a backslash opens no
+    escape at all, so the scan steps over both rather than counting them.
+
+    Strict code rejects such an escape, which is what reads this. A template refuses it too, but
+    refuses more besides, so that rule asks the decode rather than this scan: an escape naming no
+    character is a syntax error in either mode and no strict violation at all.
+    &#34;&#34;&#34;
+    i = 0
+    n = len(text)
+    while i &lt; n:
+        if text[i] != &#39;\\&#39;:
+            i += 1
+            continue
+        if i + 1 &gt;= n:
+            return False
+        nxt = text[i + 1]
+        if nxt in &#39;123456789&#39;:
+            return True
+        if nxt == &#39;0&#39;:
+            if i + 2 &lt; n and text[i + 2] in &#39;0123456789&#39;:
+                return True
+        i += 2
+    return False
+
+
+def decode_js_template_body(text: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    What a run of template text denotes, or `None` where it denotes nothing. It is the body of a
+    string literal with two rules more.
+
+    A template is the one literal that may span lines, and every line terminator sequence in it
+    denotes a line feed, so a file saved with CRLF endings holds the same template as one saved
+    with LF. Normalizing before the escapes are read is what keeps a backslash at the end of a line
+    a continuation in either file.
+
+    The escapes a template admits are those of a string minus the ones Annex B keeps alive for
+    sloppy code, and minus every spelling of `\\x` and `\\u` that names no character. A template
+    carrying one of those is not a template at all: untagged it is a syntax error, and tagged it is
+    a run whose cooked value the language states is `undefined`. There is no text it denotes, and
+    answering with the text the same spelling would denote in a string is how a script no engine
+    will run gets a value computed for it anyway.
+    &#34;&#34;&#34;
+    if &#39;\r&#39; in text:
+        text = text.replace(&#39;\r\n&#39;, &#39;\n&#39;).replace(&#39;\r&#39;, &#39;\n&#39;)
+    decoded, _, template_valid = _decode_body(text)
+    return decoded if template_valid else None</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.identifier_string_value"><code class="name flex">
+<span>def <span class="ident">identifier_string_value</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The name <em>text</em> spells, or <code>None</code> where it spells no name at all. An escape and the character it
+names are one name written two ways, so this is what says that <code>\u0061bc</code> and <code>abc</code> are the
+same binding, and it is the only reading of an identifier that any question about names may be
+asked of.</p>
+<p>The answer is code units, like every other string this package holds, so that a name written
+with a <code>\u{...}</code> escape and the same name written with the character itself compare equal.
+Validity is decided one escape at a time and before that joining happens, which is the whole of
+the difference between the two spellings of an astral character: the pair <code>\ud801\udc00</code>
+names two lone surrogates, neither of which any name may hold, while <code>\u{10400}</code> names the
+character they encode.</p>
+<p>Text holding no escape is answered as itself. What the scan read as a name is a name, and
+this is asked only of what it read: a text no scan produced, <code>0a</code>, would come back as
+itself here and as nothing at all written <code>\u0030a</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L751-L787" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def identifier_string_value(text: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    The name *text* spells, or `None` where it spells no name at all. An escape and the character it
+    names are one name written two ways, so this is what says that `\\u0061bc` and `abc` are the
+    same binding, and it is the only reading of an identifier that any question about names may be
+    asked of.
+
+    The answer is code units, like every other string this package holds, so that a name written
+    with a `\\u{...}` escape and the same name written with the character itself compare equal.
+    Validity is decided one escape at a time and before that joining happens, which is the whole of
+    the difference between the two spellings of an astral character: the pair `\\ud801\\udc00`
+    names two lone surrogates, neither of which any name may hold, while `\\u{10400}` names the
+    character they encode.
+
+    Text holding no escape is answered as itself. What the scan read as a name is a name, and
+    this is asked only of what it read: a text no scan produced, `0a`, would come back as
+    itself here and as nothing at all written `\\u0030a`.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return to_code_units(text) or None
+    parts: list[str] = []
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c == &#39;\\&#39;:
+            escape = _read_unicode_escape(text, i + 1)
+            if escape is None:
+                return None
+            value, i = escape
+            c = chr(value)
+        else:
+            i += 1
+        if not (_opens_a_name(c) if not parts else _continues_a_name(c)):
+            return None
+        parts.append(code_units(ord(c)))
+    return &#39;&#39;.join(parts) or None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.decode_js_string_body"><code class="name flex">
+<span>def <span class="ident">decode_js_string_body</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The text a string literal body denotes, or <code>None</code> where it denotes nothing. A string keeps the
+legacy escapes Annex B holds open for sloppy code, reading each as the character it names, so
+the one spelling it has no rule for is a <code>\x</code> or <code>\u</code> naming no character; the reading a
+template gives the same text is <code><a title="refinery.lib.scripts.js.lexer.decode_js_template_body" href="#refinery.lib.scripts.js.lexer.decode_js_template_body">decode_js_template_body()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L790-L798" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_js_string_body(text: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    The text a string literal body denotes, or `None` where it denotes nothing. A string keeps the
+    legacy escapes Annex B holds open for sloppy code, reading each as the character it names, so
+    the one spelling it has no rule for is a `\\x` or `\\u` naming no character; the reading a
+    template gives the same text is `decode_js_template_body`.
+    &#34;&#34;&#34;
+    text_value, string_valid, _ = _decode_body(text)
+    return text_value if string_valid else None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.has_legacy_numeric_escape"><code class="name flex">
+<span>def <span class="ident">has_legacy_numeric_escape</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the body of a literal was written with a legacy octal or non-octal-decimal escape: a
+backslash followed by <code>1</code> through <code>9</code>, or by <code>0</code> with another decimal digit behind it. A plain
+<code>\0</code> is the NUL escape and is none of these, and a backslash that escapes a backslash opens no
+escape at all, so the scan steps over both rather than counting them.</p>
+<p>Strict code rejects such an escape, which is what reads this. A template refuses it too, but
+refuses more besides, so that rule asks the decode rather than this scan: an escape naming no
+character is a syntax error in either mode and no strict violation at all.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L801-L827" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def has_legacy_numeric_escape(text: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the body of a literal was written with a legacy octal or non-octal-decimal escape: a
+    backslash followed by `1` through `9`, or by `0` with another decimal digit behind it. A plain
+    `\\0` is the NUL escape and is none of these, and a backslash that escapes a backslash opens no
+    escape at all, so the scan steps over both rather than counting them.
+
+    Strict code rejects such an escape, which is what reads this. A template refuses it too, but
+    refuses more besides, so that rule asks the decode rather than this scan: an escape naming no
+    character is a syntax error in either mode and no strict violation at all.
+    &#34;&#34;&#34;
+    i = 0
+    n = len(text)
+    while i &lt; n:
+        if text[i] != &#39;\\&#39;:
+            i += 1
+            continue
+        if i + 1 &gt;= n:
+            return False
+        nxt = text[i + 1]
+        if nxt in &#39;123456789&#39;:
+            return True
+        if nxt == &#39;0&#39;:
+            if i + 2 &lt; n and text[i + 2] in &#39;0123456789&#39;:
+                return True
+        i += 2
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.decode_js_template_body"><code class="name flex">
+<span>def <span class="ident">decode_js_template_body</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What a run of template text denotes, or <code>None</code> where it denotes nothing. It is the body of a
+string literal with two rules more.</p>
+<p>A template is the one literal that may span lines, and every line terminator sequence in it
+denotes a line feed, so a file saved with CRLF endings holds the same template as one saved
+with LF. Normalizing before the escapes are read is what keeps a backslash at the end of a line
+a continuation in either file.</p>
+<p>The escapes a template admits are those of a string minus the ones Annex B keeps alive for
+sloppy code, and minus every spelling of <code>\x</code> and <code>\u</code> that names no character. A template
+carrying one of those is not a template at all: untagged it is a syntax error, and tagged it is
+a run whose cooked value the language states is <code>undefined</code>. There is no text it denotes, and
+answering with the text the same spelling would denote in a string is how a script no engine
+will run gets a value computed for it anyway.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L830-L850" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_js_template_body(text: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    What a run of template text denotes, or `None` where it denotes nothing. It is the body of a
+    string literal with two rules more.
+
+    A template is the one literal that may span lines, and every line terminator sequence in it
+    denotes a line feed, so a file saved with CRLF endings holds the same template as one saved
+    with LF. Normalizing before the escapes are read is what keeps a backslash at the end of a line
+    a continuation in either file.
+
+    The escapes a template admits are those of a string minus the ones Annex B keeps alive for
+    sloppy code, and minus every spelling of `\\x` and `\\u` that names no character. A template
+    carrying one of those is not a template at all: untagged it is a syntax error, and tagged it is
+    a run whose cooked value the language states is `undefined`. There is no text it denotes, and
+    answering with the text the same spelling would denote in a string is how a script no engine
+    will run gets a value computed for it anyway.
+    &#34;&#34;&#34;
+    if &#39;\r&#39; in text:
+        text = text.replace(&#39;\r\n&#39;, &#39;\n&#39;).replace(&#39;\r&#39;, &#39;\n&#39;)
+    decoded, _, template_valid = _decode_body(text)
+    return decoded if template_valid else None</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexerState"><code class="flex name class">
+<span>class <span class="ident">JsLexerState</span></span>
+<span>(</span><span>template_depth, brace_stack)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What a rewind has to put back. The position is not part of it, because a rewind always goes to
+the start of a token the parser is already holding: it is the template nesting alone that no
+longer follows from that offset once scanning has moved past it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L280-L288" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(frozen=True)
+class JsLexerState:
+    &#34;&#34;&#34;
+    What a rewind has to put back. The position is not part of it, because a rewind always goes to
+    the start of a token the parser is already holding: it is the template nesting alone that no
+    longer follows from that offset once scanning has moved past it.
+    &#34;&#34;&#34;
+    template_depth: int
+    brace_stack: tuple[int, ...]</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexerState.template_depth"><code class="name">var <span class="ident">template_depth</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexerState.brace_stack"><code class="name">var <span class="ident">brace_stack</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer"><code class="flex name class">
+<span>class <span class="ident">JsLexer</span></span>
+<span>(</span><span>source, pos=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>JsLexer(source: 'str', pos: 'int' = 0, _template_depth: 'int' = 0, _brace_stack: 'list[int]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L291-L682" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class JsLexer:
+    source: str
+    pos: int = 0
+    _template_depth: int = 0
+    _brace_stack: list[int] = field(default_factory=list)
+
+    def capture(self) -&gt; JsLexerState:
+        return JsLexerState(self._template_depth, tuple(self._brace_stack))
+
+    def rewind(self, pos: int, state: JsLexerState) -&gt; None:
+        self.pos = pos
+        self._template_depth = state.template_depth
+        self._brace_stack = list(state.brace_stack)
+
+    def scan_regexp(self) -&gt; JsToken | None:
+        &#34;&#34;&#34;
+        Read a regular expression literal where scanning currently stands. ECMA-262 clause 12 picks
+        the lexical goal symbol from the syntactic grammar context, which only the parser knows, so
+        no path through `JsLexer.tokenize` reaches this scan: a slash is spelled as the operator it
+        looks like until someone who is expecting an expression asks for it again.
+
+        The answer is `None` where no literal stands here, which is what makes asking affordable:
+        a RegularExpressionLiteral holds no line terminator, so a scan that reaches the end of its
+        line has read something that is not one, and the position it started from is given back
+        untouched for the caller to read as the operator it already looked like.
+        &#34;&#34;&#34;
+        start = self.pos
+        if self._peek() != &#39;/&#39;:
+            return None
+        text = self._read_regexp()
+        if text is None:
+            return None
+        return JsToken(JsTokenKind.REGEXP, text, start)
+
+    def _peek(self, count: int = 1) -&gt; str:
+        return self.source[self.pos:self.pos + count]
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _skip_whitespace(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Consume the ECMA-262 WhiteSpace between two tokens. It is the whole production and not the
+        space and the tab alone, because every other character in it separates tokens just as they
+        do: a file that opens with a byte order mark is ordinary, and reading that mark as a token
+        of its own splits one program into two statements.
+
+        Line terminators are deliberately not consumed here. They separate tokens too, but they also
+        end a line, and the parser reads the end of a line as a place a semicolon may be inserted.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in _WHITESPACE:
+            self.pos += 1
+        return self.pos &gt; start
+
+    def _read_line_comment(self) -&gt; str:
+        &#34;&#34;&#34;
+        Consume a comment that runs to the end of its line, and the `#!` line, which is one. The end
+        is looked for at once rather than one character at a time, because a comment is the longest
+        run of characters this scan ever walks and the run is over as soon as a terminator is
+        anywhere in it.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        end = _LINE_TERMINATOR.search(src, self.pos + 2)
+        self.pos = end.start() if end else len(src)
+        return src[start:self.pos]
+
+    def _read_block_comment(self) -&gt; tuple[str, bool]:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 2
+        has_newline = False
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;*&#39; and src[self.pos + 1] == &#39;/&#39;:
+                self.pos += 2
+                return src[start:self.pos], has_newline
+            if src[self.pos] in LINE_TERMINATORS:
+                has_newline = True
+            self.pos += 1
+        self.pos = length
+        return src[start:self.pos], has_newline
+
+    def _read_string_escape(self) -&gt; str:
+        self.pos += 1
+        result, self.pos, _ = _decode_one_escape(
+            self.source, self.pos, len(self.source))
+        return result
+
+    def _read_string(self, quote: str) -&gt; tuple[str, bool]:
+        &#34;&#34;&#34;
+        The string literal that begins here, and whether the closing quote was there. A literal ends
+        at a line feed or a carriage return and at no other line terminator — `U+2028` and `U+2029`
+        stand inside one since ES2019 — and the terminator that ends it is left unread, so the line
+        still ends where the source ended it and a semicolon may be inserted there.
+
+        The escape is consumed before that check rather than after it, which is what lets a
+        backslash continue a literal onto the next line.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c in &#39;\r\n&#39;:
+                break
+            self.pos += 1
+            if c == quote:
+                return src[start:self.pos], True
+        return src[start:self.pos], False
+
+    def _scan_template_content(
+        self,
+        start: int,
+        close_kind: JsTokenKind,
+        interp_kind: JsTokenKind,
+        depth_delta: int,
+    ) -&gt; JsToken:
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self._read_string_escape()
+                continue
+            if c == &#39;`&#39;:
+                self.pos += 1
+                self._template_depth += depth_delta
+                return JsToken(close_kind, src[start:self.pos], start)
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;{&#39;:
+                self.pos += 2
+                if depth_delta == 0:
+                    self._template_depth += 1
+                self._brace_stack.append(0)
+                return JsToken(interp_kind, src[start:self.pos], start)
+            self.pos += 1
+        self._template_depth += depth_delta
+        return JsToken(close_kind, src[start:self.pos], start, False)
+
+    def _read_template(self) -&gt; JsToken:
+        start = self.pos
+        self.pos += 1
+        return self._scan_template_content(
+            start, JsTokenKind.TEMPLATE_FULL, JsTokenKind.TEMPLATE_HEAD, 0)
+
+    def _resume_template(self) -&gt; JsToken:
+        start = self.pos
+        self.pos += 1
+        return self._scan_template_content(
+            start, JsTokenKind.TEMPLATE_TAIL, JsTokenKind.TEMPLATE_MIDDLE, -1)
+
+    def _read_regexp(self) -&gt; str | None:
+        &#34;&#34;&#34;
+        The RegularExpressionLiteral that begins here, or `None` where the text spells none. A
+        backslash escapes the character after it but never a line terminator, so a literal that
+        reaches the end of its line is unterminated rather than continued, and the position is
+        restored so that the same text can be read again as whatever else it may be.
+
+        RegularExpressionFirstChar admits neither a slash nor a star, which is what leaves `//` and
+        `/*` to spell the two comments and nothing else.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        if self._peek() in (&#39;*&#39;, &#39;/&#39;):
+            self.pos = start
+            return None
+        in_class = False
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39; and self.pos + 1 &lt; length and src[self.pos + 1] not in LINE_TERMINATORS:
+                self.pos += 2
+                continue
+            if c == &#39;[&#39;:
+                in_class = True
+                self.pos += 1
+                continue
+            if c == &#39;]&#39; and in_class:
+                in_class = False
+                self.pos += 1
+                continue
+            if c == &#39;/&#39; and not in_class:
+                self.pos += 1
+                while self.pos &lt; length and src[self.pos].isalpha():
+                    self.pos += 1
+                return src[start:self.pos]
+            if c in LINE_TERMINATORS:
+                break
+            self.pos += 1
+        self.pos = start
+        return None
+
+    def _read_prefixed_int(self, start: int, valid_digits: str) -&gt; JsToken:
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] in valid_digits:
+            self.pos += 1
+        if self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+            self.pos += 1
+            return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+        return JsToken(JsTokenKind.INTEGER, src[start:self.pos], start)
+
+    def _read_number(self) -&gt; JsToken:
+        &#34;&#34;&#34;
+        The numeric literal that begins here. The digits after the point are optional where there
+        are digits in front of it — `3.` is the number three — which is what makes `1..toString()`
+        a call on a numeral rather than a member of a member. The point belongs to the numeral
+        whenever it can, so `1.toString()` is a numeral with a name behind it and no program at all.
+
+        A literal that opens with the point has no such option: `.5` needs its digits, and the
+        point that would follow them belongs to whatever comes next. Neither has a prefixed literal,
+        which ends at its digits.
+        &#34;&#34;&#34;
+        start = self.pos
+        src = self.source
+        length = len(src)
+
+        if src[self.pos] == &#39;0&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in &#39;xX&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(start, &#39;0123456789abcdefABCDEF_&#39;)
+            if nc in &#39;oO&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(start, &#39;01234567_&#39;)
+            if nc in &#39;bB&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(start, &#39;01_&#39;)
+
+        while self.pos &lt; length and (src[self.pos] in _DECIMAL or src[self.pos] == &#39;_&#39;):
+            self.pos += 1
+        has_integer_part = self.pos &gt; start
+
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39;:
+            next_pos = self.pos + 1
+            if next_pos &lt; length and src[next_pos] in _DECIMAL:
+                is_float = True
+                self.pos += 1
+                while self.pos &lt; length and (
+                    src[self.pos] in _DECIMAL or src[self.pos] == &#39;_&#39;
+                ):
+                    self.pos += 1
+            elif has_integer_part:
+                is_float = True
+                self.pos += 1
+
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            is_float = True
+            self.pos += 1
+            if self.pos &lt; length and src[self.pos] in &#39;+-&#39;:
+                self.pos += 1
+            while self.pos &lt; length and (
+                src[self.pos] in _DECIMAL or src[self.pos] == &#39;_&#39;
+            ):
+                self.pos += 1
+
+        if not is_float and self.pos &lt; length and src[self.pos] == &#39;n&#39;:
+            self.pos += 1
+            return JsToken(JsTokenKind.BIGINT, src[start:self.pos], start)
+
+        kind = JsTokenKind.FLOAT if is_float else JsTokenKind.INTEGER
+        return JsToken(kind, src[start:self.pos], start)
+
+    def _read_identifier_or_keyword(self) -&gt; JsToken:
+        start = self.pos
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if _continues_a_name(c):
+                self.pos += 1
+            elif _begins_unicode_escape(src, self.pos):
+                self._read_string_escape()
+            else:
+                break
+        word = src[start:self.pos]
+        kw = KEYWORDS.get(word)
+        if kw is not None:
+            return JsToken(kw, word, start)
+        return JsToken(JsTokenKind.IDENTIFIER, word, start)
+
+    def tokenize(self) -&gt; Generator[JsToken, None, None]:
+        src = self.source
+        length = len(src)
+
+        if self.pos == 0 and src.startswith(&#39;#!&#39;):
+            self._read_line_comment()
+
+        while True:
+            self._skip_whitespace()
+            if self._at_end():
+                yield JsToken(JsTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+
+            if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+                self.pos += 2
+                yield JsToken(JsTokenKind.NEWLINE, &#39;\r\n&#39;, start)
+                continue
+            if c in LINE_TERMINATORS:
+                self.pos += 1
+                yield JsToken(JsTokenKind.NEWLINE, c, start)
+                continue
+
+            if c2 == &#39;//&#39;:
+                text = self._read_line_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                continue
+            if c2 == &#39;/*&#39;:
+                text, has_newline = self._read_block_comment()
+                yield JsToken(JsTokenKind.COMMENT, text, start)
+                if has_newline:
+                    yield JsToken(JsTokenKind.NEWLINE, &#39;&#39;, self.pos)
+                continue
+
+            if c == &#34;&#39;&#34;:
+                text, terminated = self._read_string(&#34;&#39;&#34;)
+                yield JsToken(JsTokenKind.STRING_SINGLE, text, start, terminated)
+                continue
+            if c == &#39;&#34;&#39;:
+                text, terminated = self._read_string(&#39;&#34;&#39;)
+                yield JsToken(JsTokenKind.STRING_DOUBLE, text, start, terminated)
+                continue
+            if c == &#39;`&#39;:
+                yield self._read_template()
+                continue
+
+            if c == &#39;}&#39; and self._template_depth &gt; 0 and self._brace_stack:
+                if self._brace_stack[-1] == 0:
+                    self._brace_stack.pop()
+                    yield self._resume_template()
+                    continue
+                else:
+                    self._brace_stack[-1] -= 1
+
+            if c in _DECIMAL or (
+                c == &#39;.&#39; and src[self.pos + 1:self.pos + 2] in _DECIMAL
+            ):
+                yield self._read_number()
+                continue
+
+            if _at_identifier_start(src, self.pos):
+                yield self._read_identifier_or_keyword()
+                continue
+
+            if c == &#39;#&#39;:
+                if _at_identifier_start(src, self.pos + 1):
+                    self.pos += 1
+                    name = self._read_identifier_or_keyword()
+                    yield JsToken(JsTokenKind.PRIVATE_IDENTIFIER, &#39;#&#39; + name.value, start)
+                    continue
+
+            c4 = src[self.pos:self.pos + 4]
+            if c4 in _FOUR_CHAR_OPS:
+                self.pos += 4
+                yield JsToken(_FOUR_CHAR_OPS[c4], c4, start)
+                continue
+
+            c3 = src[self.pos:self.pos + 3]
+            if c3 in _THREE_CHAR_OPS:
+                self.pos += 3
+                yield JsToken(_THREE_CHAR_OPS[c3], c3, start)
+                continue
+
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                yield JsToken(_TWO_CHAR_OPS[c2], c2, start)
+                continue
+
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                kind = _ONE_CHAR_OPS[c]
+                if kind == JsTokenKind.LBRACE and self._brace_stack:
+                    self._brace_stack[-1] += 1
+                yield JsToken(kind, c, start)
+                continue
+
+            self.pos += 1
+            yield JsToken(JsTokenKind.ERROR, c, start)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.capture"><code class="name flex">
+<span>def <span class="ident">capture</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L298-L299" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def capture(self) -&gt; JsLexerState:
+    return JsLexerState(self._template_depth, tuple(self._brace_stack))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.rewind"><code class="name flex">
+<span>def <span class="ident">rewind</span></span>(<span>self, pos, state)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L301-L304" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def rewind(self, pos: int, state: JsLexerState) -&gt; None:
+    self.pos = pos
+    self._template_depth = state.template_depth
+    self._brace_stack = list(state.brace_stack)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.scan_regexp"><code class="name flex">
+<span>def <span class="ident">scan_regexp</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read a regular expression literal where scanning currently stands. ECMA-262 clause 12 picks
+the lexical goal symbol from the syntactic grammar context, which only the parser knows, so
+no path through <code><a title="refinery.lib.scripts.js.lexer.JsLexer.tokenize" href="#refinery.lib.scripts.js.lexer.JsLexer.tokenize">JsLexer.tokenize()</a></code> reaches this scan: a slash is spelled as the operator it
+looks like until someone who is expecting an expression asks for it again.</p>
+<p>The answer is <code>None</code> where no literal stands here, which is what makes asking affordable:
+a RegularExpressionLiteral holds no line terminator, so a scan that reaches the end of its
+line has read something that is not one, and the position it started from is given back
+untouched for the caller to read as the operator it already looked like.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L306-L324" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def scan_regexp(self) -&gt; JsToken | None:
+    &#34;&#34;&#34;
+    Read a regular expression literal where scanning currently stands. ECMA-262 clause 12 picks
+    the lexical goal symbol from the syntactic grammar context, which only the parser knows, so
+    no path through `JsLexer.tokenize` reaches this scan: a slash is spelled as the operator it
+    looks like until someone who is expecting an expression asks for it again.
+
+    The answer is `None` where no literal stands here, which is what makes asking affordable:
+    a RegularExpressionLiteral holds no line terminator, so a scan that reaches the end of its
+    line has read something that is not one, and the position it started from is given back
+    untouched for the caller to read as the operator it already looked like.
+    &#34;&#34;&#34;
+    start = self.pos
+    if self._peek() != &#39;/&#39;:
+        return None
+    text = self._read_regexp()
+    if text is None:
+        return None
+    return JsToken(JsTokenKind.REGEXP, text, start)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.lexer.JsLexer.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/lexer.py#L582-L682" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokenize(self) -&gt; Generator[JsToken, None, None]:
+    src = self.source
+    length = len(src)
+
+    if self.pos == 0 and src.startswith(&#39;#!&#39;):
+        self._read_line_comment()
+
+    while True:
+        self._skip_whitespace()
+        if self._at_end():
+            yield JsToken(JsTokenKind.EOF, &#39;&#39;, self.pos)
+            return
+
+        start = self.pos
+        c = src[self.pos]
+        c2 = src[self.pos:self.pos + 2]
+
+        if c == &#39;\r&#39; and self.pos + 1 &lt; length and src[self.pos + 1] == &#39;\n&#39;:
+            self.pos += 2
+            yield JsToken(JsTokenKind.NEWLINE, &#39;\r\n&#39;, start)
+            continue
+        if c in LINE_TERMINATORS:
+            self.pos += 1
+            yield JsToken(JsTokenKind.NEWLINE, c, start)
+            continue
+
+        if c2 == &#39;//&#39;:
+            text = self._read_line_comment()
+            yield JsToken(JsTokenKind.COMMENT, text, start)
+            continue
+        if c2 == &#39;/*&#39;:
+            text, has_newline = self._read_block_comment()
+            yield JsToken(JsTokenKind.COMMENT, text, start)
+            if has_newline:
+                yield JsToken(JsTokenKind.NEWLINE, &#39;&#39;, self.pos)
+            continue
+
+        if c == &#34;&#39;&#34;:
+            text, terminated = self._read_string(&#34;&#39;&#34;)
+            yield JsToken(JsTokenKind.STRING_SINGLE, text, start, terminated)
+            continue
+        if c == &#39;&#34;&#39;:
+            text, terminated = self._read_string(&#39;&#34;&#39;)
+            yield JsToken(JsTokenKind.STRING_DOUBLE, text, start, terminated)
+            continue
+        if c == &#39;`&#39;:
+            yield self._read_template()
+            continue
+
+        if c == &#39;}&#39; and self._template_depth &gt; 0 and self._brace_stack:
+            if self._brace_stack[-1] == 0:
+                self._brace_stack.pop()
+                yield self._resume_template()
+                continue
+            else:
+                self._brace_stack[-1] -= 1
+
+        if c in _DECIMAL or (
+            c == &#39;.&#39; and src[self.pos + 1:self.pos + 2] in _DECIMAL
+        ):
+            yield self._read_number()
+            continue
+
+        if _at_identifier_start(src, self.pos):
+            yield self._read_identifier_or_keyword()
+            continue
+
+        if c == &#39;#&#39;:
+            if _at_identifier_start(src, self.pos + 1):
+                self.pos += 1
+                name = self._read_identifier_or_keyword()
+                yield JsToken(JsTokenKind.PRIVATE_IDENTIFIER, &#39;#&#39; + name.value, start)
+                continue
+
+        c4 = src[self.pos:self.pos + 4]
+        if c4 in _FOUR_CHAR_OPS:
+            self.pos += 4
+            yield JsToken(_FOUR_CHAR_OPS[c4], c4, start)
+            continue
+
+        c3 = src[self.pos:self.pos + 3]
+        if c3 in _THREE_CHAR_OPS:
+            self.pos += 3
+            yield JsToken(_THREE_CHAR_OPS[c3], c3, start)
+            continue
+
+        if c2 in _TWO_CHAR_OPS:
+            self.pos += 2
+            yield JsToken(_TWO_CHAR_OPS[c2], c2, start)
+            continue
+
+        if c in _ONE_CHAR_OPS:
+            self.pos += 1
+            kind = _ONE_CHAR_OPS[c]
+            if kind == JsTokenKind.LBRACE and self._brace_stack:
+                self._brace_stack[-1] += 1
+            yield JsToken(kind, c, start)
+            continue
+
+        self.pos += 1
+        yield JsToken(JsTokenKind.ERROR, c, start)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js" href="index.html">refinery.lib.scripts.js</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.lexer.identifier_string_value" href="#refinery.lib.scripts.js.lexer.identifier_string_value">identifier_string_value</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.lexer.decode_js_string_body" href="#refinery.lib.scripts.js.lexer.decode_js_string_body">decode_js_string_body</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.lexer.has_legacy_numeric_escape" href="#refinery.lib.scripts.js.lexer.has_legacy_numeric_escape">has_legacy_numeric_escape</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.lexer.decode_js_template_body" href="#refinery.lib.scripts.js.lexer.decode_js_template_body">decode_js_template_body</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.lexer.JsLexerState" href="#refinery.lib.scripts.js.lexer.JsLexerState">JsLexerState</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.lexer.JsLexer" href="#refinery.lib.scripts.js.lexer.JsLexer">JsLexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.lexer.JsLexer.capture" href="#refinery.lib.scripts.js.lexer.JsLexer.capture">capture</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.lexer.JsLexer.rewind" href="#refinery.lib.scripts.js.lexer.JsLexer.rewind">rewind</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.lexer.JsLexer.scan_regexp" href="#refinery.lib.scripts.js.lexer.JsLexer.scan_regexp">scan_regexp</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.lexer.JsLexer.tokenize" href="#refinery.lib.scripts.js.lexer.JsLexer.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

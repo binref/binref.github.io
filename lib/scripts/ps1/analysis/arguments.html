@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.arguments documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.arguments</code></h1>
+</header>
+<section id="section-intro">
+<p>Which slots of a .NET call the callee writes through.</p>
+<p>A <em>slot</em> is the receiver or one argument, addressed by position. <code>[Array]::Reverse($buffer)</code> leaves
+<code>$buffer</code> bound to the array it was bound to and turns that array around, so the call is a write of
+slot 0 and every later read of the variable observes it. Nothing in the signature says so: the
+argument is passed by value, and an array is a reference the callee writes through with no <code>out</code> or
+<code>byref</code> marker on it. That is why this is a hand-kept table rather than a reading of the metadata,
+and why <code><a title="refinery.lib.scripts.ps1.data.static_overloads" href="../data.html#refinery.lib.scripts.ps1.data.static_overloads">static_overloads()</a></code> can only floor it.</p>
+<p><strong>The polarity is the opposite of the purity tables', and that is the whole design.</strong> A purity
+allow-list is a <em>grant</em> table: a miss withholds a rewrite, so a missing entry costs a fold. This is
+a <em>deny</em> table: a miss lets a caller put a value where the callee was going to write, and the write
+is then lost — <code>[Array]::Copy($x, $y, 3)</code> with <code>$y</code> replaced by the array it held fills a temporary
+and the script prints what <code>$y</code> started with. A missing entry here is a wrong answer, so the answer
+carries whether it is settled and a caller that cannot live with doubt refuses on it.</p>
+<p><strong>Keyed on the arity, and the arity may not settle the overload.</strong> <code>[Array]::Sort($a, $b)</code> runs
+<code>Sort(Array, Array)</code>, which writes both slots, when <code>$b</code> is an array and <code>Sort(Array, IComparer)</code>,
+which writes only the first, when it is a comparer — a difference no reading of the source decides.
+<code><a title="refinery.lib.scripts.ps1.analysis.arguments.written_slots" href="#refinery.lib.scripts.ps1.analysis.arguments.written_slots">written_slots()</a></code> therefore answers the <em>union</em> over the arity-matched overloads, which is what a
+caller refusing to substitute needs, and reports <code>settled</code> as false, which is what a caller
+computing the resulting value needs to see.</p>
+<p>This module is rank 0 within <code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code>: it imports nothing from the
+package, so nothing here can consult a type oracle. The type of a call's receiver is a question for
+a layer that has one, and it arrives as a parameter.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/arguments.py#L1-L245" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Which slots of a .NET call the callee writes through.
+
+A *slot* is the receiver or one argument, addressed by position. `[Array]::Reverse($buffer)` leaves
+`$buffer` bound to the array it was bound to and turns that array around, so the call is a write of
+slot 0 and every later read of the variable observes it. Nothing in the signature says so: the
+argument is passed by value, and an array is a reference the callee writes through with no `out` or
+`byref` marker on it. That is why this is a hand-kept table rather than a reading of the metadata,
+and why `refinery.lib.scripts.ps1.data.static_overloads` can only floor it.
+
+**The polarity is the opposite of the purity tables&#39;, and that is the whole design.** A purity
+allow-list is a *grant* table: a miss withholds a rewrite, so a missing entry costs a fold. This is
+a *deny* table: a miss lets a caller put a value where the callee was going to write, and the write
+is then lost — `[Array]::Copy($x, $y, 3)` with `$y` replaced by the array it held fills a temporary
+and the script prints what `$y` started with. A missing entry here is a wrong answer, so the answer
+carries whether it is settled and a caller that cannot live with doubt refuses on it.
+
+**Keyed on the arity, and the arity may not settle the overload.** `[Array]::Sort($a, $b)` runs
+`Sort(Array, Array)`, which writes both slots, when `$b` is an array and `Sort(Array, IComparer)`,
+which writes only the first, when it is a comparer — a difference no reading of the source decides.
+`written_slots` therefore answers the *union* over the arity-matched overloads, which is what a
+caller refusing to substitute needs, and reports `settled` as false, which is what a caller
+computing the resulting value needs to see.
+
+This module is rank 0 within `refinery.lib.scripts.ps1.analysis`: it imports nothing from the
+package, so nothing here can consult a type oracle. The type of a call&#39;s receiver is a question for
+a layer that has one, and it arrives as a parameter.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import functools
+import typing
+
+from refinery.lib.scripts.ps1 import data
+from refinery.lib.scripts.ps1.dotnet import Ps1TypeName
+
+#: The slot a call&#39;s receiver occupies, so that `$a.CopyTo($b, 0)` and `[Array]::Copy($a, $b, 3)`
+#: address their parts the same way. Negative because an argument&#39;s slot is its own position.
+RECEIVER = -1
+
+
+class Ps1WrittenSlots(typing.NamedTuple):
+    &#34;&#34;&#34;
+    Which slots of one call the callee may write through.
+
+    `slots` is the union over every overload the call&#39;s arity matches, so a caller may read it as
+    *every* slot that could be written and none that could not. `settled` says whether the arity
+    picked out a single overload. Its one reader is the empty-`slots` distinction below: a rule
+    computing the value a call leaves behind does not consult it, because that rule is total over
+    the same-arity overloads that write its one slot whether or not the arity picked one out.
+
+    An empty `slots` therefore means two different things and the difference is `settled`.
+    Exact and empty is a claim: this call writes nothing. Unsettled and empty is a refusal: the
+    table names the member but not this call, so nothing is claimed about it either way. A
+    consumer that reads the pair as one truth value collapses them, which is why there is no
+    `__bool__` here.
+    &#34;&#34;&#34;
+    slots: frozenset[int]
+    settled: bool
+
+
+#: Nothing is written and the answer is exact: the member is not one that writes through a slot.
+NOTHING = Ps1WrittenSlots(frozenset(), True)
+
+#: The table names the member but no overload of it takes this many arguments, so which slots the
+#: call writes is not a question this can answer — 5.1 binds no overload and raises. Distinct from
+#: `NOTHING`, which is the claim that a call was found and writes nothing.
+UNBOUND = Ps1WrittenSlots(frozenset(), False)
+
+
+def _floored(
+    entries: dict[tuple[str, str], dict[int, tuple[int, ...]]],
+    *,
+    static: bool,
+) -&gt; dict[tuple[Ps1TypeName, str], dict[int, frozenset[int]]]:
+    &#34;&#34;&#34;
+    A written-slot table keyed by canonical type, with every row checked against the collected
+    metadata: the type must resolve, the member must carry overloads on the side the row is about,
+    each arity must be one some overload of it has, and each slot must address a part that call
+    has.
+
+    The flooring is what stops a row rotting into silence. Two entries this replaces named
+    `[Array]::Fill` and a *static* `[Array]::SetValue`, neither of which 5.1 carries at all — the
+    first arrived in .NET Core — so both had been granting purity to a call the host answers with
+    `MethodNotFound`.
+
+    The slot check is the one that keeps a typo from flipping the polarity. A row naming a slot the
+    arity does not reach is skipped by every consumer that indexes the arguments by it, so the call
+    reads as writing nothing shared and the whole statement becomes removable — the deny table
+    failing open, which is the one failure this module exists to prevent. `RECEIVER` is a part only
+    a call on a *value* has, so it is a reachable slot only on the instance side. An occurrence does
+    stand at a static receiver — `$t = [Array]; $t::Reverse($x)` spells one — but what it holds
+    there is the `System.Type`, and a static member writes through its arguments and never through
+    the type it is declared on, so a row naming that slot would deny a hand-off no call makes.
+    &#34;&#34;&#34;
+    table: dict[tuple[Ps1TypeName, str], dict[int, frozenset[int]]] = {}
+    for (type_name, member), by_arity in entries.items():
+        key = data.required_type_key(type_name)
+        overloads = (
+            data.static_overloads(key, member) if static
+            else data.instance_overloads(key, member)
+        )
+        available = {len(overload.get(&#39;parameters&#39;) or ()) for overload in overloads}
+        if not available:
+            raise ValueError(
+                F&#39;the written-slot table names {type_name}::{member}, which the collected metadata &#39;
+                F&#39;carries no {&#34;static&#34; if static else &#34;instance&#34;} overload of.&#39;
+            )
+        if set(by_arity) != available:
+            raise ValueError(
+                F&#39;the written-slot table gives {type_name}::{member} entries at &#39;
+                F&#39;{sorted(by_arity)} arguments where the collected overloads take &#39;
+                F&#39;{sorted(available)}; a row is answered by arity, so one short of what the type &#39;
+                F&#39;offers would answer an uncovered call with silence rather than with doubt.&#39;
+            )
+        for arity, slots in by_arity.items():
+            unreachable = [
+                slot for slot in slots
+                if not (0 &lt;= slot &lt; arity or (slot == RECEIVER and not static))
+            ]
+            if unreachable:
+                raise ValueError(
+                    F&#39;the written-slot table gives {type_name}::{member} at {arity} arguments the &#39;
+                    F&#39;slots {sorted(unreachable)}, which that call has no part at; a slot nothing &#39;
+                    F&#39;can address is one every consumer skips, and the row would grant what it was &#39;
+                    F&#39;written to deny.&#39;
+                )
+        table[(key, member.lower())] = {
+            arity: frozenset(slots) for arity, slots in by_arity.items()
+        }
+    return table
+
+
+#: What each static call writes through, by the number of arguments it is given. `Sort` is the entry
+#: that the arity does not settle: at two arguments `(Array, Array)` writes both slots and
+#: `(Array, IComparer)` writes only the first, and the source does not say which runs.
+#:
+#: `[Array]::Resize` is deliberately absent. Its parameter is marked `byref` in the shipped capture,
+#: which `refinery.lib.scripts.ps1.analysis.effects` already reads, so a hand-written row for it
+#: would be a second place to keep the same fact.
+_STATIC_WRITES = _floored({
+    (&#39;array&#39;, &#39;clear&#39;)              : {3: (0,)},
+    (&#39;array&#39;, &#39;constrainedcopy&#39;)    : {5: (2,)},
+    (&#39;array&#39;, &#39;copy&#39;)               : {3: (1,), 5: (2,)},
+    (&#39;array&#39;, &#39;reverse&#39;)            : {1: (0,), 3: (0,)},
+    (&#39;array&#39;, &#39;sort&#39;)               : {1: (0,), 2: (0, 1), 3: (0, 1), 4: (0, 1), 5: (0, 1)},
+    (&#39;buffer&#39;, &#39;blockcopy&#39;)         : {5: (2,)},
+    (&#39;buffer&#39;, &#39;setbyte&#39;)           : {3: (0,)},
+    (&#39;convert&#39;, &#39;tobase64chararray&#39;): {5: (3,), 6: (3,)},
+}, static=True)
+
+#: What each call on a *value* writes through. `SetValue` writes the array it is called on, which is
+#: the receiver rather than any argument; `CopyTo` writes an argument, and which one depends on the
+#: type it is called on — `System.Array` fills the first, `System.String` the second.
+#:
+#: A row is answered by member *name* here, because `written_slots` is asked where no receiver type
+#: is known — so one row per name is what the union needs and a second type spelling the same name
+#: adds nothing. `System.IO.Stream` stands for every reader that fills a buffer at three arguments,
+#: `System.Collections.ArrayList` for every collection that fills one at one, and
+#: `System.Security.Cryptography.ICryptoTransform` for `HashAlgorithm` as well.
+#:
+#: `[Text.Encoding]::ASCII.GetBytes($s)` is why the encoders carry an empty row at every arity but
+#: the last: the name they share with `RNGCryptoServiceProvider::GetBytes`, which fills its *first*
+#: slot, cannot be told apart without a receiver type, and a row for that member would refuse the
+#: single most-folded call in an obfuscated script. It is left out deliberately, and it is the one
+#: written slot this module knows of and does not answer — see `written_slots`.
+_INSTANCE_WRITES = _floored({
+    (&#39;array&#39;, &#39;copyto&#39;)                 : {2: (0,)},
+    (&#39;array&#39;, &#39;setvalue&#39;)               : {2: (RECEIVER,), 3: (RECEIVER,), 4: (RECEIVER,)},
+    (&#39;collections.arraylist&#39;, &#39;copyto&#39;) : {1: (0,), 2: (0,), 4: (1,)},
+    (&#39;io.stream&#39;, &#39;read&#39;)               : {3: (0,)},
+    (&#39;random&#39;, &#39;nextbytes&#39;)             : {1: (0,)},
+    (&#39;security.cryptography.icryptotransform&#39;, &#39;transformblock&#39;): {5: (3,)},
+    (&#39;string&#39;, &#39;copyto&#39;)                : {4: (1,)},
+    (&#39;text.encoding&#39;, &#39;getbytes&#39;)       : {1: (), 3: (), 4: (), 5: (3,)},
+    (&#39;text.encoding&#39;, &#39;getchars&#39;)       : {1: (), 3: (), 4: (), 5: (3,)},
+}, static=False)
+
+
+@functools.lru_cache(maxsize=None)
+def written_slots(
+    type_name: Ps1TypeName | None,
+    member: str,
+    arity: int,
+    *,
+    static: bool,
+) -&gt; Ps1WrittenSlots:
+    &#34;&#34;&#34;
+    The slots a `[Type]::Member(...)` or `value.Member(...)` call of *arity* arguments may write
+    through, given the canonical type it is called on.
+
+    Memoized over the whole run, and soundly: the two tables are built at import and the collected
+    metadata behind `_across_every_type` does not change either, so the answer depends on nothing
+    but the four arguments. What it saves is a rescan of a type&#39;s member dictionary per occurrence
+    standing in a call slot — measured over the corpus, 809 calls resolving to eleven answers.
+
+    `type_name` is `None` where the type is not known, which is the ordinary case for a call on a
+    value: the answer is then the union over every type carrying a member of that name, since which
+    of them it is cannot be decided here. That answer is never `settled`.
+
+    **One written slot is knowingly unanswered.** `RNGCryptoServiceProvider::GetBytes` fills its
+    first argument and shares its name with `Encoding::GetBytes`, which fills none at that arity;
+    with no receiver type to separate them a row would refuse every `[Text.Encoding]::UTF8
+    .GetBytes($s)` in the corpus. Answering it needs the receiver&#39;s type, which is what
+    `_across_every_type` exists because this layer does not have.
+    &#34;&#34;&#34;
+    if type_name is None:
+        return _across_every_type(member, arity, static=static)
+    table = _STATIC_WRITES if static else _INSTANCE_WRITES
+    by_arity = table.get((type_name.generic_definition, member.lower()))
+    if by_arity is None:
+        return NOTHING
+    slots = by_arity.get(arity)
+    if slots is None:
+        # A row covers every arity its member has — `_floored` refuses to build one that does not —
+        # so an arity with no entry is an arity no overload takes. 5.1 binds none of them and
+        # raises, which is neither a write to lose nor a call to reason about.
+        return UNBOUND
+    overloads = (
+        data.static_overloads(type_name, member) if static
+        else data.instance_overloads(type_name, member)
+    )
+    matched = sum(1 for one in overloads if len(one.get(&#39;parameters&#39;) or ()) == arity)
+    return Ps1WrittenSlots(slots, matched == 1)
+
+
+def _across_every_type(member: str, arity: int, *, static: bool) -&gt; Ps1WrittenSlots:
+    &#34;&#34;&#34;
+    What a call of a member of this name may write where the type it is called on is unknown.
+
+    Every row of that name contributes, whatever type it is written for, because nothing here rules
+    any of them out. A name no row mentions writes nothing, and that answer *is* settled: the table
+    is the whole of what is claimed to write through a slot, so a member outside it is one this says
+    does not.
+    &#34;&#34;&#34;
+    wanted = member.lower()
+    table = _STATIC_WRITES if static else _INSTANCE_WRITES
+    slots: set[int] = set()
+    named = False
+    for (_, name), by_arity in table.items():
+        if name != wanted:
+            continue
+        named = True
+        slots.update(by_arity.get(arity, frozenset()))
+    return Ps1WrittenSlots(frozenset(slots), False) if named else NOTHING</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.RECEIVER"><code class="name">var <span class="ident">RECEIVER</span></code></dt>
+<dd>
+<section class="desc"><p>The slot a call's receiver occupies, so that <code>$a.CopyTo($b, 0)</code> and <code>[Array]::Copy($a, $b, 3)</code>
+address their parts the same way. Negative because an argument's slot is its own position.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.NOTHING"><code class="name">var <span class="ident">NOTHING</span></code></dt>
+<dd>
+<section class="desc"><p>Nothing is written and the answer is exact: the member is not one that writes through a slot.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.UNBOUND"><code class="name">var <span class="ident">UNBOUND</span></code></dt>
+<dd>
+<section class="desc"><p>The table names the member but no overload of it takes this many arguments, so which slots the
+call writes is not a question this can answer — 5.1 binds no overload and raises. Distinct from
+<code><a title="refinery.lib.scripts.ps1.analysis.arguments.NOTHING" href="#refinery.lib.scripts.ps1.analysis.arguments.NOTHING">NOTHING</a></code>, which is the claim that a call was found and writes nothing.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.written_slots"><code class="name flex">
+<span>def <span class="ident">written_slots</span></span>(<span>type_name, member, arity, *, static)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The slots a <code>[Type]::Member(...)</code> or <code>value.Member(&hellip;)</code> call of <em>arity</em> arguments may write
+through, given the canonical type it is called on.</p>
+<p>Memoized over the whole run, and soundly: the two tables are built at import and the collected
+metadata behind <code>_across_every_type</code> does not change either, so the answer depends on nothing
+but the four arguments. What it saves is a rescan of a type's member dictionary per occurrence
+standing in a call slot — measured over the corpus, 809 calls resolving to eleven answers.</p>
+<p><code>type_name</code> is <code>None</code> where the type is not known, which is the ordinary case for a call on a
+value: the answer is then the union over every type carrying a member of that name, since which
+of them it is cannot be decided here. That answer is never <code>settled</code>.</p>
+<p><strong>One written slot is knowingly unanswered.</strong> <code>RNGCryptoServiceProvider::GetBytes</code> fills its
+first argument and shares its name with <code>Encoding::GetBytes</code>, which fills none at that arity;
+with no receiver type to separate them a row would refuse every <code>[Text.Encoding]::UTF8
+.GetBytes($s)</code> in the corpus. Answering it needs the receiver's type, which is what
+<code>_across_every_type</code> exists because this layer does not have.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/arguments.py#L180-L224" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@functools.lru_cache(maxsize=None)
+def written_slots(
+    type_name: Ps1TypeName | None,
+    member: str,
+    arity: int,
+    *,
+    static: bool,
+) -&gt; Ps1WrittenSlots:
+    &#34;&#34;&#34;
+    The slots a `[Type]::Member(...)` or `value.Member(...)` call of *arity* arguments may write
+    through, given the canonical type it is called on.
+
+    Memoized over the whole run, and soundly: the two tables are built at import and the collected
+    metadata behind `_across_every_type` does not change either, so the answer depends on nothing
+    but the four arguments. What it saves is a rescan of a type&#39;s member dictionary per occurrence
+    standing in a call slot — measured over the corpus, 809 calls resolving to eleven answers.
+
+    `type_name` is `None` where the type is not known, which is the ordinary case for a call on a
+    value: the answer is then the union over every type carrying a member of that name, since which
+    of them it is cannot be decided here. That answer is never `settled`.
+
+    **One written slot is knowingly unanswered.** `RNGCryptoServiceProvider::GetBytes` fills its
+    first argument and shares its name with `Encoding::GetBytes`, which fills none at that arity;
+    with no receiver type to separate them a row would refuse every `[Text.Encoding]::UTF8
+    .GetBytes($s)` in the corpus. Answering it needs the receiver&#39;s type, which is what
+    `_across_every_type` exists because this layer does not have.
+    &#34;&#34;&#34;
+    if type_name is None:
+        return _across_every_type(member, arity, static=static)
+    table = _STATIC_WRITES if static else _INSTANCE_WRITES
+    by_arity = table.get((type_name.generic_definition, member.lower()))
+    if by_arity is None:
+        return NOTHING
+    slots = by_arity.get(arity)
+    if slots is None:
+        # A row covers every arity its member has — `_floored` refuses to build one that does not —
+        # so an arity with no entry is an arity no overload takes. 5.1 binds none of them and
+        # raises, which is neither a write to lose nor a call to reason about.
+        return UNBOUND
+    overloads = (
+        data.static_overloads(type_name, member) if static
+        else data.instance_overloads(type_name, member)
+    )
+    matched = sum(1 for one in overloads if len(one.get(&#39;parameters&#39;) or ()) == arity)
+    return Ps1WrittenSlots(slots, matched == 1)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.Ps1WrittenSlots"><code class="flex name class">
+<span>class <span class="ident">Ps1WrittenSlots</span></span>
+<span>(</span><span>slots, settled)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Which slots of one call the callee may write through.</p>
+<p><code>slots</code> is the union over every overload the call's arity matches, so a caller may read it as
+<em>every</em> slot that could be written and none that could not. <code>settled</code> says whether the arity
+picked out a single overload. Its one reader is the empty-<code>slots</code> distinction below: a rule
+computing the value a call leaves behind does not consult it, because that rule is total over
+the same-arity overloads that write its one slot whether or not the arity picked one out.</p>
+<p>An empty <code>slots</code> therefore means two different things and the difference is <code>settled</code>.
+Exact and empty is a claim: this call writes nothing. Unsettled and empty is a refusal: the
+table names the member but not this call, so nothing is claimed about it either way. A
+consumer that reads the pair as one truth value collapses them, which is why there is no
+<code>__bool__</code> here.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/arguments.py#L42-L59" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1WrittenSlots(typing.NamedTuple):
+    &#34;&#34;&#34;
+    Which slots of one call the callee may write through.
+
+    `slots` is the union over every overload the call&#39;s arity matches, so a caller may read it as
+    *every* slot that could be written and none that could not. `settled` says whether the arity
+    picked out a single overload. Its one reader is the empty-`slots` distinction below: a rule
+    computing the value a call leaves behind does not consult it, because that rule is total over
+    the same-arity overloads that write its one slot whether or not the arity picked one out.
+
+    An empty `slots` therefore means two different things and the difference is `settled`.
+    Exact and empty is a claim: this call writes nothing. Unsettled and empty is a refusal: the
+    table names the member but not this call, so nothing is claimed about it either way. A
+    consumer that reads the pair as one truth value collapses them, which is why there is no
+    `__bool__` here.
+    &#34;&#34;&#34;
+    slots: frozenset[int]
+    settled: bool</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.Ps1WrittenSlots.slots"><code class="name">var <span class="ident">slots</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/arguments.py#L42-L59" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1WrittenSlots(typing.NamedTuple):
+    &#34;&#34;&#34;
+    Which slots of one call the callee may write through.
+
+    `slots` is the union over every overload the call&#39;s arity matches, so a caller may read it as
+    *every* slot that could be written and none that could not. `settled` says whether the arity
+    picked out a single overload. Its one reader is the empty-`slots` distinction below: a rule
+    computing the value a call leaves behind does not consult it, because that rule is total over
+    the same-arity overloads that write its one slot whether or not the arity picked one out.
+
+    An empty `slots` therefore means two different things and the difference is `settled`.
+    Exact and empty is a claim: this call writes nothing. Unsettled and empty is a refusal: the
+    table names the member but not this call, so nothing is claimed about it either way. A
+    consumer that reads the pair as one truth value collapses them, which is why there is no
+    `__bool__` here.
+    &#34;&#34;&#34;
+    slots: frozenset[int]
+    settled: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.arguments.Ps1WrittenSlots.settled"><code class="name">var <span class="ident">settled</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/arguments.py#L42-L59" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1WrittenSlots(typing.NamedTuple):
+    &#34;&#34;&#34;
+    Which slots of one call the callee may write through.
+
+    `slots` is the union over every overload the call&#39;s arity matches, so a caller may read it as
+    *every* slot that could be written and none that could not. `settled` says whether the arity
+    picked out a single overload. Its one reader is the empty-`slots` distinction below: a rule
+    computing the value a call leaves behind does not consult it, because that rule is total over
+    the same-arity overloads that write its one slot whether or not the arity picked one out.
+
+    An empty `slots` therefore means two different things and the difference is `settled`.
+    Exact and empty is a claim: this call writes nothing. Unsettled and empty is a refusal: the
+    table names the member but not this call, so nothing is claimed about it either way. A
+    consumer that reads the pair as one truth value collapses them, which is why there is no
+    `__bool__` here.
+    &#34;&#34;&#34;
+    slots: frozenset[int]
+    settled: bool</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.arguments.RECEIVER" href="#refinery.lib.scripts.ps1.analysis.arguments.RECEIVER">RECEIVER</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.arguments.NOTHING" href="#refinery.lib.scripts.ps1.analysis.arguments.NOTHING">NOTHING</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.arguments.UNBOUND" href="#refinery.lib.scripts.ps1.analysis.arguments.UNBOUND">UNBOUND</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.arguments.written_slots" href="#refinery.lib.scripts.ps1.analysis.arguments.written_slots">written_slots</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.arguments.Ps1WrittenSlots" href="#refinery.lib.scripts.ps1.analysis.arguments.Ps1WrittenSlots">Ps1WrittenSlots</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

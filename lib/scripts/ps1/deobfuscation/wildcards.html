@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.deobfuscation.wildcards documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.deobfuscation.wildcards</code></h1>
+</header>
+<section id="section-intro">
+<p>Resolve wildcard-based obfuscation patterns in PowerShell scripts.</p>
+<p>Handles three categories of wildcard obfuscation commonly used in malware:</p>
+<ol>
+<li>Wildcard variable access via the Variable: drive (Get-Item Variable:E*t)</li>
+<li>Wildcard cmdlet resolution via GetCmdlets/Invoke with wildcard patterns</li>
+<li>Wildcard member/method filtering via Where-Object pipelines</li>
+</ol>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/deobfuscation/wildcards.py#L1-L683" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Resolve wildcard-based obfuscation patterns in PowerShell scripts.
+
+Handles three categories of wildcard obfuscation commonly used in malware:
+
+1. Wildcard variable access via the Variable: drive (Get-Item Variable:E*t)
+2. Wildcard cmdlet resolution via GetCmdlets/Invoke with wildcard patterns
+3. Wildcard member/method filtering via Where-Object pipelines
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import re
+
+from fnmatch import translate as fnmatch_translate
+from typing import Iterable
+
+from refinery.lib.scripts.ps1.analysis.values import Ps1VariableTyping, resolve_expression_type
+from refinery.lib.scripts.ps1.ast import (
+    argument_text,
+    binds_parameter,
+    free_positional_values,
+    get_command_name,
+    get_member_name,
+    bound_argument_value,
+    resolve_command_name,
+    string_value,
+    unwrap_parens,
+)
+from refinery.lib.scripts.ps1.data import (
+    GET_COMMAND_ALIASES,
+    GET_MEMBER_ALIASES,
+    KNOWN_CMDLETS,
+    PS1_KNOWN_VARIABLES,
+    member_names,
+)
+from refinery.lib.scripts.ps1.analysis.values import make_string_literal
+from refinery.lib.scripts.ps1.deobfuscation.substitution import substituted
+from refinery.lib.scripts.ps1.deobfuscation.typenames import VariableTypeAwareTransformer
+from refinery.lib.scripts.ps1.model import (
+    Expression,
+    Ps1AssignmentExpression,
+    Ps1BinaryExpression,
+    Ps1CommandArgument,
+    Ps1CommandArgumentKind,
+    Ps1CommandInvocation,
+    Ps1ExpressionStatement,
+    Ps1InvokeMember,
+    Ps1MemberAccess,
+    Ps1ParenExpression,
+    Ps1Pipeline,
+    Ps1PipelineElement,
+    Ps1ScopeModifier,
+    Ps1ScriptBlock,
+    Ps1StringLiteral,
+    Ps1Variable,
+)
+
+_GET_ITEM_COMMANDS = frozenset({&#39;get-item&#39;, &#39;gi&#39;, &#39;get-childitem&#39;, &#39;gci&#39;})
+_GET_VARIABLE_COMMANDS = frozenset({&#39;get-variable&#39;, &#39;gv&#39;})
+_SET_ITEM_COMMANDS = frozenset({&#39;set-item&#39;, &#39;si&#39;})
+_SET_VARIABLE_COMMANDS = frozenset({&#39;set-variable&#39;, &#39;sv&#39;, &#39;set&#39;})
+_WHERE_OBJECT_ALIASES = frozenset({&#39;?&#39;, &#39;where&#39;, &#39;where-object&#39;})
+_LIKE_OPERATORS = frozenset({&#39;-like&#39;, &#39;-ilike&#39;, &#39;-clike&#39;})
+
+
+def _is_wildcard(pattern: str) -&gt; bool:
+    return &#39;*&#39; in pattern or &#39;?&#39; in pattern
+
+
+def _wildcard_match_unique(
+    pattern: str,
+    candidates: Iterable[str],
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    Match a wildcard pattern case-insensitively against canonical names. Returns the name if one
+    exact candidate matches, else `None`.
+    &#34;&#34;&#34;
+    regex = re.compile(fnmatch_translate(pattern), re.IGNORECASE)
+    matches = [name for name in candidates if regex.match(name)]
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+_KNOWN_CMDLET_LIST: list[str] = list(KNOWN_CMDLETS.values())
+
+
+def _known_cmdlets() -&gt; list[str]:
+    return _KNOWN_CMDLET_LIST
+
+
+def _is_psobject_member_access(
+    expr: Expression,
+    leaf_name: str,
+) -&gt; Ps1MemberAccess | None:
+    &#34;&#34;&#34;
+    Check if expr is of the form `&lt;something&gt;.PSObject.&lt;leaf_name&gt;` and return the inner member
+    access to `&lt;something&gt;.PSObject`, or `None`.
+    &#34;&#34;&#34;
+    if not isinstance(expr, Ps1MemberAccess):
+        return None
+    name = get_member_name(expr.member)
+    if name is None or name.lower() != leaf_name:
+        return None
+    inner = expr.object
+    if not isinstance(inner, Ps1MemberAccess):
+        return None
+    ps_name = get_member_name(inner.member)
+    if ps_name is None or ps_name.lower() != &#39;psobject&#39;:
+        return None
+    return inner
+
+
+def _determine_where_object_candidates(
+    elements: list,
+    type_of_variable: Ps1VariableTyping | None = None,
+) -&gt; Iterable[str] | None:
+    &#34;&#34;&#34;
+    Examine the pipeline elements preceding `Where-Object` to determine which candidates the
+    wildcard should match against. Returns canonical names to match against, or `None` if the source
+    is unrecognized.
+    &#34;&#34;&#34;
+    for elem in elements:
+        if not isinstance(elem, Ps1PipelineElement):
+            continue
+        expr = elem.expression
+        while isinstance(expr, Ps1ParenExpression) and expr.expression is not None:
+            inner = expr.expression
+            if isinstance(inner, Ps1Pipeline):
+                result = _determine_where_object_candidates(
+                    inner.elements, type_of_variable,
+                )
+                if result is not None:
+                    return result
+                break
+            expr = inner
+
+        if isinstance(expr, Ps1CommandInvocation):
+            cmd_name = get_command_name(expr)
+            if cmd_name is not None:
+                cmd_lower = cmd_name.lower()
+                if cmd_lower in GET_COMMAND_ALIASES:
+                    return _known_cmdlets()
+                if cmd_lower in GET_MEMBER_ALIASES:
+                    return _candidates_from_get_member(
+                        elements, elem, type_of_variable,
+                    )
+
+        if isinstance(expr, Ps1MemberAccess):
+            pso = _is_psobject_member_access(expr, &#39;methods&#39;)
+            if pso is not None:
+                return _candidates_from_type(pso.object, type_of_variable)
+            pso = _is_psobject_member_access(expr, &#39;properties&#39;)
+            if pso is not None:
+                return _candidates_from_type(pso.object, type_of_variable)
+
+    return None
+
+
+def _candidates_from_get_member(
+    elements: list,
+    gm_element: Ps1PipelineElement,
+    type_of_variable: Ps1VariableTyping | None = None,
+) -&gt; list[str] | None:
+    &#34;&#34;&#34;
+    For a pipeline like `expr | Get-Member | Where-Object ...`, resolve the type of the expression
+    piped into `Get-Member`.
+    &#34;&#34;&#34;
+    idx = None
+    for i, elem in enumerate(elements):
+        if elem is gm_element:
+            idx = i
+            break
+    if idx is None or idx == 0:
+        return None
+    prev = elements[idx - 1]
+    if not isinstance(prev, Ps1PipelineElement):
+        return None
+    return _candidates_from_type(prev.expression, type_of_variable)
+
+
+def _candidates_from_type(
+    expr: Expression | None,
+    type_of_variable: Ps1VariableTyping | None = None,
+) -&gt; list[str] | None:
+    if expr is None:
+        return None
+    type_name = resolve_expression_type(expr, type_of_variable)
+    if type_name is None:
+        return None
+    return member_names(type_name)
+
+
+def _concat_expressions(exprs: list[Expression]) -&gt; Expression:
+    &#34;&#34;&#34;
+    Build a left-associative `+` chain from a list of expressions.
+    &#34;&#34;&#34;
+    result = exprs[0]
+    for expr in exprs[1:]:
+        result = Ps1BinaryExpression(
+            offset=expr.offset,
+            left=result,
+            operator=&#39;+&#39;,
+            right=expr,
+        )
+    return result
+
+
+def _has_valueonly_switch(cmd: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Check if a command has a switch that is any unambiguous abbreviation of `-ValueOnly`; this is
+    true even for just `-v` since no other flag starts with `v`.
+    &#34;&#34;&#34;
+    for arg in cmd.arguments:
+        if not isinstance(arg, Ps1CommandArgument):
+            continue
+        if arg.kind != Ps1CommandArgumentKind.SWITCH:
+            continue
+        if arg.name.lower().startswith(&#39;-v&#39;):
+            return True
+    return False
+
+
+#: The `-Scope` arguments a variable reference can express, mapped to the qualifier that expresses
+#: them. `Local` needs none, since an unqualified reference means the scope it stands in. Every
+#: other spelling — `-Scope 1`, which names the *caller&#39;s* scope, an unrecognised word, a computed
+#: expression — names a scope no qualifier reaches, and the rewrite is declined rather than
+#: approximated.
+_EXPRESSIBLE_SCOPES: dict[str, Ps1ScopeModifier] = {
+    &#39;global&#39;: Ps1ScopeModifier.GLOBAL,
+    &#39;local&#39;: Ps1ScopeModifier.NONE,
+    &#39;private&#39;: Ps1ScopeModifier.PRIVATE,
+    &#39;script&#39;: Ps1ScopeModifier.SCRIPT,
+}
+
+
+#: Parameters whose effect an assignment cannot carry, so binding one declines the rewrite.
+#:
+#: Measured: after `New-Variable x -Option ReadOnly` a later `$x = …` raises
+#: `SessionStateUnauthorizedAccessException`, where after `$x = …` it succeeds — so the option is
+#: not decoration, it decides what every later store in the script does. `-PassThru` makes the
+#: command emit the variable object, which an assignment does not emit, and `-Force` is what lets a
+#: write land on a name an option protects.
+#:
+#: `-Description` is deliberately absent: it is metadata no read or write observes. Anything not
+#: listed is *allowed*, which is the wrong polarity for a corruption and the right one for a
+#: rewrite — see `refinery.lib.scripts.ps1.analysis.naming` on why the two tables differ.
+_INEXPRESSIBLE_PARAMETERS = (
+    &#39;force&#39;,
+    &#39;option&#39;,
+    &#39;passthru&#39;,
+    &#39;visibility&#39;,
+)
+
+
+def _expresses_every_effect(cmd: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an assignment carries everything *cmd* does, or drops an effect on the floor.
+    &#34;&#34;&#34;
+    for argument in cmd.arguments:
+        if not isinstance(argument, Ps1CommandArgument):
+            continue
+        if any(binds_parameter(argument.name, name) for name in _INEXPRESSIBLE_PARAMETERS):
+            return False
+    return True
+
+
+def _subject_argument_value(
+    cmd: Ps1CommandInvocation,
+    command: str,
+    parameter: str,
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    The literal name *cmd* is about, written either as `-Name x` / `-Path x` or as the first
+    argument it binds by position, or `None` when it is not a literal this can read. The same
+    reading `refinery.lib.scripts.ps1.analysis.naming` takes, down to
+    `refinery.lib.scripts.ps1.ast.argument_text`, so the two layers agree on which argument a
+    variable command names *and* on what it is called.
+    &#34;&#34;&#34;
+    explicit = bound_argument_value(cmd, parameter)
+    if explicit is not None:
+        return argument_text(explicit)
+    for value in free_positional_values(cmd, command):
+        return argument_text(value)
+    return None
+
+
+def _expressible_scope(
+    node: Ps1CommandInvocation,
+    var_name: str,
+) -&gt; Ps1ScopeModifier | None:
+    &#34;&#34;&#34;
+    The qualifier the variable reference replacing *node* must carry, or `None` when no reference
+    can stand for the command. A name that already carries a qualifier of its own is declined
+    whenever a `-Scope` argument is present too, since the two would have to be rendered one inside
+    the other.
+    &#34;&#34;&#34;
+    declared = bound_argument_value(node, &#39;scope&#39;)
+    if declared is None:
+        return Ps1ScopeModifier.NONE
+    if &#39;:&#39; in var_name:
+        return None
+    written = string_value(declared)
+    if written is None:
+        return None
+    return _EXPRESSIBLE_SCOPES.get(written.lower())
+
+
+def _resolve_variable_name(
+    pattern: str,
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    Resolve a variable name pattern (possibly wildcard) to a canonical name. Returns the resolved
+    name, or the pattern itself for non-wildcard names.
+    &#34;&#34;&#34;
+    if _is_wildcard(pattern):
+        return _wildcard_match_unique(pattern, PS1_KNOWN_VARIABLES.values())
+    pattern_lower = pattern.lower()
+    return next(
+        (v for v in PS1_KNOWN_VARIABLES.values() if v.lower() == pattern_lower),
+        pattern,
+    )
+
+
+def _extract_where_object_wildcard(
+    cmd: Ps1CommandInvocation,
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    Detect Where-Object with a scriptblock body of the form:
+
+        $_.Name -ilike &#39;pattern&#39;
+
+    Returns the pattern string, or `None`.
+    &#34;&#34;&#34;
+    name = get_command_name(cmd)
+    if name is None or name.lower() not in _WHERE_OBJECT_ALIASES:
+        return None
+    if len(cmd.arguments) != 1:
+        return None
+    arg = cmd.arguments[0]
+    if isinstance(arg, Ps1CommandArgument):
+        if arg.kind != Ps1CommandArgumentKind.POSITIONAL:
+            return None
+        arg = arg.value
+    if not isinstance(arg, Ps1ScriptBlock):
+        return None
+    body = arg.body
+    if len(body) != 1:
+        return None
+    stmt = body[0]
+    expr = None
+    if isinstance(stmt, Ps1ExpressionStatement):
+        expr = stmt.expression
+    elif isinstance(stmt, Ps1Pipeline):
+        if len(stmt.elements) == 1:
+            elem = stmt.elements[0]
+            if isinstance(elem, Ps1PipelineElement):
+                expr = elem.expression
+    if not isinstance(expr, Ps1BinaryExpression):
+        return None
+    if expr.operator.lower() not in _LIKE_OPERATORS:
+        return None
+    left = expr.left
+    if not isinstance(left, Ps1MemberAccess):
+        return None
+    if not isinstance(left.object, Ps1Variable):
+        return None
+    if left.object.name.lower() not in (&#39;_&#39;, &#39;psitem&#39;):
+        return None
+    member = left.member
+    if isinstance(member, str):
+        member_name = member
+    elif isinstance(member, Ps1StringLiteral):
+        member_name = member.value
+    else:
+        return None
+    if member_name.lower() != &#39;name&#39;:
+        return None
+    if expr.right is None:
+        return None
+    return string_value(expr.right)
+
+
+class Ps1WildcardResolution(VariableTypeAwareTransformer):
+
+    def visit_Ps1MemberAccess(self, node: Ps1MemberAccess):
+        self.generic_visit(node)
+        return substituted(node, self._try_resolve_variable_value(node))
+
+    def visit_Ps1InvokeMember(self, node: Ps1InvokeMember):
+        self.generic_visit(node)
+        return substituted(node, self._try_resolve_cmdlet_method(node))
+
+    def visit_Ps1Pipeline(self, node: Ps1Pipeline):
+        self.generic_visit(node)
+        return substituted(node, self._try_resolve_where_object_wildcard(node))
+
+    def visit_Ps1CommandInvocation(self, node: Ps1CommandInvocation):
+        self.generic_visit(node)
+        replacement = self._try_resolve_get_variable_value_only(node)
+        if replacement is None:
+            replacement = self._try_resolve_set_variable(node)
+        return substituted(node, replacement)
+
+    def _try_resolve_variable_value(
+        self,
+        node: Ps1MemberAccess,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Resolve property access on `Get-Item Variable:X` or `Get-Variable X`:
+
+        - `.Value` resolves to `$X` (the variable&#39;s value)
+        - `.Name` resolves to `&#39;X&#39;` as a string literal (the variable&#39;s name)
+
+        `Get-Item Variable:X` and `Get-Variable X` return a `PSVariable` wrapper object whose
+        `.Value` property gives the actual variable content and `.Name` property gives its name.
+        &#34;&#34;&#34;
+        member_name = get_member_name(node.member)
+        if member_name is None:
+            return None
+        member_lower = member_name.lower()
+        if member_lower not in (&#39;value&#39;, &#39;name&#39;):
+            return None
+        if node.object is None:
+            return None
+        found = self._resolve_get_variable_pattern(node.object)
+        if found is None:
+            return None
+        resolved, scope = found
+        if member_lower == &#39;value&#39;:
+            if scope is None:
+                return None
+            return Ps1Variable(
+                offset=node.offset,
+                name=resolved,
+                scope=scope,
+            )
+        return make_string_literal(resolved)
+
+    @staticmethod
+    def _resolve_get_variable_pattern(
+        expr: Expression,
+    ) -&gt; tuple[str, Ps1ScopeModifier | None] | None:
+        &#34;&#34;&#34;
+        Given the object expression of a member access, check if it is a `Get-Item Variable:X` or
+        `Get-Variable X` invocation and resolve the variable name (supporting wildcards) together
+        with the qualifier a reference replacing it must carry.
+
+        The qualifier is `None` for a `-Scope` no reference can name, which only the `.Value`
+        rewrite has to decline: the name a command is about is that name whichever scope it reads.
+        &#34;&#34;&#34;
+        inner = unwrap_parens(expr)
+        if not isinstance(inner, Ps1CommandInvocation):
+            return None
+        name = get_command_name(inner)
+        if name is None:
+            return None
+        name_lower = name.lower()
+        if name_lower not in _GET_ITEM_COMMANDS and name_lower not in _GET_VARIABLE_COMMANDS:
+            return None
+        command = resolve_command_name(inner)
+        if command is None:
+            return None
+        subject = &#39;path&#39; if name_lower in _GET_ITEM_COMMANDS else &#39;name&#39;
+        arg_value = _subject_argument_value(inner, command, subject)
+        if arg_value is None:
+            return None
+        if name_lower in _GET_ITEM_COMMANDS:
+            prefix = &#39;variable:&#39;
+            if not arg_value.lower().startswith(prefix):
+                return None
+            pattern = arg_value[len(prefix):]
+            pattern = pattern.lstrip(&#39;/\\&#39;)
+        else:
+            pattern = arg_value
+        resolved = _resolve_variable_name(pattern)
+        if resolved is None:
+            return None
+        return resolved, _expressible_scope(inner, resolved)
+
+    def _try_resolve_get_variable_value_only(
+        self,
+        node: Ps1CommandInvocation,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Resolve `Get-Variable X -ValueOnly` to `$X`.
+        &#34;&#34;&#34;
+        cmd_name = get_command_name(node)
+        if cmd_name is None or cmd_name.lower() not in _GET_VARIABLE_COMMANDS:
+            return None
+        if not _has_valueonly_switch(node):
+            return None
+        command = resolve_command_name(node)
+        if command is None:
+            return None
+        name_expr = bound_argument_value(node, &#39;name&#39;)
+        if name_expr is None:
+            positionals = free_positional_values(node, command)
+            if not positionals:
+                return None
+            name_expr = positionals[0]
+        arg_value = argument_text(name_expr)
+        if arg_value is None:
+            return None
+        resolved = _resolve_variable_name(arg_value)
+        if resolved is None:
+            return None
+        scope = _expressible_scope(node, resolved)
+        if scope is None:
+            return None
+        return Ps1Variable(
+            offset=node.offset,
+            name=resolved,
+            scope=scope,
+        )
+
+    def _try_resolve_cmdlet_method(
+        self,
+        node: Ps1InvokeMember,
+    ) -&gt; Expression | None:
+        member_name = get_member_name(node.member)
+        if member_name is None:
+            return None
+        member_lower = member_name.lower()
+        is_getcmdlets = member_lower in (&#39;getcmdlets&#39;, &#39;getcmdlet&#39;)
+        is_getcommand = member_lower in (&#39;getcommandname&#39;, &#39;getcommand&#39;)
+        is_invoke = member_lower == &#39;invoke&#39;
+        if not is_getcmdlets and not is_getcommand and not is_invoke:
+            return None
+        if len(node.arguments) &lt; 1:
+            return None
+        pattern = string_value(node.arguments[0])
+        if pattern is None:
+            return None
+        if is_invoke and &#39;-&#39; not in pattern:
+            return None
+        cmdlets = _known_cmdlets()
+        if _is_wildcard(pattern):
+            resolved = _wildcard_match_unique(pattern, cmdlets)
+        else:
+            resolved = next(
+                (c for c in cmdlets if c.lower() == pattern.lower()), None)
+        if resolved is None:
+            return None
+        return make_string_literal(resolved)
+
+    def _try_resolve_where_object_wildcard(
+        self,
+        node: Ps1Pipeline,
+    ) -&gt; Expression | None:
+        if len(node.elements) &lt; 2:
+            return None
+        last_elem = node.elements[-1]
+        if not isinstance(last_elem, Ps1PipelineElement):
+            return None
+        cmd = last_elem.expression
+        if not isinstance(cmd, Ps1CommandInvocation):
+            return None
+        pattern = _extract_where_object_wildcard(cmd)
+        if pattern is None or not _is_wildcard(pattern):
+            return None
+        preceding = node.elements[:-1]
+        candidates = _determine_where_object_candidates(
+            preceding, self._type_of_variable,
+        )
+        if candidates is None:
+            return None
+        resolved = _wildcard_match_unique(pattern, candidates)
+        if resolved is None:
+            return None
+        return make_string_literal(resolved)
+
+    def _try_resolve_set_variable(
+        self,
+        node: Ps1CommandInvocation,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Resolve Set-Item Variable:X value or Set-Variable X value to $X = value.
+        &#34;&#34;&#34;
+        cmd_name = get_command_name(node)
+        if cmd_name is None:
+            return None
+        command = resolve_command_name(node)
+        if command is None:
+            return None
+        cmd_lower = cmd_name.lower()
+        if cmd_lower in _SET_ITEM_COMMANDS:
+            return self._handle_set_item_variable(node, command)
+        if cmd_lower in _SET_VARIABLE_COMMANDS:
+            return self._handle_set_variable(node, command)
+        return None
+
+    def _handle_set_item_variable(
+        self,
+        node: Ps1CommandInvocation,
+        command: str,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Set-Item Variable:/X val1 val2 → $X = val1 + val2
+
+        `-Path` and `-Value` name the same two arguments the positional spelling does, and a command
+        binding either of them by name leaves nothing free for the positional reading to find.
+        &#34;&#34;&#34;
+        positionals = free_positional_values(node, command)
+        path_expr = bound_argument_value(node, &#39;path&#39;)
+        if path_expr is None:
+            if not positionals:
+                return None
+            path_expr, positionals = positionals[0], positionals[1:]
+        named_value = bound_argument_value(node, &#39;value&#39;)
+        values = [named_value] if named_value is not None else positionals
+        if not values:
+            return None
+        path_str = string_value(path_expr)
+        if path_str is None:
+            return None
+        prefix = &#39;variable:&#39;
+        if not path_str.lower().startswith(prefix):
+            return None
+        var_name = path_str[len(prefix):].lstrip(&#39;/\\&#39;)
+        resolved = _resolve_variable_name(var_name)
+        if resolved is None:
+            return None
+        return self._build_assignment(node.offset, resolved, values, Ps1ScopeModifier.NONE)
+
+    def _handle_set_variable(
+        self,
+        node: Ps1CommandInvocation,
+        command: str,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Set-Variable X val or Set-Variable -Name X -Value val → $X = val
+        &#34;&#34;&#34;
+        if not _expresses_every_effect(node):
+            return None
+        named_value = bound_argument_value(node, &#39;value&#39;)
+        positionals = free_positional_values(node, command)
+        name_expr = bound_argument_value(node, &#39;name&#39;)
+        if name_expr is not None:
+            var_name = argument_text(name_expr)
+        elif positionals:
+            var_name = argument_text(positionals[0])
+            positionals = positionals[1:]
+        else:
+            return None
+        if var_name is None:
+            return None
+        resolved = _resolve_variable_name(var_name)
+        if resolved is None:
+            return None
+        scope = _expressible_scope(node, resolved)
+        if scope is None:
+            return None
+        if named_value is not None:
+            values = [named_value]
+        elif positionals:
+            values = positionals
+        else:
+            return None
+        return self._build_assignment(node.offset, resolved, values, scope)
+
+    @staticmethod
+    def _build_assignment(
+        offset: int,
+        var_name: str,
+        values: list[Expression],
+        scope: Ps1ScopeModifier,
+    ) -&gt; Ps1AssignmentExpression:
+        target = Ps1Variable(
+            offset=offset,
+            name=var_name,
+            scope=scope,
+        )
+        if len(values) == 1:
+            value = values[0]
+        else:
+            value = _concat_expressions(values)
+        return Ps1AssignmentExpression(
+            offset=offset,
+            target=target,
+            operator=&#39;=&#39;,
+            value=value,
+        )</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution"><code class="flex name class">
+<span>class <span class="ident">Ps1WildcardResolution</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>A pass that asks <code><a title="refinery.lib.scripts.ps1.analysis.variable_types.type_at" href="../analysis/variable_types.html#refinery.lib.scripts.ps1.analysis.variable_types.type_at">type_at()</a></code> what a variable
+holds where it is read, rather than carrying a table of names it built itself.</p>
+<p>The flow model is captured once at the root, for the reason
+<code><a title="refinery.lib.scripts.ps1.deobfuscation.typecast.Ps1TypeCasts.visit" href="typecast.html#refinery.lib.scripts.ps1.deobfuscation.typecast.Ps1TypeCasts.visit">Ps1TypeCasts.visit()</a></code> gives at greater length:
+every fold below marks the pass changed, which drops the shared cache, so a per-site lookup
+would rebuild the control-flow graphs of the whole script once per fold. Neither pass adds or
+removes a statement, so the graphs it would rebuild are the graphs it already holds.</p>
+<p>The model is dropped again when the walk it was captured for ends, so that a second walk over a
+tree the first one rewrote cannot be answered from the first one's graphs. The answers are held
+for as long as the model is, keyed on the occurrence they were asked about: <code>type_at</code> walks
+every write of a binding, and a member chain, two passes and every iteration of the normalize
+group ask about the same occurrences again. The occurrence is kept beside its answer because
+<code>id</code> alone identifies a node only while that node is alive, and this walk frees the ones it
+replaces.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/deobfuscation/wildcards.py#L384-L683" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1WildcardResolution(VariableTypeAwareTransformer):
+
+    def visit_Ps1MemberAccess(self, node: Ps1MemberAccess):
+        self.generic_visit(node)
+        return substituted(node, self._try_resolve_variable_value(node))
+
+    def visit_Ps1InvokeMember(self, node: Ps1InvokeMember):
+        self.generic_visit(node)
+        return substituted(node, self._try_resolve_cmdlet_method(node))
+
+    def visit_Ps1Pipeline(self, node: Ps1Pipeline):
+        self.generic_visit(node)
+        return substituted(node, self._try_resolve_where_object_wildcard(node))
+
+    def visit_Ps1CommandInvocation(self, node: Ps1CommandInvocation):
+        self.generic_visit(node)
+        replacement = self._try_resolve_get_variable_value_only(node)
+        if replacement is None:
+            replacement = self._try_resolve_set_variable(node)
+        return substituted(node, replacement)
+
+    def _try_resolve_variable_value(
+        self,
+        node: Ps1MemberAccess,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Resolve property access on `Get-Item Variable:X` or `Get-Variable X`:
+
+        - `.Value` resolves to `$X` (the variable&#39;s value)
+        - `.Name` resolves to `&#39;X&#39;` as a string literal (the variable&#39;s name)
+
+        `Get-Item Variable:X` and `Get-Variable X` return a `PSVariable` wrapper object whose
+        `.Value` property gives the actual variable content and `.Name` property gives its name.
+        &#34;&#34;&#34;
+        member_name = get_member_name(node.member)
+        if member_name is None:
+            return None
+        member_lower = member_name.lower()
+        if member_lower not in (&#39;value&#39;, &#39;name&#39;):
+            return None
+        if node.object is None:
+            return None
+        found = self._resolve_get_variable_pattern(node.object)
+        if found is None:
+            return None
+        resolved, scope = found
+        if member_lower == &#39;value&#39;:
+            if scope is None:
+                return None
+            return Ps1Variable(
+                offset=node.offset,
+                name=resolved,
+                scope=scope,
+            )
+        return make_string_literal(resolved)
+
+    @staticmethod
+    def _resolve_get_variable_pattern(
+        expr: Expression,
+    ) -&gt; tuple[str, Ps1ScopeModifier | None] | None:
+        &#34;&#34;&#34;
+        Given the object expression of a member access, check if it is a `Get-Item Variable:X` or
+        `Get-Variable X` invocation and resolve the variable name (supporting wildcards) together
+        with the qualifier a reference replacing it must carry.
+
+        The qualifier is `None` for a `-Scope` no reference can name, which only the `.Value`
+        rewrite has to decline: the name a command is about is that name whichever scope it reads.
+        &#34;&#34;&#34;
+        inner = unwrap_parens(expr)
+        if not isinstance(inner, Ps1CommandInvocation):
+            return None
+        name = get_command_name(inner)
+        if name is None:
+            return None
+        name_lower = name.lower()
+        if name_lower not in _GET_ITEM_COMMANDS and name_lower not in _GET_VARIABLE_COMMANDS:
+            return None
+        command = resolve_command_name(inner)
+        if command is None:
+            return None
+        subject = &#39;path&#39; if name_lower in _GET_ITEM_COMMANDS else &#39;name&#39;
+        arg_value = _subject_argument_value(inner, command, subject)
+        if arg_value is None:
+            return None
+        if name_lower in _GET_ITEM_COMMANDS:
+            prefix = &#39;variable:&#39;
+            if not arg_value.lower().startswith(prefix):
+                return None
+            pattern = arg_value[len(prefix):]
+            pattern = pattern.lstrip(&#39;/\\&#39;)
+        else:
+            pattern = arg_value
+        resolved = _resolve_variable_name(pattern)
+        if resolved is None:
+            return None
+        return resolved, _expressible_scope(inner, resolved)
+
+    def _try_resolve_get_variable_value_only(
+        self,
+        node: Ps1CommandInvocation,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Resolve `Get-Variable X -ValueOnly` to `$X`.
+        &#34;&#34;&#34;
+        cmd_name = get_command_name(node)
+        if cmd_name is None or cmd_name.lower() not in _GET_VARIABLE_COMMANDS:
+            return None
+        if not _has_valueonly_switch(node):
+            return None
+        command = resolve_command_name(node)
+        if command is None:
+            return None
+        name_expr = bound_argument_value(node, &#39;name&#39;)
+        if name_expr is None:
+            positionals = free_positional_values(node, command)
+            if not positionals:
+                return None
+            name_expr = positionals[0]
+        arg_value = argument_text(name_expr)
+        if arg_value is None:
+            return None
+        resolved = _resolve_variable_name(arg_value)
+        if resolved is None:
+            return None
+        scope = _expressible_scope(node, resolved)
+        if scope is None:
+            return None
+        return Ps1Variable(
+            offset=node.offset,
+            name=resolved,
+            scope=scope,
+        )
+
+    def _try_resolve_cmdlet_method(
+        self,
+        node: Ps1InvokeMember,
+    ) -&gt; Expression | None:
+        member_name = get_member_name(node.member)
+        if member_name is None:
+            return None
+        member_lower = member_name.lower()
+        is_getcmdlets = member_lower in (&#39;getcmdlets&#39;, &#39;getcmdlet&#39;)
+        is_getcommand = member_lower in (&#39;getcommandname&#39;, &#39;getcommand&#39;)
+        is_invoke = member_lower == &#39;invoke&#39;
+        if not is_getcmdlets and not is_getcommand and not is_invoke:
+            return None
+        if len(node.arguments) &lt; 1:
+            return None
+        pattern = string_value(node.arguments[0])
+        if pattern is None:
+            return None
+        if is_invoke and &#39;-&#39; not in pattern:
+            return None
+        cmdlets = _known_cmdlets()
+        if _is_wildcard(pattern):
+            resolved = _wildcard_match_unique(pattern, cmdlets)
+        else:
+            resolved = next(
+                (c for c in cmdlets if c.lower() == pattern.lower()), None)
+        if resolved is None:
+            return None
+        return make_string_literal(resolved)
+
+    def _try_resolve_where_object_wildcard(
+        self,
+        node: Ps1Pipeline,
+    ) -&gt; Expression | None:
+        if len(node.elements) &lt; 2:
+            return None
+        last_elem = node.elements[-1]
+        if not isinstance(last_elem, Ps1PipelineElement):
+            return None
+        cmd = last_elem.expression
+        if not isinstance(cmd, Ps1CommandInvocation):
+            return None
+        pattern = _extract_where_object_wildcard(cmd)
+        if pattern is None or not _is_wildcard(pattern):
+            return None
+        preceding = node.elements[:-1]
+        candidates = _determine_where_object_candidates(
+            preceding, self._type_of_variable,
+        )
+        if candidates is None:
+            return None
+        resolved = _wildcard_match_unique(pattern, candidates)
+        if resolved is None:
+            return None
+        return make_string_literal(resolved)
+
+    def _try_resolve_set_variable(
+        self,
+        node: Ps1CommandInvocation,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Resolve Set-Item Variable:X value or Set-Variable X value to $X = value.
+        &#34;&#34;&#34;
+        cmd_name = get_command_name(node)
+        if cmd_name is None:
+            return None
+        command = resolve_command_name(node)
+        if command is None:
+            return None
+        cmd_lower = cmd_name.lower()
+        if cmd_lower in _SET_ITEM_COMMANDS:
+            return self._handle_set_item_variable(node, command)
+        if cmd_lower in _SET_VARIABLE_COMMANDS:
+            return self._handle_set_variable(node, command)
+        return None
+
+    def _handle_set_item_variable(
+        self,
+        node: Ps1CommandInvocation,
+        command: str,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Set-Item Variable:/X val1 val2 → $X = val1 + val2
+
+        `-Path` and `-Value` name the same two arguments the positional spelling does, and a command
+        binding either of them by name leaves nothing free for the positional reading to find.
+        &#34;&#34;&#34;
+        positionals = free_positional_values(node, command)
+        path_expr = bound_argument_value(node, &#39;path&#39;)
+        if path_expr is None:
+            if not positionals:
+                return None
+            path_expr, positionals = positionals[0], positionals[1:]
+        named_value = bound_argument_value(node, &#39;value&#39;)
+        values = [named_value] if named_value is not None else positionals
+        if not values:
+            return None
+        path_str = string_value(path_expr)
+        if path_str is None:
+            return None
+        prefix = &#39;variable:&#39;
+        if not path_str.lower().startswith(prefix):
+            return None
+        var_name = path_str[len(prefix):].lstrip(&#39;/\\&#39;)
+        resolved = _resolve_variable_name(var_name)
+        if resolved is None:
+            return None
+        return self._build_assignment(node.offset, resolved, values, Ps1ScopeModifier.NONE)
+
+    def _handle_set_variable(
+        self,
+        node: Ps1CommandInvocation,
+        command: str,
+    ) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Set-Variable X val or Set-Variable -Name X -Value val → $X = val
+        &#34;&#34;&#34;
+        if not _expresses_every_effect(node):
+            return None
+        named_value = bound_argument_value(node, &#39;value&#39;)
+        positionals = free_positional_values(node, command)
+        name_expr = bound_argument_value(node, &#39;name&#39;)
+        if name_expr is not None:
+            var_name = argument_text(name_expr)
+        elif positionals:
+            var_name = argument_text(positionals[0])
+            positionals = positionals[1:]
+        else:
+            return None
+        if var_name is None:
+            return None
+        resolved = _resolve_variable_name(var_name)
+        if resolved is None:
+            return None
+        scope = _expressible_scope(node, resolved)
+        if scope is None:
+            return None
+        if named_value is not None:
+            values = [named_value]
+        elif positionals:
+            values = positionals
+        else:
+            return None
+        return self._build_assignment(node.offset, resolved, values, scope)
+
+    @staticmethod
+    def _build_assignment(
+        offset: int,
+        var_name: str,
+        values: list[Expression],
+        scope: Ps1ScopeModifier,
+    ) -&gt; Ps1AssignmentExpression:
+        target = Ps1Variable(
+            offset=offset,
+            name=var_name,
+            scope=scope,
+        )
+        if len(values) == 1:
+            value = values[0]
+        else:
+            value = _concat_expressions(values)
+        return Ps1AssignmentExpression(
+            offset=offset,
+            target=target,
+            operator=&#39;=&#39;,
+            value=value,
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.ps1.deobfuscation.typenames.VariableTypeAwareTransformer" href="typenames.html#refinery.lib.scripts.ps1.deobfuscation.typenames.VariableTypeAwareTransformer">VariableTypeAwareTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1MemberAccess"><code class="name flex">
+<span>def <span class="ident">visit_Ps1MemberAccess</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/deobfuscation/wildcards.py#L386-L388" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_Ps1MemberAccess(self, node: Ps1MemberAccess):
+    self.generic_visit(node)
+    return substituted(node, self._try_resolve_variable_value(node))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1InvokeMember"><code class="name flex">
+<span>def <span class="ident">visit_Ps1InvokeMember</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/deobfuscation/wildcards.py#L390-L392" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_Ps1InvokeMember(self, node: Ps1InvokeMember):
+    self.generic_visit(node)
+    return substituted(node, self._try_resolve_cmdlet_method(node))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1Pipeline"><code class="name flex">
+<span>def <span class="ident">visit_Ps1Pipeline</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/deobfuscation/wildcards.py#L394-L396" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_Ps1Pipeline(self, node: Ps1Pipeline):
+    self.generic_visit(node)
+    return substituted(node, self._try_resolve_where_object_wildcard(node))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1CommandInvocation"><code class="name flex">
+<span>def <span class="ident">visit_Ps1CommandInvocation</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/deobfuscation/wildcards.py#L398-L403" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit_Ps1CommandInvocation(self, node: Ps1CommandInvocation):
+    self.generic_visit(node)
+    replacement = self._try_resolve_get_variable_value_only(node)
+    if replacement is None:
+        replacement = self._try_resolve_set_variable(node)
+    return substituted(node, replacement)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.ps1.deobfuscation.typenames.VariableTypeAwareTransformer" href="typenames.html#refinery.lib.scripts.ps1.deobfuscation.typenames.VariableTypeAwareTransformer">VariableTypeAwareTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation.typenames.VariableTypeAwareTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation" href="index.html">refinery.lib.scripts.ps1.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution" href="#refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution">Ps1WildcardResolution</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1MemberAccess" href="#refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1MemberAccess">visit_Ps1MemberAccess</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1InvokeMember" href="#refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1InvokeMember">visit_Ps1InvokeMember</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1Pipeline" href="#refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1Pipeline">visit_Ps1Pipeline</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1CommandInvocation" href="#refinery.lib.scripts.ps1.deobfuscation.wildcards.Ps1WildcardResolution.visit_Ps1CommandInvocation">visit_Ps1CommandInvocation</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

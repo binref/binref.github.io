@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.cfg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.cfg</code></h1>
+</header>
+<section id="section-intro">
+<p>JavaScript's contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored.</p>
+<p>Everything structural — the graph, the frontier threading, the jump-target and handler stacks, and
+the shapes themselves — lives in <code><a title="refinery.lib.scripts.analysis.cfg" href="../../analysis/cfg.html">refinery.lib.scripts.analysis.cfg</a></code>. What remains here is
+<code>_Builder.statement</code>, the recognition of <code>Js*</code> node types, and the accessors that pull a construct
+apart. Three of the shape parameters are answered from JavaScript semantics rather than from syntax:
+<code>switch</code> falls through from one case to the next, an unlabelled <code>break</code> may leave a <code>switch</code> as well
+as a loop, and a <code>catch</code> carries no type filter, so a throw the guarded block makes gets past it only
+where binding the caught value can itself throw — see <code>_catch_may_rethrow</code>.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cfg.py#L1-L189" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+JavaScript&#39;s contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored.
+
+Everything structural — the graph, the frontier threading, the jump-target and handler stacks, and
+the shapes themselves — lives in `refinery.lib.scripts.analysis.cfg`. What remains here is
+`_Builder.statement`, the recognition of `Js*` node types, and the accessors that pull a construct
+apart. Three of the shape parameters are answered from JavaScript semantics rather than from syntax:
+`switch` falls through from one case to the next, an unlabelled `break` may leave a `switch` as well
+as a loop, and a `catch` carries no type filter, so a throw the guarded block makes gets past it only
+where binding the caught value can itself throw — see `_catch_may_rethrow`.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Sequence
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.cfg import (
+    ArmFlow,
+    CfgBuilder,
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+    ElementLocator,
+)
+from refinery.lib.scripts.analysis.cfg import build_control_flow as _build_control_flow
+from refinery.lib.scripts.js.analysis.model import FUNCTION_NODES
+from refinery.lib.scripts.js.model import (
+    JsArrayPattern,
+    JsBlockStatement,
+    JsBreakStatement,
+    JsCatchClause,
+    JsContinueStatement,
+    JsDoWhileStatement,
+    JsForInStatement,
+    JsForOfStatement,
+    JsForStatement,
+    JsIfStatement,
+    JsLabeledStatement,
+    JsObjectPattern,
+    JsReturnStatement,
+    JsScript,
+    JsSwitchStatement,
+    JsThrowStatement,
+    JsTryStatement,
+    JsWhileStatement,
+    JsWithStatement,
+)
+
+__all__ = [
+    &#39;CfgNode&#39;,
+    &#39;ControlFlowGraph&#39;,
+    &#39;ControlFlowModel&#39;,
+    &#39;ElementLocator&#39;,
+    &#39;build_cfg&#39;,
+    &#39;build_control_flow&#39;,
+    &#39;build_control_flow_model&#39;,
+]
+
+_LOOP_NODES = (
+    JsWhileStatement,
+    JsDoWhileStatement,
+    JsForStatement,
+    JsForInStatement,
+    JsForOfStatement,
+)
+
+
+def _catch_may_rethrow(handler: JsCatchClause | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a throw offered to *handler* may still reach whatever guards the construct.
+
+    A `catch` carries no type filter, so the clause always matches and the throw stops there — with
+    one exception, which is why this is a question rather than a constant. Binding the caught value
+    is a destructuring assignment when the parameter is a pattern, and destructuring evaluates:
+    `catch ({ a })` over a thrown `null` throws again while binding, and that second throw leaves
+    the construct. A plain identifier binds by name and an omitted parameter binds nothing, so
+    neither can.
+    &#34;&#34;&#34;
+    if handler is None:
+        return False
+    return isinstance(handler.param, (JsObjectPattern, JsArrayPattern))
+
+
+def _label_name(statement: Node) -&gt; str | None:
+    label = getattr(statement, &#39;label&#39;, None)
+    return label.name if label is not None else None
+
+
+class _Builder(CfgBuilder):
+    &#34;&#34;&#34;
+    The JavaScript dispatch over `refinery.lib.scripts.analysis.cfg.CfgBuilder`.
+    &#34;&#34;&#34;
+
+    def body_blocks(self, owner: Node) -&gt; Sequence[Sequence[Node]]:
+        &#34;&#34;&#34;
+        The one block a JavaScript body is. A concise arrow function&#39;s body is an expression rather
+        than a block, and it is reported as the single statement it evaluates.
+        &#34;&#34;&#34;
+        if isinstance(owner, JsScript):
+            return [list(owner.body)]
+        body = getattr(owner, &#39;body&#39;, None)
+        if isinstance(body, JsBlockStatement):
+            return [list(body.body)]
+        if isinstance(body, Node):
+            return [[body]]
+        return []
+
+    def statement(self, statement: Node, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        if isinstance(statement, JsBlockStatement):
+            return self.sequence(statement.body, frontier)
+        if isinstance(statement, JsIfStatement):
+            arms: list[Node | None] = [statement.consequent]
+            if statement.alternate is not None:
+                arms.append(statement.alternate)
+            return self.branch_on(
+                statement, arms, frontier, exhaustive=statement.alternate is not None)
+        if isinstance(statement, JsWhileStatement):
+            return self.loop_head_tested(statement, statement.body, frontier)
+        if isinstance(statement, JsDoWhileStatement):
+            return self.loop_tail_tested(statement, statement.body, frontier)
+        if isinstance(statement, JsForStatement):
+            return self.loop_counted(
+                statement.init, statement.test, statement.update, statement.body, frontier)
+        if isinstance(statement, (JsForInStatement, JsForOfStatement)):
+            return self.loop_head_tested(statement, getattr(statement, &#39;body&#39;, None), frontier)
+        if isinstance(statement, JsSwitchStatement):
+            return self._switch(statement, frontier)
+        if isinstance(statement, JsTryStatement):
+            handler = statement.handler
+            finalizer = statement.finalizer
+            return self.guarded(
+                statement.block,
+                [(handler, handler.body)] if handler is not None else (),
+                finalizer,
+                list(finalizer.body) if finalizer is not None else (),
+                frontier,
+                escapes=_catch_may_rethrow(handler),
+            )
+        if isinstance(statement, JsLabeledStatement):
+            return self.labelled(
+                _label_name(statement),
+                statement.body,
+                frontier,
+                binds_to_body=isinstance(statement.body, (*_LOOP_NODES, JsSwitchStatement)),
+            )
+        if isinstance(statement, JsReturnStatement):
+            return self.terminate(statement, frontier, exceptional=False)
+        if isinstance(statement, JsThrowStatement):
+            return self.terminate(statement, frontier, exceptional=True)
+        if isinstance(statement, JsBreakStatement):
+            return self.jump_out(statement, _label_name(statement), frontier)
+        if isinstance(statement, JsContinueStatement):
+            return self.jump_back(statement, _label_name(statement), frontier)
+        if isinstance(statement, JsWithStatement):
+            node = self.node(statement)
+            self.link(frontier, node)
+            return self.statement(statement.body, [node]) if statement.body else [node]
+        return self.opaque(statement, frontier)
+
+    def _switch(self, statement: JsSwitchStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        arms: list[Sequence[Node]] = [list(case.body) for case in statement.cases]
+        exhaustive = any(case.test is None for case in statement.cases)
+        return self.dispatch(
+            statement, arms, frontier, arm_flow=ArmFlow.SEQUENTIAL, exhaustive=exhaustive)
+
+
+def build_cfg(owner: Node) -&gt; ControlFlowGraph:
+    &#34;&#34;&#34;
+    Build the control-flow graph of *owner*, a `refinery.lib.scripts.js.model.JsScript` or a
+    function node, over its own body without descending into nested function bodies.
+    &#34;&#34;&#34;
+    return _Builder(owner).build()
+
+
+def build_control_flow(root: JsScript) -&gt; dict[int, ControlFlowGraph]:
+    &#34;&#34;&#34;
+    Build one control-flow graph per function and for the script itself, keyed by the owner node&#39;s
+    identity.
+    &#34;&#34;&#34;
+    return _build_control_flow(root, _Builder, FUNCTION_NODES)
+
+
+def build_control_flow_model(root: JsScript) -&gt; ControlFlowModel:
+    &#34;&#34;&#34;
+    Build the `refinery.lib.scripts.analysis.cfg.ControlFlowModel` for a script root — the shared
+    control-flow layer the `DominanceModel` and `LivenessModel` consume.
+    &#34;&#34;&#34;
+    return ControlFlowModel(build_control_flow(root))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.build_cfg"><code class="name flex">
+<span>def <span class="ident">build_cfg</span></span>(<span>owner)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the control-flow graph of <em>owner</em>, a <code><a title="refinery.lib.scripts.js.model.JsScript" href="../model.html#refinery.lib.scripts.js.model.JsScript">JsScript</a></code> or a
+function node, over its own body without descending into nested function bodies.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cfg.py#L168-L173" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_cfg(owner: Node) -&gt; ControlFlowGraph:
+    &#34;&#34;&#34;
+    Build the control-flow graph of *owner*, a `refinery.lib.scripts.js.model.JsScript` or a
+    function node, over its own body without descending into nested function bodies.
+    &#34;&#34;&#34;
+    return _Builder(owner).build()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.build_control_flow"><code class="name flex">
+<span>def <span class="ident">build_control_flow</span></span>(<span>root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build one control-flow graph per function and for the script itself, keyed by the owner node's
+identity.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cfg.py#L176-L181" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_control_flow(root: JsScript) -&gt; dict[int, ControlFlowGraph]:
+    &#34;&#34;&#34;
+    Build one control-flow graph per function and for the script itself, keyed by the owner node&#39;s
+    identity.
+    &#34;&#34;&#34;
+    return _build_control_flow(root, _Builder, FUNCTION_NODES)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.build_control_flow_model"><code class="name flex">
+<span>def <span class="ident">build_control_flow_model</span></span>(<span>root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code> for a script root — the shared
+control-flow layer the <code>DominanceModel</code> and <code>LivenessModel</code> consume.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/cfg.py#L184-L189" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_control_flow_model(root: JsScript) -&gt; ControlFlowModel:
+    &#34;&#34;&#34;
+    Build the `refinery.lib.scripts.analysis.cfg.ControlFlowModel` for a script root — the shared
+    control-flow layer the `DominanceModel` and `LivenessModel` consume.
+    &#34;&#34;&#34;
+    return ControlFlowModel(build_control_flow(root))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode"><code class="flex name class">
+<span>class <span class="ident">CfgNode</span></span>
+<span>(</span><span>graph, element, successors=&lt;factory&gt;, predecessors=&lt;factory&gt;, is_resumption_hub=False, is_hub_bound=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>One vertex of a control-flow graph. <code>element</code> is the AST node it stands for — a statement, or a
+loop-head expression whose reads and writes occur at this point — or <code>None</code> for the synthetic
+entry and exit. <code>successors</code> lists the nodes control may pass to next. <code>graph</code> is the body this
+vertex belongs to, which is what makes the questions below answerable of a node alone.</p>
+<p><code>is_resumption_hub</code> marks the synthetic fan-out standing for the over-approximate half of a
+resuming handler — see <code>CfgEdge</code>. A walk that wants only the paths going forward declines to
+enter one, and declines to leave one, which makes it a <em>projection</em> of the graph rather than a
+filter on its edges. It is a fact about the node and not about the edges into it, because an
+edge kind is keyed by the pair of nodes it joins and <code>CfgBuilder.add_edge</code> builds a multigraph:
+two edges between the same pair collapse to one entry, so a plain edge drawn beside a hub edge
+would make the pair read as pure hub and a walk keyed on the kind would decline the plain path
+too. No pair of edges can disagree about what the node is.</p>
+<p><code>is_hub_bound</code> marks a node the precise, forward-only projection does not reach: it sits inside a
+handler body that resumes the block around it. That block's forward edges join each <em>guarded</em>
+statement to the one it resumes at; a statement of the handler itself is on neither end of one,
+and everything it may reach afterwards hangs off the hub. A forward edge it does carry belongs to
+a block further out — one whose own resuming set guards the statement this handler is written
+inside — and stands for that block's resumption, not this one, so it says nothing about where
+this handler carries on. A forward-only walk seeded here would stop dead where the real run
+carries on, which for a flood is the unsound direction; <code>reachable_forward_from_any</code> reads this
+and falls back to the hub for such a source.</p>
+<p>Both are fields rather than questions asked of <em>graph</em>, and that is a matter of what a walk can
+afford as much as of where the fact lives. Every layer that had to ask them of a graph it was
+separately handed could be handed the wrong one — a node lifted from a nested body reads as
+neither against the graph around it, and the walk that asked takes the wrong branch without
+anything failing — and one depth-first sweep over a large script asks tens of millions of times.
+<code>graph</code> remains because a caller naming which body it means is a contract worth checking, and
+because <code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.hub_bound" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.hub_bound">ControlFlowGraph.hub_bound</a></code> answers the same question for a caller holding ids.</p>
+<p><code>eq=False</code> because every map in every layer above is keyed by <code>id(node)</code>, and two structurally
+equal statements are two distinct points in the program.</p>
+<p><code>repr=False</code> because a generated repr expands <code>successors</code> and <code>predecessors</code>, and the guard
+against recursion only covers the node currently being formatted, so a graph re-expands at every
+join: a chain of five hundred nodes — a script of five hundred statements — exhausts the
+interpreter's stack, and a handful of branches produces megabytes. A debugger, a failing
+assertion, or <code>pytest --showlocals</code> would print one.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L175-L224" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(eq=False, repr=False)
+class CfgNode:
+    &#34;&#34;&#34;
+    One vertex of a control-flow graph. `element` is the AST node it stands for — a statement, or a
+    loop-head expression whose reads and writes occur at this point — or `None` for the synthetic
+    entry and exit. `successors` lists the nodes control may pass to next. `graph` is the body this
+    vertex belongs to, which is what makes the questions below answerable of a node alone.
+
+    `is_resumption_hub` marks the synthetic fan-out standing for the over-approximate half of a
+    resuming handler — see `CfgEdge`. A walk that wants only the paths going forward declines to
+    enter one, and declines to leave one, which makes it a *projection* of the graph rather than a
+    filter on its edges. It is a fact about the node and not about the edges into it, because an
+    edge kind is keyed by the pair of nodes it joins and `CfgBuilder.add_edge` builds a multigraph:
+    two edges between the same pair collapse to one entry, so a plain edge drawn beside a hub edge
+    would make the pair read as pure hub and a walk keyed on the kind would decline the plain path
+    too. No pair of edges can disagree about what the node is.
+
+    `is_hub_bound` marks a node the precise, forward-only projection does not reach: it sits inside a
+    handler body that resumes the block around it. That block&#39;s forward edges join each *guarded*
+    statement to the one it resumes at; a statement of the handler itself is on neither end of one,
+    and everything it may reach afterwards hangs off the hub. A forward edge it does carry belongs to
+    a block further out — one whose own resuming set guards the statement this handler is written
+    inside — and stands for that block&#39;s resumption, not this one, so it says nothing about where
+    this handler carries on. A forward-only walk seeded here would stop dead where the real run
+    carries on, which for a flood is the unsound direction; `reachable_forward_from_any` reads this
+    and falls back to the hub for such a source.
+
+    Both are fields rather than questions asked of *graph*, and that is a matter of what a walk can
+    afford as much as of where the fact lives. Every layer that had to ask them of a graph it was
+    separately handed could be handed the wrong one — a node lifted from a nested body reads as
+    neither against the graph around it, and the walk that asked takes the wrong branch without
+    anything failing — and one depth-first sweep over a large script asks tens of millions of times.
+    `graph` remains because a caller naming which body it means is a contract worth checking, and
+    because `ControlFlowGraph.hub_bound` answers the same question for a caller holding ids.
+
+    `eq=False` because every map in every layer above is keyed by `id(node)`, and two structurally
+    equal statements are two distinct points in the program.
+
+    `repr=False` because a generated repr expands `successors` and `predecessors`, and the guard
+    against recursion only covers the node currently being formatted, so a graph re-expands at every
+    join: a chain of five hundred nodes — a script of five hundred statements — exhausts the
+    interpreter&#39;s stack, and a handful of branches produces megabytes. A debugger, a failing
+    assertion, or `pytest --showlocals` would print one.
+    &#34;&#34;&#34;
+    graph: ControlFlowGraph
+    element: Node | None
+    successors: list[CfgNode] = field(default_factory=list)
+    predecessors: list[CfgNode] = field(default_factory=list)
+    is_resumption_hub: bool = False
+    is_hub_bound: bool = False</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode.graph"><code class="name">var <span class="ident">graph</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode.element"><code class="name">var <span class="ident">element</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode.successors"><code class="name">var <span class="ident">successors</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode.predecessors"><code class="name">var <span class="ident">predecessors</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode.is_resumption_hub"><code class="name">var <span class="ident">is_resumption_hub</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.CfgNode.is_hub_bound"><code class="name">var <span class="ident">is_hub_bound</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph"><code class="flex name class">
+<span>class <span class="ident">ControlFlowGraph</span></span>
+<span>(</span><span>owner)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow graph of one function or script body. <code>entry</code> and <code>exit</code> are synthetic; every
+other node wraps an AST element reachable through <code>node_of</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L314-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ControlFlowGraph:
+    &#34;&#34;&#34;
+    The control-flow graph of one function or script body. `entry` and `exit` are synthetic; every
+    other node wraps an AST element reachable through `node_of`.
+    &#34;&#34;&#34;
+
+    def __init__(self, owner: Node):
+        self.owner = owner
+        self._node_of: dict[int, CfgNode] = {}
+        self._edge_kinds: dict[tuple[int, int], CfgEdge] = {}
+        self._hub_bound: set[int] = set()
+        self._resuming = False
+        self._fallback: dict[int, CfgNode] = {}
+        self.entry = CfgNode(self, None)
+        self.exit = CfgNode(self, None)
+        self.nodes: list[CfgNode] = [self.entry, self.exit]
+
+    def node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The graph node standing for *element*, or `None` if *element* is not part of this body, or is
+        a node the graph does not represent on its own such as a plain expression inside a statement.
+        &#34;&#34;&#34;
+        return self._node_of.get(id(element))
+
+    def fallback_of(self, handler: CfgNode) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        Where a throw offered to *handler* goes if *handler* does not take it, or `None` when
+        *handler* is not a handler entry of this graph.
+
+        This is recorded rather than read off the edges because the two are not the same claim. The
+        edge is drawn only where some run may decline — a clause with a type filter, a `trap` set
+        that may fail to match — and a handler certain to take the throw has none, which is what
+        makes it shield whatever guards the construct. The fact holds either way, and it is what
+        answers the *counterfactual*: not where the throw goes, but where it would go if this
+        handler were not written at all, which is the question asked before one is deleted.
+        &#34;&#34;&#34;
+        return self._fallback.get(id(handler))
+
+    def edge_kind(self, source: CfgNode, target: CfgNode) -&gt; CfgEdge:
+        &#34;&#34;&#34;
+        What the edge from *source* to *target* says about the run that takes it — see `CfgEdge`.
+        An edge the builder recorded nothing for is `CfgEdge.NORMAL`, which is what an unrelated
+        pair of nodes reads as too.
+        &#34;&#34;&#34;
+        return self._edge_kinds.get((id(source), id(target)), CfgEdge.NORMAL)
+
+    def is_exceptional(self, source: CfgNode, target: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the error travels along the edge from *source* to *target*: the edge into a handler
+        offered the throw, or outward from a set that declined it. This is the question `faults`
+        asks — where an error goes — and it is *narrower* than `raise_taken`, because a handler that
+        resumes swallows the error and carries on along an edge no error travels.
+        &#34;&#34;&#34;
+        return bool(self.edge_kind(source, target) &amp; CfgEdge.ERROR_CARRYING)
+
+    def raise_taken(self, source: CfgNode, target: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the edge from *source* to *target* is taken only when *source* throws rather than
+        completing normally. A definition *source* makes is not guaranteed to have happened along
+        such an edge, so a flow-sensitive analysis must not treat it as a kill there.
+
+        This is the question about *completion*, and it is the one nearly every consumer means. A
+        resumption edge answers it although no error travels along it: the statement that resumed
+        the block is precisely the one that did not finish.
+        &#34;&#34;&#34;
+        return bool(self.edge_kind(source, target) &amp; RAISE_TAKEN)
+
+    @property
+    def hub_bound(self) -&gt; Set[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes `CfgNode.is_hub_bound` is set on, for a caller holding node *ids*
+        rather than nodes. Written beside the field by `CfgBuilder.mark_hub_bound`, which is the one
+        place either is recorded. `refinery.lib.scripts.analysis.reaching.ReachabilityQuery` is one: its
+        candidate sets are ids because the layers above memoize them that way, and turning them back
+        into nodes to ask each one is what those caches exist to avoid.
+        &#34;&#34;&#34;
+        return self._hub_bound
+
+    @property
+    def carries_resumption(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether any handler of this body resumes the block it guards, which is the only shape over
+        which the two projections of `CfgEdge` differ. A body with none — every script that writes
+        no `trap`, and every one whose traps rethrow — draws no resumption edge and marks no node
+        hub-bound, so a forward walk over it answers exactly what `reachable_from_any` does and may
+        be answered by the cheaper one.
+        &#34;&#34;&#34;
+        return self._resuming</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.hub_bound"><code class="name">var <span class="ident">hub_bound</span></code></dt>
+<dd>
+<section class="desc"><p>The ids of the nodes <code><a title="refinery.lib.scripts.js.analysis.cfg.CfgNode.is_hub_bound" href="#refinery.lib.scripts.js.analysis.cfg.CfgNode.is_hub_bound">CfgNode.is_hub_bound</a></code> is set on, for a caller holding node <em>ids</em>
+rather than nodes. Written beside the field by <code>CfgBuilder.mark_hub_bound</code>, which is the one
+place either is recorded. <code><a title="refinery.lib.scripts.analysis.reaching.ReachabilityQuery" href="../../analysis/reaching.html#refinery.lib.scripts.analysis.reaching.ReachabilityQuery">ReachabilityQuery</a></code> is one: its
+candidate sets are ids because the layers above memoize them that way, and turning them back
+into nodes to ask each one is what those caches exist to avoid.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L381-L390" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def hub_bound(self) -&gt; Set[int]:
+    &#34;&#34;&#34;
+    The ids of the nodes `CfgNode.is_hub_bound` is set on, for a caller holding node *ids*
+    rather than nodes. Written beside the field by `CfgBuilder.mark_hub_bound`, which is the one
+    place either is recorded. `refinery.lib.scripts.analysis.reaching.ReachabilityQuery` is one: its
+    candidate sets are ids because the layers above memoize them that way, and turning them back
+    into nodes to ask each one is what those caches exist to avoid.
+    &#34;&#34;&#34;
+    return self._hub_bound</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.carries_resumption"><code class="name">var <span class="ident">carries_resumption</span></code></dt>
+<dd>
+<section class="desc"><p>Whether any handler of this body resumes the block it guards, which is the only shape over
+which the two projections of <code>CfgEdge</code> differ. A body with none — every script that writes
+no <code>trap</code>, and every one whose traps rethrow — draws no resumption edge and marks no node
+hub-bound, so a forward walk over it answers exactly what <code>reachable_from_any</code> does and may
+be answered by the cheaper one.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L392-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def carries_resumption(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether any handler of this body resumes the block it guards, which is the only shape over
+    which the two projections of `CfgEdge` differ. A body with none — every script that writes
+    no `trap`, and every one whose traps rethrow — draws no resumption edge and marks no node
+    hub-bound, so a forward walk over it answers exactly what `reachable_from_any` does and may
+    be answered by the cheaper one.
+    &#34;&#34;&#34;
+    return self._resuming</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.node_of"><code class="name flex">
+<span>def <span class="ident">node_of</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The graph node standing for <em>element</em>, or <code>None</code> if <em>element</em> is not part of this body, or is
+a node the graph does not represent on its own such as a plain expression inside a statement.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L331-L336" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def node_of(self, element: Node) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    The graph node standing for *element*, or `None` if *element* is not part of this body, or is
+    a node the graph does not represent on its own such as a plain expression inside a statement.
+    &#34;&#34;&#34;
+    return self._node_of.get(id(element))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.fallback_of"><code class="name flex">
+<span>def <span class="ident">fallback_of</span></span>(<span>self, handler)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Where a throw offered to <em>handler</em> goes if <em>handler</em> does not take it, or <code>None</code> when
+<em>handler</em> is not a handler entry of this graph.</p>
+<p>This is recorded rather than read off the edges because the two are not the same claim. The
+edge is drawn only where some run may decline — a clause with a type filter, a <code>trap</code> set
+that may fail to match — and a handler certain to take the throw has none, which is what
+makes it shield whatever guards the construct. The fact holds either way, and it is what
+answers the <em>counterfactual</em>: not where the throw goes, but where it would go if this
+handler were not written at all, which is the question asked before one is deleted.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L338-L350" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def fallback_of(self, handler: CfgNode) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    Where a throw offered to *handler* goes if *handler* does not take it, or `None` when
+    *handler* is not a handler entry of this graph.
+
+    This is recorded rather than read off the edges because the two are not the same claim. The
+    edge is drawn only where some run may decline — a clause with a type filter, a `trap` set
+    that may fail to match — and a handler certain to take the throw has none, which is what
+    makes it shield whatever guards the construct. The fact holds either way, and it is what
+    answers the *counterfactual*: not where the throw goes, but where it would go if this
+    handler were not written at all, which is the question asked before one is deleted.
+    &#34;&#34;&#34;
+    return self._fallback.get(id(handler))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.edge_kind"><code class="name flex">
+<span>def <span class="ident">edge_kind</span></span>(<span>self, source, target)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What the edge from <em>source</em> to <em>target</em> says about the run that takes it — see <code>CfgEdge</code>.
+An edge the builder recorded nothing for is <code>CfgEdge.NORMAL</code>, which is what an unrelated
+pair of nodes reads as too.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L352-L358" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def edge_kind(self, source: CfgNode, target: CfgNode) -&gt; CfgEdge:
+    &#34;&#34;&#34;
+    What the edge from *source* to *target* says about the run that takes it — see `CfgEdge`.
+    An edge the builder recorded nothing for is `CfgEdge.NORMAL`, which is what an unrelated
+    pair of nodes reads as too.
+    &#34;&#34;&#34;
+    return self._edge_kinds.get((id(source), id(target)), CfgEdge.NORMAL)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.is_exceptional"><code class="name flex">
+<span>def <span class="ident">is_exceptional</span></span>(<span>self, source, target)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the error travels along the edge from <em>source</em> to <em>target</em>: the edge into a handler
+offered the throw, or outward from a set that declined it. This is the question <code>faults</code>
+asks — where an error goes — and it is <em>narrower</em> than <code>raise_taken</code>, because a handler that
+resumes swallows the error and carries on along an edge no error travels.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L360-L367" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_exceptional(self, source: CfgNode, target: CfgNode) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the error travels along the edge from *source* to *target*: the edge into a handler
+    offered the throw, or outward from a set that declined it. This is the question `faults`
+    asks — where an error goes — and it is *narrower* than `raise_taken`, because a handler that
+    resumes swallows the error and carries on along an edge no error travels.
+    &#34;&#34;&#34;
+    return bool(self.edge_kind(source, target) &amp; CfgEdge.ERROR_CARRYING)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.raise_taken"><code class="name flex">
+<span>def <span class="ident">raise_taken</span></span>(<span>self, source, target)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the edge from <em>source</em> to <em>target</em> is taken only when <em>source</em> throws rather than
+completing normally. A definition <em>source</em> makes is not guaranteed to have happened along
+such an edge, so a flow-sensitive analysis must not treat it as a kill there.</p>
+<p>This is the question about <em>completion</em>, and it is the one nearly every consumer means. A
+resumption edge answers it although no error travels along it: the statement that resumed
+the block is precisely the one that did not finish.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L369-L379" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def raise_taken(self, source: CfgNode, target: CfgNode) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the edge from *source* to *target* is taken only when *source* throws rather than
+    completing normally. A definition *source* makes is not guaranteed to have happened along
+    such an edge, so a flow-sensitive analysis must not treat it as a kill there.
+
+    This is the question about *completion*, and it is the one nearly every consumer means. A
+    resumption edge answers it although no error travels along it: the statement that resumed
+    the block is precisely the one that did not finish.
+    &#34;&#34;&#34;
+    return bool(self.edge_kind(source, target) &amp; RAISE_TAKEN)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel"><code class="flex name class">
+<span>class <span class="ident">ControlFlowModel</span></span>
+<span>(</span><span>graphs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The per-body control-flow graphs of one script, paired with the <code><a title="refinery.lib.scripts.js.analysis.cfg.ElementLocator" href="#refinery.lib.scripts.js.analysis.cfg.ElementLocator">ElementLocator</a></code> that maps any
+AST node to the graph node evaluating it. Built once over the script root — the graphs are purely
+syntactic and need no semantic model — and shared by every solver layered on it, which would
+otherwise each rebuild the whole set.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L1233-L1264" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ControlFlowModel:
+    &#34;&#34;&#34;
+    The per-body control-flow graphs of one script, paired with the `ElementLocator` that maps any
+    AST node to the graph node evaluating it. Built once over the script root — the graphs are purely
+    syntactic and need no semantic model — and shared by every solver layered on it, which would
+    otherwise each rebuild the whole set.
+    &#34;&#34;&#34;
+
+    def __init__(self, graphs: dict[int, ControlFlowGraph]):
+        self.graphs = graphs
+        self._locator = ElementLocator(graphs)
+
+    def graph_of(self, owner: Node) -&gt; ControlFlowGraph | None:
+        &#34;&#34;&#34;
+        The control-flow graph owned by *owner* — a function node or the script root — or `None` when
+        it owns none.
+        &#34;&#34;&#34;
+        return self.graphs.get(id(owner))
+
+    def node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The control-flow node standing for *element*, or `None` when the graphs do not represent it
+        directly. Delegates to the shared `ElementLocator`.
+        &#34;&#34;&#34;
+        return self._locator.node_of(element)
+
+    def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+        &#34;&#34;&#34;
+        The graph and node that evaluate *element*, climbing out of any enclosing expression, or
+        `None` when it has no enclosing graph node. Delegates to the shared `ElementLocator`.
+        &#34;&#34;&#34;
+        return self._locator.locate(element)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.graph_of"><code class="name flex">
+<span>def <span class="ident">graph_of</span></span>(<span>self, owner)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow graph owned by <em>owner</em> — a function node or the script root — or <code>None</code> when
+it owns none.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L1245-L1250" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def graph_of(self, owner: Node) -&gt; ControlFlowGraph | None:
+    &#34;&#34;&#34;
+    The control-flow graph owned by *owner* — a function node or the script root — or `None` when
+    it owns none.
+    &#34;&#34;&#34;
+    return self.graphs.get(id(owner))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.node_of"><code class="name flex">
+<span>def <span class="ident">node_of</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow node standing for <em>element</em>, or <code>None</code> when the graphs do not represent it
+directly. Delegates to the shared <code><a title="refinery.lib.scripts.js.analysis.cfg.ElementLocator" href="#refinery.lib.scripts.js.analysis.cfg.ElementLocator">ElementLocator</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L1252-L1257" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def node_of(self, element: Node) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    The control-flow node standing for *element*, or `None` when the graphs do not represent it
+    directly. Delegates to the shared `ElementLocator`.
+    &#34;&#34;&#34;
+    return self._locator.node_of(element)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.locate"><code class="name flex">
+<span>def <span class="ident">locate</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The graph and node that evaluate <em>element</em>, climbing out of any enclosing expression, or
+<code>None</code> when it has no enclosing graph node. Delegates to the shared <code><a title="refinery.lib.scripts.js.analysis.cfg.ElementLocator" href="#refinery.lib.scripts.js.analysis.cfg.ElementLocator">ElementLocator</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L1259-L1264" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+    &#34;&#34;&#34;
+    The graph and node that evaluate *element*, climbing out of any enclosing expression, or
+    `None` when it has no enclosing graph node. Delegates to the shared `ElementLocator`.
+    &#34;&#34;&#34;
+    return self._locator.locate(element)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ElementLocator"><code class="flex name class">
+<span>class <span class="ident">ElementLocator</span></span>
+<span>(</span><span>graphs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Locates an AST node among the per-body control-flow graphs of one script. Built once from the
+graph set, it maps an element to the graph and node that evaluate it — directly for an element a
+graph node stands for (<code>node_of</code>), or by climbing to the enclosing statement for one nested
+inside an expression (<code>locate</code>). Every flow-sensitive layer built on the graphs shares it, so the
+AST-to-graph mapping and its parent-climb live in one place.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L443-L494" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ElementLocator:
+    &#34;&#34;&#34;
+    Locates an AST node among the per-body control-flow graphs of one script. Built once from the
+    graph set, it maps an element to the graph and node that evaluate it — directly for an element a
+    graph node stands for (`node_of`), or by climbing to the enclosing statement for one nested
+    inside an expression (`locate`). Every flow-sensitive layer built on the graphs shares it, so the
+    AST-to-graph mapping and its parent-climb live in one place.
+    &#34;&#34;&#34;
+
+    def __init__(self, graphs: dict[int, ControlFlowGraph]):
+        self._element_graph: dict[int, ControlFlowGraph] = {}
+        self._owners = {id(graph.owner) for graph in graphs.values()}
+        for graph in graphs.values():
+            for node in graph.nodes:
+                if node.element is not None:
+                    self._element_graph[id(node.element)] = graph
+
+    def node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The control-flow node standing for *element* in whichever graph owns it, or `None` when
+        *element* is not itself a node the graphs represent.
+        &#34;&#34;&#34;
+        graph = self._element_graph.get(id(element))
+        return graph.node_of(element) if graph is not None else None
+
+    def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+        &#34;&#34;&#34;
+        The graph and node that evaluate *element*, climbing out of any expression it is nested in to
+        the enclosing statement or loop head, or `None` when it has no enclosing graph node.
+
+        The climb stops at the body *element* is written in rather than continuing into the body
+        around it. Something inside a body that no node of that body&#39;s graph stands for — the default
+        of a parameter, an attribute on the body itself — is evaluated when that body is invoked, and
+        the enclosing body&#39;s statement that mentions it is not that point. Answering with that
+        statement orders the element against code the invocation may never run beside, which is the
+        false claim the per-body split exists to avoid; `None` says the graphs do not place it, and a
+        caller reads that as unknown.
+
+        The body *element* is itself is not its own boundary: a block is a value written at a point
+        in the body around it, so locating one climbs out to the statement that mentions it.
+        &#34;&#34;&#34;
+        cursor: Node | None = element
+        while cursor is not None:
+            graph = self._element_graph.get(id(cursor))
+            if graph is not None:
+                node = graph.node_of(cursor)
+                if node is not None:
+                    return graph, node
+            if cursor is not element and id(cursor) in self._owners:
+                return None
+            cursor = cursor.parent
+        return None</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ElementLocator.node_of"><code class="name flex">
+<span>def <span class="ident">node_of</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow node standing for <em>element</em> in whichever graph owns it, or <code>None</code> when
+<em>element</em> is not itself a node the graphs represent.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L460-L466" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def node_of(self, element: Node) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    The control-flow node standing for *element* in whichever graph owns it, or `None` when
+    *element* is not itself a node the graphs represent.
+    &#34;&#34;&#34;
+    graph = self._element_graph.get(id(element))
+    return graph.node_of(element) if graph is not None else None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.cfg.ElementLocator.locate"><code class="name flex">
+<span>def <span class="ident">locate</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The graph and node that evaluate <em>element</em>, climbing out of any expression it is nested in to
+the enclosing statement or loop head, or <code>None</code> when it has no enclosing graph node.</p>
+<p>The climb stops at the body <em>element</em> is written in rather than continuing into the body
+around it. Something inside a body that no node of that body's graph stands for — the default
+of a parameter, an attribute on the body itself — is evaluated when that body is invoked, and
+the enclosing body's statement that mentions it is not that point. Answering with that
+statement orders the element against code the invocation may never run beside, which is the
+false claim the per-body split exists to avoid; <code>None</code> says the graphs do not place it, and a
+caller reads that as unknown.</p>
+<p>The body <em>element</em> is itself is not its own boundary: a block is a value written at a point
+in the body around it, so locating one climbs out to the statement that mentions it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/cfg.py#L468-L494" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+    &#34;&#34;&#34;
+    The graph and node that evaluate *element*, climbing out of any expression it is nested in to
+    the enclosing statement or loop head, or `None` when it has no enclosing graph node.
+
+    The climb stops at the body *element* is written in rather than continuing into the body
+    around it. Something inside a body that no node of that body&#39;s graph stands for — the default
+    of a parameter, an attribute on the body itself — is evaluated when that body is invoked, and
+    the enclosing body&#39;s statement that mentions it is not that point. Answering with that
+    statement orders the element against code the invocation may never run beside, which is the
+    false claim the per-body split exists to avoid; `None` says the graphs do not place it, and a
+    caller reads that as unknown.
+
+    The body *element* is itself is not its own boundary: a block is a value written at a point
+    in the body around it, so locating one climbs out to the statement that mentions it.
+    &#34;&#34;&#34;
+    cursor: Node | None = element
+    while cursor is not None:
+        graph = self._element_graph.get(id(cursor))
+        if graph is not None:
+            node = graph.node_of(cursor)
+            if node is not None:
+                return graph, node
+        if cursor is not element and id(cursor) in self._owners:
+            return None
+        cursor = cursor.parent
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.build_cfg" href="#refinery.lib.scripts.js.analysis.cfg.build_cfg">build_cfg</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.build_control_flow" href="#refinery.lib.scripts.js.analysis.cfg.build_control_flow">build_control_flow</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.build_control_flow_model" href="#refinery.lib.scripts.js.analysis.cfg.build_control_flow_model">build_control_flow_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.cfg.CfgNode" href="#refinery.lib.scripts.js.analysis.cfg.CfgNode">CfgNode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph">ControlFlowGraph</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.node_of" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.node_of">node_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.fallback_of" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.fallback_of">fallback_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.edge_kind" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.edge_kind">edge_kind</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.is_exceptional" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.is_exceptional">is_exceptional</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.raise_taken" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowGraph.raise_taken">raise_taken</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.graph_of" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.graph_of">graph_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.node_of" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.node_of">node_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.locate" href="#refinery.lib.scripts.js.analysis.cfg.ControlFlowModel.locate">locate</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.cfg.ElementLocator" href="#refinery.lib.scripts.js.analysis.cfg.ElementLocator">ElementLocator</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ElementLocator.node_of" href="#refinery.lib.scripts.js.analysis.cfg.ElementLocator.node_of">node_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.cfg.ElementLocator.locate" href="#refinery.lib.scripts.js.analysis.cfg.ElementLocator.locate">locate</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

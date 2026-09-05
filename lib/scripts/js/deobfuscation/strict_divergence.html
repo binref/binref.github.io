@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.strict_divergence documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.strict_divergence</code></h1>
+</header>
+<section id="section-intro">
+<p>Runtime strict-vs-sloppy divergence detection for reflection inlining. The reflection transform inlines
+payloads from always-sloppy surfaces (<code>Function</code>, indirect <code>eval</code>, string timers) into their call site.
+When that site runs in strict mode, splicing sloppy-only code there can change behavior, so the inlining
+must be declined. Strict <em>parse</em> errors are decided by <code>collect_strict_violations</code>; this module decides the
+complementary question — whether a payload that parses in both modes would <em>run</em> differently under strict
+mode — and composes both into a single predicate, <code><a title="refinery.lib.scripts.js.deobfuscation.strict_divergence.diverges_under_strict" href="#refinery.lib.scripts.js.deobfuscation.strict_divergence.diverges_under_strict">diverges_under_strict()</a></code>.</p>
+<p>Soundness is the whole point: the precise gate this feeds inlines a strict subset of what a blunt
+strict-context refusal declines, so a false negative here is an unsound inline. Every rule therefore either
+decides a divergence class completely or conservatively reports divergence when it cannot. The rules cover
+the complete runtime divergence taxonomy for code that parses in both modes:</p>
+<ul>
+<li>R0 a nested direct <code>eval</code>, whose bindings leak into the caller scope under sloppy but stay eval-local
+under strict; it also defeats the static scope resolution the other rules rely on.</li>
+<li>R1 any strict parse error (<code>collect_strict_violations</code>) — the ultimate divergence, a <code>SyntaxError</code>.</li>
+<li>R2 a <code>this</code> reference, whose bare-call receiver is the global object under sloppy and <code>undefined</code> under
+strict. The reflection caller has already rewritten the payload's own receiver <code>this</code> to <code>globalThis</code>, so
+every surviving <code>this</code> is inside a nested function whose receiver genuinely diverges.</li>
+<li>R3 a write to a name that resolves to no local binding — a sloppy implicit-global creation that throws a
+<code>ReferenceError</code> under strict, including a write to a read-only global (<code>undefined</code>, <code>NaN</code>, <code>Infinity</code>).</li>
+<li>R4 a member write or <code>delete</code> whose base is not a provably fresh, fully writable container, which may
+target a non-writable or non-configurable property and throw a <code>TypeError</code> under strict.</li>
+<li>R5 a block-level function declaration, which sloppy hoists into the enclosing function scope but strict
+scopes to the block.</li>
+<li>R6 a function with a mapped <code>arguments</code> object (a simple parameter list), whose element aliases a
+parameter under sloppy but not under strict.</li>
+<li>R7 a <code>caller</code>/<code>callee</code>/<code>arguments</code> poison-pill member read, which throws a <code>TypeError</code> under strict.</li>
+</ul>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/strict_divergence.py#L1-L202" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Runtime strict-vs-sloppy divergence detection for reflection inlining. The reflection transform inlines
+payloads from always-sloppy surfaces (`Function`, indirect `eval`, string timers) into their call site.
+When that site runs in strict mode, splicing sloppy-only code there can change behavior, so the inlining
+must be declined. Strict *parse* errors are decided by `collect_strict_violations`; this module decides the
+complementary question — whether a payload that parses in both modes would *run* differently under strict
+mode — and composes both into a single predicate, `diverges_under_strict`.
+
+Soundness is the whole point: the precise gate this feeds inlines a strict subset of what a blunt
+strict-context refusal declines, so a false negative here is an unsound inline. Every rule therefore either
+decides a divergence class completely or conservatively reports divergence when it cannot. The rules cover
+the complete runtime divergence taxonomy for code that parses in both modes:
+
+- R0 a nested direct `eval`, whose bindings leak into the caller scope under sloppy but stay eval-local
+  under strict; it also defeats the static scope resolution the other rules rely on.
+- R1 any strict parse error (`collect_strict_violations`) — the ultimate divergence, a `SyntaxError`.
+- R2 a `this` reference, whose bare-call receiver is the global object under sloppy and `undefined` under
+  strict. The reflection caller has already rewritten the payload&#39;s own receiver `this` to `globalThis`, so
+  every surviving `this` is inside a nested function whose receiver genuinely diverges.
+- R3 a write to a name that resolves to no local binding — a sloppy implicit-global creation that throws a
+  `ReferenceError` under strict, including a write to a read-only global (`undefined`, `NaN`, `Infinity`).
+- R4 a member write or `delete` whose base is not a provably fresh, fully writable container, which may
+  target a non-writable or non-configurable property and throw a `TypeError` under strict.
+- R5 a block-level function declaration, which sloppy hoists into the enclosing function scope but strict
+  scopes to the block.
+- R6 a function with a mapped `arguments` object (a simple parameter list), whose element aliases a
+  parameter under sloppy but not under strict.
+- R7 a `caller`/`callee`/`arguments` poison-pill member read, which throws a `TypeError` under strict.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.js.analysis.effects import container_literal_access_is_plain
+from refinery.lib.scripts.js.analysis.model import (
+    FUNCTION_NODES,
+    BindingKind,
+    Role,
+    SemanticModel,
+    has_mapped_arguments,
+    is_direct_eval_call,
+    is_member_write_target,
+    reference_role,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrowFunctionExpression,
+    JsBlockStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsMemberExpression,
+    JsScript,
+    JsStringLiteral,
+    JsSwitchCase,
+    JsThisExpression,
+    strip_parens,
+)
+from refinery.lib.scripts.js.strict import collect_strict_violations
+
+_POISON_PILL_PROPERTIES = frozenset({&#39;caller&#39;, &#39;callee&#39;, &#39;arguments&#39;})
+
+
+def diverges_under_strict(parsed: JsScript, model: SemanticModel) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the reflected body *parsed* — global sloppy code — would behave differently if it ran in strict
+    mode, so that inlining it into a strict context would change meaning. *model* is a `SemanticModel` built
+    over *parsed*. Reports divergence conservatively: any construct not provably mode-invariant declines. The
+    reflection caller must have already rewritten the payload&#39;s own receiver `this` to `globalThis` (R2 sees
+    only nested-function `this`).
+    &#34;&#34;&#34;
+    return (
+        bool(collect_strict_violations(parsed, strict=True))
+        or _has_direct_eval(parsed)
+        or _references_this(parsed)
+        or _writes_free_name(parsed, model)
+        or _writes_unsafe_member(parsed)
+        or _has_block_function(parsed)
+        or _has_mapped_arguments(parsed)
+        or _reads_poison_pill(parsed)
+    )
+
+
+def _has_direct_eval(parsed: JsScript) -&gt; bool:
+    &#34;&#34;&#34;
+    R0 — whether the body contains a direct `eval` call. Its declarations leak into the caller scope under
+    sloppy but stay eval-local under strict, and it can inject or shadow bindings that defeat the static
+    scope resolution the write and reference rules depend on.
+    &#34;&#34;&#34;
+    return any(is_direct_eval_call(node) for node in parsed.walk())
+
+
+def _references_this(parsed: JsScript) -&gt; bool:
+    &#34;&#34;&#34;
+    R2 — whether the body still references `this`. The payload&#39;s own receiver `this` has been rewritten to
+    `globalThis` by the caller, so a surviving `this` is inside a nested regular or generator function whose
+    bare-call receiver is the global object under sloppy and `undefined` under strict.
+    &#34;&#34;&#34;
+    return any(isinstance(node, JsThisExpression) for node in parsed.walk())
+
+
+def _writes_free_name(parsed: JsScript, model: SemanticModel) -&gt; bool:
+    &#34;&#34;&#34;
+    R3 — whether the body assigns to a name that binds to no local declaration. Under sloppy such a write
+    creates a global; under strict it throws a `ReferenceError` (or a `TypeError` for a read-only global
+    such as `undefined`). A bare read of a free name throws in both modes and does not diverge, so only
+    write and read-write references count.
+    &#34;&#34;&#34;
+    for node in parsed.walk():
+        if not isinstance(node, JsIdentifier) or not model.is_reference(node):
+            continue
+        if reference_role(node) is Role.READ:
+            continue
+        binding = model.resolve(node)
+        if binding is None or binding.kind is BindingKind.IMPLICIT_GLOBAL:
+            return True
+    return False
+
+
+def _writes_unsafe_member(parsed: JsScript) -&gt; bool:
+    &#34;&#34;&#34;
+    R4 — whether the body writes or deletes a member whose base is not a provably fresh, fully writable
+    container. A write to a non-writable data property, an accessor without a setter, a property of a
+    primitive, or a frozen object is a silent no-op under sloppy but a `TypeError` under strict; only a
+    fresh array or plain object literal is guaranteed writable.
+    &#34;&#34;&#34;
+    for node in parsed.walk():
+        if isinstance(node, JsMemberExpression) and is_member_write_target(node):
+            if not _fresh_writable_base(node.object):
+                return True
+    return False
+
+
+def _fresh_writable_base(base: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *base* is an object or array literal whose members are all writable data slots — an array
+    literal, or an object literal that declares no accessor and installs no custom prototype (either could
+    route a member write through a setter or an inherited non-writable). Every other base — an identifier,
+    a member, a call, `this`, or a primitive literal — may target a non-writable property and is not
+    provably safe.
+
+    This is `container_literal_access_is_plain` minus the function literal, and the exclusion is the whole
+    reason this stays a separate predicate: a function&#39;s `name` and `length` are non-writable, so a write
+    through one is a silent no-op under sloppy and a `TypeError` under strict — exactly the divergence R4
+    detects — while a *read* of them runs no accessor, which is all the shared atom claims.
+    &#34;&#34;&#34;
+    inner = strip_parens(base)
+    if isinstance(inner, (JsFunctionExpression, JsArrowFunctionExpression)):
+        return False
+    return container_literal_access_is_plain(inner)
+
+
+def _has_block_function(parsed: JsScript) -&gt; bool:
+    &#34;&#34;&#34;
+    R5 — whether the body contains a block-level function declaration, one whose owning statement list is a
+    block or a switch case rather than a function body or the script top level. Sloppy Annex-B semantics
+    hoist such a name into the enclosing function scope; strict scopes it to the block.
+    &#34;&#34;&#34;
+    for node in parsed.walk():
+        if not isinstance(node, JsFunctionDeclaration):
+            continue
+        parent = node.parent
+        if isinstance(parent, JsSwitchCase):
+            return True
+        if isinstance(parent, JsBlockStatement) and not isinstance(parent.parent, FUNCTION_NODES):
+            return True
+    return False
+
+
+def _has_mapped_arguments(parsed: JsScript) -&gt; bool:
+    &#34;&#34;&#34;
+    R6 — whether the body contains a function with a mapped `arguments` object that it references. A regular
+    or generator function with a simple parameter list (all plain identifiers) gets an `arguments` object
+    whose elements alias the parameters under sloppy but are an independent copy under strict; a default,
+    rest, or destructuring parameter already unmaps it, so those do not diverge.
+
+    Every function is asked as though it were sloppy. That is what the rule needs: a body already strict
+    diverges nowhere, so seeding the whole payload sloppy can only decline more, and this predicate exists
+    to decline.
+    &#34;&#34;&#34;
+    return any(has_mapped_arguments(node, strict=False) for node in parsed.walk())
+
+
+def _reads_poison_pill(parsed: JsScript) -&gt; bool:
+    &#34;&#34;&#34;
+    R7 — whether the body reads a `caller`, `callee`, or `arguments` member, a poison-pill accessor that
+    throws a `TypeError` under strict. A statically named property (`f.caller`, `f[&#39;caller&#39;]`) is inspected;
+    a fully dynamic computed key is a documented residual left to the surrounding checks.
+    &#34;&#34;&#34;
+    for node in parsed.walk():
+        if isinstance(node, JsMemberExpression) and _member_name(node) in _POISON_PILL_PROPERTIES:
+            return True
+    return False
+
+
+def _member_name(member: JsMemberExpression) -&gt; str | None:
+    &#34;&#34;&#34;
+    The statically known property name *member* designates — the identifier of a dot access or the value of
+    a string-literal computed access — or `None` for a non-literal computed key.
+    &#34;&#34;&#34;
+    prop = member.property
+    if member.computed:
+        return prop.value if isinstance(prop, JsStringLiteral) else None
+    return prop.name if isinstance(prop, JsIdentifier) else None</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.strict_divergence.diverges_under_strict"><code class="name flex">
+<span>def <span class="ident">diverges_under_strict</span></span>(<span>parsed, model)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the reflected body <em>parsed</em> — global sloppy code — would behave differently if it ran in strict
+mode, so that inlining it into a strict context would change meaning. <em>model</em> is a <code>SemanticModel</code> built
+over <em>parsed</em>. Reports divergence conservatively: any construct not provably mode-invariant declines. The
+reflection caller must have already rewritten the payload's own receiver <code>this</code> to <code>globalThis</code> (R2 sees
+only nested-function <code>this</code>).</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/strict_divergence.py#L62-L79" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def diverges_under_strict(parsed: JsScript, model: SemanticModel) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the reflected body *parsed* — global sloppy code — would behave differently if it ran in strict
+    mode, so that inlining it into a strict context would change meaning. *model* is a `SemanticModel` built
+    over *parsed*. Reports divergence conservatively: any construct not provably mode-invariant declines. The
+    reflection caller must have already rewritten the payload&#39;s own receiver `this` to `globalThis` (R2 sees
+    only nested-function `this`).
+    &#34;&#34;&#34;
+    return (
+        bool(collect_strict_violations(parsed, strict=True))
+        or _has_direct_eval(parsed)
+        or _references_this(parsed)
+        or _writes_free_name(parsed, model)
+        or _writes_unsafe_member(parsed)
+        or _has_block_function(parsed)
+        or _has_mapped_arguments(parsed)
+        or _reads_poison_pill(parsed)
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.strict_divergence.diverges_under_strict" href="#refinery.lib.scripts.js.deobfuscation.strict_divergence.diverges_under_strict">diverges_under_strict</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

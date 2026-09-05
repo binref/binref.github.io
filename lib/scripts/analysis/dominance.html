@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.analysis.dominance documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.analysis.dominance</code></h1>
+</header>
+<section id="section-intro">
+<p>Dominance over the per-body control-flow graphs of one script, in the graph-theoretic sense only.</p>
+<p>One node <em>dominates</em> another when every path from the body's entry to the second passes through the
+first, so the first is guaranteed to have executed by the time the second runs. That is a statement
+about a graph and nothing else, which is why the whole of it lives here: a language contributes the
+graph, and the relation over it is the same relation for every language.</p>
+<p>The queries are keyed to AST nodes rather than to graph nodes, because that is what every caller
+holds. An element the graph does not represent on its own — an expression inside a statement —
+resolves to the node of the statement that evaluates it, which is the granularity the graph reasons
+at. Two elements in different bodies' graphs are not ordered here at all: whether one body runs
+before another is a question about calls, and a language answers it with the layer it builds on this
+one.</p>
+<p>Exceptional edges take part in the computation like any other edge. A definition is therefore
+reported as dominating a use only when it runs first on <em>every</em> path, including the ones that leave a
+guarded block by throwing, which is the conservative direction and the one a caller may rely on.</p>
+<p><strong>A node no path from the entry reaches is dominated by nothing and dominates nothing</strong>, itself
+included. Dominance quantifies over the paths from the entry, and an unreachable node lies on none of
+them, so every answer about one is vacuous. Reporting it as dominating itself would let a region the
+program cannot enter order code that it can, and — worse — a <em>reachable</em> join one of whose
+predecessors is unreachable would inherit that predecessor's answer and lose the dominators it really
+has. Obfuscated scripts are full of the tail after a <code>return</code> or a <code>throw</code>, so this is the ordinary
+case rather than the exotic one.</p>
+<p><strong>Dominance orders, it does not certify.</strong> That a definition dominates a use says the statement
+holding it ran, not that the store it performs completed: a statement may throw part-way through, and
+<code><a title="refinery.lib.scripts.analysis.liveness" href="liveness.html">refinery.lib.scripts.analysis.liveness</a></code> states the same asymmetry as the reason its transfer function
+is not the textbook one. A caller reading dominance as evidence a value was established needs the
+extra refusal, which <code><a title="refinery.lib.scripts.analysis.reaching" href="reaching.html">refinery.lib.scripts.analysis.reaching</a></code> makes.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L1-L376" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Dominance over the per-body control-flow graphs of one script, in the graph-theoretic sense only.
+
+One node *dominates* another when every path from the body&#39;s entry to the second passes through the
+first, so the first is guaranteed to have executed by the time the second runs. That is a statement
+about a graph and nothing else, which is why the whole of it lives here: a language contributes the
+graph, and the relation over it is the same relation for every language.
+
+The queries are keyed to AST nodes rather than to graph nodes, because that is what every caller
+holds. An element the graph does not represent on its own — an expression inside a statement —
+resolves to the node of the statement that evaluates it, which is the granularity the graph reasons
+at. Two elements in different bodies&#39; graphs are not ordered here at all: whether one body runs
+before another is a question about calls, and a language answers it with the layer it builds on this
+one.
+
+Exceptional edges take part in the computation like any other edge. A definition is therefore
+reported as dominating a use only when it runs first on *every* path, including the ones that leave a
+guarded block by throwing, which is the conservative direction and the one a caller may rely on.
+
+**A node no path from the entry reaches is dominated by nothing and dominates nothing**, itself
+included. Dominance quantifies over the paths from the entry, and an unreachable node lies on none of
+them, so every answer about one is vacuous. Reporting it as dominating itself would let a region the
+program cannot enter order code that it can, and — worse — a *reachable* join one of whose
+predecessors is unreachable would inherit that predecessor&#39;s answer and lose the dominators it really
+has. Obfuscated scripts are full of the tail after a `return` or a `throw`, so this is the ordinary
+case rather than the exotic one.
+
+**Dominance orders, it does not certify.** That a definition dominates a use says the statement
+holding it ran, not that the store it performs completed: a statement may throw part-way through, and
+`refinery.lib.scripts.analysis.liveness` states the same asymmetry as the reason its transfer function
+is not the textbook one. A caller reading dominance as evidence a value was established needs the
+extra refusal, which `refinery.lib.scripts.analysis.reaching` makes.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import AbstractSet as Set, Iterator
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.cfg import (
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+    Projection,
+    flood,
+)
+
+
+def _reverse_postorder(graph: ControlFlowGraph, projection: Projection) -&gt; list[CfgNode]:
+    &#34;&#34;&#34;
+    The nodes of *graph* that its entry reaches under *projection*, ordered so that a node precedes
+    every successor a depth-first walk first arrived at through it. The entry comes first, and a node
+    the projection does not reach does not appear at all — which is what confines every later step to
+    the part of the graph the projection draws.
+
+    The walk is iterative rather than recursive. A body of five thousand statements is a walk five
+    thousand deep, and the interpreter&#39;s stack is not.
+    &#34;&#34;&#34;
+    order: list[CfgNode] = []
+    seen: set[int] = {id(graph.entry)}
+    stack: list[tuple[CfgNode, Iterator[CfgNode]]] = [
+        (graph.entry, iter(projection.successors(graph.entry)))
+    ]
+    while stack:
+        node, successors = stack[-1]
+        for successor in successors:
+            if id(successor) in seen:
+                continue
+            seen.add(id(successor))
+            stack.append((successor, iter(projection.successors(successor))))
+            break
+        else:
+            order.append(node)
+            stack.pop()
+    order.reverse()
+    return order
+
+
+def _immediate_dominators(
+    graph: ControlFlowGraph, order: list[CfgNode], projection: Projection,
+) -&gt; dict[int, int]:
+    &#34;&#34;&#34;
+    The immediate dominator of every node in *order*, keyed by node identity. The entry is seeded as
+    its own, which is the conventional answer and, more to the point here, what marks it as placed
+    for the predecessors that resolve against it.
+
+    Cooper, Harvey and Kennedy&#39;s iterative formulation: walk the nodes in reverse postorder and
+    replace each one&#39;s immediate dominator with the nearest common ancestor of the ones its
+    already-placed predecessors have, until a whole pass changes nothing. The ancestor is found by
+    walking two chains up in lockstep, always advancing whichever is further from the entry, which is
+    what the reverse-postorder rank measures.
+
+    A predecessor with no immediate dominator yet is skipped rather than intersected against, which
+    is how an unreachable predecessor stays out of the answer: it never gains one, so it is skipped
+    forever, and a reachable node keeps the dominators its reachable predecessors give it. *That is
+    also what would carry the projection on its own* — a node *order* leaves out never gains an
+    immediate dominator and is therefore skipped forever — but the adjacency is read through
+    *projection* here as well, so that this function and the ordering above cannot come to disagree
+    about which graph they are walking.
+
+    **The placed predecessors are folded deepest first, and that is what keeps the pass linear.**
+    Which order they are folded in cannot change the answer — the ancestor operation is commutative
+    and associative, and the loop runs to a fixpoint either way — but it decides how far `common`
+    climbs. A `catch` clause has one predecessor per statement of the body it guards, and those
+    predecessors are themselves a chain; folded shallowest first, the running answer sits at the top
+    of that chain and every further predecessor climbs the whole way down to it, which is a pass
+    quadratic in the size of the body. Folded deepest first, each predecessor is the immediate
+    dominator of the one before it and the climb is a single step. A body of eight hundred statements
+    is the difference between thirteen hundred thousand steps and thirteen thousand.
+
+    The ordering is taken once, before the fixpoint, and not per pass. Neither the adjacency nor
+    the rank changes while the loop runs; only which predecessors are placed does, and filtering
+    a sorted list leaves it sorted. Reading the adjacency inside the loop would also allocate a
+    fresh predecessor list per node per pass under `Projection.FORWARD`, which builds one.
+
+    **The fixpoint is what makes the answer independent of the shape of the graph.** One pass
+    suffices only where every cycle is entered at one point; on a cycle entered at two, a node placed
+    from the predecessors seen so far reports a dominator it does not have, which is the direction a
+    caller cannot defend against. Neither language here was seen to build such a graph and neither is
+    asked to promise it — this module takes whatever graph it is handed — and the fixpoint costs one
+    confirming pass on the graphs that never needed it.
+    &#34;&#34;&#34;
+    rank = {id(node): index for index, node in enumerate(order)}
+    idom: dict[int, int] = {id(graph.entry): id(graph.entry)}
+
+    def common(a: int, b: int) -&gt; int:
+        while a != b:
+            while rank[a] &gt; rank[b]:
+                a = idom[a]
+            while rank[b] &gt; rank[a]:
+                b = idom[b]
+        return a
+
+    ranked = [
+        (
+            id(node),
+            sorted(
+                (known for known in map(id, projection.predecessors(node)) if known in rank),
+                key=rank.__getitem__,
+                reverse=True,
+            ),
+        )
+        for node in order
+        if node is not graph.entry
+    ]
+    changed = True
+    while changed:
+        changed = False
+        for key, predecessors in ranked:
+            candidate: int | None = None
+            for known in predecessors:
+                if known not in idom:
+                    continue
+                candidate = known if candidate is None else common(known, candidate)
+            if candidate is not None and idom.get(key) != candidate:
+                idom[key] = candidate
+                changed = True
+    return idom
+
+
+def _dominance_intervals(
+    idom: dict[int, int], graph: ControlFlowGraph, order: list[CfgNode],
+) -&gt; tuple[dict[int, int], dict[int, int]]:
+    &#34;&#34;&#34;
+    Entry and exit stamps from a depth-first walk of the immediate-dominator tree, keyed by node
+    identity. A node&#39;s descendants in that tree are exactly the nodes it dominates, and a depth-first
+    walk visits a subtree contiguously, so *dominates* becomes the test that one stamp lies inside
+    another&#39;s half-open interval.
+
+    Iterative for the reason the postorder walk is: the tree of a straight-line body is a chain as
+    long as the body.
+    &#34;&#34;&#34;
+    root = id(graph.entry)
+    children: dict[int, list[int]] = {id(node): [] for node in order}
+    for node in order:
+        key = id(node)
+        if key != root:
+            children[idom[key]].append(key)
+    entered: dict[int, int] = {root: 0}
+    left: dict[int, int] = {}
+    clock = 1
+    stack: list[tuple[int, Iterator[int]]] = [(root, iter(children[root]))]
+    while stack:
+        key, remaining = stack[-1]
+        for child in remaining:
+            entered[child] = clock
+            clock += 1
+            stack.append((child, iter(children[child])))
+            break
+        else:
+            left[key] = clock
+            stack.pop()
+    return entered, left
+
+
+class DominanceTree:
+    &#34;&#34;&#34;
+    The dominator relation of one control-flow graph, held as the *immediate*-dominator tree with a
+    depth-first numbering over it.
+
+    A node&#39;s dominators are the path from it to the root of that tree, so the tree carries the whole
+    relation in space linear in the body where a set per node is quadratic in it: one straight-line
+    body of five thousand statements costs twelve million set entries as sets and five thousand
+    parent links as a tree. The numbering then answers `dominates` with two comparisons rather than a
+    set lookup, which matters because the callers above ask it hundreds of thousands of times per
+    script.
+
+    Only the nodes the entry reaches are in the tree. That is not an optimisation but the relation:
+    see the module docstring on why an unreachable node dominates nothing.
+    &#34;&#34;&#34;
+
+    def __init__(self, graph: ControlFlowGraph, projection: Projection):
+        order = _reverse_postorder(graph, projection)
+        self.idom = _immediate_dominators(graph, order, projection)
+        self._entered, self._left = _dominance_intervals(self.idom, graph, order)
+
+    @property
+    def reached(self) -&gt; Set[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes the entry reaches under the projection this tree was built with, which
+        is exactly the set the tree holds: a node the entry does not reach is not in it at all.
+
+        Read rather than flooded again. A caller asking which statements of a body can run is asking
+        the question the tree already had to answer to exist, and a flood per body per pass over a
+        script whose bodies share one graph is the same walk repeated.
+        &#34;&#34;&#34;
+        return self._entered.keys()
+
+    def dominates(self, a: CfgNode, b: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *a* dominates *b*. Reflexive for a reachable node; `False` whenever either node is
+        unreachable, the two being one unreachable node included.
+        &#34;&#34;&#34;
+        opened = self._entered.get(id(a))
+        if opened is None:
+            return False
+        reached = self._entered.get(id(b))
+        return reached is not None and opened &lt;= reached &lt; self._left[id(a)]
+
+
+class DominatorModel:
+    &#34;&#34;&#34;
+    Dominator relations for the per-body control-flow graphs of one script. A graph&#39;s dominance tree
+    is computed once, on the first ordering question asked about that graph, and kept for as long as
+    this model lives.
+
+    Computing them all on construction instead would charge every caller for the whole script when
+    most callers ask about one body, and the model is rebuilt from scratch whenever the tree version
+    advances. This is the same laziness `refinery.lib.scripts.analysis.cycles.CycleModel` has, for the
+    same reason.
+    &#34;&#34;&#34;
+
+    def __init__(self, flow: ControlFlowModel):
+        self._flow = flow
+        self._trees: dict[tuple[int, Projection], DominanceTree] = {}
+
+    def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+        &#34;&#34;&#34;
+        The control-flow graph and node that evaluate *element*, climbing out of any expression it is
+        nested in, or `None` when it has no enclosing graph node. The graph identifies the body whose
+        invocation runs *element*, which a caller needs to keep a query within one graph.
+        &#34;&#34;&#34;
+        return self._flow.locate(element)
+
+    def cfg_node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The control-flow node of the statement or loop head that evaluates *element*, or `None` when
+        *element* has no enclosing graph node.
+        &#34;&#34;&#34;
+        located = self._flow.locate(element)
+        return located[1] if located is not None else None
+
+    def locate_pair(self, a: Node, b: Node) -&gt; tuple[ControlFlowGraph, CfgNode, CfgNode] | None:
+        &#34;&#34;&#34;
+        The graph and the two control-flow nodes that evaluate *a* and *b* when both lie in the same
+        body&#39;s graph, or `None` when either is unlocatable or the two lie in different graphs, where
+        intraprocedural dominance does not apply.
+        &#34;&#34;&#34;
+        located_a = self._flow.locate(a)
+        located_b = self._flow.locate(b)
+        if located_a is None or located_b is None:
+            return None
+        graph_a, node_a = located_a
+        graph_b, node_b = located_b
+        if graph_a is not graph_b:
+            return None
+        return graph_a, node_a, node_b
+
+    def dominates(self, a: Node, b: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the statement evaluating *a* is guaranteed to have executed by the time the statement
+        evaluating *b* runs. Reflexive — *a* and *b* in the same statement share one control-flow
+        node, so a node dominates itself. `False` when either element is unlocatable, when the two
+        lie in different graphs, or when the statement holding either cannot be reached at all.
+
+        The `Projection.MAY` reading, which is the one an ordering question wants: it accepts *a*
+        only where it runs first on *every* path the graph draws, and a path the forward projection
+        declines to draw is a path the run can still take. A caller that means the forward reading —
+        one flooding rather than ordering — asks `dominates_node` and names it.
+        &#34;&#34;&#34;
+        located = self.locate_pair(a, b)
+        return located is not None and self.dominates_node(*located, Projection.MAY)
+
+    def strictly_dominates(self, a: Node, b: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Like `dominates`, but not reflexive: `False` when *a* and *b* share one control-flow node.
+
+        A caller that must reject a same-statement occurrence needs this. Two occurrences inside one
+        statement may be evaluated in either order as far as this granularity can tell, so the
+        reflexive answer would accept a reference that is in fact evaluated first.
+        &#34;&#34;&#34;
+        located = self.locate_pair(a, b)
+        if located is None or located[1] is located[2]:
+            return False
+        return self.dominates_node(*located, Projection.MAY)
+
+    def dominates_node(
+        self, graph: ControlFlowGraph, a: CfgNode, b: CfgNode, projection: Projection,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether control-flow node *a* dominates *b* within *graph*, which must be the graph both
+        belong to, under *projection*. Reflexive. The node-level counterpart of `dominates`, for a
+        caller that has already located the two.
+
+        *graph* is asked for rather than looked up because it is the key the dominance tree is
+        memoized under, and because a caller holding two nodes has already had to establish that they
+        share a body for the question to mean anything.
+
+        *projection* is asked for and has no default, because the two readings disagree exactly where
+        this is hardest to check: under `Projection.MAY` a statement guarded by a resuming `trap`
+        dominates nothing below it, since the hub draws a run arriving from every later statement,
+        and under `Projection.FORWARD` it dominates what follows it. Both answers are right about
+        different questions, and a caller that did not choose got whichever this happened to be
+        written with.
+        &#34;&#34;&#34;
+        return self.tree_of(graph, projection).dominates(a, b)
+
+    def tree_of(self, graph: ControlFlowGraph, projection: Projection) -&gt; DominanceTree:
+        &#34;&#34;&#34;
+        The dominance tree of *graph* under *projection*, computed on first use and kept thereafter.
+
+        A graph that `carries_resumption` reports nothing of has one tree and not two: the projections
+        draw the same edges over it, so both keys answer from the `Projection.MAY` entry. That is
+        nearly every script, and it is what keeps a second consumer asking the forward reading from
+        doubling the dominance work of the whole run.
+        &#34;&#34;&#34;
+        key = (id(graph), projection if graph.carries_resumption else Projection.MAY)
+        found = self._trees.get(key)
+        if found is None:
+            found = self._trees[key] = DominanceTree(graph, key[1])
+        return found
+
+    def reached_from_entry(self, graph: ControlFlowGraph, projection: Projection) -&gt; Set[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes of *graph* the body&#39;s entry reaches under *projection*.
+
+        Answered from the dominance tree, which is the same walk and is memoized per graph. A
+        caller deciding which statements of a body can run asks this rather than `reachable` from
+        the entry: a script&#39;s bodies share one graph per function, and a pass asking per body pays
+        one flood per body for an answer that does not vary within a graph.
+        &#34;&#34;&#34;
+        return self.tree_of(graph, projection).reached
+
+    def reachable(
+        self, start: CfgNode, *, forward: bool, projection: Projection,
+    ) -&gt; set[int]:
+        &#34;&#34;&#34;
+        The ids of the control-flow nodes reachable from *start* under *projection* — over successor
+        edges when *forward*, over predecessor edges otherwise — including *start* itself. Exceptional
+        edges are followed like any other, since they live in the same successor and predecessor
+        lists.
+
+        The two directions are kept separate rather than offered as one path-between query because a
+        caller intersecting them memoizes each side independently: one definition is asked against
+        many uses, and the forward set from the definition is the same every time.
+        &#34;&#34;&#34;
+        return flood([start], forward=forward, projection=projection)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.analysis.dominance.DominanceTree"><code class="flex name class">
+<span>class <span class="ident">DominanceTree</span></span>
+<span>(</span><span>graph, projection)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The dominator relation of one control-flow graph, held as the <em>immediate</em>-dominator tree with a
+depth-first numbering over it.</p>
+<p>A node's dominators are the path from it to the root of that tree, so the tree carries the whole
+relation in space linear in the body where a set per node is quadratic in it: one straight-line
+body of five thousand statements costs twelve million set entries as sets and five thousand
+parent links as a tree. The numbering then answers <code>dominates</code> with two comparisons rather than a
+set lookup, which matters because the callers above ask it hundreds of thousands of times per
+script.</p>
+<p>Only the nodes the entry reaches are in the tree. That is not an optimisation but the relation:
+see the module docstring on why an unreachable node dominates nothing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L195-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class DominanceTree:
+    &#34;&#34;&#34;
+    The dominator relation of one control-flow graph, held as the *immediate*-dominator tree with a
+    depth-first numbering over it.
+
+    A node&#39;s dominators are the path from it to the root of that tree, so the tree carries the whole
+    relation in space linear in the body where a set per node is quadratic in it: one straight-line
+    body of five thousand statements costs twelve million set entries as sets and five thousand
+    parent links as a tree. The numbering then answers `dominates` with two comparisons rather than a
+    set lookup, which matters because the callers above ask it hundreds of thousands of times per
+    script.
+
+    Only the nodes the entry reaches are in the tree. That is not an optimisation but the relation:
+    see the module docstring on why an unreachable node dominates nothing.
+    &#34;&#34;&#34;
+
+    def __init__(self, graph: ControlFlowGraph, projection: Projection):
+        order = _reverse_postorder(graph, projection)
+        self.idom = _immediate_dominators(graph, order, projection)
+        self._entered, self._left = _dominance_intervals(self.idom, graph, order)
+
+    @property
+    def reached(self) -&gt; Set[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes the entry reaches under the projection this tree was built with, which
+        is exactly the set the tree holds: a node the entry does not reach is not in it at all.
+
+        Read rather than flooded again. A caller asking which statements of a body can run is asking
+        the question the tree already had to answer to exist, and a flood per body per pass over a
+        script whose bodies share one graph is the same walk repeated.
+        &#34;&#34;&#34;
+        return self._entered.keys()
+
+    def dominates(self, a: CfgNode, b: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *a* dominates *b*. Reflexive for a reachable node; `False` whenever either node is
+        unreachable, the two being one unreachable node included.
+        &#34;&#34;&#34;
+        opened = self._entered.get(id(a))
+        if opened is None:
+            return False
+        reached = self._entered.get(id(b))
+        return reached is not None and opened &lt;= reached &lt; self._left[id(a)]</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.analysis.dominance.DominanceTree.reached"><code class="name">var <span class="ident">reached</span></code></dt>
+<dd>
+<section class="desc"><p>The ids of the nodes the entry reaches under the projection this tree was built with, which
+is exactly the set the tree holds: a node the entry does not reach is not in it at all.</p>
+<p>Read rather than flooded again. A caller asking which statements of a body can run is asking
+the question the tree already had to answer to exist, and a flood per body per pass over a
+script whose bodies share one graph is the same walk repeated.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L216-L226" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def reached(self) -&gt; Set[int]:
+    &#34;&#34;&#34;
+    The ids of the nodes the entry reaches under the projection this tree was built with, which
+    is exactly the set the tree holds: a node the entry does not reach is not in it at all.
+
+    Read rather than flooded again. A caller asking which statements of a body can run is asking
+    the question the tree already had to answer to exist, and a flood per body per pass over a
+    script whose bodies share one graph is the same walk repeated.
+    &#34;&#34;&#34;
+    return self._entered.keys()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.analysis.dominance.DominanceTree.dominates"><code class="name flex">
+<span>def <span class="ident">dominates</span></span>(<span>self, a, b)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>a</em> dominates <em>b</em>. Reflexive for a reachable node; <code>False</code> whenever either node is
+unreachable, the two being one unreachable node included.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L228-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dominates(self, a: CfgNode, b: CfgNode) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *a* dominates *b*. Reflexive for a reachable node; `False` whenever either node is
+    unreachable, the two being one unreachable node included.
+    &#34;&#34;&#34;
+    opened = self._entered.get(id(a))
+    if opened is None:
+        return False
+    reached = self._entered.get(id(b))
+    return reached is not None and opened &lt;= reached &lt; self._left[id(a)]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel"><code class="flex name class">
+<span>class <span class="ident">DominatorModel</span></span>
+<span>(</span><span>flow)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Dominator relations for the per-body control-flow graphs of one script. A graph's dominance tree
+is computed once, on the first ordering question asked about that graph, and kept for as long as
+this model lives.</p>
+<p>Computing them all on construction instead would charge every caller for the whole script when
+most callers ask about one body, and the model is rebuilt from scratch whenever the tree version
+advances. This is the same laziness <code><a title="refinery.lib.scripts.analysis.cycles.CycleModel" href="cycles.html#refinery.lib.scripts.analysis.cycles.CycleModel">CycleModel</a></code> has, for the
+same reason.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L240-L376" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class DominatorModel:
+    &#34;&#34;&#34;
+    Dominator relations for the per-body control-flow graphs of one script. A graph&#39;s dominance tree
+    is computed once, on the first ordering question asked about that graph, and kept for as long as
+    this model lives.
+
+    Computing them all on construction instead would charge every caller for the whole script when
+    most callers ask about one body, and the model is rebuilt from scratch whenever the tree version
+    advances. This is the same laziness `refinery.lib.scripts.analysis.cycles.CycleModel` has, for the
+    same reason.
+    &#34;&#34;&#34;
+
+    def __init__(self, flow: ControlFlowModel):
+        self._flow = flow
+        self._trees: dict[tuple[int, Projection], DominanceTree] = {}
+
+    def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+        &#34;&#34;&#34;
+        The control-flow graph and node that evaluate *element*, climbing out of any expression it is
+        nested in, or `None` when it has no enclosing graph node. The graph identifies the body whose
+        invocation runs *element*, which a caller needs to keep a query within one graph.
+        &#34;&#34;&#34;
+        return self._flow.locate(element)
+
+    def cfg_node_of(self, element: Node) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        The control-flow node of the statement or loop head that evaluates *element*, or `None` when
+        *element* has no enclosing graph node.
+        &#34;&#34;&#34;
+        located = self._flow.locate(element)
+        return located[1] if located is not None else None
+
+    def locate_pair(self, a: Node, b: Node) -&gt; tuple[ControlFlowGraph, CfgNode, CfgNode] | None:
+        &#34;&#34;&#34;
+        The graph and the two control-flow nodes that evaluate *a* and *b* when both lie in the same
+        body&#39;s graph, or `None` when either is unlocatable or the two lie in different graphs, where
+        intraprocedural dominance does not apply.
+        &#34;&#34;&#34;
+        located_a = self._flow.locate(a)
+        located_b = self._flow.locate(b)
+        if located_a is None or located_b is None:
+            return None
+        graph_a, node_a = located_a
+        graph_b, node_b = located_b
+        if graph_a is not graph_b:
+            return None
+        return graph_a, node_a, node_b
+
+    def dominates(self, a: Node, b: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the statement evaluating *a* is guaranteed to have executed by the time the statement
+        evaluating *b* runs. Reflexive — *a* and *b* in the same statement share one control-flow
+        node, so a node dominates itself. `False` when either element is unlocatable, when the two
+        lie in different graphs, or when the statement holding either cannot be reached at all.
+
+        The `Projection.MAY` reading, which is the one an ordering question wants: it accepts *a*
+        only where it runs first on *every* path the graph draws, and a path the forward projection
+        declines to draw is a path the run can still take. A caller that means the forward reading —
+        one flooding rather than ordering — asks `dominates_node` and names it.
+        &#34;&#34;&#34;
+        located = self.locate_pair(a, b)
+        return located is not None and self.dominates_node(*located, Projection.MAY)
+
+    def strictly_dominates(self, a: Node, b: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Like `dominates`, but not reflexive: `False` when *a* and *b* share one control-flow node.
+
+        A caller that must reject a same-statement occurrence needs this. Two occurrences inside one
+        statement may be evaluated in either order as far as this granularity can tell, so the
+        reflexive answer would accept a reference that is in fact evaluated first.
+        &#34;&#34;&#34;
+        located = self.locate_pair(a, b)
+        if located is None or located[1] is located[2]:
+            return False
+        return self.dominates_node(*located, Projection.MAY)
+
+    def dominates_node(
+        self, graph: ControlFlowGraph, a: CfgNode, b: CfgNode, projection: Projection,
+    ) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether control-flow node *a* dominates *b* within *graph*, which must be the graph both
+        belong to, under *projection*. Reflexive. The node-level counterpart of `dominates`, for a
+        caller that has already located the two.
+
+        *graph* is asked for rather than looked up because it is the key the dominance tree is
+        memoized under, and because a caller holding two nodes has already had to establish that they
+        share a body for the question to mean anything.
+
+        *projection* is asked for and has no default, because the two readings disagree exactly where
+        this is hardest to check: under `Projection.MAY` a statement guarded by a resuming `trap`
+        dominates nothing below it, since the hub draws a run arriving from every later statement,
+        and under `Projection.FORWARD` it dominates what follows it. Both answers are right about
+        different questions, and a caller that did not choose got whichever this happened to be
+        written with.
+        &#34;&#34;&#34;
+        return self.tree_of(graph, projection).dominates(a, b)
+
+    def tree_of(self, graph: ControlFlowGraph, projection: Projection) -&gt; DominanceTree:
+        &#34;&#34;&#34;
+        The dominance tree of *graph* under *projection*, computed on first use and kept thereafter.
+
+        A graph that `carries_resumption` reports nothing of has one tree and not two: the projections
+        draw the same edges over it, so both keys answer from the `Projection.MAY` entry. That is
+        nearly every script, and it is what keeps a second consumer asking the forward reading from
+        doubling the dominance work of the whole run.
+        &#34;&#34;&#34;
+        key = (id(graph), projection if graph.carries_resumption else Projection.MAY)
+        found = self._trees.get(key)
+        if found is None:
+            found = self._trees[key] = DominanceTree(graph, key[1])
+        return found
+
+    def reached_from_entry(self, graph: ControlFlowGraph, projection: Projection) -&gt; Set[int]:
+        &#34;&#34;&#34;
+        The ids of the nodes of *graph* the body&#39;s entry reaches under *projection*.
+
+        Answered from the dominance tree, which is the same walk and is memoized per graph. A
+        caller deciding which statements of a body can run asks this rather than `reachable` from
+        the entry: a script&#39;s bodies share one graph per function, and a pass asking per body pays
+        one flood per body for an answer that does not vary within a graph.
+        &#34;&#34;&#34;
+        return self.tree_of(graph, projection).reached
+
+    def reachable(
+        self, start: CfgNode, *, forward: bool, projection: Projection,
+    ) -&gt; set[int]:
+        &#34;&#34;&#34;
+        The ids of the control-flow nodes reachable from *start* under *projection* — over successor
+        edges when *forward*, over predecessor edges otherwise — including *start* itself. Exceptional
+        edges are followed like any other, since they live in the same successor and predecessor
+        lists.
+
+        The two directions are kept separate rather than offered as one path-between query because a
+        caller intersecting them memoizes each side independently: one definition is asked against
+        many uses, and the forward set from the definition is the same every time.
+        &#34;&#34;&#34;
+        return flood([start], forward=forward, projection=projection)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel" href="../js/analysis/dominance.html#refinery.lib.scripts.js.analysis.dominance.DominanceModel">DominanceModel</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.locate"><code class="name flex">
+<span>def <span class="ident">locate</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow graph and node that evaluate <em>element</em>, climbing out of any expression it is
+nested in, or <code>None</code> when it has no enclosing graph node. The graph identifies the body whose
+invocation runs <em>element</em>, which a caller needs to keep a query within one graph.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L256-L262" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def locate(self, element: Node) -&gt; tuple[ControlFlowGraph, CfgNode] | None:
+    &#34;&#34;&#34;
+    The control-flow graph and node that evaluate *element*, climbing out of any expression it is
+    nested in, or `None` when it has no enclosing graph node. The graph identifies the body whose
+    invocation runs *element*, which a caller needs to keep a query within one graph.
+    &#34;&#34;&#34;
+    return self._flow.locate(element)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.cfg_node_of"><code class="name flex">
+<span>def <span class="ident">cfg_node_of</span></span>(<span>self, element)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow node of the statement or loop head that evaluates <em>element</em>, or <code>None</code> when
+<em>element</em> has no enclosing graph node.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L264-L270" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def cfg_node_of(self, element: Node) -&gt; CfgNode | None:
+    &#34;&#34;&#34;
+    The control-flow node of the statement or loop head that evaluates *element*, or `None` when
+    *element* has no enclosing graph node.
+    &#34;&#34;&#34;
+    located = self._flow.locate(element)
+    return located[1] if located is not None else None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.locate_pair"><code class="name flex">
+<span>def <span class="ident">locate_pair</span></span>(<span>self, a, b)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The graph and the two control-flow nodes that evaluate <em>a</em> and <em>b</em> when both lie in the same
+body's graph, or <code>None</code> when either is unlocatable or the two lie in different graphs, where
+intraprocedural dominance does not apply.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L272-L286" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def locate_pair(self, a: Node, b: Node) -&gt; tuple[ControlFlowGraph, CfgNode, CfgNode] | None:
+    &#34;&#34;&#34;
+    The graph and the two control-flow nodes that evaluate *a* and *b* when both lie in the same
+    body&#39;s graph, or `None` when either is unlocatable or the two lie in different graphs, where
+    intraprocedural dominance does not apply.
+    &#34;&#34;&#34;
+    located_a = self._flow.locate(a)
+    located_b = self._flow.locate(b)
+    if located_a is None or located_b is None:
+        return None
+    graph_a, node_a = located_a
+    graph_b, node_b = located_b
+    if graph_a is not graph_b:
+        return None
+    return graph_a, node_a, node_b</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.dominates"><code class="name flex">
+<span>def <span class="ident">dominates</span></span>(<span>self, a, b)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the statement evaluating <em>a</em> is guaranteed to have executed by the time the statement
+evaluating <em>b</em> runs. Reflexive — <em>a</em> and <em>b</em> in the same statement share one control-flow
+node, so a node dominates itself. <code>False</code> when either element is unlocatable, when the two
+lie in different graphs, or when the statement holding either cannot be reached at all.</p>
+<p>The <code>Projection.MAY</code> reading, which is the one an ordering question wants: it accepts <em>a</em>
+only where it runs first on <em>every</em> path the graph draws, and a path the forward projection
+declines to draw is a path the run can still take. A caller that means the forward reading —
+one flooding rather than ordering — asks <code>dominates_node</code> and names it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L288-L301" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dominates(self, a: Node, b: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the statement evaluating *a* is guaranteed to have executed by the time the statement
+    evaluating *b* runs. Reflexive — *a* and *b* in the same statement share one control-flow
+    node, so a node dominates itself. `False` when either element is unlocatable, when the two
+    lie in different graphs, or when the statement holding either cannot be reached at all.
+
+    The `Projection.MAY` reading, which is the one an ordering question wants: it accepts *a*
+    only where it runs first on *every* path the graph draws, and a path the forward projection
+    declines to draw is a path the run can still take. A caller that means the forward reading —
+    one flooding rather than ordering — asks `dominates_node` and names it.
+    &#34;&#34;&#34;
+    located = self.locate_pair(a, b)
+    return located is not None and self.dominates_node(*located, Projection.MAY)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.strictly_dominates"><code class="name flex">
+<span>def <span class="ident">strictly_dominates</span></span>(<span>self, a, b)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Like <code>dominates</code>, but not reflexive: <code>False</code> when <em>a</em> and <em>b</em> share one control-flow node.</p>
+<p>A caller that must reject a same-statement occurrence needs this. Two occurrences inside one
+statement may be evaluated in either order as far as this granularity can tell, so the
+reflexive answer would accept a reference that is in fact evaluated first.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L303-L314" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def strictly_dominates(self, a: Node, b: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Like `dominates`, but not reflexive: `False` when *a* and *b* share one control-flow node.
+
+    A caller that must reject a same-statement occurrence needs this. Two occurrences inside one
+    statement may be evaluated in either order as far as this granularity can tell, so the
+    reflexive answer would accept a reference that is in fact evaluated first.
+    &#34;&#34;&#34;
+    located = self.locate_pair(a, b)
+    if located is None or located[1] is located[2]:
+        return False
+    return self.dominates_node(*located, Projection.MAY)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.dominates_node"><code class="name flex">
+<span>def <span class="ident">dominates_node</span></span>(<span>self, graph, a, b, projection)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether control-flow node <em>a</em> dominates <em>b</em> within <em>graph</em>, which must be the graph both
+belong to, under <em>projection</em>. Reflexive. The node-level counterpart of <code>dominates</code>, for a
+caller that has already located the two.</p>
+<p><em>graph</em> is asked for rather than looked up because it is the key the dominance tree is
+memoized under, and because a caller holding two nodes has already had to establish that they
+share a body for the question to mean anything.</p>
+<p><em>projection</em> is asked for and has no default, because the two readings disagree exactly where
+this is hardest to check: under <code>Projection.MAY</code> a statement guarded by a resuming <code>trap</code>
+dominates nothing below it, since the hub draws a run arriving from every later statement,
+and under <code>Projection.FORWARD</code> it dominates what follows it. Both answers are right about
+different questions, and a caller that did not choose got whichever this happened to be
+written with.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L316-L335" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dominates_node(
+    self, graph: ControlFlowGraph, a: CfgNode, b: CfgNode, projection: Projection,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether control-flow node *a* dominates *b* within *graph*, which must be the graph both
+    belong to, under *projection*. Reflexive. The node-level counterpart of `dominates`, for a
+    caller that has already located the two.
+
+    *graph* is asked for rather than looked up because it is the key the dominance tree is
+    memoized under, and because a caller holding two nodes has already had to establish that they
+    share a body for the question to mean anything.
+
+    *projection* is asked for and has no default, because the two readings disagree exactly where
+    this is hardest to check: under `Projection.MAY` a statement guarded by a resuming `trap`
+    dominates nothing below it, since the hub draws a run arriving from every later statement,
+    and under `Projection.FORWARD` it dominates what follows it. Both answers are right about
+    different questions, and a caller that did not choose got whichever this happened to be
+    written with.
+    &#34;&#34;&#34;
+    return self.tree_of(graph, projection).dominates(a, b)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.tree_of"><code class="name flex">
+<span>def <span class="ident">tree_of</span></span>(<span>self, graph, projection)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The dominance tree of <em>graph</em> under <em>projection</em>, computed on first use and kept thereafter.</p>
+<p>A graph that <code>carries_resumption</code> reports nothing of has one tree and not two: the projections
+draw the same edges over it, so both keys answer from the <code>Projection.MAY</code> entry. That is
+nearly every script, and it is what keeps a second consumer asking the forward reading from
+doubling the dominance work of the whole run.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L337-L350" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tree_of(self, graph: ControlFlowGraph, projection: Projection) -&gt; DominanceTree:
+    &#34;&#34;&#34;
+    The dominance tree of *graph* under *projection*, computed on first use and kept thereafter.
+
+    A graph that `carries_resumption` reports nothing of has one tree and not two: the projections
+    draw the same edges over it, so both keys answer from the `Projection.MAY` entry. That is
+    nearly every script, and it is what keeps a second consumer asking the forward reading from
+    doubling the dominance work of the whole run.
+    &#34;&#34;&#34;
+    key = (id(graph), projection if graph.carries_resumption else Projection.MAY)
+    found = self._trees.get(key)
+    if found is None:
+        found = self._trees[key] = DominanceTree(graph, key[1])
+    return found</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.reached_from_entry"><code class="name flex">
+<span>def <span class="ident">reached_from_entry</span></span>(<span>self, graph, projection)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The ids of the nodes of <em>graph</em> the body's entry reaches under <em>projection</em>.</p>
+<p>Answered from the dominance tree, which is the same walk and is memoized per graph. A
+caller deciding which statements of a body can run asks this rather than <code>reachable</code> from
+the entry: a script's bodies share one graph per function, and a pass asking per body pays
+one flood per body for an answer that does not vary within a graph.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L352-L361" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reached_from_entry(self, graph: ControlFlowGraph, projection: Projection) -&gt; Set[int]:
+    &#34;&#34;&#34;
+    The ids of the nodes of *graph* the body&#39;s entry reaches under *projection*.
+
+    Answered from the dominance tree, which is the same walk and is memoized per graph. A
+    caller deciding which statements of a body can run asks this rather than `reachable` from
+    the entry: a script&#39;s bodies share one graph per function, and a pass asking per body pays
+    one flood per body for an answer that does not vary within a graph.
+    &#34;&#34;&#34;
+    return self.tree_of(graph, projection).reached</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.analysis.dominance.DominatorModel.reachable"><code class="name flex">
+<span>def <span class="ident">reachable</span></span>(<span>self, start, *, forward, projection)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The ids of the control-flow nodes reachable from <em>start</em> under <em>projection</em> — over successor
+edges when <em>forward</em>, over predecessor edges otherwise — including <em>start</em> itself. Exceptional
+edges are followed like any other, since they live in the same successor and predecessor
+lists.</p>
+<p>The two directions are kept separate rather than offered as one path-between query because a
+caller intersecting them memoizes each side independently: one definition is asked against
+many uses, and the forward set from the definition is the same every time.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/analysis/dominance.py#L363-L376" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reachable(
+    self, start: CfgNode, *, forward: bool, projection: Projection,
+) -&gt; set[int]:
+    &#34;&#34;&#34;
+    The ids of the control-flow nodes reachable from *start* under *projection* — over successor
+    edges when *forward*, over predecessor edges otherwise — including *start* itself. Exceptional
+    edges are followed like any other, since they live in the same successor and predecessor
+    lists.
+
+    The two directions are kept separate rather than offered as one path-between query because a
+    caller intersecting them memoizes each side independently: one definition is asked against
+    many uses, and the forward set from the definition is the same every time.
+    &#34;&#34;&#34;
+    return flood([start], forward=forward, projection=projection)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.analysis" href="index.html">refinery.lib.scripts.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.analysis.dominance.DominanceTree" href="#refinery.lib.scripts.analysis.dominance.DominanceTree">DominanceTree</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominanceTree.dominates" href="#refinery.lib.scripts.analysis.dominance.DominanceTree.dominates">dominates</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel" href="#refinery.lib.scripts.analysis.dominance.DominatorModel">DominatorModel</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.locate" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.locate">locate</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.cfg_node_of" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.cfg_node_of">cfg_node_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.locate_pair" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.locate_pair">locate_pair</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.dominates" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.dominates">dominates</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.strictly_dominates" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.strictly_dominates">strictly_dominates</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.dominates_node" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.dominates_node">dominates_node</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.tree_of" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.tree_of">tree_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.reached_from_entry" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.reached_from_entry">reached_from_entry</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.reachable" href="#refinery.lib.scripts.analysis.dominance.DominatorModel.reachable">reachable</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

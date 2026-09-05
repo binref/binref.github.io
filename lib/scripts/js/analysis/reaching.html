@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.reaching documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.reaching</code></h1>
+</header>
+<section id="section-intro">
+<p>Reaching-value queries for JavaScript inlining, over the per-function control-flow graphs of the
+<code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>. One question: does the value a binding holds
+where a definition is evaluated still hold when a later use runs? A definition <em>reaches</em> a use
+unchanged when it runs first on every path to the use and nothing rewrites the binding in between —
+the precondition for replacing the use with the definition's value.</p>
+<p>This is the query the constant inliner needs, stated once for the binding it inlines and once for each
+free variable of the expression it inlines: an expression may be relocated to a use only when the
+inlined binding <em>and</em> every variable the expression reads all still hold, at the use, the value they
+held at the definition. The layer sits above two others. Dominance
+(<code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel" href="dominance.html#refinery.lib.scripts.js.analysis.dominance.DominanceModel">DominanceModel</a></code>) orders the definition strictly before
+the use and supplies the reachability primitive
+<code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.reachable" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.reachable">DominatorModel.reachable()</a></code>, from which the path-between
+question is asked as a forward walk from the definition intersected with a backward walk from the
+use; the effect model
+(<code><a title="refinery.lib.scripts.js.analysis.effects.EffectModel" href="effects.html#refinery.lib.scripts.js.analysis.effects.EffectModel">EffectModel</a></code>) says where a binding may change — a
+reassignment recorded on the binding, or a call to a function that may write it. Kills the model
+cannot pin to a site — a mutating function that escapes, a write through a global-object alias or a
+dynamic scope — make the answer conservatively negative, and so does a definition and use that share a
+single statement, which statement granularity cannot order.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/reaching.py#L1-L236" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Reaching-value queries for JavaScript inlining, over the per-function control-flow graphs of the
+`refinery.lib.scripts.js.analysis.model.SemanticModel`. One question: does the value a binding holds
+where a definition is evaluated still hold when a later use runs? A definition *reaches* a use
+unchanged when it runs first on every path to the use and nothing rewrites the binding in between —
+the precondition for replacing the use with the definition&#39;s value.
+
+This is the query the constant inliner needs, stated once for the binding it inlines and once for each
+free variable of the expression it inlines: an expression may be relocated to a use only when the
+inlined binding *and* every variable the expression reads all still hold, at the use, the value they
+held at the definition. The layer sits above two others. Dominance
+(`refinery.lib.scripts.js.analysis.dominance.DominanceModel`) orders the definition strictly before
+the use and supplies the reachability primitive
+`refinery.lib.scripts.js.analysis.dominance.DominanceModel.reachable`, from which the path-between
+question is asked as a forward walk from the definition intersected with a backward walk from the
+use; the effect model
+(`refinery.lib.scripts.js.analysis.effects.EffectModel`) says where a binding may change — a
+reassignment recorded on the binding, or a call to a function that may write it. Kills the model
+cannot pin to a site — a mutating function that escapes, a write through a global-object alias or a
+dynamic scope — make the answer conservatively negative, and so does a definition and use that share a
+single statement, which statement granularity cannot order.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterator
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.cfg import Projection
+from refinery.lib.scripts.analysis.reaching import ReachabilityQuery
+from refinery.lib.scripts.js.analysis.cfg import CfgNode, ControlFlowGraph
+from refinery.lib.scripts.js.analysis.dominance import DominanceModel
+from refinery.lib.scripts.js.analysis.effects import EffectModel
+from refinery.lib.scripts.js.analysis.model import Binding, annex_b_copies_into
+from refinery.lib.scripts.js.model import (
+    JsAssignmentExpression,
+    JsCallExpression,
+    JsFunctionDeclaration,
+    JsIdentifier,
+    JsVariableDeclarator,
+    strip_parens,
+)
+
+
+class ReachingModel:
+    &#34;&#34;&#34;
+    Reaching-value verdicts for one script, built over a
+    `refinery.lib.scripts.js.analysis.dominance.DominanceModel` and a
+    `refinery.lib.scripts.js.analysis.effects.EffectModel`. Ask whether the value a binding holds at a
+    definition is the value observed at a use with `value_preserved`. Build through `build_reaching`.
+    &#34;&#34;&#34;
+
+    def __init__(self, dominance: DominanceModel, effects: EffectModel):
+        self.dominance = dominance
+        self.effects = effects
+        self.model = effects.model
+        self._kill_cache: dict[tuple[int, int, int], frozenset[int] | None] = {}
+        self._call_cache: dict[int, list[tuple[JsCallExpression, CfgNode]]] = {}
+        self._between = ReachabilityQuery(dominance, Projection.MAY)
+
+    def value_preserved(self, binding: Binding, definition: Node, use: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the value *binding* holds where *definition* is evaluated is the value observed at *use*:
+        *definition*&#39;s control-flow node strictly dominates *use*&#39;s — it runs first on every path that
+        reaches *use*, and the two do not merely share one statement, which statement granularity cannot
+        order — and no kill of *binding* lies on any control-flow path between them. `False` when either
+        node lies outside the graphs or in a different function, when *definition* does not strictly
+        dominate *use*, or when *binding*&#39;s kills cannot be enumerated. *definition* is the value
+        expression whose binding is tracked; a free variable of that expression is checked by passing the
+        same *definition* and *use* with the variable&#39;s own binding.
+        &#34;&#34;&#34;
+        located_d = self.dominance.locate(definition)
+        located_u = self.dominance.locate(use)
+        if located_d is None or located_u is None:
+            return False
+        graph_d, node_d = located_d
+        graph_u, node_u = located_u
+        if graph_d is not graph_u:
+            return False
+        if node_d is node_u:
+            return False
+        if not self.dominance.dominates_node(graph_d, node_d, node_u, Projection.MAY):
+            return False
+        kills = self._kill_nodes(binding, graph_d, definition)
+        if kills is None:
+            return False
+        return not self._between.any_between(graph_d, node_d, node_u, kills)
+
+    def _kill_nodes(
+        self, binding: Binding, graph: ControlFlowGraph, definition: Node,
+    ) -&gt; frozenset[int] | None:
+        &#34;&#34;&#34;
+        The ids of the control-flow nodes in *graph* at which *binding* may change value — a reassignment
+        located in this graph, or a call whose statically known callee may write *binding* — excluding
+        the write that establishes *definition* itself. `None` when a change cannot be pinned to a site:
+        *binding* is written by a function that escapes, through a global-object alias, or through a name
+        a dynamic scope resolves at runtime, so its value must be treated as volatile everywhere. The
+        answer is fixed for the model&#39;s lifetime, so it is memoized per definition.
+        &#34;&#34;&#34;
+        def_write = self._definition_write(definition)
+        key = (id(binding), id(graph), id(def_write) if def_write is not None else 0)
+        if key not in self._kill_cache:
+            self._kill_cache[key] = self._compute_kill_nodes(binding, graph, def_write)
+        return self._kill_cache[key]
+
+    def _compute_kill_nodes(
+        self, binding: Binding, graph: ControlFlowGraph, def_write: Node | None,
+    ) -&gt; frozenset[int] | None:
+        &#34;&#34;&#34;
+        The nodes of *graph* at which *binding*&#39;s definition stops holding, or `None` where they
+        cannot be listed and the caller must treat the value as reaching nowhere.
+
+        A call this file binds the name of but whose function the model will not state kills the
+        binding, wherever some function of this file writes it. Not knowing which function runs is
+        not knowing that it does not write, and the one that runs may be exactly the one that does:
+        a body `var` repeating a parameter&#39;s name is such a callee, since the call writes the name
+        before any statement runs and the model declines to say what it holds after that, while the
+        name is still one every invocation of the function goes through, so `mutators_escape` reads
+        it as pinned down. A callee no name here binds is a different answer and is left alone,
+        which is the condition every reader of this was already written under.
+        &#34;&#34;&#34;
+        if (
+            binding.has_indefinite_write
+            or binding.has_global_member_write
+            or self.effects.mutators_escape(binding)
+            or self.model.reflection_can_reach(binding)
+        ):
+            return None
+        kills: set[int] = set()
+        for definition in self._value_definitions(binding):
+            if definition is def_write:
+                continue
+            located = self.dominance.locate(definition)
+            if located is None:
+                return None
+            def_graph, def_node = located
+            if def_graph is graph:
+                kills.add(id(def_node))
+        for call, node in self._graph_calls(graph):
+            target = self.effects.static_callee(call)
+            if target is None:
+                if not self.effects.a_name_this_file_binds_holds_the_callee(call):
+                    continue
+                if not self.effects.some_function_can_mutate(binding):
+                    continue
+            elif not self.effects.function_can_mutate(target, binding):
+                continue
+            if node is None:
+                return None
+            kills.add(id(node))
+        return frozenset(kills)
+
+    def _graph_calls(
+        self, graph: ControlFlowGraph,
+    ) -&gt; list[tuple[JsCallExpression, CfgNode | None]]:
+        &#34;&#34;&#34;
+        The call expressions of *graph*&#39;s body that are not inside a nested function, each paired
+        with the control-flow node that evaluates it, or with `None` when the graphs place it
+        nowhere. Memoized per graph.
+
+        A call inside a nested function locates into that function&#39;s own graph and is left out. A
+        call the graphs do not place at all is a different answer and is kept: it is evaluated when
+        the body around it is invoked, which is a point no node of this graph stands for — a
+        parameter default of a function *expression* is one — so it can neither be ordered here nor
+        dismissed, and the caller has to refuse rather than drop the kill.
+        &#34;&#34;&#34;
+        cached = self._call_cache.get(id(graph))
+        if cached is None:
+            cached = []
+            for node in graph.owner.walk():
+                if not isinstance(node, JsCallExpression):
+                    continue
+                located = self.dominance.locate(node)
+                if located is None:
+                    cached.append((node, None))
+                elif located[0] is graph:
+                    cached.append((node, located[1]))
+            self._call_cache[id(graph)] = cached
+        return cached
+
+    @staticmethod
+    def _value_definitions(binding: Binding) -&gt; Iterator[Node]:
+        &#34;&#34;&#34;
+        Every site that establishes *binding*&#39;s value: a write in `writes`, and a declaration that
+        ends the binding&#39;s temporal dead zone. A `let`, `const`, or `class` declaration ends that
+        zone even without an initializer, so a read cannot move across it and it is a kill; a `var`
+        has no dead zone, so a bare `var x;` establishes nothing and only an initialized declarator
+        counts. A later definition kills an earlier one, so the query counts them all bar the
+        one it tracks from.
+
+        A function declaration Annex B copies into the scope around its block is one too, and for
+        the same reason a lexical declaration is: the value arrives where the declaration runs, so a
+        read of the name before it answers something else and may not move across it. A function
+        declared in the scope it names is not, its value being there before any statement runs.
+
+        The flow-aware sibling of `SemanticModel.binding_values`: that query lists the values a
+        binding&#39;s readable channels store and whether the list is complete, while this one enumerates
+        the sites whose execution changes which value a read observes — every write, whatever it
+        stores, is a kill here even where it is no readable channel there.
+        &#34;&#34;&#34;
+        yield from binding.writes
+        lexical = binding.is_lexical
+        copied = annex_b_copies_into(binding)
+        for declaration in binding.declarations:
+            if lexical:
+                yield declaration
+                continue
+            parent = declaration.parent
+            if isinstance(parent, JsVariableDeclarator) and parent.init is not None:
+                yield declaration
+            elif isinstance(parent, JsFunctionDeclaration) and copied:
+                yield declaration
+
+    @staticmethod
+    def _definition_write(definition: Node) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The identifier a value expression is assigned to — the declarator or `=` target *definition* is
+        the initializer of — so the reaching query can exclude that write from the binding&#39;s kills. `None`
+        when *definition* is not the value of a single-identifier declarator or assignment.
+        &#34;&#34;&#34;
+        cursor: Node | None = definition
+        while cursor is not None:
+            parent = cursor.parent
+            if isinstance(parent, JsVariableDeclarator) and parent.init is cursor:
+                return parent.id if isinstance(parent.id, JsIdentifier) else None
+            if isinstance(parent, JsAssignmentExpression) and parent.right is cursor:
+                left = strip_parens(parent.left)
+                return left if isinstance(left, JsIdentifier) else None
+            cursor = parent
+        return None
+
+
+def build_reaching(dominance: DominanceModel, effects: EffectModel) -&gt; ReachingModel:
+    &#34;&#34;&#34;
+    Build the `ReachingModel` from a script&#39;s dominance and effect models.
+    &#34;&#34;&#34;
+    return ReachingModel(dominance, effects)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.reaching.build_reaching"><code class="name flex">
+<span>def <span class="ident">build_reaching</span></span>(<span>dominance, effects)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.js.analysis.reaching.ReachingModel" href="#refinery.lib.scripts.js.analysis.reaching.ReachingModel">ReachingModel</a></code> from a script's dominance and effect models.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/reaching.py#L232-L236" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_reaching(dominance: DominanceModel, effects: EffectModel) -&gt; ReachingModel:
+    &#34;&#34;&#34;
+    Build the `ReachingModel` from a script&#39;s dominance and effect models.
+    &#34;&#34;&#34;
+    return ReachingModel(dominance, effects)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.reaching.ReachingModel"><code class="flex name class">
+<span>class <span class="ident">ReachingModel</span></span>
+<span>(</span><span>dominance, effects)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Reaching-value verdicts for one script, built over a
+<code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel" href="dominance.html#refinery.lib.scripts.js.analysis.dominance.DominanceModel">DominanceModel</a></code> and a
+<code><a title="refinery.lib.scripts.js.analysis.effects.EffectModel" href="effects.html#refinery.lib.scripts.js.analysis.effects.EffectModel">EffectModel</a></code>. Ask whether the value a binding holds at a
+definition is the value observed at a use with <code>value_preserved</code>. Build through <code><a title="refinery.lib.scripts.js.analysis.reaching.build_reaching" href="#refinery.lib.scripts.js.analysis.reaching.build_reaching">build_reaching()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/reaching.py#L44-L229" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ReachingModel:
+    &#34;&#34;&#34;
+    Reaching-value verdicts for one script, built over a
+    `refinery.lib.scripts.js.analysis.dominance.DominanceModel` and a
+    `refinery.lib.scripts.js.analysis.effects.EffectModel`. Ask whether the value a binding holds at a
+    definition is the value observed at a use with `value_preserved`. Build through `build_reaching`.
+    &#34;&#34;&#34;
+
+    def __init__(self, dominance: DominanceModel, effects: EffectModel):
+        self.dominance = dominance
+        self.effects = effects
+        self.model = effects.model
+        self._kill_cache: dict[tuple[int, int, int], frozenset[int] | None] = {}
+        self._call_cache: dict[int, list[tuple[JsCallExpression, CfgNode]]] = {}
+        self._between = ReachabilityQuery(dominance, Projection.MAY)
+
+    def value_preserved(self, binding: Binding, definition: Node, use: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the value *binding* holds where *definition* is evaluated is the value observed at *use*:
+        *definition*&#39;s control-flow node strictly dominates *use*&#39;s — it runs first on every path that
+        reaches *use*, and the two do not merely share one statement, which statement granularity cannot
+        order — and no kill of *binding* lies on any control-flow path between them. `False` when either
+        node lies outside the graphs or in a different function, when *definition* does not strictly
+        dominate *use*, or when *binding*&#39;s kills cannot be enumerated. *definition* is the value
+        expression whose binding is tracked; a free variable of that expression is checked by passing the
+        same *definition* and *use* with the variable&#39;s own binding.
+        &#34;&#34;&#34;
+        located_d = self.dominance.locate(definition)
+        located_u = self.dominance.locate(use)
+        if located_d is None or located_u is None:
+            return False
+        graph_d, node_d = located_d
+        graph_u, node_u = located_u
+        if graph_d is not graph_u:
+            return False
+        if node_d is node_u:
+            return False
+        if not self.dominance.dominates_node(graph_d, node_d, node_u, Projection.MAY):
+            return False
+        kills = self._kill_nodes(binding, graph_d, definition)
+        if kills is None:
+            return False
+        return not self._between.any_between(graph_d, node_d, node_u, kills)
+
+    def _kill_nodes(
+        self, binding: Binding, graph: ControlFlowGraph, definition: Node,
+    ) -&gt; frozenset[int] | None:
+        &#34;&#34;&#34;
+        The ids of the control-flow nodes in *graph* at which *binding* may change value — a reassignment
+        located in this graph, or a call whose statically known callee may write *binding* — excluding
+        the write that establishes *definition* itself. `None` when a change cannot be pinned to a site:
+        *binding* is written by a function that escapes, through a global-object alias, or through a name
+        a dynamic scope resolves at runtime, so its value must be treated as volatile everywhere. The
+        answer is fixed for the model&#39;s lifetime, so it is memoized per definition.
+        &#34;&#34;&#34;
+        def_write = self._definition_write(definition)
+        key = (id(binding), id(graph), id(def_write) if def_write is not None else 0)
+        if key not in self._kill_cache:
+            self._kill_cache[key] = self._compute_kill_nodes(binding, graph, def_write)
+        return self._kill_cache[key]
+
+    def _compute_kill_nodes(
+        self, binding: Binding, graph: ControlFlowGraph, def_write: Node | None,
+    ) -&gt; frozenset[int] | None:
+        &#34;&#34;&#34;
+        The nodes of *graph* at which *binding*&#39;s definition stops holding, or `None` where they
+        cannot be listed and the caller must treat the value as reaching nowhere.
+
+        A call this file binds the name of but whose function the model will not state kills the
+        binding, wherever some function of this file writes it. Not knowing which function runs is
+        not knowing that it does not write, and the one that runs may be exactly the one that does:
+        a body `var` repeating a parameter&#39;s name is such a callee, since the call writes the name
+        before any statement runs and the model declines to say what it holds after that, while the
+        name is still one every invocation of the function goes through, so `mutators_escape` reads
+        it as pinned down. A callee no name here binds is a different answer and is left alone,
+        which is the condition every reader of this was already written under.
+        &#34;&#34;&#34;
+        if (
+            binding.has_indefinite_write
+            or binding.has_global_member_write
+            or self.effects.mutators_escape(binding)
+            or self.model.reflection_can_reach(binding)
+        ):
+            return None
+        kills: set[int] = set()
+        for definition in self._value_definitions(binding):
+            if definition is def_write:
+                continue
+            located = self.dominance.locate(definition)
+            if located is None:
+                return None
+            def_graph, def_node = located
+            if def_graph is graph:
+                kills.add(id(def_node))
+        for call, node in self._graph_calls(graph):
+            target = self.effects.static_callee(call)
+            if target is None:
+                if not self.effects.a_name_this_file_binds_holds_the_callee(call):
+                    continue
+                if not self.effects.some_function_can_mutate(binding):
+                    continue
+            elif not self.effects.function_can_mutate(target, binding):
+                continue
+            if node is None:
+                return None
+            kills.add(id(node))
+        return frozenset(kills)
+
+    def _graph_calls(
+        self, graph: ControlFlowGraph,
+    ) -&gt; list[tuple[JsCallExpression, CfgNode | None]]:
+        &#34;&#34;&#34;
+        The call expressions of *graph*&#39;s body that are not inside a nested function, each paired
+        with the control-flow node that evaluates it, or with `None` when the graphs place it
+        nowhere. Memoized per graph.
+
+        A call inside a nested function locates into that function&#39;s own graph and is left out. A
+        call the graphs do not place at all is a different answer and is kept: it is evaluated when
+        the body around it is invoked, which is a point no node of this graph stands for — a
+        parameter default of a function *expression* is one — so it can neither be ordered here nor
+        dismissed, and the caller has to refuse rather than drop the kill.
+        &#34;&#34;&#34;
+        cached = self._call_cache.get(id(graph))
+        if cached is None:
+            cached = []
+            for node in graph.owner.walk():
+                if not isinstance(node, JsCallExpression):
+                    continue
+                located = self.dominance.locate(node)
+                if located is None:
+                    cached.append((node, None))
+                elif located[0] is graph:
+                    cached.append((node, located[1]))
+            self._call_cache[id(graph)] = cached
+        return cached
+
+    @staticmethod
+    def _value_definitions(binding: Binding) -&gt; Iterator[Node]:
+        &#34;&#34;&#34;
+        Every site that establishes *binding*&#39;s value: a write in `writes`, and a declaration that
+        ends the binding&#39;s temporal dead zone. A `let`, `const`, or `class` declaration ends that
+        zone even without an initializer, so a read cannot move across it and it is a kill; a `var`
+        has no dead zone, so a bare `var x;` establishes nothing and only an initialized declarator
+        counts. A later definition kills an earlier one, so the query counts them all bar the
+        one it tracks from.
+
+        A function declaration Annex B copies into the scope around its block is one too, and for
+        the same reason a lexical declaration is: the value arrives where the declaration runs, so a
+        read of the name before it answers something else and may not move across it. A function
+        declared in the scope it names is not, its value being there before any statement runs.
+
+        The flow-aware sibling of `SemanticModel.binding_values`: that query lists the values a
+        binding&#39;s readable channels store and whether the list is complete, while this one enumerates
+        the sites whose execution changes which value a read observes — every write, whatever it
+        stores, is a kill here even where it is no readable channel there.
+        &#34;&#34;&#34;
+        yield from binding.writes
+        lexical = binding.is_lexical
+        copied = annex_b_copies_into(binding)
+        for declaration in binding.declarations:
+            if lexical:
+                yield declaration
+                continue
+            parent = declaration.parent
+            if isinstance(parent, JsVariableDeclarator) and parent.init is not None:
+                yield declaration
+            elif isinstance(parent, JsFunctionDeclaration) and copied:
+                yield declaration
+
+    @staticmethod
+    def _definition_write(definition: Node) -&gt; Node | None:
+        &#34;&#34;&#34;
+        The identifier a value expression is assigned to — the declarator or `=` target *definition* is
+        the initializer of — so the reaching query can exclude that write from the binding&#39;s kills. `None`
+        when *definition* is not the value of a single-identifier declarator or assignment.
+        &#34;&#34;&#34;
+        cursor: Node | None = definition
+        while cursor is not None:
+            parent = cursor.parent
+            if isinstance(parent, JsVariableDeclarator) and parent.init is cursor:
+                return parent.id if isinstance(parent.id, JsIdentifier) else None
+            if isinstance(parent, JsAssignmentExpression) and parent.right is cursor:
+                left = strip_parens(parent.left)
+                return left if isinstance(left, JsIdentifier) else None
+            cursor = parent
+        return None</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.reaching.ReachingModel.value_preserved"><code class="name flex">
+<span>def <span class="ident">value_preserved</span></span>(<span>self, binding, definition, use)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the value <em>binding</em> holds where <em>definition</em> is evaluated is the value observed at <em>use</em>:
+<em>definition</em>'s control-flow node strictly dominates <em>use</em>'s — it runs first on every path that
+reaches <em>use</em>, and the two do not merely share one statement, which statement granularity cannot
+order — and no kill of <em>binding</em> lies on any control-flow path between them. <code>False</code> when either
+node lies outside the graphs or in a different function, when <em>definition</em> does not strictly
+dominate <em>use</em>, or when <em>binding</em>'s kills cannot be enumerated. <em>definition</em> is the value
+expression whose binding is tracked; a free variable of that expression is checked by passing the
+same <em>definition</em> and <em>use</em> with the variable's own binding.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/reaching.py#L60-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def value_preserved(self, binding: Binding, definition: Node, use: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the value *binding* holds where *definition* is evaluated is the value observed at *use*:
+    *definition*&#39;s control-flow node strictly dominates *use*&#39;s — it runs first on every path that
+    reaches *use*, and the two do not merely share one statement, which statement granularity cannot
+    order — and no kill of *binding* lies on any control-flow path between them. `False` when either
+    node lies outside the graphs or in a different function, when *definition* does not strictly
+    dominate *use*, or when *binding*&#39;s kills cannot be enumerated. *definition* is the value
+    expression whose binding is tracked; a free variable of that expression is checked by passing the
+    same *definition* and *use* with the variable&#39;s own binding.
+    &#34;&#34;&#34;
+    located_d = self.dominance.locate(definition)
+    located_u = self.dominance.locate(use)
+    if located_d is None or located_u is None:
+        return False
+    graph_d, node_d = located_d
+    graph_u, node_u = located_u
+    if graph_d is not graph_u:
+        return False
+    if node_d is node_u:
+        return False
+    if not self.dominance.dominates_node(graph_d, node_d, node_u, Projection.MAY):
+        return False
+    kills = self._kill_nodes(binding, graph_d, definition)
+    if kills is None:
+        return False
+    return not self._between.any_between(graph_d, node_d, node_u, kills)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.reaching.build_reaching" href="#refinery.lib.scripts.js.analysis.reaching.build_reaching">build_reaching</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.reaching.ReachingModel" href="#refinery.lib.scripts.js.analysis.reaching.ReachingModel">ReachingModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.reaching.ReachingModel.value_preserved" href="#refinery.lib.scripts.js.analysis.reaching.ReachingModel.value_preserved">value_preserved</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

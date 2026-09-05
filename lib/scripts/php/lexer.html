@@ -1,0 +1,1419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.php.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.php.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L1-L579" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+
+from dataclasses import dataclass, field
+from typing import Generator
+
+from refinery.lib.scripts.php.token import (
+    CAST_KEYWORDS,
+    KEYWORDS,
+    PhpToken,
+    PhpTokenKind,
+)
+
+_ESCAPE_MAP: dict[str, str] = {
+    &#39;n&#39;  : &#39;\n&#39;,
+    &#39;r&#39;  : &#39;\r&#39;,
+    &#39;t&#39;  : &#39;\t&#39;,
+    &#39;v&#39;  : &#39;\v&#39;,
+    &#39;f&#39;  : &#39;\f&#39;,
+    &#39;e&#39;  : &#39;\x1b&#39;,
+    &#39;\\&#39; : &#39;\\&#39;,
+    &#39;$&#39;  : &#39;$&#39;,
+    &#39;&#34;&#39;  : &#39;&#34;&#39;,
+}
+
+_HEX = frozenset(&#39;0123456789abcdefABCDEF&#39;)
+
+_THREE_CHAR_OPS: dict[str, PhpTokenKind] = {
+    &#39;===&#39; : PhpTokenKind.IS_IDENTICAL,
+    &#39;!==&#39; : PhpTokenKind.IS_NOT_IDENTICAL,
+    &#39;&lt;=&gt;&#39; : PhpTokenKind.SPACESHIP,
+    &#39;**=&#39; : PhpTokenKind.POW_EQUAL,
+    &#39;&lt;&lt;=&#39; : PhpTokenKind.SL_EQUAL,
+    &#39;&gt;&gt;=&#39; : PhpTokenKind.SR_EQUAL,
+    &#39;??=&#39; : PhpTokenKind.COALESCE_EQUAL,
+    &#39;?-&gt;&#39; : PhpTokenKind.NULLSAFE_OPERATOR,
+    &#39;...&#39; : PhpTokenKind.ELLIPSIS,
+}
+
+_TWO_CHAR_OPS: dict[str, PhpTokenKind] = {
+    &#39;**&#39; : PhpTokenKind.POW,
+    &#39;++&#39; : PhpTokenKind.INC,
+    &#39;--&#39; : PhpTokenKind.DEC,
+    &#39;-&gt;&#39; : PhpTokenKind.OBJECT_OPERATOR,
+    &#39;=&gt;&#39; : PhpTokenKind.DOUBLE_ARROW,
+    &#39;::&#39; : PhpTokenKind.DOUBLE_COLON,
+    &#39;==&#39; : PhpTokenKind.IS_EQUAL,
+    &#39;!=&#39; : PhpTokenKind.IS_NOT_EQUAL,
+    &#39;&lt;&gt;&#39; : PhpTokenKind.IS_NOT_EQUAL,
+    &#39;&lt;=&#39; : PhpTokenKind.IS_SMALLER_OR_EQUAL,
+    &#39;&gt;=&#39; : PhpTokenKind.IS_GREATER_OR_EQUAL,
+    &#39;+=&#39; : PhpTokenKind.PLUS_EQUAL,
+    &#39;-=&#39; : PhpTokenKind.MINUS_EQUAL,
+    &#39;*=&#39; : PhpTokenKind.MUL_EQUAL,
+    &#39;/=&#39; : PhpTokenKind.DIV_EQUAL,
+    &#39;%=&#39; : PhpTokenKind.MOD_EQUAL,
+    &#39;.=&#39; : PhpTokenKind.CONCAT_EQUAL,
+    &#39;&amp;=&#39; : PhpTokenKind.AND_EQUAL,
+    &#39;|=&#39; : PhpTokenKind.OR_EQUAL,
+    &#39;^=&#39; : PhpTokenKind.XOR_EQUAL,
+    &#39;&amp;&amp;&#39; : PhpTokenKind.BOOLEAN_AND,
+    &#39;||&#39; : PhpTokenKind.BOOLEAN_OR,
+    &#39;??&#39; : PhpTokenKind.COALESCE,
+    &#39;&lt;&lt;&#39; : PhpTokenKind.SL,
+    &#39;&gt;&gt;&#39; : PhpTokenKind.SR,
+}
+
+_ONE_CHAR_OPS: dict[str, PhpTokenKind] = {
+    &#39;+&#39; : PhpTokenKind.PLUS,
+    &#39;-&#39; : PhpTokenKind.MINUS,
+    &#39;*&#39; : PhpTokenKind.STAR,
+    &#39;/&#39; : PhpTokenKind.SLASH,
+    &#39;%&#39; : PhpTokenKind.PERCENT,
+    &#39;.&#39; : PhpTokenKind.DOT,
+    &#39;=&#39; : PhpTokenKind.EQUALS,
+    &#39;&lt;&#39; : PhpTokenKind.LT,
+    &#39;&gt;&#39; : PhpTokenKind.GT,
+    &#39;&amp;&#39; : PhpTokenKind.AMP,
+    &#39;|&#39; : PhpTokenKind.PIPE,
+    &#39;^&#39; : PhpTokenKind.CARET,
+    &#39;~&#39; : PhpTokenKind.TILDE,
+    &#39;!&#39; : PhpTokenKind.BANG,
+    &#39;@&#39; : PhpTokenKind.AT,
+    &#39;?&#39; : PhpTokenKind.QUESTION,
+    &#39;:&#39; : PhpTokenKind.COLON,
+    &#39;(&#39; : PhpTokenKind.LPAREN,
+    &#39;)&#39; : PhpTokenKind.RPAREN,
+    &#39;{&#39; : PhpTokenKind.LBRACE,
+    &#39;}&#39; : PhpTokenKind.RBRACE,
+    &#39;[&#39; : PhpTokenKind.LBRACKET,
+    &#39;]&#39; : PhpTokenKind.RBRACKET,
+    &#39;;&#39; : PhpTokenKind.SEMICOLON,
+    &#39;,&#39; : PhpTokenKind.COMMA,
+    &#39;$&#39; : PhpTokenKind.DOLLAR,
+    &#39;\\&#39;: PhpTokenKind.NS_SEPARATOR,
+}
+
+
+class PhpLexerMode(enum.Enum):
+    INLINE_HTML = &#39;inline-html&#39;
+    SCRIPTING = &#39;scripting&#39;
+
+
+def _is_ident_start(c: str) -&gt; bool:
+    return c.isalpha() or c == &#39;_&#39; or ord(c) &gt;= 0x80
+
+
+def _is_ident_part(c: str) -&gt; bool:
+    return c.isalnum() or c == &#39;_&#39; or ord(c) &gt;= 0x80
+
+
+@dataclass
+class PhpLexer:
+    source: str
+    pos: int = 0
+    mode_stack: list[PhpLexerMode] = field(
+        default_factory=lambda: [PhpLexerMode.INLINE_HTML])
+
+    @property
+    def mode(self) -&gt; PhpLexerMode:
+        return self.mode_stack[-1]
+
+    @mode.setter
+    def mode(self, value: PhpLexerMode):
+        self.mode_stack[-1] = value
+
+    def push_mode(self, mode: PhpLexerMode):
+        self.mode_stack.append(mode)
+
+    def pop_mode(self):
+        if len(self.mode_stack) &gt; 1:
+            self.mode_stack.pop()
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _read_inline_html(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length:
+            if src[self.pos] == &#39;&lt;&#39; and src[self.pos + 1:self.pos + 2] == &#39;?&#39;:
+                break
+            self.pos += 1
+        return PhpToken(PhpTokenKind.INLINE_HTML, src[start:self.pos], start)
+
+    def _read_open_tag(self) -&gt; PhpToken:
+        src = self.source
+        start = self.pos
+        if src[self.pos:self.pos + 3] == &#39;&lt;?=&#39;:
+            self.pos += 3
+            return PhpToken(PhpTokenKind.OPEN_TAG_ECHO, &#39;&lt;?=&#39;, start)
+        if src[self.pos:self.pos + 5].lower() == &#39;&lt;?php&#39;:
+            after = src[self.pos + 5:self.pos + 6]
+            if after == &#39;&#39; or after.isspace():
+                self.pos += 5
+                return PhpToken(PhpTokenKind.OPEN_TAG, src[start:self.pos], start)
+        self.pos += 2
+        return PhpToken(PhpTokenKind.OPEN_TAG, &#39;&lt;?&#39;, start)
+
+    def _read_line_comment(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+            if src[self.pos] == &#39;?&#39; and src[self.pos + 1:self.pos + 2] == &#39;&gt;&#39;:
+                break
+            self.pos += 1
+        return PhpToken(PhpTokenKind.COMMENT, src[start:self.pos], start)
+
+    def _read_block_comment(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        kind = PhpTokenKind.COMMENT
+        if src[self.pos:self.pos + 3] == &#39;/**&#39; and src[self.pos + 3:self.pos + 4] != &#39;/&#39;:
+            kind = PhpTokenKind.DOC_COMMENT
+        self.pos += 2
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;*&#39; and src[self.pos + 1] == &#39;/&#39;:
+                self.pos += 2
+                return PhpToken(kind, src[start:self.pos], start)
+            self.pos += 1
+        self.pos = length
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _skip_string_interpolation(self):
+        &#34;&#34;&#34;
+        Advance the cursor over a balanced `{ ... }` interpolation region inside a double-quoted
+        string or heredoc body. The cursor must point at the opening brace. Nested braces and nested
+        quoted strings are skipped as units so that a closing brace or quote appearing inside the
+        interpolation does not terminate the enclosing string prematurely.
+        &#34;&#34;&#34;
+        src = self.source
+        length = len(src)
+        depth = 0
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            if c in &#39;\&#39;&#34;&#39;:
+                self._skip_nested_string(c)
+                continue
+            if c == &#39;{&#39;:
+                depth += 1
+            elif c == &#39;}&#39;:
+                depth -= 1
+                self.pos += 1
+                if depth == 0:
+                    return
+                continue
+            self.pos += 1
+
+    def _skip_nested_string(self, quote: str):
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            self.pos += 1
+            if c == quote:
+                return
+
+    def _read_single_quoted(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            self.pos += 1
+            if c == &#39;\&#39;&#39;:
+                break
+        return PhpToken(PhpTokenKind.STRING_SINGLE, src[start:self.pos], start)
+
+    def _read_interpolated(self, quote: str, kind: PhpTokenKind) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            if c == quote:
+                self.pos += 1
+                break
+            if c == &#39;{&#39; and src[self.pos + 1:self.pos + 2] == &#39;$&#39;:
+                self._skip_string_interpolation()
+                continue
+            if c == &#39;$&#39; and src[self.pos + 1:self.pos + 2] == &#39;{&#39;:
+                self.pos += 1
+                self._skip_string_interpolation()
+                continue
+            self.pos += 1
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _read_heredoc(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 3
+        while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+            self.pos += 1
+        nowdoc = False
+        quote = &#39;&#39;
+        if self.pos &lt; length and src[self.pos] in &#39;\&#39;&#34;&#39;:
+            quote = src[self.pos]
+            nowdoc = quote == &#39;\&#39;&#39;
+            self.pos += 1
+        label_start = self.pos
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        label = src[label_start:self.pos]
+        if quote:
+            self.pos += 1
+        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+            self.pos += 1
+        kind = PhpTokenKind.NOWDOC if nowdoc else PhpTokenKind.HEREDOC
+        if not label:
+            return PhpToken(PhpTokenKind.ERROR, src[start:self.pos], start)
+        while self.pos &lt; length:
+            line_start = self.pos
+            while self.pos &lt; length and src[self.pos] in &#39;\r\n&#39;:
+                self.pos += 1
+            content_start = self.pos
+            while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+                self.pos += 1
+            if src[self.pos:self.pos + len(label)] == label:
+                after_start = self.pos + len(label)
+                after = src[after_start:after_start + 1]
+                if not (after and _is_ident_part(after)):
+                    self.pos = after_start
+                    return PhpToken(kind, src[start:self.pos], start)
+            self.pos = content_start
+            if self.pos == line_start:
+                self.pos += 1
+            while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+                if (
+                    not nowdoc
+                    and src[self.pos] == &#39;\\&#39;
+                    and src[self.pos + 1:self.pos + 2] not in (&#39;&#39;, &#39;\r&#39;, &#39;\n&#39;)
+                ):
+                    self.pos += 2
+                    continue
+                self.pos += 1
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _read_number(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        if src[self.pos] == &#39;0&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in &#39;xX&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(&#39;0123456789abcdefABCDEF_&#39;, start)
+            if nc in &#39;oO&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(&#39;01234567_&#39;, start)
+            if nc in &#39;bB&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(&#39;01_&#39;, start)
+        while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+            self.pos += 1
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39; and src[self.pos + 1:self.pos + 2] != &#39;.&#39;:
+            is_float = True
+            self.pos += 1
+            while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+                self.pos += 1
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            peek = self.pos + 1
+            if peek &lt; length and src[peek] in &#39;+-&#39;:
+                peek += 1
+            if peek &lt; length and src[peek].isdigit():
+                is_float = True
+                self.pos = peek
+                while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+                    self.pos += 1
+        kind = PhpTokenKind.FLOAT if is_float else PhpTokenKind.INTEGER
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _read_prefixed_int(self, valid_digits: str, start: int) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        if self.pos &gt;= length or src[self.pos] not in valid_digits or src[self.pos] == &#39;_&#39;:
+            return PhpToken(PhpTokenKind.ERROR, src[start:self.pos], start)
+        while self.pos &lt; length and src[self.pos] in valid_digits:
+            self.pos += 1
+        if src[self.pos - 1] == &#39;_&#39;:
+            return PhpToken(PhpTokenKind.ERROR, src[start:self.pos], start)
+        return PhpToken(PhpTokenKind.INTEGER, src[start:self.pos], start)
+
+    def _read_variable(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        return PhpToken(PhpTokenKind.VARIABLE, src[start:self.pos], start)
+
+    def _read_identifier(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        word = src[start:self.pos]
+        kind = KEYWORDS.get(word.lower())
+        if kind is not None:
+            return PhpToken(kind, word, start)
+        return PhpToken(PhpTokenKind.IDENTIFIER, word, start)
+
+    def _try_read_cast(self) -&gt; PhpToken | None:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        pos = self.pos + 1
+        while pos &lt; length and src[pos] in &#39; \t&#39;:
+            pos += 1
+        word_start = pos
+        while pos &lt; length and src[pos].isalpha():
+            pos += 1
+        word = src[word_start:pos]
+        if not word:
+            return None
+        while pos &lt; length and src[pos] in &#39; \t&#39;:
+            pos += 1
+        if pos &gt;= length or src[pos] != &#39;)&#39;:
+            return None
+        kind = CAST_KEYWORDS.get(word.lower())
+        if kind is None:
+            return None
+        self.pos = pos + 1
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def tokenize(self) -&gt; Generator[PhpToken, None, None]:
+        src = self.source
+        length = len(src)
+        while True:
+            if self.mode is PhpLexerMode.INLINE_HTML:
+                if self._at_end():
+                    yield PhpToken(PhpTokenKind.EOF, &#39;&#39;, self.pos)
+                    return
+                if src[self.pos] == &#39;&lt;&#39; and src[self.pos + 1:self.pos + 2] == &#39;?&#39;:
+                    tok = self._read_open_tag()
+                    self.mode = PhpLexerMode.SCRIPTING
+                    yield tok
+                    continue
+                html = self._read_inline_html()
+                if html.value:
+                    yield html
+                continue
+
+            while self.pos &lt; length and src[self.pos] in &#39; \t\r\n\f\v&#39;:
+                self.pos += 1
+            if self._at_end():
+                yield PhpToken(PhpTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+
+            if c2 == &#39;?&gt;&#39;:
+                self.pos += 2
+                if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                    self.pos += 1
+                elif src[self.pos:self.pos + 2] == &#39;\r\n&#39;:
+                    self.pos += 2
+                self.mode = PhpLexerMode.INLINE_HTML
+                yield PhpToken(PhpTokenKind.CLOSE_TAG, &#39;?&gt;&#39;, start)
+                continue
+
+            if c2 == &#39;//&#39; or c == &#39;#&#39; and c2 != &#39;#[&#39;:
+                yield self._read_line_comment()
+                continue
+            if c2 == &#39;/*&#39;:
+                yield self._read_block_comment()
+                continue
+            if c2 == &#39;#[&#39;:
+                self.pos += 2
+                yield PhpToken(PhpTokenKind.ATTRIBUTE, &#39;#[&#39;, start)
+                continue
+
+            if c == &#39;\&#39;&#39;:
+                yield self._read_single_quoted()
+                continue
+            if c == &#39;&#34;&#39;:
+                yield self._read_interpolated(&#39;&#34;&#39;, PhpTokenKind.STRING_DOUBLE)
+                continue
+            if c == &#39;`&#39;:
+                yield self._read_interpolated(&#39;`&#39;, PhpTokenKind.SHELL_EXEC)
+                continue
+            if c2 == &#39;&lt;&lt;&#39; and src[self.pos:self.pos + 3] == &#39;&lt;&lt;&lt;&#39;:
+                yield self._read_heredoc()
+                continue
+
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+                yield self._read_variable()
+                continue
+
+            if c.isdigit() or (
+                c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()
+            ):
+                yield self._read_number()
+                continue
+
+            if _is_ident_start(c):
+                yield self._read_identifier()
+                continue
+
+            if c == &#39;(&#39;:
+                cast = self._try_read_cast()
+                if cast is not None:
+                    yield cast
+                    continue
+
+            c3 = src[self.pos:self.pos + 3]
+            if c3 in _THREE_CHAR_OPS:
+                self.pos += 3
+                yield PhpToken(_THREE_CHAR_OPS[c3], c3, start)
+                continue
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                yield PhpToken(_TWO_CHAR_OPS[c2], c2, start)
+                continue
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                yield PhpToken(_ONE_CHAR_OPS[c], c, start)
+                continue
+
+            self.pos += 1
+            yield PhpToken(PhpTokenKind.ERROR, c, start)
+
+
+def decode_php_single_quoted(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode the body of a single-quoted PHP string literal. Only `\\&#39;` and `\\\\` are recognized as
+    escape sequences; every other backslash is literal.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return text
+    parts: list[str] = []
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c == &#39;\\&#39; and i + 1 &lt; length and text[i + 1] in &#39;\\\&#39;&#39;:
+            parts.append(text[i + 1])
+            i += 2
+            continue
+        parts.append(c)
+        i += 1
+    return &#39;&#39;.join(parts)
+
+
+def decode_php_double_quoted(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode the escape sequences of a double-quoted PHP string body. Interpolation is not resolved;
+    embedded variable references are left verbatim. Recognizes the standard C-style escapes as well
+    as `\\xHH`, `\\u{...}`, and octal `\\NNN`.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return text
+    parts: list[str] = []
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c != &#39;\\&#39; or i + 1 &gt;= length:
+            parts.append(c)
+            i += 1
+            continue
+        n = text[i + 1]
+        mapped = _ESCAPE_MAP.get(n)
+        if mapped is not None:
+            parts.append(mapped)
+            i += 2
+            continue
+        if n == &#39;x&#39; and i + 2 &lt; length and text[i + 2] in _HEX:
+            j = i + 2
+            while j &lt; length and j &lt; i + 4 and text[j] in _HEX:
+                j += 1
+            parts.append(chr(int(text[i + 2:j], 16)))
+            i = j
+            continue
+        if n == &#39;u&#39; and text[i + 2:i + 3] == &#39;{&#39;:
+            end = text.find(&#39;}&#39;, i + 3)
+            if end != -1 and all(h in _HEX for h in text[i + 3:end]) and end &gt; i + 3:
+                code_point = int(text[i + 3:end], 16)
+                if code_point &lt;= 0x10FFFF:
+                    parts.append(chr(code_point))
+                    i = end + 1
+                    continue
+                parts.append(text[i:end + 1])
+                i = end + 1
+                continue
+        if n in &#39;01234567&#39;:
+            j = i + 1
+            while j &lt; length and j &lt; i + 4 and text[j] in &#39;01234567&#39;:
+                j += 1
+            parts.append(chr(int(text[i + 1:j], 8) &amp; 0xFF))
+            i = j
+            continue
+        parts.append(c)
+        i += 1
+    return &#39;&#39;.join(parts)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.php.lexer.decode_php_single_quoted"><code class="name flex">
+<span>def <span class="ident">decode_php_single_quoted</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode the body of a single-quoted PHP string literal. Only <code>\'</code> and <code>\\</code> are recognized as
+escape sequences; every other backslash is literal.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L508-L526" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_php_single_quoted(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode the body of a single-quoted PHP string literal. Only `\\&#39;` and `\\\\` are recognized as
+    escape sequences; every other backslash is literal.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return text
+    parts: list[str] = []
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c == &#39;\\&#39; and i + 1 &lt; length and text[i + 1] in &#39;\\\&#39;&#39;:
+            parts.append(text[i + 1])
+            i += 2
+            continue
+        parts.append(c)
+        i += 1
+    return &#39;&#39;.join(parts)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.decode_php_double_quoted"><code class="name flex">
+<span>def <span class="ident">decode_php_double_quoted</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode the escape sequences of a double-quoted PHP string body. Interpolation is not resolved;
+embedded variable references are left verbatim. Recognizes the standard C-style escapes as well
+as <code>\xHH</code>, <code>\u{...}</code>, and octal <code>\NNN</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L529-L579" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_php_double_quoted(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode the escape sequences of a double-quoted PHP string body. Interpolation is not resolved;
+    embedded variable references are left verbatim. Recognizes the standard C-style escapes as well
+    as `\\xHH`, `\\u{...}`, and octal `\\NNN`.
+    &#34;&#34;&#34;
+    if &#39;\\&#39; not in text:
+        return text
+    parts: list[str] = []
+    i = 0
+    length = len(text)
+    while i &lt; length:
+        c = text[i]
+        if c != &#39;\\&#39; or i + 1 &gt;= length:
+            parts.append(c)
+            i += 1
+            continue
+        n = text[i + 1]
+        mapped = _ESCAPE_MAP.get(n)
+        if mapped is not None:
+            parts.append(mapped)
+            i += 2
+            continue
+        if n == &#39;x&#39; and i + 2 &lt; length and text[i + 2] in _HEX:
+            j = i + 2
+            while j &lt; length and j &lt; i + 4 and text[j] in _HEX:
+                j += 1
+            parts.append(chr(int(text[i + 2:j], 16)))
+            i = j
+            continue
+        if n == &#39;u&#39; and text[i + 2:i + 3] == &#39;{&#39;:
+            end = text.find(&#39;}&#39;, i + 3)
+            if end != -1 and all(h in _HEX for h in text[i + 3:end]) and end &gt; i + 3:
+                code_point = int(text[i + 3:end], 16)
+                if code_point &lt;= 0x10FFFF:
+                    parts.append(chr(code_point))
+                    i = end + 1
+                    continue
+                parts.append(text[i:end + 1])
+                i = end + 1
+                continue
+        if n in &#39;01234567&#39;:
+            j = i + 1
+            while j &lt; length and j &lt; i + 4 and text[j] in &#39;01234567&#39;:
+                j += 1
+            parts.append(chr(int(text[i + 1:j], 8) &amp; 0xFF))
+            i = j
+            continue
+        parts.append(c)
+        i += 1
+    return &#39;&#39;.join(parts)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexerMode"><code class="flex name class">
+<span>class <span class="ident">PhpLexerMode</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Create a collection of name/value pairs.</p>
+<p>Example enumeration:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+</code></pre>
+<p>Access them by:</p>
+<ul>
+<li>attribute access:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color.RED
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>value lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color(1)
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul>
+<li>name lookup:</li>
+</ul>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Color['RED']
+<Color.RED: 1></p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>Enumerations can be iterated over, and know how many members they have:</p>
+<pre><code class="language-python-repl">&gt;&gt;&gt; len(Color)
+3
+</code></pre>
+<pre><code class="language-python-repl">&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+</code></pre>
+<p>Methods can be added to enumerations, and members can have their own
+attributes &ndash; see the documentation for details.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L100-L102" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class PhpLexerMode(enum.Enum):
+    INLINE_HTML = &#39;inline-html&#39;
+    SCRIPTING = &#39;scripting&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexerMode.INLINE_HTML"><code class="name">var <span class="ident">INLINE_HTML</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexerMode.SCRIPTING"><code class="name">var <span class="ident">SCRIPTING</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer"><code class="flex name class">
+<span>class <span class="ident">PhpLexer</span></span>
+<span>(</span><span>source, pos=0, mode_stack=&lt;factory&gt;)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>PhpLexer(source: 'str', pos: 'int' = 0, mode_stack: 'list[PhpLexerMode]' = <factory>)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L113-L505" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class PhpLexer:
+    source: str
+    pos: int = 0
+    mode_stack: list[PhpLexerMode] = field(
+        default_factory=lambda: [PhpLexerMode.INLINE_HTML])
+
+    @property
+    def mode(self) -&gt; PhpLexerMode:
+        return self.mode_stack[-1]
+
+    @mode.setter
+    def mode(self, value: PhpLexerMode):
+        self.mode_stack[-1] = value
+
+    def push_mode(self, mode: PhpLexerMode):
+        self.mode_stack.append(mode)
+
+    def pop_mode(self):
+        if len(self.mode_stack) &gt; 1:
+            self.mode_stack.pop()
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _read_inline_html(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length:
+            if src[self.pos] == &#39;&lt;&#39; and src[self.pos + 1:self.pos + 2] == &#39;?&#39;:
+                break
+            self.pos += 1
+        return PhpToken(PhpTokenKind.INLINE_HTML, src[start:self.pos], start)
+
+    def _read_open_tag(self) -&gt; PhpToken:
+        src = self.source
+        start = self.pos
+        if src[self.pos:self.pos + 3] == &#39;&lt;?=&#39;:
+            self.pos += 3
+            return PhpToken(PhpTokenKind.OPEN_TAG_ECHO, &#39;&lt;?=&#39;, start)
+        if src[self.pos:self.pos + 5].lower() == &#39;&lt;?php&#39;:
+            after = src[self.pos + 5:self.pos + 6]
+            if after == &#39;&#39; or after.isspace():
+                self.pos += 5
+                return PhpToken(PhpTokenKind.OPEN_TAG, src[start:self.pos], start)
+        self.pos += 2
+        return PhpToken(PhpTokenKind.OPEN_TAG, &#39;&lt;?&#39;, start)
+
+    def _read_line_comment(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+            if src[self.pos] == &#39;?&#39; and src[self.pos + 1:self.pos + 2] == &#39;&gt;&#39;:
+                break
+            self.pos += 1
+        return PhpToken(PhpTokenKind.COMMENT, src[start:self.pos], start)
+
+    def _read_block_comment(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        kind = PhpTokenKind.COMMENT
+        if src[self.pos:self.pos + 3] == &#39;/**&#39; and src[self.pos + 3:self.pos + 4] != &#39;/&#39;:
+            kind = PhpTokenKind.DOC_COMMENT
+        self.pos += 2
+        while self.pos &lt; length - 1:
+            if src[self.pos] == &#39;*&#39; and src[self.pos + 1] == &#39;/&#39;:
+                self.pos += 2
+                return PhpToken(kind, src[start:self.pos], start)
+            self.pos += 1
+        self.pos = length
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _skip_string_interpolation(self):
+        &#34;&#34;&#34;
+        Advance the cursor over a balanced `{ ... }` interpolation region inside a double-quoted
+        string or heredoc body. The cursor must point at the opening brace. Nested braces and nested
+        quoted strings are skipped as units so that a closing brace or quote appearing inside the
+        interpolation does not terminate the enclosing string prematurely.
+        &#34;&#34;&#34;
+        src = self.source
+        length = len(src)
+        depth = 0
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            if c in &#39;\&#39;&#34;&#39;:
+                self._skip_nested_string(c)
+                continue
+            if c == &#39;{&#39;:
+                depth += 1
+            elif c == &#39;}&#39;:
+                depth -= 1
+                self.pos += 1
+                if depth == 0:
+                    return
+                continue
+            self.pos += 1
+
+    def _skip_nested_string(self, quote: str):
+        src = self.source
+        length = len(src)
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            self.pos += 1
+            if c == quote:
+                return
+
+    def _read_single_quoted(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            self.pos += 1
+            if c == &#39;\&#39;&#39;:
+                break
+        return PhpToken(PhpTokenKind.STRING_SINGLE, src[start:self.pos], start)
+
+    def _read_interpolated(self, quote: str, kind: PhpTokenKind) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c == &#39;\\&#39;:
+                self.pos += 2
+                continue
+            if c == quote:
+                self.pos += 1
+                break
+            if c == &#39;{&#39; and src[self.pos + 1:self.pos + 2] == &#39;$&#39;:
+                self._skip_string_interpolation()
+                continue
+            if c == &#39;$&#39; and src[self.pos + 1:self.pos + 2] == &#39;{&#39;:
+                self.pos += 1
+                self._skip_string_interpolation()
+                continue
+            self.pos += 1
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _read_heredoc(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 3
+        while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+            self.pos += 1
+        nowdoc = False
+        quote = &#39;&#39;
+        if self.pos &lt; length and src[self.pos] in &#39;\&#39;&#34;&#39;:
+            quote = src[self.pos]
+            nowdoc = quote == &#39;\&#39;&#39;
+            self.pos += 1
+        label_start = self.pos
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        label = src[label_start:self.pos]
+        if quote:
+            self.pos += 1
+        while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+            self.pos += 1
+        kind = PhpTokenKind.NOWDOC if nowdoc else PhpTokenKind.HEREDOC
+        if not label:
+            return PhpToken(PhpTokenKind.ERROR, src[start:self.pos], start)
+        while self.pos &lt; length:
+            line_start = self.pos
+            while self.pos &lt; length and src[self.pos] in &#39;\r\n&#39;:
+                self.pos += 1
+            content_start = self.pos
+            while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+                self.pos += 1
+            if src[self.pos:self.pos + len(label)] == label:
+                after_start = self.pos + len(label)
+                after = src[after_start:after_start + 1]
+                if not (after and _is_ident_part(after)):
+                    self.pos = after_start
+                    return PhpToken(kind, src[start:self.pos], start)
+            self.pos = content_start
+            if self.pos == line_start:
+                self.pos += 1
+            while self.pos &lt; length and src[self.pos] not in &#39;\r\n&#39;:
+                if (
+                    not nowdoc
+                    and src[self.pos] == &#39;\\&#39;
+                    and src[self.pos + 1:self.pos + 2] not in (&#39;&#39;, &#39;\r&#39;, &#39;\n&#39;)
+                ):
+                    self.pos += 2
+                    continue
+                self.pos += 1
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _read_number(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        if src[self.pos] == &#39;0&#39; and self.pos + 1 &lt; length:
+            nc = src[self.pos + 1]
+            if nc in &#39;xX&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(&#39;0123456789abcdefABCDEF_&#39;, start)
+            if nc in &#39;oO&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(&#39;01234567_&#39;, start)
+            if nc in &#39;bB&#39;:
+                self.pos += 2
+                return self._read_prefixed_int(&#39;01_&#39;, start)
+        while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+            self.pos += 1
+        is_float = False
+        if self.pos &lt; length and src[self.pos] == &#39;.&#39; and src[self.pos + 1:self.pos + 2] != &#39;.&#39;:
+            is_float = True
+            self.pos += 1
+            while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+                self.pos += 1
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            peek = self.pos + 1
+            if peek &lt; length and src[peek] in &#39;+-&#39;:
+                peek += 1
+            if peek &lt; length and src[peek].isdigit():
+                is_float = True
+                self.pos = peek
+                while self.pos &lt; length and (src[self.pos].isdigit() or src[self.pos] == &#39;_&#39;):
+                    self.pos += 1
+        kind = PhpTokenKind.FLOAT if is_float else PhpTokenKind.INTEGER
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def _read_prefixed_int(self, valid_digits: str, start: int) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        if self.pos &gt;= length or src[self.pos] not in valid_digits or src[self.pos] == &#39;_&#39;:
+            return PhpToken(PhpTokenKind.ERROR, src[start:self.pos], start)
+        while self.pos &lt; length and src[self.pos] in valid_digits:
+            self.pos += 1
+        if src[self.pos - 1] == &#39;_&#39;:
+            return PhpToken(PhpTokenKind.ERROR, src[start:self.pos], start)
+        return PhpToken(PhpTokenKind.INTEGER, src[start:self.pos], start)
+
+    def _read_variable(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        return PhpToken(PhpTokenKind.VARIABLE, src[start:self.pos], start)
+
+    def _read_identifier(self) -&gt; PhpToken:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        word = src[start:self.pos]
+        kind = KEYWORDS.get(word.lower())
+        if kind is not None:
+            return PhpToken(kind, word, start)
+        return PhpToken(PhpTokenKind.IDENTIFIER, word, start)
+
+    def _try_read_cast(self) -&gt; PhpToken | None:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        pos = self.pos + 1
+        while pos &lt; length and src[pos] in &#39; \t&#39;:
+            pos += 1
+        word_start = pos
+        while pos &lt; length and src[pos].isalpha():
+            pos += 1
+        word = src[word_start:pos]
+        if not word:
+            return None
+        while pos &lt; length and src[pos] in &#39; \t&#39;:
+            pos += 1
+        if pos &gt;= length or src[pos] != &#39;)&#39;:
+            return None
+        kind = CAST_KEYWORDS.get(word.lower())
+        if kind is None:
+            return None
+        self.pos = pos + 1
+        return PhpToken(kind, src[start:self.pos], start)
+
+    def tokenize(self) -&gt; Generator[PhpToken, None, None]:
+        src = self.source
+        length = len(src)
+        while True:
+            if self.mode is PhpLexerMode.INLINE_HTML:
+                if self._at_end():
+                    yield PhpToken(PhpTokenKind.EOF, &#39;&#39;, self.pos)
+                    return
+                if src[self.pos] == &#39;&lt;&#39; and src[self.pos + 1:self.pos + 2] == &#39;?&#39;:
+                    tok = self._read_open_tag()
+                    self.mode = PhpLexerMode.SCRIPTING
+                    yield tok
+                    continue
+                html = self._read_inline_html()
+                if html.value:
+                    yield html
+                continue
+
+            while self.pos &lt; length and src[self.pos] in &#39; \t\r\n\f\v&#39;:
+                self.pos += 1
+            if self._at_end():
+                yield PhpToken(PhpTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+
+            if c2 == &#39;?&gt;&#39;:
+                self.pos += 2
+                if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                    self.pos += 1
+                elif src[self.pos:self.pos + 2] == &#39;\r\n&#39;:
+                    self.pos += 2
+                self.mode = PhpLexerMode.INLINE_HTML
+                yield PhpToken(PhpTokenKind.CLOSE_TAG, &#39;?&gt;&#39;, start)
+                continue
+
+            if c2 == &#39;//&#39; or c == &#39;#&#39; and c2 != &#39;#[&#39;:
+                yield self._read_line_comment()
+                continue
+            if c2 == &#39;/*&#39;:
+                yield self._read_block_comment()
+                continue
+            if c2 == &#39;#[&#39;:
+                self.pos += 2
+                yield PhpToken(PhpTokenKind.ATTRIBUTE, &#39;#[&#39;, start)
+                continue
+
+            if c == &#39;\&#39;&#39;:
+                yield self._read_single_quoted()
+                continue
+            if c == &#39;&#34;&#39;:
+                yield self._read_interpolated(&#39;&#34;&#39;, PhpTokenKind.STRING_DOUBLE)
+                continue
+            if c == &#39;`&#39;:
+                yield self._read_interpolated(&#39;`&#39;, PhpTokenKind.SHELL_EXEC)
+                continue
+            if c2 == &#39;&lt;&lt;&#39; and src[self.pos:self.pos + 3] == &#39;&lt;&lt;&lt;&#39;:
+                yield self._read_heredoc()
+                continue
+
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+                yield self._read_variable()
+                continue
+
+            if c.isdigit() or (
+                c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()
+            ):
+                yield self._read_number()
+                continue
+
+            if _is_ident_start(c):
+                yield self._read_identifier()
+                continue
+
+            if c == &#39;(&#39;:
+                cast = self._try_read_cast()
+                if cast is not None:
+                    yield cast
+                    continue
+
+            c3 = src[self.pos:self.pos + 3]
+            if c3 in _THREE_CHAR_OPS:
+                self.pos += 3
+                yield PhpToken(_THREE_CHAR_OPS[c3], c3, start)
+                continue
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                yield PhpToken(_TWO_CHAR_OPS[c2], c2, start)
+                continue
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                yield PhpToken(_ONE_CHAR_OPS[c], c, start)
+                continue
+
+            self.pos += 1
+            yield PhpToken(PhpTokenKind.ERROR, c, start)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.mode_stack"><code class="name">var <span class="ident">mode_stack</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.mode"><code class="name">var <span class="ident">mode</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L120-L122" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def mode(self) -&gt; PhpLexerMode:
+    return self.mode_stack[-1]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.push_mode"><code class="name flex">
+<span>def <span class="ident">push_mode</span></span>(<span>self, mode)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L128-L129" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def push_mode(self, mode: PhpLexerMode):
+    self.mode_stack.append(mode)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.pop_mode"><code class="name flex">
+<span>def <span class="ident">pop_mode</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L131-L133" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def pop_mode(self):
+    if len(self.mode_stack) &gt; 1:
+        self.mode_stack.pop()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.php.lexer.PhpLexer.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/php/lexer.py#L408-L505" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokenize(self) -&gt; Generator[PhpToken, None, None]:
+    src = self.source
+    length = len(src)
+    while True:
+        if self.mode is PhpLexerMode.INLINE_HTML:
+            if self._at_end():
+                yield PhpToken(PhpTokenKind.EOF, &#39;&#39;, self.pos)
+                return
+            if src[self.pos] == &#39;&lt;&#39; and src[self.pos + 1:self.pos + 2] == &#39;?&#39;:
+                tok = self._read_open_tag()
+                self.mode = PhpLexerMode.SCRIPTING
+                yield tok
+                continue
+            html = self._read_inline_html()
+            if html.value:
+                yield html
+            continue
+
+        while self.pos &lt; length and src[self.pos] in &#39; \t\r\n\f\v&#39;:
+            self.pos += 1
+        if self._at_end():
+            yield PhpToken(PhpTokenKind.EOF, &#39;&#39;, self.pos)
+            return
+
+        start = self.pos
+        c = src[self.pos]
+        c2 = src[self.pos:self.pos + 2]
+
+        if c2 == &#39;?&gt;&#39;:
+            self.pos += 2
+            if self.pos &lt; length and src[self.pos] == &#39;\n&#39;:
+                self.pos += 1
+            elif src[self.pos:self.pos + 2] == &#39;\r\n&#39;:
+                self.pos += 2
+            self.mode = PhpLexerMode.INLINE_HTML
+            yield PhpToken(PhpTokenKind.CLOSE_TAG, &#39;?&gt;&#39;, start)
+            continue
+
+        if c2 == &#39;//&#39; or c == &#39;#&#39; and c2 != &#39;#[&#39;:
+            yield self._read_line_comment()
+            continue
+        if c2 == &#39;/*&#39;:
+            yield self._read_block_comment()
+            continue
+        if c2 == &#39;#[&#39;:
+            self.pos += 2
+            yield PhpToken(PhpTokenKind.ATTRIBUTE, &#39;#[&#39;, start)
+            continue
+
+        if c == &#39;\&#39;&#39;:
+            yield self._read_single_quoted()
+            continue
+        if c == &#39;&#34;&#39;:
+            yield self._read_interpolated(&#39;&#34;&#39;, PhpTokenKind.STRING_DOUBLE)
+            continue
+        if c == &#39;`&#39;:
+            yield self._read_interpolated(&#39;`&#39;, PhpTokenKind.SHELL_EXEC)
+            continue
+        if c2 == &#39;&lt;&lt;&#39; and src[self.pos:self.pos + 3] == &#39;&lt;&lt;&lt;&#39;:
+            yield self._read_heredoc()
+            continue
+
+        if c == &#39;$&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+            yield self._read_variable()
+            continue
+
+        if c.isdigit() or (
+            c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit()
+        ):
+            yield self._read_number()
+            continue
+
+        if _is_ident_start(c):
+            yield self._read_identifier()
+            continue
+
+        if c == &#39;(&#39;:
+            cast = self._try_read_cast()
+            if cast is not None:
+                yield cast
+                continue
+
+        c3 = src[self.pos:self.pos + 3]
+        if c3 in _THREE_CHAR_OPS:
+            self.pos += 3
+            yield PhpToken(_THREE_CHAR_OPS[c3], c3, start)
+            continue
+        if c2 in _TWO_CHAR_OPS:
+            self.pos += 2
+            yield PhpToken(_TWO_CHAR_OPS[c2], c2, start)
+            continue
+        if c in _ONE_CHAR_OPS:
+            self.pos += 1
+            yield PhpToken(_ONE_CHAR_OPS[c], c, start)
+            continue
+
+        self.pos += 1
+        yield PhpToken(PhpTokenKind.ERROR, c, start)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.php" href="index.html">refinery.lib.scripts.php</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.php.lexer.decode_php_single_quoted" href="#refinery.lib.scripts.php.lexer.decode_php_single_quoted">decode_php_single_quoted</a></code></li>
+<li><code><a title="refinery.lib.scripts.php.lexer.decode_php_double_quoted" href="#refinery.lib.scripts.php.lexer.decode_php_double_quoted">decode_php_double_quoted</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.php.lexer.PhpLexerMode" href="#refinery.lib.scripts.php.lexer.PhpLexerMode">PhpLexerMode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.php.lexer.PhpLexer" href="#refinery.lib.scripts.php.lexer.PhpLexer">PhpLexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.php.lexer.PhpLexer.push_mode" href="#refinery.lib.scripts.php.lexer.PhpLexer.push_mode">push_mode</a></code></li>
+<li><code><a title="refinery.lib.scripts.php.lexer.PhpLexer.pop_mode" href="#refinery.lib.scripts.php.lexer.PhpLexer.pop_mode">pop_mode</a></code></li>
+<li><code><a title="refinery.lib.scripts.php.lexer.PhpLexer.tokenize" href="#refinery.lib.scripts.php.lexer.PhpLexer.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

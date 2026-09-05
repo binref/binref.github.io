@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.callgraph documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.callgraph</code></h1>
+</header>
+<section id="section-intro">
+<p>The call graph of one PowerShell script: which function definitions a command name denotes, which
+invocations reach that name, and whether the two together are the whole story.</p>
+<p>Two questions are asked of it, and they fail in opposite directions, which is why one walk answers
+both. <em>Reachability</em> decides whether a definition may be deleted, so a call site the walk misses
+deletes live code. <em>Output flow</em> — <code><a title="refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow">Ps1OutputFlow</a></code> —
+decides whether a bare value inside a body may be deleted, so a call site the walk misses deletes a
+payload. The reachability expansion this replaced descended only into bodies it had already proven
+reachable: sound for its own question, and a deletion licence for the other, because a call site
+sitting inside an unreached function was never read at all.</p>
+<p>The graph is structure and nothing more. It says who can call what; what a call <em>does</em> with the
+value it produces is the effect layer's question, asked through here rather than answered here.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L1-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The call graph of one PowerShell script: which function definitions a command name denotes, which
+invocations reach that name, and whether the two together are the whole story.
+
+Two questions are asked of it, and they fail in opposite directions, which is why one walk answers
+both. *Reachability* decides whether a definition may be deleted, so a call site the walk misses
+deletes live code. *Output flow* — `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow` —
+decides whether a bare value inside a body may be deleted, so a call site the walk misses deletes a
+payload. The reachability expansion this replaced descended only into bodies it had already proven
+reachable: sound for its own question, and a deletion licence for the other, because a call site
+sitting inside an unreached function was never read at all.
+
+The graph is structure and nothing more. It says who can call what; what a call *does* with the
+value it produces is the effect layer&#39;s question, asked through here rather than answered here.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Mapping, NamedTuple, Sequence
+
+if TYPE_CHECKING:
+    from refinery.lib.scripts.analysis.dominance import DominatorModel
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.ps1.analysis.world import (
+    Ps1TypeWorld,
+    command_definition_keyword_binding,
+)
+from refinery.lib.scripts.ps1.ast import (
+    assignment_target_variables,
+    get_command_name,
+    implicit_get_retry,
+    is_opaque_dispatch,
+    normalize_command_name,
+    resolve_command_name,
+)
+from refinery.lib.scripts.ps1.model import (
+    Ps1AssignmentExpression,
+    Ps1CommandInvocation,
+    Ps1FunctionDefinition,
+    Ps1MethodMember,
+    Ps1ScopeModifier,
+    Ps1Script,
+    Ps1ScriptBlock,
+)
+from refinery.lib.scripts.ps1.options import eval_is_trusted
+
+#: The variable namespaces that name a command rather than a value. Kept in step with
+#: `refinery.lib.scripts.ps1.analysis.world._IDENTITY_SCOPES`, which this module cannot reuse
+#: because the world reports one verdict for the whole script and this one needs the single node.
+_IDENTITY_SCOPES = frozenset({
+    Ps1ScopeModifier.ALIAS,
+    Ps1ScopeModifier.FUNCTION,
+})
+
+#: Commands that hand a name to code outside this file. A `.psm1` exporting a function has call
+#: sites in whatever imported it, and no walk over this tree can see them. Read through
+#: `refinery.lib.scripts.ps1.ast.resolve_command_name`, which is the deny-list reading of a name:
+#: a hit here withholds every name-keyed removal, so a spelling that dodges the table is the
+#: dangerous direction. That closes a module qualifier written after the call operator, quoted or
+#: not — `&amp; Microsoft.PowerShell.Core\Export-ModuleMember` arrives as one token either way. Written
+#: as a bare command statement the lexer splits the name at the backslash and the table is dodged;
+#: see `refinery.lib.scripts.ps1.ast.resolve_command_name` for why that hole is the lexer&#39;s.
+_EXPORTING_COMMANDS = frozenset({
+    &#39;export-modulemember&#39;,
+})
+
+
+def binds_command_identity(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `node` writes the `function:` or `alias:` namespace, binding a command name to something
+    the definition scan does not read as a definition and the call scan does not read as a call.
+    Every name-keyed decision has to treat such a node as an unknown: it can bind the name about to
+    be deleted, and it can be the only thing that reaches it.
+    &#34;&#34;&#34;
+    if not isinstance(node, Ps1AssignmentExpression):
+        return False
+    return any(
+        variable.scope in _IDENTITY_SCOPES
+        for variable in assignment_target_variables(node.target)
+    )
+
+
+def _is_class_method(definition: Ps1FunctionDefinition) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a function definition is the body of a class method rather than a command. A method is
+    reached through `$object.Method()` and never through its bare name, so it is neither a
+    definition a call site can name nor a definition this graph can find the callers of.
+    &#34;&#34;&#34;
+    return isinstance(definition.parent, Ps1MethodMember)
+
+
+def _enclosing_function(node: Node) -&gt; str | None:
+    &#34;&#34;&#34;
+    The key of the **outermost** function definition whose body holds `node`, or `None` when `node`
+    runs as part of the script itself.
+
+    Outermost rather than innermost, because the only reader is `Ps1CallGraph.reachable_names` and a
+    nested definition is never called by name. `function Outer { function Inner { Payload } }`
+    credits the call to `Outer`: reading it as `Inner`&#39;s leaves `Payload` reached by nothing, so it
+    is deleted while `Inner` — which no pass removes, since only a top-level definition is
+    removable — stands there calling a name the emitted script no longer defines. Attribution to the
+    enclosing scope is what makes the two answers agree.
+
+    A class method anywhere on the way out answers `None` and stops the walk, which is the
+    conservative direction. A method body runs whenever something constructs or calls into the
+    class, and this graph cannot see that happen; treating its calls as unconditional keeps every
+    name they reach reachable, and `Ps1OutputFlow` separately refuses to ground a method body
+    because no call site ever names it. Carrying on to the enclosing function instead would make
+    those calls conditional on a name that reaches the *class*, which nothing here can prove.
+    &#34;&#34;&#34;
+    found: str | None = None
+    cursor = node.parent
+    while cursor is not None:
+        if isinstance(cursor, Ps1FunctionDefinition):
+            if _is_class_method(cursor):
+                return None
+            found = normalize_command_name(cursor.name)
+        cursor = cursor.parent
+    return found
+
+
+class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None
+
+
+class Ps1CallGraph:
+    &#34;&#34;&#34;
+    The verdict of `build_call_graph`. Definitions and call sites are keyed through
+    `refinery.lib.scripts.ps1.ast.normalize_command_name`, so `function global:F` and a bare call to
+    `F` meet on one key, and every definition sharing a key is kept: a redefinition shadows the
+    earlier body only from the point it runs, which is order and scope information no walk over the
+    tree carries.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        definitions: Mapping[str, Sequence[Ps1FunctionDefinition]],
+        keyword_definitions: Mapping[str, Sequence[Ps1ScriptBlock]],
+        call_sites: Mapping[str, Sequence[Ps1CallSite]],
+        readable: bool,
+        exports: bool,
+    ):
+        self._definitions = dict(definitions)
+        self._keyword_definitions = dict(keyword_definitions)
+        self._call_sites = dict(call_sites)
+        self._readable = readable
+        self._exports = exports
+
+    @property
+    def is_readable(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this tree is the whole story about what a command name denotes and who reaches it.
+        Five independent things say it is not, and every one of them has to be asked, because none
+        implies another:
+
+        - the type world is open, so a dot-sourced file, an imported module or an `iex` holds
+          definitions and call sites the walk never read;
+        - an invocation dispatches opaquely (`&amp; $f`), so a name is reached without being written;
+        - an assignment binds the `function:` or `alias:` namespace, which defines a command under a
+          spelling the definition scan does not read — and leaves the world closed while doing it,
+          since `${function:j} = { }` remaps nothing in the type system;
+        - the script calls `Export-ModuleMember`, which hands a name to a caller outside the file;
+        - a call written under a qualifier resolves onto a name this script defines; see
+          `_collides_with_a_definition`.
+
+        Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.
+
+        The first two rows are the ones
+        `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` switches off, being
+        the two that say a name is reached by code nobody can read; see `build_call_graph`.
+
+        The `Export-ModuleMember` row catches the explicit export and not the general case. A
+        `.psm1` with no export statement exports every function by default, and nothing in a file
+        says it is a module — the assumption the bare-output default rests on, stated where a
+        caller can see it in `refinery.units.scripting.ps1`.
+        &#34;&#34;&#34;
+        return self._readable
+
+    @property
+    def exports_a_name(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script hands a command name to code outside the file, which is one of the five
+        things `is_readable` reads and the only one that says a *definition* has a reader elsewhere.
+
+        The distinction is worth the separate name because the two questions have different answers
+        for the same script. An `Invoke-Expression` opens the type world and could in principle call
+        anything, and every pass here has long accepted that risk in exchange for resolving the
+        trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+        script says in as many words that a caller it cannot see will call this name, so a pass that
+        deletes the definition deletes a reachable entry point.
+        &#34;&#34;&#34;
+        return self._exports
+
+    def definitions(self, name: str) -&gt; Sequence[Ps1FunctionDefinition]:
+        &#34;&#34;&#34;
+        Every function definition a call to `name` could reach, in source order.
+        &#34;&#34;&#34;
+        return self._definitions.get(normalize_command_name(name), ())
+
+    def keyword_definitions(self, name: str) -&gt; Sequence[Ps1ScriptBlock]:
+        &#34;&#34;&#34;
+        The scriptblock bodies a `workflow`/`configuration` statement binds to `name`, in source
+        order. These define the same command name a `function` does but are not themselves a
+        `refinery.lib.scripts.ps1.model.Ps1FunctionDefinition`, so a caller weighing whether a name
+        is inert reads them beside `definitions`: the empty `function` a call names may be shadowed
+        by a `workflow` whose body acts.
+        &#34;&#34;&#34;
+        return self._keyword_definitions.get(normalize_command_name(name), ())
+
+    def call_sites(self, name: str) -&gt; Sequence[Ps1CallSite]:
+        &#34;&#34;&#34;
+        Every invocation of `name` standing in this tree, in source order, wherever it sits. This
+        is what separates the graph from the reachability query below, which reads only the edges it
+        can reach from the script itself.
+        &#34;&#34;&#34;
+        return self._call_sites.get(normalize_command_name(name), ())
+
+    @property
+    def defined_names(self) -&gt; Sequence[str]:
+        &#34;&#34;&#34;
+        Every key this script defines a function under, in source order of the first definition.
+        &#34;&#34;&#34;
+        return tuple(self._definitions)
+
+    def reachable_names(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        Every command name some path from the script itself can reach: the names called outside any
+        function, then the names those functions call, to a fixpoint. A function whose key is absent
+        is called from nowhere in this tree.
+
+        An unreadable graph answers with every name it saw, defined or called, since a name reached
+        from outside is reached by a path this cannot trace.
+        &#34;&#34;&#34;
+        if not self._readable:
+            return frozenset(self._definitions) | frozenset(self._call_sites)
+        calls_from: dict[str | None, set[str]] = {}
+        for name, sites in self._call_sites.items():
+            for site in sites:
+                calls_from.setdefault(site.caller, set()).add(name)
+        reachable = set(calls_from.get(None, ()))
+        frontier = [name for name in reachable if name in self._definitions]
+        while frontier:
+            for name in calls_from.get(frontier.pop(), ()):
+                if name in reachable:
+                    continue
+                reachable.add(name)
+                if name in self._definitions:
+                    frontier.append(name)
+        return frozenset(reachable)
+
+
+def names_used_before_defined(
+    graph: Ps1CallGraph,
+    dominance: DominatorModel,
+) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    The keys with a call site that no definition of the name is guaranteed to have run before. Such
+    a call names, at the point it stands, whatever bound the name earlier — nothing, at script
+    scope, where Windows PowerShell 5.1 answers the bare word with a `CommandNotFoundException`.
+    That error is non-terminating there, so the run carries on and a later call does reach the
+    body, but the earlier call ran the error rather than the body — measured: `zzqfoo1; function
+    zzqfoo1 { &#39;boom&#39; }; zzqfoo1` writes an error record and then `boom`. A pass that folds that
+    earlier call into the body invents the body&#39;s value for a statement that raised, and one that
+    deletes it with the definition as an inert pair erases the error; which body the call reaches,
+    and whether it reaches one at all, is order the fold does not carry, so every definition and
+    call of a name reported here is left alone rather than resolved for the reachable calls alone.
+
+    Only a call the definition shares a control-flow graph with is ordered. A call inside another
+    function&#39;s body runs when that body is invoked, an ordering no per-body graph carries, and
+    dominance across two graphs is always false; reading that as unreached would refuse every helper
+    that calls another, so a cross-graph call is treated as reached — the direction that keeps a
+    fold the pass already takes. **Strict** dominance, so a definition and a call sharing one node
+    do not read as ordered: statement granularity cannot order a use and a definition written on one
+    line, and the reflexive answer for that pair is the use-before-definition this refuses.
+    &#34;&#34;&#34;
+    unreached: set[str] = set()
+    for key in graph.defined_names:
+        definitions = graph.definitions(key)
+        for site in graph.call_sites(key):
+            call = site.invocation
+            colocated = [d for d in definitions if dominance.locate_pair(d, call) is not None]
+            if colocated and not any(dominance.strictly_dominates(d, call) for d in colocated):
+                unreached.add(key)
+                break
+    return frozenset(unreached)
+
+
+def _collides_with_a_definition(
+    resolved: Sequence[str],
+    definitions: Mapping[str, Sequence[Ps1FunctionDefinition]],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether some call keyed under a qualifier resolves onto a name this script defines.
+
+    `&amp; &#39;MyModule\\Qzmr&#39;` keys as `mymodule\\qzmr` while `function Qzmr` keys as `qzmr`, so nothing
+    matches, the definition reads as uncalled, and deleting it leaves a script calling a name it no
+    longer defines. `resolved` holds every name a call may run that its written key does not spell,
+    which is the deny-list reading `refinery.lib.scripts.ps1.ast.resolve_command_name` gives — so an
+    alias is here too, and `iex $x` beside a `function Invoke-Expression` collides for the same
+    reason, as does `item` beside a `function Get-Item`, which the implicit `Get-` retry reaches.
+
+    **The two arrive under different conditions, because they sit at opposite ends of the
+    precedence.** An alias is the highest tier and beats a script function, so `iex` reaches
+    `Invoke-Expression` however the script spells its own definitions. The implicit `Get-` retry is
+    the lowest, reached only once the function tier has missed, so `item` reaches `Get-Item` only in
+    a script that defines no `item` of its own — and `build_call_graph` therefore withholds a retry
+    name when the bare key is one this script defines. The set it withholds against is the one
+    `defined_names` reports, which is what the command model&#39;s own function tier reads, so the two
+    cannot disagree about which calls the retry is reached from.
+
+    **The condition is the collision and not the qualifier.** A quoted executable path is the same
+    shape: `&amp; &#39;C:\\tools\\stage2.exe&#39;` keys as the path and resolves to `stage2.exe`. Reading the
+    backslash itself as the signal would make every script that invokes an executable by path
+    unreadable, and `&amp; &#39;C:\\Windows\\Temp\\payload.exe&#39;` is one of the commonest shapes there is;
+    that is not failing closed, it is switching the analysis off. Asked this way it costs nothing
+    unless the stripped name is one this tree actually defines.
+
+    **This has no PowerShell oracle and is a policy choice.** Real PowerShell errors on
+    `&amp; &#39;MyModule\\Qzmr&#39;` when no such module is loaded — it does not reach the local definition — so
+    the language does not say the definition must survive. What says so is the internal invariant
+    that no removal leaves a dangling reference, plus a decision to fail closed in front of the
+    lexer&#39;s qualified-name hole rather than behind it. `&amp; &#39;global:Qzmr&#39;` is a different case and is
+    oracle-backed: the scope qualifier is stripped by the *key*, so the call and the definition
+    already meet and nothing here fires.
+
+    The call is not filed under the stripped key instead, which would be the other way to make the
+    two meet. The same list feeds `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow`, where
+    an extra call site *grounds* a function and licenses deleting what its body writes — so a guess
+    that keeps a definition alive would buy that at the price of a payload.
+    &#34;&#34;&#34;
+    return any(name in definitions for name in resolved)
+
+
+def build_call_graph(
+    root: Ps1Script,
+    world: Ps1TypeWorld,
+    options: object | None = None,
+) -&gt; Ps1CallGraph:
+    &#34;&#34;&#34;
+    Walk the whole tree once, recording every function definition, every statically named invocation
+    with the function that holds it, and every reason the result is not the whole story.
+
+    The walk runs in source order so that a consumer removing what it finds removes from the front,
+    and cannot short-circuit on the first unknown, because the definitions and call sites are still
+    needed to decide what to keep.
+
+    The collision row is decided after the walk rather than during it, because a definition may be
+    written below the call that resolves onto it and a script is not read top to bottom.
+
+    `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` clears exactly the two
+    rows that say code nobody can read reaches a name — the open world, through the verdict this is
+    handed, and the opaque dispatch, here. The other three stand under it: an export and a collision
+    are written in the script, and so is an assignment into the `function:` namespace, which is a
+    definition under a spelling the scan does not read rather than a call from outside it.
+    &#34;&#34;&#34;
+    trusting = eval_is_trusted(options)
+    definitions: dict[str, list[Ps1FunctionDefinition]] = {}
+    keyword_definitions: dict[str, list[Ps1ScriptBlock]] = {}
+    call_sites: dict[str, list[Ps1CallSite]] = {}
+    qualified: list[str] = []
+    retried: dict[str, list[str]] = {}
+    readable = world.closed_for_the_whole_run
+    exports = False
+    for node in root.walk_in_order():
+        if isinstance(node, Ps1FunctionDefinition):
+            if not _is_class_method(node):
+                definitions.setdefault(normalize_command_name(node.name), []).append(node)
+        elif isinstance(node, Ps1CommandInvocation):
+            binding = command_definition_keyword_binding(node)
+            if binding is not None:
+                keyword_name, keyword_body = binding
+                keyword_definitions.setdefault(keyword_name, []).append(keyword_body)
+            name = get_command_name(node)
+            if name is None:
+                if not trusting and is_opaque_dispatch(node):
+                    readable = False
+                continue
+            key = normalize_command_name(name)
+            resolved = resolve_command_name(node)
+            if resolved in _EXPORTING_COMMANDS:
+                readable = False
+                exports = True
+            if resolved is not None and resolved != key:
+                qualified.append(resolved)
+            retry = None if resolved is None else implicit_get_retry(resolved)
+            if retry is not None:
+                retried.setdefault(key, []).append(retry)
+            call_sites.setdefault(key, []).append(Ps1CallSite(node, _enclosing_function(node)))
+        elif binds_command_identity(node):
+            readable = False
+    for key, names in retried.items():
+        if key not in definitions:
+            qualified.extend(names)
+    if _collides_with_a_definition(qualified, definitions):
+        readable = False
+    return Ps1CallGraph(definitions, keyword_definitions, call_sites, readable, exports)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.binds_command_identity"><code class="name flex">
+<span>def <span class="ident">binds_command_identity</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <code>node</code> writes the <code>function:</code> or <code>alias:</code> namespace, binding a command name to something
+the definition scan does not read as a definition and the call scan does not read as a call.
+Every name-keyed decision has to treat such a node as an unknown: it can bind the name about to
+be deleted, and it can be the only thing that reaches it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L68-L80" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def binds_command_identity(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `node` writes the `function:` or `alias:` namespace, binding a command name to something
+    the definition scan does not read as a definition and the call scan does not read as a call.
+    Every name-keyed decision has to treat such a node as an unknown: it can bind the name about to
+    be deleted, and it can be the only thing that reaches it.
+    &#34;&#34;&#34;
+    if not isinstance(node, Ps1AssignmentExpression):
+        return False
+    return any(
+        variable.scope in _IDENTITY_SCOPES
+        for variable in assignment_target_variables(node.target)
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined"><code class="name flex">
+<span>def <span class="ident">names_used_before_defined</span></span>(<span>graph, dominance)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The keys with a call site that no definition of the name is guaranteed to have run before. Such
+a call names, at the point it stands, whatever bound the name earlier — nothing, at script
+scope, where Windows PowerShell 5.1 answers the bare word with a <code>CommandNotFoundException</code>.
+That error is non-terminating there, so the run carries on and a later call does reach the
+body, but the earlier call ran the error rather than the body — measured: <code>zzqfoo1; function
+zzqfoo1 { 'boom' }; zzqfoo1&lt;code&gt; writes an error record and then &lt;/code&gt;boom</code>. A pass that folds that
+earlier call into the body invents the body's value for a statement that raised, and one that
+deletes it with the definition as an inert pair erases the error; which body the call reaches,
+and whether it reaches one at all, is order the fold does not carry, so every definition and
+call of a name reported here is left alone rather than resolved for the reachable calls alone.</p>
+<p>Only a call the definition shares a control-flow graph with is ordered. A call inside another
+function's body runs when that body is invoked, an ordering no per-body graph carries, and
+dominance across two graphs is always false; reading that as unreached would refuse every helper
+that calls another, so a cross-graph call is treated as reached — the direction that keeps a
+fold the pass already takes. <strong>Strict</strong> dominance, so a definition and a call sharing one node
+do not read as ordered: statement granularity cannot order a use and a definition written on one
+line, and the reflexive answer for that pair is the use-before-definition this refuses.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L257-L290" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def names_used_before_defined(
+    graph: Ps1CallGraph,
+    dominance: DominatorModel,
+) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    The keys with a call site that no definition of the name is guaranteed to have run before. Such
+    a call names, at the point it stands, whatever bound the name earlier — nothing, at script
+    scope, where Windows PowerShell 5.1 answers the bare word with a `CommandNotFoundException`.
+    That error is non-terminating there, so the run carries on and a later call does reach the
+    body, but the earlier call ran the error rather than the body — measured: `zzqfoo1; function
+    zzqfoo1 { &#39;boom&#39; }; zzqfoo1` writes an error record and then `boom`. A pass that folds that
+    earlier call into the body invents the body&#39;s value for a statement that raised, and one that
+    deletes it with the definition as an inert pair erases the error; which body the call reaches,
+    and whether it reaches one at all, is order the fold does not carry, so every definition and
+    call of a name reported here is left alone rather than resolved for the reachable calls alone.
+
+    Only a call the definition shares a control-flow graph with is ordered. A call inside another
+    function&#39;s body runs when that body is invoked, an ordering no per-body graph carries, and
+    dominance across two graphs is always false; reading that as unreached would refuse every helper
+    that calls another, so a cross-graph call is treated as reached — the direction that keeps a
+    fold the pass already takes. **Strict** dominance, so a definition and a call sharing one node
+    do not read as ordered: statement granularity cannot order a use and a definition written on one
+    line, and the reflexive answer for that pair is the use-before-definition this refuses.
+    &#34;&#34;&#34;
+    unreached: set[str] = set()
+    for key in graph.defined_names:
+        definitions = graph.definitions(key)
+        for site in graph.call_sites(key):
+            call = site.invocation
+            colocated = [d for d in definitions if dominance.locate_pair(d, call) is not None]
+            if colocated and not any(dominance.strictly_dominates(d, call) for d in colocated):
+                unreached.add(key)
+                break
+    return frozenset(unreached)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph"><code class="name flex">
+<span>def <span class="ident">build_call_graph</span></span>(<span>root, world, options=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Walk the whole tree once, recording every function definition, every statically named invocation
+with the function that holds it, and every reason the result is not the whole story.</p>
+<p>The walk runs in source order so that a consumer removing what it finds removes from the front,
+and cannot short-circuit on the first unknown, because the definitions and call sites are still
+needed to decide what to keep.</p>
+<p>The collision row is decided after the walk rather than during it, because a definition may be
+written below the call that resolves onto it and a script is not read top to bottom.</p>
+<p><code><a title="refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval" href="../options.html#refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval">Ps1DeobfuscationOptions.trust_eval</a></code> clears exactly the two
+rows that say code nobody can read reaches a name — the open world, through the verdict this is
+handed, and the opaque dispatch, here. The other three stand under it: an export and a collision
+are written in the script, and so is an assignment into the <code>function:</code> namespace, which is a
+definition under a spelling the scan does not read rather than a call from outside it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L339-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_call_graph(
+    root: Ps1Script,
+    world: Ps1TypeWorld,
+    options: object | None = None,
+) -&gt; Ps1CallGraph:
+    &#34;&#34;&#34;
+    Walk the whole tree once, recording every function definition, every statically named invocation
+    with the function that holds it, and every reason the result is not the whole story.
+
+    The walk runs in source order so that a consumer removing what it finds removes from the front,
+    and cannot short-circuit on the first unknown, because the definitions and call sites are still
+    needed to decide what to keep.
+
+    The collision row is decided after the walk rather than during it, because a definition may be
+    written below the call that resolves onto it and a script is not read top to bottom.
+
+    `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` clears exactly the two
+    rows that say code nobody can read reaches a name — the open world, through the verdict this is
+    handed, and the opaque dispatch, here. The other three stand under it: an export and a collision
+    are written in the script, and so is an assignment into the `function:` namespace, which is a
+    definition under a spelling the scan does not read rather than a call from outside it.
+    &#34;&#34;&#34;
+    trusting = eval_is_trusted(options)
+    definitions: dict[str, list[Ps1FunctionDefinition]] = {}
+    keyword_definitions: dict[str, list[Ps1ScriptBlock]] = {}
+    call_sites: dict[str, list[Ps1CallSite]] = {}
+    qualified: list[str] = []
+    retried: dict[str, list[str]] = {}
+    readable = world.closed_for_the_whole_run
+    exports = False
+    for node in root.walk_in_order():
+        if isinstance(node, Ps1FunctionDefinition):
+            if not _is_class_method(node):
+                definitions.setdefault(normalize_command_name(node.name), []).append(node)
+        elif isinstance(node, Ps1CommandInvocation):
+            binding = command_definition_keyword_binding(node)
+            if binding is not None:
+                keyword_name, keyword_body = binding
+                keyword_definitions.setdefault(keyword_name, []).append(keyword_body)
+            name = get_command_name(node)
+            if name is None:
+                if not trusting and is_opaque_dispatch(node):
+                    readable = False
+                continue
+            key = normalize_command_name(name)
+            resolved = resolve_command_name(node)
+            if resolved in _EXPORTING_COMMANDS:
+                readable = False
+                exports = True
+            if resolved is not None and resolved != key:
+                qualified.append(resolved)
+            retry = None if resolved is None else implicit_get_retry(resolved)
+            if retry is not None:
+                retried.setdefault(key, []).append(retry)
+            call_sites.setdefault(key, []).append(Ps1CallSite(node, _enclosing_function(node)))
+        elif binds_command_identity(node):
+            readable = False
+    for key, names in retried.items():
+        if key not in definitions:
+            qualified.extend(names)
+    if _collides_with_a_definition(qualified, definitions):
+        readable = False
+    return Ps1CallGraph(definitions, keyword_definitions, call_sites, readable, exports)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite"><code class="flex name class">
+<span>class <span class="ident">Ps1CallSite</span></span>
+<span>(</span><span>invocation, caller)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>One invocation of a command name, paired with the key of the outermost function whose body holds
+it — see <code>_enclosing_function</code> — which is the edge's source, where the invocation is its target.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L122-L128" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite.invocation"><code class="name">var <span class="ident">invocation</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L122-L128" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite.caller"><code class="name">var <span class="ident">caller</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L122-L128" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph"><code class="flex name class">
+<span>class <span class="ident">Ps1CallGraph</span></span>
+<span>(</span><span>definitions, keyword_definitions, call_sites, readable, exports)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The verdict of <code><a title="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph" href="#refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph">build_call_graph()</a></code>. Definitions and call sites are keyed through
+<code><a title="refinery.lib.scripts.ps1.ast.normalize_command_name" href="../ast.html#refinery.lib.scripts.ps1.ast.normalize_command_name">normalize_command_name()</a></code>, so <code>function global:F</code> and a bare call to
+<code>F</code> meet on one key, and every definition sharing a key is kept: a redefinition shadows the
+earlier body only from the point it runs, which is order and scope information no walk over the
+tree carries.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L131-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallGraph:
+    &#34;&#34;&#34;
+    The verdict of `build_call_graph`. Definitions and call sites are keyed through
+    `refinery.lib.scripts.ps1.ast.normalize_command_name`, so `function global:F` and a bare call to
+    `F` meet on one key, and every definition sharing a key is kept: a redefinition shadows the
+    earlier body only from the point it runs, which is order and scope information no walk over the
+    tree carries.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        definitions: Mapping[str, Sequence[Ps1FunctionDefinition]],
+        keyword_definitions: Mapping[str, Sequence[Ps1ScriptBlock]],
+        call_sites: Mapping[str, Sequence[Ps1CallSite]],
+        readable: bool,
+        exports: bool,
+    ):
+        self._definitions = dict(definitions)
+        self._keyword_definitions = dict(keyword_definitions)
+        self._call_sites = dict(call_sites)
+        self._readable = readable
+        self._exports = exports
+
+    @property
+    def is_readable(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this tree is the whole story about what a command name denotes and who reaches it.
+        Five independent things say it is not, and every one of them has to be asked, because none
+        implies another:
+
+        - the type world is open, so a dot-sourced file, an imported module or an `iex` holds
+          definitions and call sites the walk never read;
+        - an invocation dispatches opaquely (`&amp; $f`), so a name is reached without being written;
+        - an assignment binds the `function:` or `alias:` namespace, which defines a command under a
+          spelling the definition scan does not read — and leaves the world closed while doing it,
+          since `${function:j} = { }` remaps nothing in the type system;
+        - the script calls `Export-ModuleMember`, which hands a name to a caller outside the file;
+        - a call written under a qualifier resolves onto a name this script defines; see
+          `_collides_with_a_definition`.
+
+        Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.
+
+        The first two rows are the ones
+        `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` switches off, being
+        the two that say a name is reached by code nobody can read; see `build_call_graph`.
+
+        The `Export-ModuleMember` row catches the explicit export and not the general case. A
+        `.psm1` with no export statement exports every function by default, and nothing in a file
+        says it is a module — the assumption the bare-output default rests on, stated where a
+        caller can see it in `refinery.units.scripting.ps1`.
+        &#34;&#34;&#34;
+        return self._readable
+
+    @property
+    def exports_a_name(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script hands a command name to code outside the file, which is one of the five
+        things `is_readable` reads and the only one that says a *definition* has a reader elsewhere.
+
+        The distinction is worth the separate name because the two questions have different answers
+        for the same script. An `Invoke-Expression` opens the type world and could in principle call
+        anything, and every pass here has long accepted that risk in exchange for resolving the
+        trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+        script says in as many words that a caller it cannot see will call this name, so a pass that
+        deletes the definition deletes a reachable entry point.
+        &#34;&#34;&#34;
+        return self._exports
+
+    def definitions(self, name: str) -&gt; Sequence[Ps1FunctionDefinition]:
+        &#34;&#34;&#34;
+        Every function definition a call to `name` could reach, in source order.
+        &#34;&#34;&#34;
+        return self._definitions.get(normalize_command_name(name), ())
+
+    def keyword_definitions(self, name: str) -&gt; Sequence[Ps1ScriptBlock]:
+        &#34;&#34;&#34;
+        The scriptblock bodies a `workflow`/`configuration` statement binds to `name`, in source
+        order. These define the same command name a `function` does but are not themselves a
+        `refinery.lib.scripts.ps1.model.Ps1FunctionDefinition`, so a caller weighing whether a name
+        is inert reads them beside `definitions`: the empty `function` a call names may be shadowed
+        by a `workflow` whose body acts.
+        &#34;&#34;&#34;
+        return self._keyword_definitions.get(normalize_command_name(name), ())
+
+    def call_sites(self, name: str) -&gt; Sequence[Ps1CallSite]:
+        &#34;&#34;&#34;
+        Every invocation of `name` standing in this tree, in source order, wherever it sits. This
+        is what separates the graph from the reachability query below, which reads only the edges it
+        can reach from the script itself.
+        &#34;&#34;&#34;
+        return self._call_sites.get(normalize_command_name(name), ())
+
+    @property
+    def defined_names(self) -&gt; Sequence[str]:
+        &#34;&#34;&#34;
+        Every key this script defines a function under, in source order of the first definition.
+        &#34;&#34;&#34;
+        return tuple(self._definitions)
+
+    def reachable_names(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        Every command name some path from the script itself can reach: the names called outside any
+        function, then the names those functions call, to a fixpoint. A function whose key is absent
+        is called from nowhere in this tree.
+
+        An unreadable graph answers with every name it saw, defined or called, since a name reached
+        from outside is reached by a path this cannot trace.
+        &#34;&#34;&#34;
+        if not self._readable:
+            return frozenset(self._definitions) | frozenset(self._call_sites)
+        calls_from: dict[str | None, set[str]] = {}
+        for name, sites in self._call_sites.items():
+            for site in sites:
+                calls_from.setdefault(site.caller, set()).add(name)
+        reachable = set(calls_from.get(None, ()))
+        frontier = [name for name in reachable if name in self._definitions]
+        while frontier:
+            for name in calls_from.get(frontier.pop(), ()):
+                if name in reachable:
+                    continue
+                reachable.add(name)
+                if name in self._definitions:
+                    frontier.append(name)
+        return frozenset(reachable)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.is_readable"><code class="name">var <span class="ident">is_readable</span></code></dt>
+<dd>
+<section class="desc"><p>Whether this tree is the whole story about what a command name denotes and who reaches it.
+Five independent things say it is not, and every one of them has to be asked, because none
+implies another:</p>
+<ul>
+<li>the type world is open, so a dot-sourced file, an imported module or an <code>iex</code> holds
+definitions and call sites the walk never read;</li>
+<li>an invocation dispatches opaquely (<code>&amp; $f</code>), so a name is reached without being written;</li>
+<li>an assignment binds the <code>function:</code> or <code>alias:</code> namespace, which defines a command under a
+spelling the definition scan does not read — and leaves the world closed while doing it,
+since <code>${function:j} = { }</code> remaps nothing in the type system;</li>
+<li>the script calls <code>Export-ModuleMember</code>, which hands a name to a caller outside the file;</li>
+<li>a call written under a qualifier resolves onto a name this script defines; see
+<code>_collides_with_a_definition</code>.</li>
+</ul>
+<p>Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.</p>
+<p>The first two rows are the ones
+<code><a title="refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval" href="../options.html#refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval">Ps1DeobfuscationOptions.trust_eval</a></code> switches off, being
+the two that say a name is reached by code nobody can read; see <code><a title="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph" href="#refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph">build_call_graph()</a></code>.</p>
+<p>The <code>Export-ModuleMember</code> row catches the explicit export and not the general case. A
+<code>.psm1</code> with no export statement exports every function by default, and nothing in a file
+says it is a module — the assumption the bare-output default rests on, stated where a
+caller can see it in <code><a title="refinery.units.scripting.ps1" href="../../../../units/scripting/ps1.html">refinery.units.scripting.ps1</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L154-L182" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_readable(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether this tree is the whole story about what a command name denotes and who reaches it.
+    Five independent things say it is not, and every one of them has to be asked, because none
+    implies another:
+
+    - the type world is open, so a dot-sourced file, an imported module or an `iex` holds
+      definitions and call sites the walk never read;
+    - an invocation dispatches opaquely (`&amp; $f`), so a name is reached without being written;
+    - an assignment binds the `function:` or `alias:` namespace, which defines a command under a
+      spelling the definition scan does not read — and leaves the world closed while doing it,
+      since `${function:j} = { }` remaps nothing in the type system;
+    - the script calls `Export-ModuleMember`, which hands a name to a caller outside the file;
+    - a call written under a qualifier resolves onto a name this script defines; see
+      `_collides_with_a_definition`.
+
+    Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.
+
+    The first two rows are the ones
+    `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` switches off, being
+    the two that say a name is reached by code nobody can read; see `build_call_graph`.
+
+    The `Export-ModuleMember` row catches the explicit export and not the general case. A
+    `.psm1` with no export statement exports every function by default, and nothing in a file
+    says it is a module — the assumption the bare-output default rests on, stated where a
+    caller can see it in `refinery.units.scripting.ps1`.
+    &#34;&#34;&#34;
+    return self._readable</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.exports_a_name"><code class="name">var <span class="ident">exports_a_name</span></code></dt>
+<dd>
+<section class="desc"><p>Whether this script hands a command name to code outside the file, which is one of the five
+things <code>is_readable</code> reads and the only one that says a <em>definition</em> has a reader elsewhere.</p>
+<p>The distinction is worth the separate name because the two questions have different answers
+for the same script. An <code>Invoke-Expression</code> opens the type world and could in principle call
+anything, and every pass here has long accepted that risk in exchange for resolving the
+trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+script says in as many words that a caller it cannot see will call this name, so a pass that
+deletes the definition deletes a reachable entry point.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L184-L197" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def exports_a_name(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether this script hands a command name to code outside the file, which is one of the five
+    things `is_readable` reads and the only one that says a *definition* has a reader elsewhere.
+
+    The distinction is worth the separate name because the two questions have different answers
+    for the same script. An `Invoke-Expression` opens the type world and could in principle call
+    anything, and every pass here has long accepted that risk in exchange for resolving the
+    trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+    script says in as many words that a caller it cannot see will call this name, so a pass that
+    deletes the definition deletes a reachable entry point.
+    &#34;&#34;&#34;
+    return self._exports</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.defined_names"><code class="name">var <span class="ident">defined_names</span></code></dt>
+<dd>
+<section class="desc"><p>Every key this script defines a function under, in source order of the first definition.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L223-L228" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def defined_names(self) -&gt; Sequence[str]:
+    &#34;&#34;&#34;
+    Every key this script defines a function under, in source order of the first definition.
+    &#34;&#34;&#34;
+    return tuple(self._definitions)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.definitions"><code class="name flex">
+<span>def <span class="ident">definitions</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every function definition a call to <code>name</code> could reach, in source order.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L199-L203" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def definitions(self, name: str) -&gt; Sequence[Ps1FunctionDefinition]:
+    &#34;&#34;&#34;
+    Every function definition a call to `name` could reach, in source order.
+    &#34;&#34;&#34;
+    return self._definitions.get(normalize_command_name(name), ())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.keyword_definitions"><code class="name flex">
+<span>def <span class="ident">keyword_definitions</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The scriptblock bodies a <code>workflow</code>/<code>configuration</code> statement binds to <code>name</code>, in source
+order. These define the same command name a <code>function</code> does but are not themselves a
+<code><a title="refinery.lib.scripts.ps1.model.Ps1FunctionDefinition" href="../model.html#refinery.lib.scripts.ps1.model.Ps1FunctionDefinition">Ps1FunctionDefinition</a></code>, so a caller weighing whether a name
+is inert reads them beside <code>definitions</code>: the empty <code>function</code> a call names may be shadowed
+by a <code>workflow</code> whose body acts.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L205-L213" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def keyword_definitions(self, name: str) -&gt; Sequence[Ps1ScriptBlock]:
+    &#34;&#34;&#34;
+    The scriptblock bodies a `workflow`/`configuration` statement binds to `name`, in source
+    order. These define the same command name a `function` does but are not themselves a
+    `refinery.lib.scripts.ps1.model.Ps1FunctionDefinition`, so a caller weighing whether a name
+    is inert reads them beside `definitions`: the empty `function` a call names may be shadowed
+    by a `workflow` whose body acts.
+    &#34;&#34;&#34;
+    return self._keyword_definitions.get(normalize_command_name(name), ())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.call_sites"><code class="name flex">
+<span>def <span class="ident">call_sites</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every invocation of <code>name</code> standing in this tree, in source order, wherever it sits. This
+is what separates the graph from the reachability query below, which reads only the edges it
+can reach from the script itself.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L215-L221" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call_sites(self, name: str) -&gt; Sequence[Ps1CallSite]:
+    &#34;&#34;&#34;
+    Every invocation of `name` standing in this tree, in source order, wherever it sits. This
+    is what separates the graph from the reachability query below, which reads only the edges it
+    can reach from the script itself.
+    &#34;&#34;&#34;
+    return self._call_sites.get(normalize_command_name(name), ())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.reachable_names"><code class="name flex">
+<span>def <span class="ident">reachable_names</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every command name some path from the script itself can reach: the names called outside any
+function, then the names those functions call, to a fixpoint. A function whose key is absent
+is called from nowhere in this tree.</p>
+<p>An unreadable graph answers with every name it saw, defined or called, since a name reached
+from outside is reached by a path this cannot trace.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/callgraph.py#L230-L254" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reachable_names(self) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    Every command name some path from the script itself can reach: the names called outside any
+    function, then the names those functions call, to a fixpoint. A function whose key is absent
+    is called from nowhere in this tree.
+
+    An unreadable graph answers with every name it saw, defined or called, since a name reached
+    from outside is reached by a path this cannot trace.
+    &#34;&#34;&#34;
+    if not self._readable:
+        return frozenset(self._definitions) | frozenset(self._call_sites)
+    calls_from: dict[str | None, set[str]] = {}
+    for name, sites in self._call_sites.items():
+        for site in sites:
+            calls_from.setdefault(site.caller, set()).add(name)
+    reachable = set(calls_from.get(None, ()))
+    frontier = [name for name in reachable if name in self._definitions]
+    while frontier:
+        for name in calls_from.get(frontier.pop(), ()):
+            if name in reachable:
+                continue
+            reachable.add(name)
+            if name in self._definitions:
+                frontier.append(name)
+    return frozenset(reachable)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.binds_command_identity" href="#refinery.lib.scripts.ps1.analysis.callgraph.binds_command_identity">binds_command_identity</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined" href="#refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined">names_used_before_defined</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph" href="#refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph">build_call_graph</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite">Ps1CallSite</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph">Ps1CallGraph</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.definitions" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.definitions">definitions</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.keyword_definitions" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.keyword_definitions">keyword_definitions</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.call_sites" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.call_sites">call_sites</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.reachable_names" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.reachable_names">reachable_names</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

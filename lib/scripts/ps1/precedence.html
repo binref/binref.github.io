@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.precedence documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.precedence</code></h1>
+</header>
+<section id="section-intro">
+<p>How tightly each PowerShell construct binds, as one scale read by both the parser and the
+synthesizer.</p>
+<p>The parser needs it to decide what an operator takes as its operands; the synthesizer needs it to
+decide where a bracket has to go, because a tree a pass builds carries no parentheses of its own and
+<code>Ps1BinaryExpression(Ps1BinaryExpression(1, '+', 2), '*', 3)</code> prints as <code>1 + 2 * 3</code> without one.
+Keeping the two on separate tables is how a printer drifts from the grammar it is supposed to
+invert, so the tiers are named here once and both sides name them.</p>
+<p>The order is the one <code>Ps1Parser</code> implements, which is also the order the reference tokenizer gives:
+range binds tighter than format, format tighter than multiplication, and the comma that builds an
+array tighter than any binary operator.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/precedence.py#L1-L120" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+How tightly each PowerShell construct binds, as one scale read by both the parser and the
+synthesizer.
+
+The parser needs it to decide what an operator takes as its operands; the synthesizer needs it to
+decide where a bracket has to go, because a tree a pass builds carries no parentheses of its own and
+`Ps1BinaryExpression(Ps1BinaryExpression(1, &#39;+&#39;, 2), &#39;*&#39;, 3)` prints as `1 + 2 * 3` without one.
+Keeping the two on separate tables is how a printer drifts from the grammar it is supposed to
+invert, so the tiers are named here once and both sides name them.
+
+The order is the one `Ps1Parser` implements, which is also the order the reference tokenizer gives:
+range binds tighter than format, format tighter than multiplication, and the comma that builds an
+array tighter than any binary operator.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Expression, Node
+from refinery.lib.scripts.ps1.model import (
+    Ps1ArrayLiteral,
+    Ps1AssignmentExpression,
+    Ps1BinaryExpression,
+    Ps1CastExpression,
+    Ps1CommandInvocation,
+    Ps1Pipeline,
+    Ps1RangeExpression,
+    Ps1UnaryExpression,
+)
+
+#: A primary expression: a literal, a variable, a member access, anything already delimited. It
+#: takes no neighbours, so it never needs a bracket and every slot accepts it.
+ATOM = 100
+
+#: A prefix operator and a cast. Both bind to a single operand.
+UNARY = 90
+
+#: The comma that builds an array. It is an operand of the binary operators rather than the other
+#: way round, so it binds tighter than all of them.
+COMMA = 80
+
+RANGE = 70
+FORMAT = 60
+MULTIPLICATIVE = 50
+ADDITIVE = 40
+COMPARISON = 30
+BITWISE = 20
+LOGICAL = 10
+ASSIGNMENT = 5
+
+#: A command invocation and a pipeline. Both run to the end of the statement, taking whatever
+#: follows as arguments or stages, so anything printed after one is swallowed by it. Nothing may
+#: stand beside one unbracketed.
+COMMAND = 0
+
+BINARY: dict[str, int] = {
+    &#39;..&#39;  : RANGE,          # noqa
+    &#39;-f&#39;  : FORMAT,         # noqa
+    &#39;*&#39;   : MULTIPLICATIVE, # noqa
+    &#39;/&#39;   : MULTIPLICATIVE, # noqa
+    &#39;%&#39;   : MULTIPLICATIVE, # noqa
+    &#39;+&#39;   : ADDITIVE,       # noqa
+    &#39;-&#39;   : ADDITIVE,       # noqa
+}
+BINARY.update(dict.fromkeys((&#39;-and&#39;, &#39;-or&#39;, &#39;-xor&#39;), LOGICAL))
+BINARY.update(dict.fromkeys((&#39;-band&#39;, &#39;-bor&#39;, &#39;-bxor&#39;), BITWISE))
+
+
+def register_comparisons(operators) -&gt; None:
+    &#34;&#34;&#34;
+    Record the comparison operators, which the parser derives from its dash-operator table. They
+    are added here rather than spelled out twice, so that an operator the lexer learns to read is
+    one the synthesizer knows how to bracket.
+    &#34;&#34;&#34;
+    BINARY.update(dict.fromkeys(operators, COMPARISON))
+
+
+def of_operator(operator: str) -&gt; int:
+    &#34;&#34;&#34;
+    How tightly `operator` binds. An operator the table does not know is treated as the loosest
+    binary tier, which brackets more than necessary rather than less.
+    &#34;&#34;&#34;
+    return BINARY.get(operator.lower(), LOGICAL)
+
+
+def of(node: Node) -&gt; int:
+    &#34;&#34;&#34;
+    How tightly the *spelling* of `node` binds — that is, how loosely its outermost operator holds
+    on to what is printed beside it. A slot that requires more than this has to bracket the node.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1BinaryExpression):
+        return of_operator(node.operator)
+    if isinstance(node, Ps1RangeExpression):
+        return RANGE
+    if isinstance(node, Ps1ArrayLiteral):
+        return COMMA
+    if isinstance(node, (Ps1UnaryExpression, Ps1CastExpression)):
+        return UNARY
+    if isinstance(node, Ps1AssignmentExpression):
+        return ASSIGNMENT
+    if isinstance(node, (Ps1CommandInvocation, Ps1Pipeline)):
+        return COMMAND
+    return ATOM
+
+
+def needs_brackets(node: Expression, minimum: int) -&gt; bool:
+    return of(node) &lt; minimum
+
+
+def needs_brackets_between_delimiters(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `node` has to be bracketed inside a list the language already delimits, as a method
+    call and an attribute delimit their arguments with `(` and `)`.
+
+    This is not a question about binding power, because the delimiters bound the slot on both
+    sides and every operator binds tighter than they do: `M($a * 2)` reads back whole. Two things
+    still reach past them. A comma is the delimiter, so an argument built with the comma operator
+    would be read as several arguments; the parser makes the same distinction from the other side
+    by disabling the comma while it reads one. And a command takes what follows as its own
+    arguments.
+    &#34;&#34;&#34;
+    return isinstance(node, Ps1ArrayLiteral) or of(node) &lt;= COMMAND</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.precedence.ATOM"><code class="name">var <span class="ident">ATOM</span></code></dt>
+<dd>
+<section class="desc"><p>A primary expression: a literal, a variable, a member access, anything already delimited. It
+takes no neighbours, so it never needs a bracket and every slot accepts it.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.UNARY"><code class="name">var <span class="ident">UNARY</span></code></dt>
+<dd>
+<section class="desc"><p>A prefix operator and a cast. Both bind to a single operand.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.COMMA"><code class="name">var <span class="ident">COMMA</span></code></dt>
+<dd>
+<section class="desc"><p>The comma that builds an array. It is an operand of the binary operators rather than the other
+way round, so it binds tighter than all of them.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.COMMAND"><code class="name">var <span class="ident">COMMAND</span></code></dt>
+<dd>
+<section class="desc"><p>A command invocation and a pipeline. Both run to the end of the statement, taking whatever
+follows as arguments or stages, so anything printed after one is swallowed by it. Nothing may
+stand beside one unbracketed.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.precedence.register_comparisons"><code class="name flex">
+<span>def <span class="ident">register_comparisons</span></span>(<span>operators)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Record the comparison operators, which the parser derives from its dash-operator table. They
+are added here rather than spelled out twice, so that an operator the lexer learns to read is
+one the synthesizer knows how to bracket.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/precedence.py#L67-L73" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def register_comparisons(operators) -&gt; None:
+    &#34;&#34;&#34;
+    Record the comparison operators, which the parser derives from its dash-operator table. They
+    are added here rather than spelled out twice, so that an operator the lexer learns to read is
+    one the synthesizer knows how to bracket.
+    &#34;&#34;&#34;
+    BINARY.update(dict.fromkeys(operators, COMPARISON))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.of_operator"><code class="name flex">
+<span>def <span class="ident">of_operator</span></span>(<span>operator)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>How tightly <code>operator</code> binds. An operator the table does not know is treated as the loosest
+binary tier, which brackets more than necessary rather than less.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/precedence.py#L76-L81" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def of_operator(operator: str) -&gt; int:
+    &#34;&#34;&#34;
+    How tightly `operator` binds. An operator the table does not know is treated as the loosest
+    binary tier, which brackets more than necessary rather than less.
+    &#34;&#34;&#34;
+    return BINARY.get(operator.lower(), LOGICAL)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.of"><code class="name flex">
+<span>def <span class="ident">of</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>How tightly the <em>spelling</em> of <code>node</code> binds — that is, how loosely its outermost operator holds
+on to what is printed beside it. A slot that requires more than this has to bracket the node.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/precedence.py#L84-L101" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def of(node: Node) -&gt; int:
+    &#34;&#34;&#34;
+    How tightly the *spelling* of `node` binds — that is, how loosely its outermost operator holds
+    on to what is printed beside it. A slot that requires more than this has to bracket the node.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1BinaryExpression):
+        return of_operator(node.operator)
+    if isinstance(node, Ps1RangeExpression):
+        return RANGE
+    if isinstance(node, Ps1ArrayLiteral):
+        return COMMA
+    if isinstance(node, (Ps1UnaryExpression, Ps1CastExpression)):
+        return UNARY
+    if isinstance(node, Ps1AssignmentExpression):
+        return ASSIGNMENT
+    if isinstance(node, (Ps1CommandInvocation, Ps1Pipeline)):
+        return COMMAND
+    return ATOM</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.needs_brackets"><code class="name flex">
+<span>def <span class="ident">needs_brackets</span></span>(<span>node, minimum)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/precedence.py#L104-L105" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def needs_brackets(node: Expression, minimum: int) -&gt; bool:
+    return of(node) &lt; minimum</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.precedence.needs_brackets_between_delimiters"><code class="name flex">
+<span>def <span class="ident">needs_brackets_between_delimiters</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <code>node</code> has to be bracketed inside a list the language already delimits, as a method
+call and an attribute delimit their arguments with <code>(</code> and <code>)</code>.</p>
+<p>This is not a question about binding power, because the delimiters bound the slot on both
+sides and every operator binds tighter than they do: <code>M($a * 2)</code> reads back whole. Two things
+still reach past them. A comma is the delimiter, so an argument built with the comma operator
+would be read as several arguments; the parser makes the same distinction from the other side
+by disabling the comma while it reads one. And a command takes what follows as its own
+arguments.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/precedence.py#L108-L120" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def needs_brackets_between_delimiters(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `node` has to be bracketed inside a list the language already delimits, as a method
+    call and an attribute delimit their arguments with `(` and `)`.
+
+    This is not a question about binding power, because the delimiters bound the slot on both
+    sides and every operator binds tighter than they do: `M($a * 2)` reads back whole. Two things
+    still reach past them. A comma is the delimiter, so an argument built with the comma operator
+    would be read as several arguments; the parser makes the same distinction from the other side
+    by disabling the comma while it reads one. And a command takes what follows as its own
+    arguments.
+    &#34;&#34;&#34;
+    return isinstance(node, Ps1ArrayLiteral) or of(node) &lt;= COMMAND</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1" href="index.html">refinery.lib.scripts.ps1</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.precedence.ATOM" href="#refinery.lib.scripts.ps1.precedence.ATOM">ATOM</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.UNARY" href="#refinery.lib.scripts.ps1.precedence.UNARY">UNARY</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.COMMA" href="#refinery.lib.scripts.ps1.precedence.COMMA">COMMA</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.COMMAND" href="#refinery.lib.scripts.ps1.precedence.COMMAND">COMMAND</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.precedence.register_comparisons" href="#refinery.lib.scripts.ps1.precedence.register_comparisons">register_comparisons</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.of_operator" href="#refinery.lib.scripts.ps1.precedence.of_operator">of_operator</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.of" href="#refinery.lib.scripts.ps1.precedence.of">of</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.needs_brackets" href="#refinery.lib.scripts.ps1.precedence.needs_brackets">needs_brackets</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.precedence.needs_brackets_between_delimiters" href="#refinery.lib.scripts.ps1.precedence.needs_brackets_between_delimiters">needs_brackets_between_delimiters</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

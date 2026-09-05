@@ -1,0 +1,985 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.cache documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.cache</code></h1>
+</header>
+<section id="section-intro">
+<p>A per-run cache of the PowerShell analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across every transform in a run, rebuilding the model
+only after that script's tree changes — whether a transform announces the change through
+<code><a title="refinery.lib.scripts.Transformer.changed" href="../../index.html#refinery.lib.scripts.Transformer.changed">Transformer.changed</a></code> or an in-pass mutation advances the script's
+<code><a title="refinery.lib.scripts.tree_version" href="../../index.html#refinery.lib.scripts.tree_version">tree_version()</a></code> counter. The version tracking, invalidation, and
+transformer-reuse mechanism live in <code><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></code>; this module
+only declares the PowerShell model slot and its <code>build_*</code> wiring.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L1-L263" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+A per-run cache of the PowerShell analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across every transform in a run, rebuilding the model
+only after that script&#39;s tree changes — whether a transform announces the change through
+`refinery.lib.scripts.Transformer.changed` or an in-pass mutation advances the script&#39;s
+`refinery.lib.scripts.tree_version` counter. The version tracking, invalidation, and
+transformer-reuse mechanism live in `refinery.lib.scripts.modelcache.ModelCacheBase`; this module
+only declares the PowerShell model slot and its `build_*` wiring.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Node, Transformer
+from refinery.lib.scripts.analysis.cfg import ControlFlowModel
+from refinery.lib.scripts.analysis.cycles import CycleModel
+from refinery.lib.scripts.analysis.dominance import DominatorModel
+from refinery.lib.scripts.modelcache import ModelCacheBase
+from refinery.lib.scripts.ps1.analysis.blocks import Ps1BlockModel, build_block_model
+from refinery.lib.scripts.ps1.analysis.callgraph import (
+    Ps1CallGraph,
+    build_call_graph,
+    names_used_before_defined,
+)
+from refinery.lib.scripts.ps1.analysis.cfg import build_control_flow_model
+from refinery.lib.scripts.ps1.analysis.commands import Ps1CommandModel, build_command_model
+from refinery.lib.scripts.ps1.analysis.dataflow import Ps1VariableFlow, build_variable_flow
+from refinery.lib.scripts.ps1.analysis.dominance import build_dominance
+from refinery.lib.scripts.ps1.analysis.effects import Ps1OutputFlow, build_output_flow
+from refinery.lib.scripts.ps1.analysis.faults import Ps1FaultReach, build_fault_reach
+from refinery.lib.scripts.ps1.analysis.model import Ps1SemanticModel, build_semantic_model
+from refinery.lib.scripts.ps1.analysis.world import (
+    Ps1TypeWorld,
+    Ps1WorldMeasurement,
+    measure_world,
+)
+from refinery.lib.scripts.ps1.analysis.worldflow import Ps1WorldReach, build_world_reach
+from refinery.lib.scripts.ps1.model import Ps1Script
+
+
+class Ps1ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the analysis models for one root script — the
+    `refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel`, the
+    `refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld`, the
+    `refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph`, the
+    `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow`, the
+    `refinery.lib.scripts.analysis.cfg.ControlFlowModel`, the
+    `refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach`, the
+    `refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel` and the
+    `refinery.lib.scripts.analysis.cycles.CycleModel` derived from it — each dropped
+    whenever this root&#39;s AST-mutation counter advances past the value it was built at.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_model&#39;,
+        &#39;_world_measurement&#39;,
+        &#39;_world_reach&#39;,
+        &#39;_call_graph&#39;,
+        &#39;_output_flow&#39;,
+        &#39;_control_flow&#39;,
+        &#39;_faults&#39;,
+        &#39;_dominance&#39;,
+        &#39;_blocks&#39;,
+        &#39;_cycles&#39;,
+        &#39;_variable_flow&#39;,
+        &#39;_commands&#39;,
+        &#39;_used_before_defined&#39;,
+    )
+
+    root: Ps1Script
+    _model: Ps1SemanticModel | None
+    _world_measurement: Ps1WorldMeasurement | None
+    _world_reach: Ps1WorldReach | None
+    _call_graph: Ps1CallGraph | None
+    _output_flow: Ps1OutputFlow | None
+    _control_flow: ControlFlowModel | None
+    _faults: Ps1FaultReach | None
+    _dominance: DominatorModel | None
+    _blocks: Ps1BlockModel | None
+    _cycles: CycleModel | None
+    _variable_flow: Ps1VariableFlow | None
+    _commands: Ps1CommandModel | None
+    _used_before_defined: frozenset[str] | None
+
+    @property
+    def model(self) -&gt; Ps1SemanticModel:
+        return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))
+
+    @property
+    def world_measurement(self) -&gt; Ps1WorldMeasurement:
+        &#34;&#34;&#34;
+        The one walk that reads whether this script leaves the .NET type system and the command
+        table intact, which command names it takes over, and where every world-opening statement
+        sits. `closed_world` projects the verdict from it and `world_reach` floods from its openers,
+        so the whole-run answer and the positional one are never two different readings of the tree.
+
+        The run&#39;s `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions` are read from the cache
+        because the walk is performed once per cache. A cache made without them — a model built
+        standalone in a test — measures the suspecting model, which is the sound answer.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_world_measurement&#39;, lambda: measure_world(self.root, self.options))
+
+    @property
+    def closed_world(self) -&gt; Ps1TypeWorld:
+        &#34;&#34;&#34;
+        Whether this script leaves the .NET type system and the command table intact, and which
+        command names it takes over. `refinery.lib.scripts.ps1.analysis.effects` takes this as the
+        context of every purity verdict, and every verdict in a run must be asked against the same
+        one, or two transforms reach opposite conclusions about the same node.
+        &#34;&#34;&#34;
+        return self.world_measurement.world
+
+    @property
+    def world_reach(self) -&gt; Ps1WorldReach:
+        &#34;&#34;&#34;
+        The flow-sensitive reading of `closed_world`: whether the type world is closed, and a
+        command name still trustworthy, at one particular node, over `control_flow`. The effect
+        layer takes this in place of the leaf world so a member-read grant or a pure-command
+        verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+        cache when this root&#39;s tree changes, so a transform never reads a position against a stale
+        graph. The control-flow model is passed as a thunk so a script that neither opens the
+        world nor redefines a command — one with nothing to flood from — never pays to build a
+        graph its reach model would not read.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_world_reach&#39;, lambda: build_world_reach(
+            self.world_measurement, lambda: self.control_flow))
+
+    @property
+    def call_graph(self) -&gt; Ps1CallGraph:
+        &#34;&#34;&#34;
+        Which definitions a command name reaches and which invocations reach it, over this root. The
+        `closed_world` is a parameter of the build rather than of the queries because the verdict it
+        supplies is one of the reasons the graph declares itself unreadable, and a graph that
+        answered that differently per caller would be two graphs.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_call_graph&#39;,
+            lambda: build_call_graph(self.root, self.closed_world, self.options),
+        )
+
+    @property
+    def output_flow(self) -&gt; Ps1OutputFlow:
+        &#34;&#34;&#34;
+        Where each function body&#39;s output ends up, joined over the call sites in `call_graph`.
+        Every pass that deletes a write to the output stream reads this one, so no two of them can
+        disagree about who was going to see the value.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_output_flow&#39;, lambda: build_output_flow(self.call_graph))
+
+    @property
+    def control_flow(self) -&gt; ControlFlowModel:
+        &#34;&#34;&#34;
+        One control-flow graph per script block and one for the script itself, over this root — see
+        `refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES` for what owns one and why.
+
+        Purely syntactic, so it needs none of the models above and nothing about the order they are
+        built in matters. What it answers is the question every pass here has been approximating
+        privately: whether one statement runs before another, whether a branch runs at all, and
+        whether a handler is still reachable once a body is emptied.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))
+
+    @property
+    def faults(self) -&gt; Ps1FaultReach:
+        &#34;&#34;&#34;
+        Where a terminating error raised at a point in this root goes, over `control_flow`. The
+        single place a pass asks whether deleting something changes which handler runs — the
+        question every removing pass used to answer for itself by looking at the statement&#39;s
+        immediate holder, which reads a handler one nesting level away as no handler at all.
+
+        The transpose that weighs deleting a `trap` reads one further graph — this root at the finer
+        granularity that descends into a `$( )` or `@( )` — so a soft error stepping over inside such
+        a construct is the local path it is rather than detail hidden in the one node the coarse
+        graph gives the whole statement. The reader draws that itself, on demand, from the root it
+        already holds, so only a script whose trap removal turns on such a step-over ever pays for it.
+
+        Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_faults&#39;, lambda: build_fault_reach(self.control_flow))
+
+    @property
+    def dominance(self) -&gt; DominatorModel:
+        &#34;&#34;&#34;
+        Whether one statement of this root is guaranteed to have executed by the time another runs,
+        over `control_flow`. The single place that ordering is answered: a pass that needs to know a
+        write runs before a read, or that a statement after a `return` cannot be reached, asks here
+        rather than reconstructing the relation from the tree.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.control_flow))
+
+    @property
+    def blocks(self) -&gt; Ps1BlockModel:
+        &#34;&#34;&#34;
+        Where each script block of this root runs — at what point, in whose scope, how many times.
+        Reads the whole-run shadow set from `closed_world` so a body handed to a `ForEach-Object` or
+        `Where-Object` the script has redefined is placed as data, and is otherwise syntactic like
+        `control_flow` — the answer three other layers used to guess from the code a block is
+        *written* in.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_blocks&#39;, lambda: build_block_model(
+            self.root, self.closed_world.shadowed_names))
+
+    @property
+    def cycles(self) -&gt; CycleModel:
+        &#34;&#34;&#34;
+        Which points of this script can be reached more than once, over `control_flow`. A pass that
+        establishes a fact from one visit to a statement — a variable&#39;s value, a stream&#39;s contents —
+        asks this before carrying it to a reader, because a point control returns to has no single
+        value to carry.
+
+        It is built over `blocks` so that a body run by a cmdlet that enumerates is known to repeat.
+        Without that the walk out of a block follows it to where its value was written, and a
+        `ForEach-Object` body reads as running exactly once.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_cycles&#39;, lambda: CycleModel(self.control_flow, self.blocks.body_site))
+
+    @property
+    def commands(self) -&gt; Ps1CommandModel:
+        &#34;&#34;&#34;
+        What each command invocation of this root denotes — a name, nothing, or unknown — over
+        `control_flow` and `dominance`. The one place command identity is answered: a pass that
+        rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+        rather than splitting the alias relation or ignoring the precedence that makes a default
+        alias beat a script function. It reads the script&#39;s function names from `call_graph`, the
+        layer that already owns which definitions a name denotes, and the wider set of names the
+        script takes over from `closed_world`, so the two models agree on what has been shadowed.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_commands&#39;, lambda: build_command_model(
+            self.root, self.control_flow, self.dominance, self.blocks,
+            frozenset(self.call_graph.defined_names), self.closed_world.shadowed_names))
+
+    @property
+    def variable_flow(self) -&gt; Ps1VariableFlow:
+        &#34;&#34;&#34;
+        Which write each variable read observes, over `model`, `control_flow`, `dominance`, `blocks`
+        and `cycles`. The one place that question is answered: a pass that decides what a name holds
+        at a point asks here rather than walking the tree for an assignment that looks near enough.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_variable_flow&#39;, lambda: build_variable_flow(
+            self.model, self.control_flow, self.dominance, self.blocks, self.cycles))
+
+    @property
+    def used_before_defined(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        The command names some call to which no definition of the name is guaranteed to have run
+        before, over `call_graph` and `dominance`. The single place that ordering is asked of the
+        call graph: a pass that folds a call into its body or deletes a definition with its calls
+        reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+        the fold cannot carry. It composes the two models here because
+        `refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined` needs the ordering
+        `dominance` owns, which the deliberately syntactic `call_graph` does not carry.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_used_before_defined&#39;, lambda: names_used_before_defined(
+            self.call_graph, self.dominance))
+
+
+def model_cache(transformer: Transformer, root: Node) -&gt; Ps1ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `Ps1ModelCache` for *root* when one is attached to *transformer* and
+    built over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse
+    within its single-pass lifetime. See
+    `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return Ps1ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.model_cache"><code class="name flex">
+<span>def <span class="ident">model_cache</span></span>(<span>transformer, root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The pipeline's shared <code><a title="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache" href="#refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache">Ps1ModelCache</a></code> for <em>root</em> when one is attached to <em>transformer</em> and
+built over that same root, otherwise a fresh cache stashed back onto <em>transformer</em> for reuse
+within its single-pass lifetime. See
+<code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">ModelCacheBase.for_transformer()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L256-L263" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def model_cache(transformer: Transformer, root: Node) -&gt; Ps1ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `Ps1ModelCache` for *root* when one is attached to *transformer* and
+    built over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse
+    within its single-pass lifetime. See
+    `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return Ps1ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache"><code class="flex name class">
+<span>class <span class="ident">Ps1ModelCache</span></span>
+<span>(</span><span>root, options=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Lazily builds and memoizes the analysis models for one root script — the
+<code><a title="refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel" href="model.html#refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel">Ps1SemanticModel</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld" href="world.html#refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld">Ps1TypeWorld</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph" href="callgraph.html#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph">Ps1CallGraph</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow">Ps1OutputFlow</a></code>, the
+<code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach" href="faults.html#refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach">Ps1FaultReach</a></code>, the
+<code><a title="refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel" href="blocks.html#refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel">Ps1BlockModel</a></code> and the
+<code><a title="refinery.lib.scripts.analysis.cycles.CycleModel" href="../../analysis/cycles.html#refinery.lib.scripts.analysis.cycles.CycleModel">CycleModel</a></code> derived from it — each dropped
+whenever this root's AST-mutation counter advances past the value it was built at.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L39-L253" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the analysis models for one root script — the
+    `refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel`, the
+    `refinery.lib.scripts.ps1.analysis.world.Ps1TypeWorld`, the
+    `refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph`, the
+    `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow`, the
+    `refinery.lib.scripts.analysis.cfg.ControlFlowModel`, the
+    `refinery.lib.scripts.ps1.analysis.faults.Ps1FaultReach`, the
+    `refinery.lib.scripts.ps1.analysis.blocks.Ps1BlockModel` and the
+    `refinery.lib.scripts.analysis.cycles.CycleModel` derived from it — each dropped
+    whenever this root&#39;s AST-mutation counter advances past the value it was built at.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_model&#39;,
+        &#39;_world_measurement&#39;,
+        &#39;_world_reach&#39;,
+        &#39;_call_graph&#39;,
+        &#39;_output_flow&#39;,
+        &#39;_control_flow&#39;,
+        &#39;_faults&#39;,
+        &#39;_dominance&#39;,
+        &#39;_blocks&#39;,
+        &#39;_cycles&#39;,
+        &#39;_variable_flow&#39;,
+        &#39;_commands&#39;,
+        &#39;_used_before_defined&#39;,
+    )
+
+    root: Ps1Script
+    _model: Ps1SemanticModel | None
+    _world_measurement: Ps1WorldMeasurement | None
+    _world_reach: Ps1WorldReach | None
+    _call_graph: Ps1CallGraph | None
+    _output_flow: Ps1OutputFlow | None
+    _control_flow: ControlFlowModel | None
+    _faults: Ps1FaultReach | None
+    _dominance: DominatorModel | None
+    _blocks: Ps1BlockModel | None
+    _cycles: CycleModel | None
+    _variable_flow: Ps1VariableFlow | None
+    _commands: Ps1CommandModel | None
+    _used_before_defined: frozenset[str] | None
+
+    @property
+    def model(self) -&gt; Ps1SemanticModel:
+        return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))
+
+    @property
+    def world_measurement(self) -&gt; Ps1WorldMeasurement:
+        &#34;&#34;&#34;
+        The one walk that reads whether this script leaves the .NET type system and the command
+        table intact, which command names it takes over, and where every world-opening statement
+        sits. `closed_world` projects the verdict from it and `world_reach` floods from its openers,
+        so the whole-run answer and the positional one are never two different readings of the tree.
+
+        The run&#39;s `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions` are read from the cache
+        because the walk is performed once per cache. A cache made without them — a model built
+        standalone in a test — measures the suspecting model, which is the sound answer.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_world_measurement&#39;, lambda: measure_world(self.root, self.options))
+
+    @property
+    def closed_world(self) -&gt; Ps1TypeWorld:
+        &#34;&#34;&#34;
+        Whether this script leaves the .NET type system and the command table intact, and which
+        command names it takes over. `refinery.lib.scripts.ps1.analysis.effects` takes this as the
+        context of every purity verdict, and every verdict in a run must be asked against the same
+        one, or two transforms reach opposite conclusions about the same node.
+        &#34;&#34;&#34;
+        return self.world_measurement.world
+
+    @property
+    def world_reach(self) -&gt; Ps1WorldReach:
+        &#34;&#34;&#34;
+        The flow-sensitive reading of `closed_world`: whether the type world is closed, and a
+        command name still trustworthy, at one particular node, over `control_flow`. The effect
+        layer takes this in place of the leaf world so a member-read grant or a pure-command
+        verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+        cache when this root&#39;s tree changes, so a transform never reads a position against a stale
+        graph. The control-flow model is passed as a thunk so a script that neither opens the
+        world nor redefines a command — one with nothing to flood from — never pays to build a
+        graph its reach model would not read.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_world_reach&#39;, lambda: build_world_reach(
+            self.world_measurement, lambda: self.control_flow))
+
+    @property
+    def call_graph(self) -&gt; Ps1CallGraph:
+        &#34;&#34;&#34;
+        Which definitions a command name reaches and which invocations reach it, over this root. The
+        `closed_world` is a parameter of the build rather than of the queries because the verdict it
+        supplies is one of the reasons the graph declares itself unreadable, and a graph that
+        answered that differently per caller would be two graphs.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_call_graph&#39;,
+            lambda: build_call_graph(self.root, self.closed_world, self.options),
+        )
+
+    @property
+    def output_flow(self) -&gt; Ps1OutputFlow:
+        &#34;&#34;&#34;
+        Where each function body&#39;s output ends up, joined over the call sites in `call_graph`.
+        Every pass that deletes a write to the output stream reads this one, so no two of them can
+        disagree about who was going to see the value.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_output_flow&#39;, lambda: build_output_flow(self.call_graph))
+
+    @property
+    def control_flow(self) -&gt; ControlFlowModel:
+        &#34;&#34;&#34;
+        One control-flow graph per script block and one for the script itself, over this root — see
+        `refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES` for what owns one and why.
+
+        Purely syntactic, so it needs none of the models above and nothing about the order they are
+        built in matters. What it answers is the question every pass here has been approximating
+        privately: whether one statement runs before another, whether a branch runs at all, and
+        whether a handler is still reachable once a body is emptied.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))
+
+    @property
+    def faults(self) -&gt; Ps1FaultReach:
+        &#34;&#34;&#34;
+        Where a terminating error raised at a point in this root goes, over `control_flow`. The
+        single place a pass asks whether deleting something changes which handler runs — the
+        question every removing pass used to answer for itself by looking at the statement&#39;s
+        immediate holder, which reads a handler one nesting level away as no handler at all.
+
+        The transpose that weighs deleting a `trap` reads one further graph — this root at the finer
+        granularity that descends into a `$( )` or `@( )` — so a soft error stepping over inside such
+        a construct is the local path it is rather than detail hidden in the one node the coarse
+        graph gives the whole statement. The reader draws that itself, on demand, from the root it
+        already holds, so only a script whose trap removal turns on such a step-over ever pays for it.
+
+        Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_faults&#39;, lambda: build_fault_reach(self.control_flow))
+
+    @property
+    def dominance(self) -&gt; DominatorModel:
+        &#34;&#34;&#34;
+        Whether one statement of this root is guaranteed to have executed by the time another runs,
+        over `control_flow`. The single place that ordering is answered: a pass that needs to know a
+        write runs before a read, or that a statement after a `return` cannot be reached, asks here
+        rather than reconstructing the relation from the tree.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.control_flow))
+
+    @property
+    def blocks(self) -&gt; Ps1BlockModel:
+        &#34;&#34;&#34;
+        Where each script block of this root runs — at what point, in whose scope, how many times.
+        Reads the whole-run shadow set from `closed_world` so a body handed to a `ForEach-Object` or
+        `Where-Object` the script has redefined is placed as data, and is otherwise syntactic like
+        `control_flow` — the answer three other layers used to guess from the code a block is
+        *written* in.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_blocks&#39;, lambda: build_block_model(
+            self.root, self.closed_world.shadowed_names))
+
+    @property
+    def cycles(self) -&gt; CycleModel:
+        &#34;&#34;&#34;
+        Which points of this script can be reached more than once, over `control_flow`. A pass that
+        establishes a fact from one visit to a statement — a variable&#39;s value, a stream&#39;s contents —
+        asks this before carrying it to a reader, because a point control returns to has no single
+        value to carry.
+
+        It is built over `blocks` so that a body run by a cmdlet that enumerates is known to repeat.
+        Without that the walk out of a block follows it to where its value was written, and a
+        `ForEach-Object` body reads as running exactly once.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_cycles&#39;, lambda: CycleModel(self.control_flow, self.blocks.body_site))
+
+    @property
+    def commands(self) -&gt; Ps1CommandModel:
+        &#34;&#34;&#34;
+        What each command invocation of this root denotes — a name, nothing, or unknown — over
+        `control_flow` and `dominance`. The one place command identity is answered: a pass that
+        rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+        rather than splitting the alias relation or ignoring the precedence that makes a default
+        alias beat a script function. It reads the script&#39;s function names from `call_graph`, the
+        layer that already owns which definitions a name denotes, and the wider set of names the
+        script takes over from `closed_world`, so the two models agree on what has been shadowed.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_commands&#39;, lambda: build_command_model(
+            self.root, self.control_flow, self.dominance, self.blocks,
+            frozenset(self.call_graph.defined_names), self.closed_world.shadowed_names))
+
+    @property
+    def variable_flow(self) -&gt; Ps1VariableFlow:
+        &#34;&#34;&#34;
+        Which write each variable read observes, over `model`, `control_flow`, `dominance`, `blocks`
+        and `cycles`. The one place that question is answered: a pass that decides what a name holds
+        at a point asks here rather than walking the tree for an assignment that looks near enough.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_variable_flow&#39;, lambda: build_variable_flow(
+            self.model, self.control_flow, self.dominance, self.blocks, self.cycles))
+
+    @property
+    def used_before_defined(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        The command names some call to which no definition of the name is guaranteed to have run
+        before, over `call_graph` and `dominance`. The single place that ordering is asked of the
+        call graph: a pass that folds a call into its body or deletes a definition with its calls
+        reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+        the fold cannot carry. It composes the two models here because
+        `refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined` needs the ordering
+        `dominance` owns, which the deliberately syntactic `call_graph` does not carry.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_used_before_defined&#39;, lambda: names_used_before_defined(
+            self.call_graph, self.dominance))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.model"><code class="name">var <span class="ident">model</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L84-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def model(self) -&gt; Ps1SemanticModel:
+    return self._lazy(&#39;_model&#39;, lambda: build_semantic_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.world_measurement"><code class="name">var <span class="ident">world_measurement</span></code></dt>
+<dd>
+<section class="desc"><p>The one walk that reads whether this script leaves the .NET type system and the command
+table intact, which command names it takes over, and where every world-opening statement
+sits. <code>closed_world</code> projects the verdict from it and <code>world_reach</code> floods from its openers,
+so the whole-run answer and the positional one are never two different readings of the tree.</p>
+<p>The run's <code><a title="refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions" href="../options.html#refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions">Ps1DeobfuscationOptions</a></code> are read from the cache
+because the walk is performed once per cache. A cache made without them — a model built
+standalone in a test — measures the suspecting model, which is the sound answer.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L88-L100" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def world_measurement(self) -&gt; Ps1WorldMeasurement:
+    &#34;&#34;&#34;
+    The one walk that reads whether this script leaves the .NET type system and the command
+    table intact, which command names it takes over, and where every world-opening statement
+    sits. `closed_world` projects the verdict from it and `world_reach` floods from its openers,
+    so the whole-run answer and the positional one are never two different readings of the tree.
+
+    The run&#39;s `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions` are read from the cache
+    because the walk is performed once per cache. A cache made without them — a model built
+    standalone in a test — measures the suspecting model, which is the sound answer.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_world_measurement&#39;, lambda: measure_world(self.root, self.options))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.closed_world"><code class="name">var <span class="ident">closed_world</span></code></dt>
+<dd>
+<section class="desc"><p>Whether this script leaves the .NET type system and the command table intact, and which
+command names it takes over. <code><a title="refinery.lib.scripts.ps1.analysis.effects" href="effects.html">refinery.lib.scripts.ps1.analysis.effects</a></code> takes this as the
+context of every purity verdict, and every verdict in a run must be asked against the same
+one, or two transforms reach opposite conclusions about the same node.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L102-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def closed_world(self) -&gt; Ps1TypeWorld:
+    &#34;&#34;&#34;
+    Whether this script leaves the .NET type system and the command table intact, and which
+    command names it takes over. `refinery.lib.scripts.ps1.analysis.effects` takes this as the
+    context of every purity verdict, and every verdict in a run must be asked against the same
+    one, or two transforms reach opposite conclusions about the same node.
+    &#34;&#34;&#34;
+    return self.world_measurement.world</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.world_reach"><code class="name">var <span class="ident">world_reach</span></code></dt>
+<dd>
+<section class="desc"><p>The flow-sensitive reading of <code>closed_world</code>: whether the type world is closed, and a
+command name still trustworthy, at one particular node, over <code>control_flow</code>. The effect
+layer takes this in place of the leaf world so a member-read grant or a pure-command
+verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+cache when this root's tree changes, so a transform never reads a position against a stale
+graph. The control-flow model is passed as a thunk so a script that neither opens the
+world nor redefines a command — one with nothing to flood from — never pays to build a
+graph its reach model would not read.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L112-L125" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def world_reach(self) -&gt; Ps1WorldReach:
+    &#34;&#34;&#34;
+    The flow-sensitive reading of `closed_world`: whether the type world is closed, and a
+    command name still trustworthy, at one particular node, over `control_flow`. The effect
+    layer takes this in place of the leaf world so a member-read grant or a pure-command
+    verdict may survive a leak the node provably runs before. Rebuilt with the rest of the
+    cache when this root&#39;s tree changes, so a transform never reads a position against a stale
+    graph. The control-flow model is passed as a thunk so a script that neither opens the
+    world nor redefines a command — one with nothing to flood from — never pays to build a
+    graph its reach model would not read.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_world_reach&#39;, lambda: build_world_reach(
+        self.world_measurement, lambda: self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.call_graph"><code class="name">var <span class="ident">call_graph</span></code></dt>
+<dd>
+<section class="desc"><p>Which definitions a command name reaches and which invocations reach it, over this root. The
+<code>closed_world</code> is a parameter of the build rather than of the queries because the verdict it
+supplies is one of the reasons the graph declares itself unreadable, and a graph that
+answered that differently per caller would be two graphs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L127-L138" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def call_graph(self) -&gt; Ps1CallGraph:
+    &#34;&#34;&#34;
+    Which definitions a command name reaches and which invocations reach it, over this root. The
+    `closed_world` is a parameter of the build rather than of the queries because the verdict it
+    supplies is one of the reasons the graph declares itself unreadable, and a graph that
+    answered that differently per caller would be two graphs.
+    &#34;&#34;&#34;
+    return self._lazy(
+        &#39;_call_graph&#39;,
+        lambda: build_call_graph(self.root, self.closed_world, self.options),
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.output_flow"><code class="name">var <span class="ident">output_flow</span></code></dt>
+<dd>
+<section class="desc"><p>Where each function body's output ends up, joined over the call sites in <code>call_graph</code>.
+Every pass that deletes a write to the output stream reads this one, so no two of them can
+disagree about who was going to see the value.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L140-L147" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def output_flow(self) -&gt; Ps1OutputFlow:
+    &#34;&#34;&#34;
+    Where each function body&#39;s output ends up, joined over the call sites in `call_graph`.
+    Every pass that deletes a write to the output stream reads this one, so no two of them can
+    disagree about who was going to see the value.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_output_flow&#39;, lambda: build_output_flow(self.call_graph))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.control_flow"><code class="name">var <span class="ident">control_flow</span></code></dt>
+<dd>
+<section class="desc"><p>One control-flow graph per script block and one for the script itself, over this root — see
+<code><a title="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES" href="cfg.html#refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES">FUNCTION_NODES</a></code> for what owns one and why.</p>
+<p>Purely syntactic, so it needs none of the models above and nothing about the order they are
+built in matters. What it answers is the question every pass here has been approximating
+privately: whether one statement runs before another, whether a branch runs at all, and
+whether a handler is still reachable once a body is emptied.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L149-L160" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def control_flow(self) -&gt; ControlFlowModel:
+    &#34;&#34;&#34;
+    One control-flow graph per script block and one for the script itself, over this root — see
+    `refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES` for what owns one and why.
+
+    Purely syntactic, so it needs none of the models above and nothing about the order they are
+    built in matters. What it answers is the question every pass here has been approximating
+    privately: whether one statement runs before another, whether a branch runs at all, and
+    whether a handler is still reachable once a body is emptied.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_control_flow&#39;, lambda: build_control_flow_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.faults"><code class="name">var <span class="ident">faults</span></code></dt>
+<dd>
+<section class="desc"><p>Where a terminating error raised at a point in this root goes, over <code>control_flow</code>. The
+single place a pass asks whether deleting something changes which handler runs — the
+question every removing pass used to answer for itself by looking at the statement's
+immediate holder, which reads a handler one nesting level away as no handler at all.</p>
+<p>The transpose that weighs deleting a <code>trap</code> reads one further graph — this root at the finer
+granularity that descends into a <code>$( )</code> or <code>@( )</code> — so a soft error stepping over inside such
+a construct is the local path it is rather than detail hidden in the one node the coarse
+graph gives the whole statement. The reader draws that itself, on demand, from the root it
+already holds, so only a script whose trap removal turns on such a step-over ever pays for it.</p>
+<p>Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L162-L178" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def faults(self) -&gt; Ps1FaultReach:
+    &#34;&#34;&#34;
+    Where a terminating error raised at a point in this root goes, over `control_flow`. The
+    single place a pass asks whether deleting something changes which handler runs — the
+    question every removing pass used to answer for itself by looking at the statement&#39;s
+    immediate holder, which reads a handler one nesting level away as no handler at all.
+
+    The transpose that weighs deleting a `trap` reads one further graph — this root at the finer
+    granularity that descends into a `$( )` or `@( )` — so a soft error stepping over inside such
+    a construct is the local path it is rather than detail hidden in the one node the coarse
+    graph gives the whole statement. The reader draws that itself, on demand, from the root it
+    already holds, so only a script whose trap removal turns on such a step-over ever pays for it.
+
+    Purely syntactic like the graphs it reads, so it joins nothing else and orders nothing else.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_faults&#39;, lambda: build_fault_reach(self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.dominance"><code class="name">var <span class="ident">dominance</span></code></dt>
+<dd>
+<section class="desc"><p>Whether one statement of this root is guaranteed to have executed by the time another runs,
+over <code>control_flow</code>. The single place that ordering is answered: a pass that needs to know a
+write runs before a read, or that a statement after a <code>return</code> cannot be reached, asks here
+rather than reconstructing the relation from the tree.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L180-L188" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def dominance(self) -&gt; DominatorModel:
+    &#34;&#34;&#34;
+    Whether one statement of this root is guaranteed to have executed by the time another runs,
+    over `control_flow`. The single place that ordering is answered: a pass that needs to know a
+    write runs before a read, or that a statement after a `return` cannot be reached, asks here
+    rather than reconstructing the relation from the tree.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_dominance&#39;, lambda: build_dominance(self.control_flow))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.blocks"><code class="name">var <span class="ident">blocks</span></code></dt>
+<dd>
+<section class="desc"><p>Where each script block of this root runs — at what point, in whose scope, how many times.
+Reads the whole-run shadow set from <code>closed_world</code> so a body handed to a <code>ForEach-Object</code> or
+<code>Where-Object</code> the script has redefined is placed as data, and is otherwise syntactic like
+<code>control_flow</code> — the answer three other layers used to guess from the code a block is
+<em>written</em> in.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L190-L200" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def blocks(self) -&gt; Ps1BlockModel:
+    &#34;&#34;&#34;
+    Where each script block of this root runs — at what point, in whose scope, how many times.
+    Reads the whole-run shadow set from `closed_world` so a body handed to a `ForEach-Object` or
+    `Where-Object` the script has redefined is placed as data, and is otherwise syntactic like
+    `control_flow` — the answer three other layers used to guess from the code a block is
+    *written* in.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_blocks&#39;, lambda: build_block_model(
+        self.root, self.closed_world.shadowed_names))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.cycles"><code class="name">var <span class="ident">cycles</span></code></dt>
+<dd>
+<section class="desc"><p>Which points of this script can be reached more than once, over <code>control_flow</code>. A pass that
+establishes a fact from one visit to a statement — a variable's value, a stream's contents —
+asks this before carrying it to a reader, because a point control returns to has no single
+value to carry.</p>
+<p>It is built over <code>blocks</code> so that a body run by a cmdlet that enumerates is known to repeat.
+Without that the walk out of a block follows it to where its value was written, and a
+<code>ForEach-Object</code> body reads as running exactly once.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L202-L214" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def cycles(self) -&gt; CycleModel:
+    &#34;&#34;&#34;
+    Which points of this script can be reached more than once, over `control_flow`. A pass that
+    establishes a fact from one visit to a statement — a variable&#39;s value, a stream&#39;s contents —
+    asks this before carrying it to a reader, because a point control returns to has no single
+    value to carry.
+
+    It is built over `blocks` so that a body run by a cmdlet that enumerates is known to repeat.
+    Without that the walk out of a block follows it to where its value was written, and a
+    `ForEach-Object` body reads as running exactly once.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_cycles&#39;, lambda: CycleModel(self.control_flow, self.blocks.body_site))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.commands"><code class="name">var <span class="ident">commands</span></code></dt>
+<dd>
+<section class="desc"><p>What each command invocation of this root denotes — a name, nothing, or unknown — over
+<code>control_flow</code> and <code>dominance</code>. The one place command identity is answered: a pass that
+rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+rather than splitting the alias relation or ignoring the precedence that makes a default
+alias beat a script function. It reads the script's function names from <code>call_graph</code>, the
+layer that already owns which definitions a name denotes, and the wider set of names the
+script takes over from <code>closed_world</code>, so the two models agree on what has been shadowed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L216-L229" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def commands(self) -&gt; Ps1CommandModel:
+    &#34;&#34;&#34;
+    What each command invocation of this root denotes — a name, nothing, or unknown — over
+    `control_flow` and `dominance`. The one place command identity is answered: a pass that
+    rewrites an alias, folds a call to a function, or reads which command a name runs asks here
+    rather than splitting the alias relation or ignoring the precedence that makes a default
+    alias beat a script function. It reads the script&#39;s function names from `call_graph`, the
+    layer that already owns which definitions a name denotes, and the wider set of names the
+    script takes over from `closed_world`, so the two models agree on what has been shadowed.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_commands&#39;, lambda: build_command_model(
+        self.root, self.control_flow, self.dominance, self.blocks,
+        frozenset(self.call_graph.defined_names), self.closed_world.shadowed_names))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.variable_flow"><code class="name">var <span class="ident">variable_flow</span></code></dt>
+<dd>
+<section class="desc"><p>Which write each variable read observes, over <code>model</code>, <code>control_flow</code>, <code>dominance</code>, <code>blocks</code>
+and <code>cycles</code>. The one place that question is answered: a pass that decides what a name holds
+at a point asks here rather than walking the tree for an assignment that looks near enough.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L231-L239" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def variable_flow(self) -&gt; Ps1VariableFlow:
+    &#34;&#34;&#34;
+    Which write each variable read observes, over `model`, `control_flow`, `dominance`, `blocks`
+    and `cycles`. The one place that question is answered: a pass that decides what a name holds
+    at a point asks here rather than walking the tree for an assignment that looks near enough.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_variable_flow&#39;, lambda: build_variable_flow(
+        self.model, self.control_flow, self.dominance, self.blocks, self.cycles))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache.used_before_defined"><code class="name">var <span class="ident">used_before_defined</span></code></dt>
+<dd>
+<section class="desc"><p>The command names some call to which no definition of the name is guaranteed to have run
+before, over <code>call_graph</code> and <code>dominance</code>. The single place that ordering is asked of the
+call graph: a pass that folds a call into its body or deletes a definition with its calls
+reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+the fold cannot carry. It composes the two models here because
+<code><a title="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined" href="callgraph.html#refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined">names_used_before_defined()</a></code> needs the ordering
+<code>dominance</code> owns, which the deliberately syntactic <code>call_graph</code> does not carry.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cache.py#L241-L253" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def used_before_defined(self) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    The command names some call to which no definition of the name is guaranteed to have run
+    before, over `call_graph` and `dominance`. The single place that ordering is asked of the
+    call graph: a pass that folds a call into its body or deletes a definition with its calls
+    reads this rather than resolving a name whose earlier binding — nothing, at script scope —
+    the fold cannot carry. It composes the two models here because
+    `refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined` needs the ordering
+    `dominance` owns, which the deliberately syntactic `call_graph` does not carry.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_used_before_defined&#39;, lambda: names_used_before_defined(
+        self.call_graph, self.dominance))</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">for_transformer</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.options" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.options">options</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.pinned" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.pinned">pinned</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.root" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.root">root</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cache.model_cache" href="#refinery.lib.scripts.ps1.analysis.cache.model_cache">model_cache</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache" href="#refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache">Ps1ModelCache</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

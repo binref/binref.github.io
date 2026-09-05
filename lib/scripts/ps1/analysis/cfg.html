@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.cfg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.cfg</code></h1>
+</header>
+<section id="section-intro">
+<p>PowerShell's contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored.</p>
+<p>Everything structural lives in <code><a title="refinery.lib.scripts.analysis.cfg" href="../../analysis/cfg.html">refinery.lib.scripts.analysis.cfg</a></code>. What is here is the dispatch, the
+accessors, and the places PowerShell's answer differs from the shape JavaScript established:</p>
+<ul>
+<li><strong><code>switch</code> does not fall through, it keeps matching.</strong> Every clause is tested against the value and
+every matching one runs, so an arm's exits may reach any <em>later</em> arm rather than only the next.
+That is <code><a title="refinery.lib.scripts.analysis.cfg.ArmFlow.CUMULATIVE" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ArmFlow.CUMULATIVE">ArmFlow.CUMULATIVE</a></code>, and reading it as C-style
+fallthrough would drop the path in which the first and third clauses match and the second does not.
+It also <em>enumerates its input</em>, so <code>continue</code> inside it advances to the next input value rather
+than to an enclosing loop, and a <code>default</code> clause does not make it exhaustive: over an empty
+collection no clause runs at all.</li>
+<li><strong><code>if</code>/<code>elseif</code> is one flat statement</strong>, not a nest, so the chain of tests is built through
+<code>branch_chain</code> and each <code>elseif</code> condition gets a node of its own.</li>
+<li><strong><code>trap</code> guards the statement block it is written in</strong>, not the scope around it: it catches for
+that block entire, statements written above it included, and for nothing outside it, so one
+written inside an <code>if</code> body is no handler for the body around it. Where blocks nest, the innermost
+block declaring one is the only set consulted, and a set that may fail to match passes the error
+outward rather than letting it resume. <code>continue</code> inside it resumes at the statement after the one
+that threw. See <code>_Builder.block</code>.</li>
+<li><strong><code>exit</code> is a terminator like <code>return</code></strong>, modelled as one: control does not continue in this body.
+That it leaves the <em>script</em> rather than the function is a claim about the caller's body, which a
+per-body graph does not make; keeping the caller's paths is the conservative reading.</li>
+<li><strong>A label is a field of the construct</strong>, not a statement wrapping it, so <code>park_label</code> is called
+from the dispatch rather than through <code>labelled</code>, and the <code>:</code> the lexer keeps on the declaration
+is stripped before a jump can be matched against it.</li>
+</ul>
+<p><code>Ps1Code</code> also splits one body across <code>begin</code>/<code>process</code>/<code>end</code>/<code>dynamicparam</code> blocks, so <code>owner.body</code>
+alone is not what an advanced function runs.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cfg.py#L1-L580" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+PowerShell&#39;s contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored.
+
+Everything structural lives in `refinery.lib.scripts.analysis.cfg`. What is here is the dispatch, the
+accessors, and the places PowerShell&#39;s answer differs from the shape JavaScript established:
+
+- **`switch` does not fall through, it keeps matching.** Every clause is tested against the value and
+  every matching one runs, so an arm&#39;s exits may reach any *later* arm rather than only the next.
+  That is `refinery.lib.scripts.analysis.cfg.ArmFlow.CUMULATIVE`, and reading it as C-style
+  fallthrough would drop the path in which the first and third clauses match and the second does not.
+  It also *enumerates its input*, so `continue` inside it advances to the next input value rather
+  than to an enclosing loop, and a `default` clause does not make it exhaustive: over an empty
+  collection no clause runs at all.
+- **`if`/`elseif` is one flat statement**, not a nest, so the chain of tests is built through
+  `branch_chain` and each `elseif` condition gets a node of its own.
+- **`trap` guards the statement block it is written in**, not the scope around it: it catches for
+  that block entire, statements written above it included, and for nothing outside it, so one
+  written inside an `if` body is no handler for the body around it. Where blocks nest, the innermost
+  block declaring one is the only set consulted, and a set that may fail to match passes the error
+  outward rather than letting it resume. `continue` inside it resumes at the statement after the one
+  that threw. See `_Builder.block`.
+- **`exit` is a terminator like `return`**, modelled as one: control does not continue in this body.
+  That it leaves the *script* rather than the function is a claim about the caller&#39;s body, which a
+  per-body graph does not make; keeping the caller&#39;s paths is the conservative reading.
+- **A label is a field of the construct**, not a statement wrapping it, so `park_label` is called
+  from the dispatch rather than through `labelled`, and the `:` the lexer keeps on the declaration
+  is stripped before a jump can be matched against it.
+
+`Ps1Code` also splits one body across `begin`/`process`/`end`/`dynamicparam` blocks, so `owner.body`
+alone is not what an advanced function runs.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from functools import partial
+from typing import Sequence
+
+from refinery.lib.scripts import Block, Node
+from refinery.lib.scripts.analysis.cfg import (
+    ArmFlow,
+    CfgBuilder,
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+    build_control_flow,
+)
+from refinery.lib.scripts.ps1.ast import (
+    STATEMENT_LIST_EXPRESSIONS,
+    get_named_blocks,
+    string_value,
+)
+from refinery.lib.scripts.ps1.model import (
+    Ps1BreakStatement,
+    Ps1CatchClause,
+    Ps1Code,
+    Ps1ContinueStatement,
+    Ps1DoLoop,
+    Ps1ExitStatement,
+    Ps1ForEachLoop,
+    Ps1ForLoop,
+    Ps1IfStatement,
+    Ps1Jump,
+    Ps1ReturnStatement,
+    Ps1Script,
+    Ps1ScriptBlock,
+    Ps1SwitchStatement,
+    Ps1ThrowStatement,
+    Ps1TrapStatement,
+    Ps1TryCatchFinally,
+    Ps1WhileLoop,
+)
+
+#: The nodes that own a control-flow graph of their own, beside the script itself. A script block is
+#: PowerShell&#39;s anonymous function: it is a *value* where it is written and runs somewhere else
+#: entirely — as the body of `ForEach-Object`, through `&amp;` or `.`, or as the body of a function,
+#: which is the only script block a `Ps1FunctionDefinition` has and why keying on the definition
+#: instead adds no graph but leaves every other block without one. A block with no graph is climbed
+#: out of, so its statements are reported as running where the block is *written*: they claim to
+#: precede everything after that point and lose their order among themselves.
+#:
+#: This is the same partition `refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel.scope_of`
+#: makes — one body, one scope, one graph. A `trap` divides more finely still: it belongs to the
+#: statement block it is written in, of which a body is only the outermost.
+FUNCTION_NODES = (Ps1ScriptBlock,)
+
+_LOOP_NODES = (
+    Ps1WhileLoop,
+    Ps1DoLoop,
+    Ps1ForLoop,
+    Ps1ForEachLoop,
+)
+
+
+#: The type names a `catch` clause may carry that take every terminating error Windows PowerShell
+#: 5.1 raises, in the spellings 5.1 resolves. `System.Exception` is the root of the .NET hierarchy
+#: and matches by definition; `RuntimeException` is what the engine wraps a terminating error in,
+#: measured to match a failed cast, a division by zero, `throw` of a string, `throw` of a .NET
+#: exception, a method that threw, a member access on `$null`, and a cmdlet stopped by
+#: `-ErrorAction Stop`.
+#:
+#: The spellings are the measurement too, and they are not symmetric: a bare name is resolved
+#: against `System` alone, so `[Exception]` names `System.Exception` while `[RuntimeException]`
+#: names nothing at all and the clause it filters matches no error whatsoever. Listing the short
+#: form of the second would grant a clause that in fact declines everything, which is the one
+#: direction that deletes code.
+_CATCHES_EVERY_ERROR = frozenset({
+    &#39;exception&#39;,
+    &#39;system.exception&#39;,
+    &#39;management.automation.runtimeexception&#39;,
+    &#39;system.management.automation.runtimeexception&#39;,
+})
+
+
+def _names_every_error(name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *name* is a type filter every terminating error matches. An empty name is a `trap`
+    carrying no type filter, which takes every error the way a bare `catch` does. A `catch` clause
+    reaches this only with the names it could read: whether it carried a filter at all is
+    `Ps1CatchClause.filtered`, so an unreadable one is never spelled here as the empty name.
+    &#34;&#34;&#34;
+    return not name.strip() or name.strip().lower() in _CATCHES_EVERY_ERROR
+
+
+def _catch_takes_every_error(clause: Ps1CatchClause) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *clause* is certain to be the one that takes a throw the guarded block makes: it carries
+    no type filter at all, or one of the filters it carries names a type every terminating error is.
+
+    A clause carrying several types matches when *any* of them does, so one universal name among
+    them settles it however narrow the others are. A clause whose filter was written but could not
+    be read carries an empty `types` for a different reason than an unfiltered clause does, and
+    `filtered` is what tells the two apart: erring towards *takes everything* would close the
+    exceptional edge an enclosing handler still needs, so the unread filter takes nothing certain.
+    &#34;&#34;&#34;
+    if not clause.filtered:
+        return True
+    return any(_names_every_error(name) for name in clause.types)
+
+
+def swallows_every_error(statement: Ps1TryCatchFinally) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether every terminating error the `try` body of *statement* raises is certain to land in one
+    of that statement&#39;s own `catch` clauses.
+
+    The quantifier is the whole question, and it is an `any`: one clause that takes everything
+    settles it however narrow the others are, and a construct carrying no `catch` at all swallows
+    nothing, which an `all` reads as vacuously true. Answering it wrong in that direction hands a
+    caller a raise it believes confined.
+
+    What this licenses is confinement and not invisibility. A caught error is still recorded, and
+    whether the script reads that record back is a different question with a different owner.
+    &#34;&#34;&#34;
+    return any(_catch_takes_every_error(clause) for clause in statement.catch_clauses)
+
+
+def _jump_label(statement: Ps1Jump) -&gt; str | None:
+    &#34;&#34;&#34;
+    The label a `break` or `continue` names, or `None` when it names none or names one this cannot
+    read. PowerShell allows the label to be any expression — `break $name` is legal — and a label
+    that is not a static string is one no lexical target can be matched against, so it is treated as
+    unlabelled, which resolves to the innermost enclosing target and is the conservative reading.
+    &#34;&#34;&#34;
+    return string_value(statement.label) if statement.label is not None else None
+
+
+def _construct_label(label: str | None) -&gt; str | None:
+    &#34;&#34;&#34;
+    The name a labelled loop or `switch` declares, without the `:` the lexer keeps on the token.
+
+    A jump names its target without the colon, so the declaration and the reference are two
+    spellings of one name and comparing them unnormalized never matches — which resolves every
+    labelled jump to nothing and sends it out of the body instead of out of the construct it names.
+    &#34;&#34;&#34;
+    return label[1:] if label is not None and label.startswith(&#39;:&#39;) else label
+
+
+def _declared_traps(statements: Sequence[Node]) -&gt; list[Ps1TrapStatement]:
+    &#34;&#34;&#34;
+    The `trap` statements *statements* declares, in source order.
+
+    A `trap` belongs to the statement block it is written in and to no other: it catches for that
+    block entire, including the statements written above it, and an error raised outside the block
+    is never offered to it. Collecting the traps of a nested block for the block around it hands
+    those errors to a handler no run reaches, and — where the nested one is typed — reports a filter
+    that may miss as guarding statements it does not guard at all.
+    &#34;&#34;&#34;
+    return [statement for statement in statements if isinstance(statement, Ps1TrapStatement)]
+
+
+@dataclass
+class _TrapBody:
+    &#34;&#34;&#34;
+    What building one `trap` body reported back: the nodes at which control resumes the block the
+    `trap` guards, and whether the body reaches the `break` that rethrows.
+
+    `resumes` collects the explicit `continue` spellings only. A body that runs off its end resumes
+    too — the error record is written and the block carries on — but that is its exit frontier,
+    which the caller already holds.
+
+    `rethrows` is decided through the builder&#39;s jump-target stack rather than by finding the
+    keyword: a `break` naming a loop written inside the body leaves that loop, and the `trap` goes
+    on swallowing. The stack the body is built against holds nothing from outside it — see
+    `_Builder.block` — because a `trap` body is a scope of its own and a jump in it can name no
+    construct the block is written inside.
+    &#34;&#34;&#34;
+    resumes: list[CfgNode] = field(default_factory=list)
+    rethrows: bool = False
+
+
+def _descended_bodies(statement: Node) -&gt; list[list[Node]]:
+    &#34;&#34;&#34;
+    The statement lists of the `STATEMENT_LIST_EXPRESSIONS` written in *statement*&#39;s expression tree,
+    in source order — the sub-statement granularity the fault reader needs and no coarser consumer
+    wants.
+
+    Only the outermost such construct on each path is collected: one nested inside another is reached
+    when the outer body&#39;s statements are built, each of which passes back through `statement` and this
+    descent again, so the nesting is handled by recursion through the builder rather than flattened
+    here. A nested script block is its own graph and is left to it.
+    &#34;&#34;&#34;
+    bodies: list[list[Node]] = []
+
+    def collect(node: Node) -&gt; None:
+        for child in node.children():
+            if isinstance(child, Ps1ScriptBlock):
+                continue
+            if isinstance(child, STATEMENT_LIST_EXPRESSIONS):
+                bodies.append(list(child.body))
+                continue
+            collect(child)
+
+    collect(statement)
+    return bodies
+
+
+class _Builder(CfgBuilder):
+    def __init__(self, owner: Node, descend: bool = False):
+        super().__init__(owner)
+        self._trap_body: _TrapBody | None = None
+        self._descend = descend
+
+    def block(self, statements: Sequence[Node], frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        One statement block, with every `trap` it declares installed as a handler over the whole of
+        it.
+
+        A `trap` is not a guarded block. It is declared somewhere in the block and catches for that
+        block entire, including the statements written above it, so it cannot be pushed at the point
+        it appears the way a `try` is — it is pushed before the block is walked at all. Several
+        traps in one block are peers and are chained the way
+        `refinery.lib.scripts.analysis.cfg.CfgBuilder.guarded` chains several `catch` clauses,
+        because which one runs depends on the type of the error and none of them is guaranteed.
+
+        Where blocks nest, the innermost one declaring a `trap` is the only set the error is offered
+        to, which pushing that set on the handler stack already says. The set passes the error
+        outward — to the `catch` or `trap` guarding the block, and to the body exit when nothing
+        guards it — exactly when it may fail to take it: every `trap` in it carrying a filter no
+        error is known to match, or one of them reaching the `break` that runs the body and
+        rethrows. Nothing else in a body reaches the exit on an exceptional edge without a handler
+        having been offered the error, which is what tells an error that ends the script apart from
+        one that is reported and stepped over.
+
+        A trap does not guard itself: an error raised inside a trap body is offered to whatever
+        the set itself unwinds to, so the trap bodies are built under that and only the block&#39;s own
+        statements are built under the set. Building them under the set instead gives every node of
+        every trap body an exceptional edge back to a handler that already has a normal edge into
+        it, which is a cycle through the trap that no run can take — and reads as a body that
+        repeats. `refinery.lib.scripts.analysis.cfg.CfgBuilder.guarded` pops before building its
+        `catch` bodies for the same reason. Where nothing guards the block, the trap body unwinds to
+        the body exit: the error ends the body, which is the one place a `trap` turns a fault that
+        would have been reported and stepped over into one that stops everything after it.
+
+        **A trap body is built against an empty jump-target stack**, because 5.1 compiles one as a
+        scope of its own: `break` in it ends the trap and rethrows, and `continue` in it resumes the
+        guarded block, whatever loop or `switch` the block itself is written inside. Leaving the
+        enclosing construct&#39;s targets in place resolves both keywords to that construct instead —
+        the `break` stops being a rethrow, so the set reads as swallowing an error that in fact ends
+        the body, and the `continue` becomes a back-jump, so the resumption the trap exists to
+        create is never wired at all.
+
+        The *resumption* stack is deliberately not cleared the same way. A jump names a construct and
+        a trap body encloses none of them; a resumption names a place control carries on at, and a
+        trap body written inside a block some outer set resumes is a place that outer set carries on
+        from. Clearing it would leave the body&#39;s nodes on neither projection of the level that does
+        guard them.
+
+        `continue` inside a trap resumes at the statement following the one that threw, which is a
+        shape no single edge set expresses. It is therefore carried twice, as
+        `refinery.lib.scripts.analysis.cfg.CfgEdge` describes: every resumption point is taken to
+        reach *every* node the block owns, through the hub
+        `refinery.lib.scripts.analysis.cfg.CfgBuilder.resumption` wires — the over-approximation
+        an analysis asking whether any resumption path exists must read, since claiming fewer paths
+        would let one call a statement after a trap unreachable, or let a store before one look dead
+        because the resumption that reads it was never modelled — and, alongside it, the precise
+        forward-only half (`_resumable_sequence`), which joins each statement to the one control
+        actually resumes at and is what a flood reads.
+
+        The set is opened after its own handler entries and bodies are built. A `trap` declared in
+        a nested block is a statement of the block around it, so its entries and body belong to the
+        *enclosing* resumable level and are wired against that one. Opening this level first would
+        take them, and the forward projection would then have no
+        edge saying where control goes when the inner set *declines* an error — the enclosing set
+        takes it and resumes past the whole nested block, which is the one path a typed inner trap
+        makes observable.
+        &#34;&#34;&#34;
+        traps = _declared_traps(statements)
+        if not traps:
+            return self.sequence(statements, frontier)
+        entries: list[CfgNode] = []
+        for trap in traps:
+            handler = self.detached_node(trap)
+            if entries:
+                self.exceptional_edge(entries[-1], handler)
+            entries.append(handler)
+        handling = list(entries)
+        resumes: list[CfgNode] = []
+        escapes = True
+        enclosing = self._trap_body
+        outer_targets = self._targets
+        outer_label = self._pending_label
+        self._targets = []
+        self._pending_label = None
+        self._handlers.append(self.unwinding())
+        for trap, handler in zip(traps, entries):
+            self._trap_body = built = _TrapBody()
+            body_from = len(self.cfg.nodes)
+            resumes += self._body(trap.body, [handler]) + built.resumes
+            handling += self.cfg.nodes[body_from:]
+            if _names_every_error(trap.type_name) and not built.rethrows:
+                escapes = False
+        self._handlers.pop()
+        self._trap_body = enclosing
+        self._targets = outer_targets
+        self._pending_label = outer_label
+        self.close_handler_set(entries, escapes=escapes)
+        self._handlers.append(entries[0])
+        if not resumes:
+            exits = self.sequence(statements, frontier)
+        else:
+            self.mark_hub_bound(handling)
+            with self.resumption(resumes):
+                exits = self._resumable_sequence(statements, frontier)
+        self._handlers.pop()
+        return exits
+
+    def _resumable_sequence(
+        self, statements: Sequence[Node], frontier: list[CfgNode],
+    ) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        The guarded statements of a block whose `trap` set resumes it, threaded as `sequence` does,
+        with the precise forward-only half of resumption drawn against the open block as each node
+        appears.
+
+        What finds the point control resumes at is one elementless slot per statement, which
+        `refinery.lib.scripts.analysis.cfg.CfgBuilder.resume_past` reports once the statement is
+        built. The slot is then passed in the frontier the *next* statement is built from, so that
+        whatever that statement control-*enters* gains an edge from it — its own node, the condition
+        of an `if`, the first guarded statement of a nested block. Reading the entry off the nodes a
+        statement created instead answers the wrong one for every construct that builds something
+        before what it runs first: a `try` builds its handler entry first, so the forward edge would
+        reach the `catch` clause and leave the body it guards reachable only through the hub, which
+        is exactly the backward reach the forward half exists to avoid.
+
+        The last statement&#39;s slot goes into the returned frontier rather than to the body exit.
+        Control resuming past the end of a guarded block carries on with whatever follows the
+        *block*, and for a nested one that is not the end of the body; only the caller threading
+        this frontier knows where it is.
+
+        A statement inside a nested resumable block claims that block&#39;s slot and not this one&#39;s,
+        which is what makes the edge count linear in the nesting depth rather than quadratic. It
+        loses no path: the nested block hands its own last slot back in the frontier this loop
+        threads on, so a statement inside it still reaches the statement after the nested block. The
+        slot a node draws to is the *representative* of a resumption, not the exact statement control
+        lands at — no graph knows which statement threw — and what every consumer reads off it is
+        where the resumption can go, not where it went.
+        &#34;&#34;&#34;
+        for statement in statements:
+            frontier = self.resume_past(self.statement(statement, frontier))
+        return frontier
+
+    def body_blocks(self, owner: Node) -&gt; Sequence[Sequence[Node]]:
+        &#34;&#34;&#34;
+        The statement blocks *owner* runs, in the order it runs them.
+
+        An advanced function fills `begin`/`process`/`end`/`dynamicparam` instead of `body`, and
+        reading only `body` for one would report an empty graph for a function that runs a great
+        deal — the same trap `refinery.lib.scripts.ps1.ast.get_named_blocks` exists to warn about.
+        `dynamicparam` is pulled to the front because the engine evaluates it during parameter
+        binding, before `begin`, while that accessor reports the blocks in the order they are
+        declared in.
+
+        They are kept apart rather than concatenated because each is a statement block of its own: a
+        `trap` written in `begin` is offered nothing that `process` raises, and joining them hands
+        it errors no run ever will.
+        &#34;&#34;&#34;
+        if not isinstance(owner, Ps1Code):
+            return []
+        blocks = sorted(
+            get_named_blocks(owner),
+            key=lambda block: block is not owner.dynamicparam_block,
+        )
+        return [block.body for block in blocks] + [owner.body]
+
+    def statement(self, statement: Node, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        if isinstance(statement, Block):
+            return self.block(statement.body, frontier)
+        if isinstance(statement, _LOOP_NODES):
+            self.park_label(_construct_label(statement.label))
+        if isinstance(statement, Ps1IfStatement):
+            return self._if(statement, frontier)
+        if isinstance(statement, Ps1WhileLoop):
+            return self.loop_head_tested(statement, statement.body, frontier)
+        if isinstance(statement, Ps1DoLoop):
+            return self.loop_tail_tested(statement, statement.body, frontier)
+        if isinstance(statement, Ps1ForLoop):
+            return self.loop_counted(
+                statement.initializer,
+                statement.condition,
+                statement.iterator,
+                statement.body,
+                frontier,
+            )
+        if isinstance(statement, Ps1ForEachLoop):
+            return self.loop_head_tested(statement, statement.body, frontier)
+        if isinstance(statement, Ps1SwitchStatement):
+            return self._switch(statement, frontier)
+        if isinstance(statement, Ps1TryCatchFinally):
+            return self._try(statement, frontier)
+        if isinstance(statement, Ps1TrapStatement):
+            return list(frontier)
+        if isinstance(statement, Ps1ExitStatement):
+            return self.terminate(statement, frontier, exceptional=False)
+        if isinstance(statement, Ps1ThrowStatement):
+            return self.terminate(statement, frontier, exceptional=True)
+        if isinstance(statement, Ps1ReturnStatement):
+            return self.terminate(statement, frontier, exceptional=False)
+        if isinstance(statement, Ps1BreakStatement):
+            label = _jump_label(statement)
+            trap = self._trap_body
+            if trap is not None and not self.has_break_target(label):
+                trap.rethrows = True
+            return self.jump_out(statement, label, frontier)
+        if isinstance(statement, Ps1ContinueStatement):
+            label = _jump_label(statement)
+            trap = self._trap_body
+            if trap is not None and not self.has_continue_target(label):
+                return self._resume(trap.resumes, statement, frontier)
+            return self.jump_back(statement, label, frontier)
+        if self._descend:
+            descended = self._descend_statement(statement, frontier)
+            if descended is not None:
+                return descended
+        return self.opaque(statement, frontier)
+
+    def _descend_statement(
+        self, statement: Node, frontier: list[CfgNode],
+    ) -&gt; list[CfgNode] | None:
+        &#34;&#34;&#34;
+        A leaf statement carrying a value construct whose operand is a statement list — a `$( )` or a
+        `@( )` — modelled at sub-statement granularity so the fault reader sees a statement-terminating
+        error step over to the next statement *inside* the construct. `None` when it carries none, so
+        the caller falls back to `opaque`.
+
+        Each inner statement list is built through `block`, so a `trap` declared inside the construct
+        installs as a handler over its siblings, not as noise the enclosing block owns. The inner
+        frontier then feeds the outer statement&#39;s own node: the construct yields its value, then the
+        statement consuming it runs. This inner-then-outer order is the soundness hinge — a soft raiser
+        that is the last inner statement has the outer node as its successor, which keeps a trap that
+        guards it, where the reverse order would drop it.
+
+        Reached only where `descend` is set, which is only the fault reader&#39;s own graph; every other
+        consumer reads the coarse model, in which this statement is one atomic node.
+        &#34;&#34;&#34;
+        bodies = _descended_bodies(statement)
+        if not bodies:
+            return None
+        for body in bodies:
+            frontier = self.block(body, frontier)
+        node = self.node(statement)
+        self.link(frontier, node)
+        return [node]
+
+    def _resume(
+        self, resumes: list[CfgNode], statement: Node, frontier: list[CfgNode],
+    ) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        A `continue` inside a `trap` body, which is not a back-jump: it resumes the guarded block at
+        the statement after the one that threw. The node is recorded for `block` to link to every
+        landing point once that block exists, and control does not fall through it here.
+
+        Reading it as a loop back-jump instead resolves it to nothing and wires it to the body exit,
+        which deletes the one path the trap exists to create — and leaves the whole resumption model
+        unexercised, because this is the spelling that resumes.
+        &#34;&#34;&#34;
+        node = self.node(statement)
+        self.link(frontier, node)
+        resumes.append(node)
+        return []
+
+    def _if(self, statement: Ps1IfStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        The chain, keyed so that the whole statement is the first test&#39;s node: a caller that locates
+        the `if` itself must reach a node, and the first condition is where control first arrives.
+        &#34;&#34;&#34;
+        clauses: list[tuple[Node, Node | None]] = []
+        for index, (condition, block) in enumerate(statement.clauses):
+            clauses.append((statement if index == 0 else condition, block))
+        if not clauses:
+            return self.opaque(statement, frontier)
+        return self.branch_chain(clauses, statement.else_block, frontier)
+
+    def _switch(self, statement: Ps1SwitchStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        The clauses as arms of an iterated, cumulative dispatch.
+
+        A `default` clause does not make the construct exhaustive the way it does in a language
+        whose `switch` tests one value: PowerShell&#39;s enumerates its input, and over an empty
+        collection no clause runs at all — not even `default`. Reporting it exhaustive drops the
+        edge that leaves the switch without entering any arm, which is what makes the statement
+        after it look unreachable.
+
+        An arm is handed over as the block it is rather than as the statements in it, because a
+        clause body is a statement block of its own and a `trap` written in one guards that clause
+        and nothing else.
+        &#34;&#34;&#34;
+        arms: list[Sequence[Node]] = [
+            [block] if block is not None else [] for _, block in statement.clauses
+        ]
+        self.park_label(_construct_label(statement.label))
+        return self.dispatch(
+            statement,
+            arms,
+            frontier,
+            arm_flow=ArmFlow.CUMULATIVE,
+            exhaustive=False,
+            iterated=True,
+        )
+
+    def _try(self, statement: Ps1TryCatchFinally, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        PowerShell allows several typed `catch` clauses where JavaScript allows one binding, so the
+        clauses are chained: the guarded block reaches the first, and each clause reaches the next,
+        because which one runs depends on the exception type and none of them is guaranteed.
+
+        A clause certain to take every error leaves nothing to pass outward — which is what makes
+        an empty `catch` shield the `catch` or `trap` around it where a typed one hands the error
+        straight on to it. Carrying no type is one way to be certain and naming `System.Exception`
+        is another; see `_catch_takes_every_error`.
+
+        The `finally` body travels as its block for the same reason a `switch` arm does: it is a
+        statement block, and a `trap` written in one guards it alone.
+        &#34;&#34;&#34;
+        clauses = statement.catch_clauses
+        finalizer = statement.finally_block
+        return self.guarded(
+            statement.try_block,
+            [(clause, clause.body) for clause in clauses],
+            finalizer,
+            (finalizer,) if finalizer is not None else (),
+            frontier,
+            escapes=not swallows_every_error(statement),
+        )
+
+
+def build_ps1_control_flow(root: Ps1Script, descend: bool = False) -&gt; dict[int, ControlFlowGraph]:
+    &#34;&#34;&#34;
+    One control-flow graph per script block — see `FUNCTION_NODES` — and one for the script itself.
+
+    With *descend* set, a statement carrying a `STATEMENT_LIST_EXPRESSIONS` construct is modelled at
+    sub-statement granularity rather than as one atomic node — the finer graph the fault reader needs
+    to see a statement-terminating error step over inside a `$( )` or `@( )`. It is off by default
+    because every consumer but the fault reader wants the coarse one-statement-one-node graph, and
+    turning it on changes only the graph the caller who asks for it reads.
+    &#34;&#34;&#34;
+    return build_control_flow(root, partial(_Builder, descend=descend), FUNCTION_NODES)
+
+
+def build_control_flow_model(root: Ps1Script, descend: bool = False) -&gt; ControlFlowModel:
+    return ControlFlowModel(build_ps1_control_flow(root, descend))</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES"><code class="name">var <span class="ident">FUNCTION_NODES</span></code></dt>
+<dd>
+<section class="desc"><p>This is the same partition <code><a title="refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel.scope_of" href="model.html#refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel.scope_of">Ps1SemanticModel.scope_of()</a></code>
+makes — one body, one scope, one graph. A <code>trap</code> divides more finely still: it belongs to the
+statement block it is written in, of which a body is only the outermost.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.swallows_every_error"><code class="name flex">
+<span>def <span class="ident">swallows_every_error</span></span>(<span>statement)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether every terminating error the <code>try</code> body of <em>statement</em> raises is certain to land in one
+of that statement's own <code>catch</code> clauses.</p>
+<p>The quantifier is the whole question, and it is an <code>any</code>: one clause that takes everything
+settles it however narrow the others are, and a construct carrying no <code>catch</code> at all swallows
+nothing, which an <code>all</code> reads as vacuously true. Answering it wrong in that direction hands a
+caller a raise it believes confined.</p>
+<p>What this licenses is confinement and not invisibility. A caught error is still recorded, and
+whether the script reads that record back is a different question with a different owner.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cfg.py#L141-L154" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def swallows_every_error(statement: Ps1TryCatchFinally) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether every terminating error the `try` body of *statement* raises is certain to land in one
+    of that statement&#39;s own `catch` clauses.
+
+    The quantifier is the whole question, and it is an `any`: one clause that takes everything
+    settles it however narrow the others are, and a construct carrying no `catch` at all swallows
+    nothing, which an `all` reads as vacuously true. Answering it wrong in that direction hands a
+    caller a raise it believes confined.
+
+    What this licenses is confinement and not invisibility. A caught error is still recorded, and
+    whether the script reads that record back is a different question with a different owner.
+    &#34;&#34;&#34;
+    return any(_catch_takes_every_error(clause) for clause in statement.catch_clauses)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow"><code class="name flex">
+<span>def <span class="ident">build_ps1_control_flow</span></span>(<span>root, descend=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>One control-flow graph per script block — see <code><a title="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES" href="#refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES">FUNCTION_NODES</a></code> — and one for the script itself.</p>
+<p>With <em>descend</em> set, a statement carrying a <code>STATEMENT_LIST_EXPRESSIONS</code> construct is modelled at
+sub-statement granularity rather than as one atomic node — the finer graph the fault reader needs
+to see a statement-terminating error step over inside a <code>$( )</code> or <code>@( )</code>. It is off by default
+because every consumer but the fault reader wants the coarse one-statement-one-node graph, and
+turning it on changes only the graph the caller who asks for it reads.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cfg.py#L566-L576" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_ps1_control_flow(root: Ps1Script, descend: bool = False) -&gt; dict[int, ControlFlowGraph]:
+    &#34;&#34;&#34;
+    One control-flow graph per script block — see `FUNCTION_NODES` — and one for the script itself.
+
+    With *descend* set, a statement carrying a `STATEMENT_LIST_EXPRESSIONS` construct is modelled at
+    sub-statement granularity rather than as one atomic node — the finer graph the fault reader needs
+    to see a statement-terminating error step over inside a `$( )` or `@( )`. It is off by default
+    because every consumer but the fault reader wants the coarse one-statement-one-node graph, and
+    turning it on changes only the graph the caller who asks for it reads.
+    &#34;&#34;&#34;
+    return build_control_flow(root, partial(_Builder, descend=descend), FUNCTION_NODES)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model"><code class="name flex">
+<span>def <span class="ident">build_control_flow_model</span></span>(<span>root, descend=False)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/ps1/analysis/cfg.py#L579-L580" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_control_flow_model(root: Ps1Script, descend: bool = False) -&gt; ControlFlowModel:
+    return ControlFlowModel(build_ps1_control_flow(root, descend))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES" href="#refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES">FUNCTION_NODES</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.swallows_every_error" href="#refinery.lib.scripts.ps1.analysis.cfg.swallows_every_error">swallows_every_error</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow" href="#refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow">build_ps1_control_flow</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model" href="#refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model">build_control_flow_model</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

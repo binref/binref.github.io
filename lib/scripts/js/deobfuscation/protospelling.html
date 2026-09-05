@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.protospelling documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.protospelling</code></h1>
+</header>
+<section id="section-intro">
+<p>Rewrite the spellings that reach an intrinsic prototype without naming it to <code>Owner.prototype</code>.</p>
+<p>A prototype pollution gadget writes <code>Object.prototype</code> through a literal rather than through the
+name — <code>({}).__proto__.z = 9</code>, <code>Object.getPrototypeOf({}).z = 9</code>,
+<code>({}).constructor.prototype.z = 9</code> — and every one of them means the same object as
+<code>Object.prototype</code>. Spelling it that way instead is what lets the rest of the pipeline see the
+write at all: a write is attributed to the name at the root of the member chain it is written
+through, so a chain rooted in a literal is attributed to nothing and every question about that
+prototype goes on being answered from a table of what the language puts there.</p>
+<p>The rewrite is the same shape as
+<code><a title="refinery.lib.scripts.js.deobfuscation.globalfinder.JsGlobalFinderInlining" href="globalfinder.html#refinery.lib.scripts.js.deobfuscation.globalfinder.JsGlobalFinderInlining">JsGlobalFinderInlining</a></code>, which already rewrites
+a call that computes the global object to <code>globalThis</code>, and it earns its place the same way twice
+over: the file the analyst reads says which object is being patched, and every existing check sees
+the write with no new analysis behind it.</p>
+<p>The identity is not unconditional and each gate below was established by running Node. It holds
+because the mechanism each spelling goes through is the one the language installs, so a file that
+replaces that mechanism is asking for something else — <code>Object.prototype.constructor = C</code> makes
+<code>({}).constructor.prototype</code> mean <code>C.prototype</code>, and replacing the <code>__proto__</code> accessor or
+<code>Object.getPrototypeOf</code> redirects the other two. Those are asked of the effect model per key,
+since asking per name would refuse every file this exists for: a file that writes
+<code>Object.prototype.z</code> has written <code>Object</code>.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/protospelling.py#L1-L252" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Rewrite the spellings that reach an intrinsic prototype without naming it to `Owner.prototype`.
+
+A prototype pollution gadget writes `Object.prototype` through a literal rather than through the
+name — `({}).__proto__.z = 9`, `Object.getPrototypeOf({}).z = 9`,
+`({}).constructor.prototype.z = 9` — and every one of them means the same object as
+`Object.prototype`. Spelling it that way instead is what lets the rest of the pipeline see the
+write at all: a write is attributed to the name at the root of the member chain it is written
+through, so a chain rooted in a literal is attributed to nothing and every question about that
+prototype goes on being answered from a table of what the language puts there.
+
+The rewrite is the same shape as
+`refinery.lib.scripts.js.deobfuscation.globalfinder.JsGlobalFinderInlining`, which already rewrites
+a call that computes the global object to `globalThis`, and it earns its place the same way twice
+over: the file the analyst reads says which object is being patched, and every existing check sees
+the write with no new analysis behind it.
+
+The identity is not unconditional and each gate below was established by running Node. It holds
+because the mechanism each spelling goes through is the one the language installs, so a file that
+replaces that mechanism is asking for something else — `Object.prototype.constructor = C` makes
+`({}).constructor.prototype` mean `C.prototype`, and replacing the `__proto__` accessor or
+`Object.getPrototypeOf` redirects the other two. Those are asked of the effect model per key,
+since asking per name would refuse every file this exists for: a file that writes
+`Object.prototype.z` has written `Object`.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Node, _replace_in_parent
+from refinery.lib.scripts.js.analysis.cache import model_cache
+from refinery.lib.scripts.js.analysis.effects import EffectModel
+from refinery.lib.scripts.js.analysis.model import (
+    Role,
+    SemanticModel,
+    crosses_dynamic_scope,
+    reference_role,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import ScriptLevelTransformer, access_key
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsCallExpression,
+    JsIdentifier,
+    JsMemberExpression,
+    JsObjectExpression,
+    JsScript,
+    JsSpreadElement,
+    strip_parens,
+)
+
+_PROTO_KEY = &#39;__proto__&#39;
+
+_GET_PROTOTYPE_OF = &#39;getPrototypeOf&#39;
+
+_CONSTRUCTOR_KEY = &#39;constructor&#39;
+
+
+class JsPrototypeSpellingNormalization(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Replace each expression that reaches an intrinsic prototype through a literal with the
+    `Owner.prototype` that names it. See the module documentation for the spellings recognized and
+    the gates the identity rests on.
+    &#34;&#34;&#34;
+
+    self_converging = True
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite every recognized spelling in *node*.
+
+        The models are re-read per rewrite rather than held for the walk, which is the one direction
+        the pinning contract in `refinery.lib.scripts.js.analysis.cache.ModelCache.pinned` leaves
+        open to a pass whose rewrites make the facts it reads **more** restrictive. Every rewrite
+        here attributes a write to a name that had none — `({}).__proto__.constructor = C` becomes
+        a write of `constructor` on `Object`, which is exactly what the gate on the next spelling
+        asks about — so a held model would answer that gate from a program state its own rewrites
+        have already left behind, and clear a rewrite the current facts refuse.
+
+        A candidate an earlier rewrite has taken out of the tree is passed over. Its holder is no
+        longer reachable from the script, so replacing it would write into a subtree the output
+        does not contain and report a change nothing can observe.
+        &#34;&#34;&#34;
+        cache = model_cache(self, node)
+        for candidate in list(node.walk()):
+            if not candidate.is_descendant_of(node):
+                continue
+            owner = self._owner_whose_prototype_is_named(candidate, cache.model, cache.effects)
+            if owner is None:
+                continue
+            _replace_in_parent(candidate, _a_prototype_of(owner))
+            self.mark_changed()
+
+    def _owner_whose_prototype_is_named(
+        self,
+        node: Node,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The name of the intrinsic whose `prototype` *node* denotes, or `None` where *node* is not
+        one of the recognized spellings or a gate refuses it.
+
+        The identity is one between *values*, so it settles only a spelling read as a value. A
+        spelling standing where the language wants a reference — the target of an assignment, the
+        operand of a `delete`, the head of a `for-in` — is a different question with a different
+        answer: `({}).__proto__ = x` sets the prototype of an object nothing else can reach, while
+        `Object.prototype = x` writes a property the language made neither writable nor
+        configurable, which a module answers with a `TypeError` and the original answered with
+        nothing at all.
+        &#34;&#34;&#34;
+        if isinstance(node, JsMemberExpression):
+            if reference_role(node) is not Role.READ:
+                return None
+            key = access_key(node)
+            if key == _PROTO_KEY:
+                return self._owner_read_through_proto(node, model, effects)
+            if key == &#39;prototype&#39;:
+                return self._owner_read_through_constructor(node, model, effects)
+            return None
+        if isinstance(node, JsCallExpression):
+            return self._owner_read_through_get_prototype_of(node, model, effects)
+        return None
+
+    def _owner_read_through_proto(
+        self,
+        node: JsMemberExpression,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The owner of `&lt;literal&gt;.__proto__`. The accessor that answers it is installed on
+        `Object.prototype` whatever the receiver is, so replacing it there redirects the spelling
+        for an array literal as much as for an object one.
+
+        Installing it *closer* redirects the spelling too, and only for that receiver: the key is
+        found by an ordinary chain walk, so an own `__proto__` on `Array.prototype` shadows the
+        accessor for every array and leaves it answering for everything else. Both names are asked
+        because a write to either is one the read goes through.
+        &#34;&#34;&#34;
+        owner = _owner_of_literal(node.object, effects)
+        if owner is None:
+            return None
+        if effects.global_key_written(&#39;Object&#39;, _PROTO_KEY):
+            return None
+        if effects.global_key_written(owner, _PROTO_KEY):
+            return None
+        return owner if _names_the_intrinsic(owner, node, model) else None
+
+    def _owner_read_through_constructor(
+        self,
+        node: JsMemberExpression,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The owner of `&lt;literal&gt;.constructor.prototype`. The `constructor` the receiver inherits is a
+        data property of the owner&#39;s own prototype, so a file that writes that key is naming its own
+        function rather than the intrinsic.
+        &#34;&#34;&#34;
+        inner = strip_parens(node.object)
+        if not isinstance(inner, JsMemberExpression) or access_key(inner) != _CONSTRUCTOR_KEY:
+            return None
+        owner = _owner_of_literal(inner.object, effects)
+        if owner is None or effects.global_key_written(owner, _CONSTRUCTOR_KEY):
+            return None
+        return owner if _names_the_intrinsic(owner, node, model) else None
+
+    def _owner_read_through_get_prototype_of(
+        self,
+        node: JsCallExpression,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The owner of `Object.getPrototypeOf(&lt;literal&gt;)`, where `Object` is the intrinsic and the
+        method is the one it was given.
+        &#34;&#34;&#34;
+        callee = strip_parens(node.callee)
+        if not isinstance(callee, JsMemberExpression) or access_key(callee) != _GET_PROTOTYPE_OF:
+            return None
+        base = strip_parens(callee.object)
+        if not isinstance(base, JsIdentifier) or base.name != &#39;Object&#39;:
+            return None
+        if len(node.arguments) != 1:
+            return None
+        owner = _owner_of_literal(node.arguments[0], effects)
+        if owner is None or effects.global_key_written(&#39;Object&#39;, _GET_PROTOTYPE_OF):
+            return None
+        if not _names_the_intrinsic(&#39;Object&#39;, node, model):
+            return None
+        return owner if _names_the_intrinsic(owner, node, model) else None
+
+
+def _owner_of_literal(node: Node | None, effects: EffectModel) -&gt; str | None:
+    &#34;&#34;&#34;
+    The intrinsic whose prototype a literal receiver inherits, or `None` for a receiver whose
+    prototype is not knowable from the syntax alone or whose evaluation the rewrite may not drop.
+
+    An array literal always inherits `Array.prototype`: no spelling of one says otherwise, an
+    elision included. An object literal is taken only when it is empty, because every way of
+    writing a `__proto__` key changes what the receiver answers — written with a colon it sets the
+    prototype, and written as a shorthand or a computed key it installs an own property that
+    shadows the accessor — and a spread carries one in from a value the syntax does not show.
+
+    The receiver is the one part of the spelling the rewrite does not keep, so the elements have to
+    be free of anything the program could miss: `[f()].__proto__` runs `f` and `Array.prototype`
+    does not. A spread is refused outright rather than asked, since it iterates its argument and
+    `[...null]` is a `TypeError` where the array it would build is not.
+    &#34;&#34;&#34;
+    node = strip_parens(node)
+    if isinstance(node, JsArrayExpression):
+        if any(isinstance(element, JsSpreadElement) for element in node.elements):
+            return None
+        if any(
+            element is not None and not effects.is_side_effect_free(element, discarded=True)
+            for element in node.elements
+        ):
+            return None
+        return &#39;Array&#39;
+    if isinstance(node, JsObjectExpression) and not node.properties:
+        return &#39;Object&#39;
+    return None
+
+
+def _names_the_intrinsic(name: str, at: Node, model: SemanticModel) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *name* denotes the intrinsic at *at* rather than something the program can have given a
+    meaning of its own. A file declaring `var Object = {prototype: {}}` names its own object with
+    it, and rewriting a spelling to `Object.prototype` there would name that one instead of the
+    prototype the spelling reaches.
+
+    This is `refinery.lib.scripts.js.deobfuscation.helpers.name_is_unbound` asked of a name that is
+    not written anywhere yet, so it cannot be asked through a reference to one. The three ways that
+    predicate lists are all asked here: a binding, which `lookup` reports and which is crossed
+    deliberately so that a `with` between the two does not hide it; the `with` itself, whose object
+    may carry a property of the name and answer the read from it; and a direct `eval`, which
+    declares bindings no reference records.
+    &#34;&#34;&#34;
+    scope = model.scope_of(at)
+    if scope is None:
+        return False
+    if model.lookup(name, scope, cross_dynamic=True) is not None:
+        return False
+    if crosses_dynamic_scope(scope):
+        return False
+    return not model.free_name_reachable_by_direct_eval(at)
+
+
+def _a_prototype_of(owner: str) -&gt; JsMemberExpression:
+    return JsMemberExpression(
+        object=JsIdentifier(name=owner),
+        property=JsIdentifier(name=&#39;prototype&#39;),
+        computed=False,
+    )</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.protospelling.JsPrototypeSpellingNormalization"><code class="flex name class">
+<span>class <span class="ident">JsPrototypeSpellingNormalization</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Replace each expression that reaches an intrinsic prototype through a literal with the
+<code>Owner.prototype</code> that names it. See the module documentation for the spellings recognized and
+the gates the identity rests on.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/protospelling.py#L56-L189" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsPrototypeSpellingNormalization(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Replace each expression that reaches an intrinsic prototype through a literal with the
+    `Owner.prototype` that names it. See the module documentation for the spellings recognized and
+    the gates the identity rests on.
+    &#34;&#34;&#34;
+
+    self_converging = True
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite every recognized spelling in *node*.
+
+        The models are re-read per rewrite rather than held for the walk, which is the one direction
+        the pinning contract in `refinery.lib.scripts.js.analysis.cache.ModelCache.pinned` leaves
+        open to a pass whose rewrites make the facts it reads **more** restrictive. Every rewrite
+        here attributes a write to a name that had none — `({}).__proto__.constructor = C` becomes
+        a write of `constructor` on `Object`, which is exactly what the gate on the next spelling
+        asks about — so a held model would answer that gate from a program state its own rewrites
+        have already left behind, and clear a rewrite the current facts refuse.
+
+        A candidate an earlier rewrite has taken out of the tree is passed over. Its holder is no
+        longer reachable from the script, so replacing it would write into a subtree the output
+        does not contain and report a change nothing can observe.
+        &#34;&#34;&#34;
+        cache = model_cache(self, node)
+        for candidate in list(node.walk()):
+            if not candidate.is_descendant_of(node):
+                continue
+            owner = self._owner_whose_prototype_is_named(candidate, cache.model, cache.effects)
+            if owner is None:
+                continue
+            _replace_in_parent(candidate, _a_prototype_of(owner))
+            self.mark_changed()
+
+    def _owner_whose_prototype_is_named(
+        self,
+        node: Node,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The name of the intrinsic whose `prototype` *node* denotes, or `None` where *node* is not
+        one of the recognized spellings or a gate refuses it.
+
+        The identity is one between *values*, so it settles only a spelling read as a value. A
+        spelling standing where the language wants a reference — the target of an assignment, the
+        operand of a `delete`, the head of a `for-in` — is a different question with a different
+        answer: `({}).__proto__ = x` sets the prototype of an object nothing else can reach, while
+        `Object.prototype = x` writes a property the language made neither writable nor
+        configurable, which a module answers with a `TypeError` and the original answered with
+        nothing at all.
+        &#34;&#34;&#34;
+        if isinstance(node, JsMemberExpression):
+            if reference_role(node) is not Role.READ:
+                return None
+            key = access_key(node)
+            if key == _PROTO_KEY:
+                return self._owner_read_through_proto(node, model, effects)
+            if key == &#39;prototype&#39;:
+                return self._owner_read_through_constructor(node, model, effects)
+            return None
+        if isinstance(node, JsCallExpression):
+            return self._owner_read_through_get_prototype_of(node, model, effects)
+        return None
+
+    def _owner_read_through_proto(
+        self,
+        node: JsMemberExpression,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The owner of `&lt;literal&gt;.__proto__`. The accessor that answers it is installed on
+        `Object.prototype` whatever the receiver is, so replacing it there redirects the spelling
+        for an array literal as much as for an object one.
+
+        Installing it *closer* redirects the spelling too, and only for that receiver: the key is
+        found by an ordinary chain walk, so an own `__proto__` on `Array.prototype` shadows the
+        accessor for every array and leaves it answering for everything else. Both names are asked
+        because a write to either is one the read goes through.
+        &#34;&#34;&#34;
+        owner = _owner_of_literal(node.object, effects)
+        if owner is None:
+            return None
+        if effects.global_key_written(&#39;Object&#39;, _PROTO_KEY):
+            return None
+        if effects.global_key_written(owner, _PROTO_KEY):
+            return None
+        return owner if _names_the_intrinsic(owner, node, model) else None
+
+    def _owner_read_through_constructor(
+        self,
+        node: JsMemberExpression,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The owner of `&lt;literal&gt;.constructor.prototype`. The `constructor` the receiver inherits is a
+        data property of the owner&#39;s own prototype, so a file that writes that key is naming its own
+        function rather than the intrinsic.
+        &#34;&#34;&#34;
+        inner = strip_parens(node.object)
+        if not isinstance(inner, JsMemberExpression) or access_key(inner) != _CONSTRUCTOR_KEY:
+            return None
+        owner = _owner_of_literal(inner.object, effects)
+        if owner is None or effects.global_key_written(owner, _CONSTRUCTOR_KEY):
+            return None
+        return owner if _names_the_intrinsic(owner, node, model) else None
+
+    def _owner_read_through_get_prototype_of(
+        self,
+        node: JsCallExpression,
+        model: SemanticModel,
+        effects: EffectModel,
+    ) -&gt; str | None:
+        &#34;&#34;&#34;
+        The owner of `Object.getPrototypeOf(&lt;literal&gt;)`, where `Object` is the intrinsic and the
+        method is the one it was given.
+        &#34;&#34;&#34;
+        callee = strip_parens(node.callee)
+        if not isinstance(callee, JsMemberExpression) or access_key(callee) != _GET_PROTOTYPE_OF:
+            return None
+        base = strip_parens(callee.object)
+        if not isinstance(base, JsIdentifier) or base.name != &#39;Object&#39;:
+            return None
+        if len(node.arguments) != 1:
+            return None
+        owner = _owner_of_literal(node.arguments[0], effects)
+        if owner is None or effects.global_key_written(&#39;Object&#39;, _GET_PROTOTYPE_OF):
+            return None
+        if not _names_the_intrinsic(&#39;Object&#39;, node, model):
+            return None
+        return owner if _names_the_intrinsic(owner, node, model) else None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.protospelling.JsPrototypeSpellingNormalization" href="#refinery.lib.scripts.js.deobfuscation.protospelling.JsPrototypeSpellingNormalization">JsPrototypeSpellingNormalization</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

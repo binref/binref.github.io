@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.dominance documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.dominance</code></h1>
+</header>
+<section id="section-intro">
+<p>Dominance over the per-function control-flow graphs of the
+<code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>. One node <em>dominates</em> another when every path
+from the function's entry to the second passes through the first — so the first is guaranteed to have
+executed by the time the second runs. This is the flow-sensitive replacement for the constant
+inliner's statement-position heuristics: because an inlining candidate is single-assignment, "does the
+constant hold its value at this use?" is exactly "does the definition dominate the use?".</p>
+<p>This is a fourth layer of the analysis substrate, built on the control-flow graphs in
+<code><a title="refinery.lib.scripts.js.analysis.cfg" href="cfg.html">refinery.lib.scripts.js.analysis.cfg</a></code> and keyed to AST node identity. Like those graphs it is
+per-function — a nested function is a separate graph — and conservative by construction: the
+exceptional edges the graph adds (a throw reaching a handler) are kept in the dominator computation, so
+a definition is reported as dominating a use only when it runs before that use on <em>every</em> path,
+including the ones that leave a <code>try</code> by throwing. A use a definition does not dominate, or one in a
+different function's graph, is answered conservatively as not-dominated.</p>
+<p>The public surface — <code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.dominates" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.dominates">DominatorModel.dominates()</a></code>, <code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.strictly_dominates" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.strictly_dominates">DominatorModel.strictly_dominates()</a></code>,
+<code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.cfg_node_of" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.cfg_node_of">DominatorModel.cfg_node_of()</a></code>, <code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_function" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_function">DominanceModel.runs_before_function()</a></code>, <code><a title="refinery.lib.scripts.js.analysis.dominance.build_dominance" href="#refinery.lib.scripts.js.analysis.dominance.build_dominance">build_dominance()</a></code> — is keyed to AST
+nodes: an arbitrary node is located to the control-flow node of the statement (or loop head) that
+evaluates it, the granularity at which the graph reasons. <code>strictly_dominates</code> is the non-reflexive
+<code>dominates</code>, refusing a same-statement pair a caller must order. <code>runs_before_function</code> lifts dominance
+across calls: it answers whether a definition runs before every invocation of a function, which a single
+graph cannot, by ordering the definition against the points the function is referenced and recursing up
+the call graph. <code>runs_before</code> and <code>runs_before_all</code> expose that same ordering against a single reference,
+or every reference in a set — the query a transform needs to confirm a value is established before every
+use that could observe it.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L1-L246" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Dominance over the per-function control-flow graphs of the
+`refinery.lib.scripts.js.analysis.model.SemanticModel`. One node *dominates* another when every path
+from the function&#39;s entry to the second passes through the first — so the first is guaranteed to have
+executed by the time the second runs. This is the flow-sensitive replacement for the constant
+inliner&#39;s statement-position heuristics: because an inlining candidate is single-assignment, &#34;does the
+constant hold its value at this use?&#34; is exactly &#34;does the definition dominate the use?&#34;.
+
+This is a fourth layer of the analysis substrate, built on the control-flow graphs in
+`refinery.lib.scripts.js.analysis.cfg` and keyed to AST node identity. Like those graphs it is
+per-function — a nested function is a separate graph — and conservative by construction: the
+exceptional edges the graph adds (a throw reaching a handler) are kept in the dominator computation, so
+a definition is reported as dominating a use only when it runs before that use on *every* path,
+including the ones that leave a `try` by throwing. A use a definition does not dominate, or one in a
+different function&#39;s graph, is answered conservatively as not-dominated.
+
+The public surface — `DominanceModel.dominates`, `DominanceModel.strictly_dominates`,
+`DominanceModel.cfg_node_of`, `DominanceModel.runs_before_function`, `build_dominance` — is keyed to AST
+nodes: an arbitrary node is located to the control-flow node of the statement (or loop head) that
+evaluates it, the granularity at which the graph reasons. `strictly_dominates` is the non-reflexive
+`dominates`, refusing a same-statement pair a caller must order. `runs_before_function` lifts dominance
+across calls: it answers whether a definition runs before every invocation of a function, which a single
+graph cannot, by ordering the definition against the points the function is referenced and recursing up
+the call graph. `runs_before` and `runs_before_all` expose that same ordering against a single reference,
+or every reference in a set — the query a transform needs to confirm a value is established before every
+use that could observe it.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterable
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.dominance import DominatorModel
+from refinery.lib.scripts.js.analysis.cfg import (
+    FUNCTION_NODES,
+    ControlFlowModel,
+    build_control_flow_model,
+)
+from refinery.lib.scripts.js.analysis.model import Binding, SemanticModel, enclosing_function
+
+
+class DominanceModel(DominatorModel):
+    &#34;&#34;&#34;
+    Dominator relations for the per-function control-flow graphs of one script, built over a
+    `refinery.lib.scripts.js.analysis.model.SemanticModel`. Ask whether one AST node is guaranteed to
+    execute before another with `dominates`. Build through `build_dominance`.
+    &#34;&#34;&#34;
+
+    def __init__(self, model: SemanticModel, control_flow: ControlFlowModel | None = None):
+        flow = control_flow if control_flow is not None else build_control_flow_model(model.root)
+        super().__init__(flow)
+        self.model = model
+        self._reference_points_cache: dict[int, list[Node] | None] = {}
+
+    def runs_before_function(self, definition: Node, function: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *definition* is guaranteed to have executed before any invocation of *function* — so a
+        value established at *definition* holds throughout every call of *function*, and may be inlined
+        into its body. The reasoning rests on one fact: a function cannot be invoked before a reference
+        to it has been evaluated. Its reference points are its own creation, for an anonymous function
+        expression, or the uses of its name, for a named binding; no invocation can precede the earliest
+        of them. So *definition* runs before every invocation exactly when it runs before every reference
+        point — and that, per point, is strict dominance when the point lies in *definition*&#39;s own
+        function, or the same question applied to the function the point lies in, recursing up the call
+        graph. The ordering is *strict*: a reference sharing the definition&#39;s statement — an earlier
+        declarator or sequence operand evaluated before it — is not accepted, since statement-granularity
+        dominance is reflexive and cannot order within one statement. A reference&#39;s function is its
+        nearest enclosing function (its `_activation_of`), so a use in a function&#39;s parameter defaults is
+        attributed to that function&#39;s invocation, not to the statement that declares it. This is the
+        interprocedural counterpart of `dominates`, and the sound replacement for ordering a
+        cross-function inline by statement position.
+
+        Conservatively `False` when a reference point cannot be ordered or enumerated: the named binding
+        is reassigned or redeclared (its references no longer pin one function), a reference lies in a
+        function that itself runs too late or escapes, or the walk meets a call cycle it cannot bottom
+        out. A function neither referenced nor within reflection&#39;s reach is vacuously safe.
+        &#34;&#34;&#34;
+        definition_owner = self._activation_of(definition)
+        return self._runs_before_function(definition, definition_owner, function, set(), {})
+
+    def runs_before(self, definition: Node, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *definition* is guaranteed to have executed before *reference* is evaluated — the
+        single-reference form of the ordering `runs_before_function` applies per reference point. When
+        *reference* shares *definition*&#39;s activation this is intraprocedural *strict* dominance (a
+        reference sharing *definition*&#39;s statement is not accepted, since statement-granularity
+        dominance is reflexive and cannot order within one statement); when *reference* lies inside a
+        function that cannot be invoked until after *definition*, it is the interprocedural
+        runs-before-function query, recursing up the call graph. Conservatively `False` whenever the
+        ordering cannot be established — a reference in an activation that may run before *definition*,
+        or a reference point that cannot be enumerated — so a caller may treat `True` as a guarantee.
+        &#34;&#34;&#34;
+        definition_owner = self._activation_of(definition)
+        return self._runs_after(definition, definition_owner, reference, set(), {})
+
+    def runs_before_all(self, definition: Node, references: Iterable[Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *definition* is guaranteed to run before every reference in *references* — `runs_before`
+        for each, vacuously `True` for an empty iterable. The definition&#39;s activation is resolved once
+        and shared across the references.
+        &#34;&#34;&#34;
+        definition_owner = self._activation_of(definition)
+        return all(
+            self._runs_after(definition, definition_owner, reference, set(), {})
+            for reference in references
+        )
+
+    def established_before(self, function: Node, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *function*&#39;s callable value is in place before *reference* runs. The
+        function-invocation view of `binding_established_before`: `False` when *function* is not invoked
+        through a single orderable name, so its presence cannot be ordered — the query a consumer needs
+        before folding or dropping a call whose callee would otherwise read a temporal dead zone or a
+        hoisted `undefined`.
+        &#34;&#34;&#34;
+        return self.binding_established_before(self.model.invocation_binding(function), reference)
+
+    def binding_established_before(self, binding: Binding | None, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *binding*&#39;s `singular_value` is in place before *reference* runs: every node in its
+        `SemanticModel.binding_establishment_sites` executes first. A hoisted function declaration has no
+        sites and qualifies unconditionally; a `var`/`let`/`const` initializer, a class declaration, or a
+        lone assignment (`f = function(){}`, the form namespace flattening leaves) qualifies only where
+        each establishing node runs before *reference*. `False` when the binding holds no single orderable
+        value, so its presence cannot be ordered — the query a consumer needs before trusting a value that
+        would otherwise be read out of its temporal dead zone or before its establishing write.
+        &#34;&#34;&#34;
+        sites = self.model.binding_establishment_sites(binding)
+        if sites is None:
+            return False
+        return all(self.runs_before(site, reference) for site in sites)
+
+    def _runs_before_function(
+        self,
+        definition: Node,
+        definition_owner: Node,
+        function: Node,
+        visiting: set[int],
+        memo: dict[int, bool],
+    ) -&gt; bool:
+        function_id = id(function)
+        if function_id in visiting:
+            return False
+        cached = memo.get(function_id)
+        if cached is not None:
+            return cached
+        points = self._reference_points(function)
+        if points is None:
+            memo[function_id] = False
+            return False
+        visiting = visiting | {function_id}
+        result = all(
+            self._runs_after(definition, definition_owner, point, visiting, memo)
+            for point in points
+        )
+        memo[function_id] = result
+        return result
+
+    def _reference_points(self, function: Node) -&gt; list[Node] | None:
+        &#34;&#34;&#34;
+        The points no invocation of *function* can precede, or `None` when they cannot be enumerated.
+        For a function pinned to a name (`SemanticModel.invocation_binding`) these are the value-reads of
+        that name — a read must be evaluated before the value it denotes can be called — together with the
+        opaque reflective surface sites that could invoke it by name
+        (`SemanticModel.reflection_surface_sites`): a direct `eval`, `Function`, a string timer, or a
+        dynamic global access cannot invoke the function before the surface that grants the capability has
+        run, so each surface is itself a point no invocation precedes, ranked exactly like a read. The
+        enumeration is `None` when the name is redeclared, reassigned to another value so a read no longer
+        pins this one function (`SemanticModel.binding_pinned_to`), or resolved inside a dynamic scope a
+        `with` body governs, whose `dynamic_refs` entry is unorderable; this mirrors the escape verdict
+        `EffectModel.function_escapes` draws from the same fact. A surface lexically inside *function* is
+        dropped: it cannot trigger the function&#39;s first invocation, only a re-entrant one, so it never
+        bounds the ordering. A function pinned to no name but installed as a property of a non-escaping
+        local object (`SemanticModel.object_property_reference_points`) is enumerated instead by the read
+        sites of that property, the only way its callable can be obtained; this is consulted first, so a
+        namespace method ordered by its call sites is not mistaken for an anonymous closure ordered by its
+        creation. For a function bound to no name and matching neither pattern, the single point is the
+        function expression itself: the closure cannot be invoked before it is created.
+
+        Memoized by function identity: the enumeration is a pure function of *function* and the model,
+        both fixed for the model&#39;s lifetime — the whole DominanceModel is rebuilt when the tree version
+        advances — so every `runs_before*` caller shares one result per function instead of recomputing
+        it per reference and per query.
+        &#34;&#34;&#34;
+        key = id(function)
+        cache = self._reference_points_cache
+        if key not in cache:
+            cache[key] = self._compute_reference_points(function)
+        return cache[key]
+
+    def _compute_reference_points(self, function: Node) -&gt; list[Node] | None:
+        member_points = self.model.object_property_reference_points(function)
+        if member_points is not None:
+            return member_points
+        binding = self.model.invocation_binding(function)
+        if binding is None:
+            return [function]
+        if (
+            binding.dynamic_refs
+            or len(binding.declarations) != 1
+            or not self.model.binding_pinned_to(binding, function)
+        ):
+            return None
+        points: list[Node] = [*binding.reads]
+        points.extend(
+            site
+            for site in self.model.reflection_surface_sites(binding)
+            if not site.is_descendant_of(function)
+        )
+        return points
+
+    def _runs_after(
+        self,
+        definition: Node,
+        definition_owner: Node,
+        point: Node,
+        visiting: set[int],
+        memo: dict[int, bool],
+    ) -&gt; bool:
+        owner = self._activation_of(point)
+        if owner is definition_owner:
+            return self.strictly_dominates(definition, point)
+        if isinstance(owner, FUNCTION_NODES):
+            return self._runs_before_function(definition, definition_owner, owner, visiting, memo)
+        return False
+
+    def _activation_of(self, element: Node) -&gt; Node:
+        &#34;&#34;&#34;
+        The function or script whose invocation evaluates *element*: the nearest function that lexically
+        encloses it, or the script root when none does. This is the unit `runs_before_function` reasons
+        about — a reference in a function&#39;s body *or its parameter defaults* runs when that function is
+        invoked, so both must attribute to the function, never to the statement that merely declares it in
+        the enclosing graph.
+        &#34;&#34;&#34;
+        function = enclosing_function(element)
+        return function if function is not None else self.model.root
+
+
+def build_dominance(
+    model: SemanticModel, control_flow: ControlFlowModel | None = None,
+) -&gt; DominanceModel:
+    &#34;&#34;&#34;
+    Build the `DominanceModel` for a script&#39;s `refinery.lib.scripts.js.analysis.model.SemanticModel`,
+    reusing *control_flow* when the caller has one to share, or building a fresh one when it is `None`.
+    &#34;&#34;&#34;
+    return DominanceModel(model, control_flow)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.dominance.build_dominance"><code class="name flex">
+<span>def <span class="ident">build_dominance</span></span>(<span>model, control_flow=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel">DominanceModel</a></code> for a script's <code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>,
+reusing <em>control_flow</em> when the caller has one to share, or building a fresh one when it is <code>None</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L239-L246" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_dominance(
+    model: SemanticModel, control_flow: ControlFlowModel | None = None,
+) -&gt; DominanceModel:
+    &#34;&#34;&#34;
+    Build the `DominanceModel` for a script&#39;s `refinery.lib.scripts.js.analysis.model.SemanticModel`,
+    reusing *control_flow* when the caller has one to share, or building a fresh one when it is `None`.
+    &#34;&#34;&#34;
+    return DominanceModel(model, control_flow)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.dominance.DominanceModel"><code class="flex name class">
+<span>class <span class="ident">DominanceModel</span></span>
+<span>(</span><span>model, control_flow=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Dominator relations for the per-function control-flow graphs of one script, built over a
+<code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code>. Ask whether one AST node is guaranteed to
+execute before another with <code>dominates</code>. Build through <code><a title="refinery.lib.scripts.js.analysis.dominance.build_dominance" href="#refinery.lib.scripts.js.analysis.dominance.build_dominance">build_dominance()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L42-L236" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class DominanceModel(DominatorModel):
+    &#34;&#34;&#34;
+    Dominator relations for the per-function control-flow graphs of one script, built over a
+    `refinery.lib.scripts.js.analysis.model.SemanticModel`. Ask whether one AST node is guaranteed to
+    execute before another with `dominates`. Build through `build_dominance`.
+    &#34;&#34;&#34;
+
+    def __init__(self, model: SemanticModel, control_flow: ControlFlowModel | None = None):
+        flow = control_flow if control_flow is not None else build_control_flow_model(model.root)
+        super().__init__(flow)
+        self.model = model
+        self._reference_points_cache: dict[int, list[Node] | None] = {}
+
+    def runs_before_function(self, definition: Node, function: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *definition* is guaranteed to have executed before any invocation of *function* — so a
+        value established at *definition* holds throughout every call of *function*, and may be inlined
+        into its body. The reasoning rests on one fact: a function cannot be invoked before a reference
+        to it has been evaluated. Its reference points are its own creation, for an anonymous function
+        expression, or the uses of its name, for a named binding; no invocation can precede the earliest
+        of them. So *definition* runs before every invocation exactly when it runs before every reference
+        point — and that, per point, is strict dominance when the point lies in *definition*&#39;s own
+        function, or the same question applied to the function the point lies in, recursing up the call
+        graph. The ordering is *strict*: a reference sharing the definition&#39;s statement — an earlier
+        declarator or sequence operand evaluated before it — is not accepted, since statement-granularity
+        dominance is reflexive and cannot order within one statement. A reference&#39;s function is its
+        nearest enclosing function (its `_activation_of`), so a use in a function&#39;s parameter defaults is
+        attributed to that function&#39;s invocation, not to the statement that declares it. This is the
+        interprocedural counterpart of `dominates`, and the sound replacement for ordering a
+        cross-function inline by statement position.
+
+        Conservatively `False` when a reference point cannot be ordered or enumerated: the named binding
+        is reassigned or redeclared (its references no longer pin one function), a reference lies in a
+        function that itself runs too late or escapes, or the walk meets a call cycle it cannot bottom
+        out. A function neither referenced nor within reflection&#39;s reach is vacuously safe.
+        &#34;&#34;&#34;
+        definition_owner = self._activation_of(definition)
+        return self._runs_before_function(definition, definition_owner, function, set(), {})
+
+    def runs_before(self, definition: Node, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *definition* is guaranteed to have executed before *reference* is evaluated — the
+        single-reference form of the ordering `runs_before_function` applies per reference point. When
+        *reference* shares *definition*&#39;s activation this is intraprocedural *strict* dominance (a
+        reference sharing *definition*&#39;s statement is not accepted, since statement-granularity
+        dominance is reflexive and cannot order within one statement); when *reference* lies inside a
+        function that cannot be invoked until after *definition*, it is the interprocedural
+        runs-before-function query, recursing up the call graph. Conservatively `False` whenever the
+        ordering cannot be established — a reference in an activation that may run before *definition*,
+        or a reference point that cannot be enumerated — so a caller may treat `True` as a guarantee.
+        &#34;&#34;&#34;
+        definition_owner = self._activation_of(definition)
+        return self._runs_after(definition, definition_owner, reference, set(), {})
+
+    def runs_before_all(self, definition: Node, references: Iterable[Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *definition* is guaranteed to run before every reference in *references* — `runs_before`
+        for each, vacuously `True` for an empty iterable. The definition&#39;s activation is resolved once
+        and shared across the references.
+        &#34;&#34;&#34;
+        definition_owner = self._activation_of(definition)
+        return all(
+            self._runs_after(definition, definition_owner, reference, set(), {})
+            for reference in references
+        )
+
+    def established_before(self, function: Node, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *function*&#39;s callable value is in place before *reference* runs. The
+        function-invocation view of `binding_established_before`: `False` when *function* is not invoked
+        through a single orderable name, so its presence cannot be ordered — the query a consumer needs
+        before folding or dropping a call whose callee would otherwise read a temporal dead zone or a
+        hoisted `undefined`.
+        &#34;&#34;&#34;
+        return self.binding_established_before(self.model.invocation_binding(function), reference)
+
+    def binding_established_before(self, binding: Binding | None, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *binding*&#39;s `singular_value` is in place before *reference* runs: every node in its
+        `SemanticModel.binding_establishment_sites` executes first. A hoisted function declaration has no
+        sites and qualifies unconditionally; a `var`/`let`/`const` initializer, a class declaration, or a
+        lone assignment (`f = function(){}`, the form namespace flattening leaves) qualifies only where
+        each establishing node runs before *reference*. `False` when the binding holds no single orderable
+        value, so its presence cannot be ordered — the query a consumer needs before trusting a value that
+        would otherwise be read out of its temporal dead zone or before its establishing write.
+        &#34;&#34;&#34;
+        sites = self.model.binding_establishment_sites(binding)
+        if sites is None:
+            return False
+        return all(self.runs_before(site, reference) for site in sites)
+
+    def _runs_before_function(
+        self,
+        definition: Node,
+        definition_owner: Node,
+        function: Node,
+        visiting: set[int],
+        memo: dict[int, bool],
+    ) -&gt; bool:
+        function_id = id(function)
+        if function_id in visiting:
+            return False
+        cached = memo.get(function_id)
+        if cached is not None:
+            return cached
+        points = self._reference_points(function)
+        if points is None:
+            memo[function_id] = False
+            return False
+        visiting = visiting | {function_id}
+        result = all(
+            self._runs_after(definition, definition_owner, point, visiting, memo)
+            for point in points
+        )
+        memo[function_id] = result
+        return result
+
+    def _reference_points(self, function: Node) -&gt; list[Node] | None:
+        &#34;&#34;&#34;
+        The points no invocation of *function* can precede, or `None` when they cannot be enumerated.
+        For a function pinned to a name (`SemanticModel.invocation_binding`) these are the value-reads of
+        that name — a read must be evaluated before the value it denotes can be called — together with the
+        opaque reflective surface sites that could invoke it by name
+        (`SemanticModel.reflection_surface_sites`): a direct `eval`, `Function`, a string timer, or a
+        dynamic global access cannot invoke the function before the surface that grants the capability has
+        run, so each surface is itself a point no invocation precedes, ranked exactly like a read. The
+        enumeration is `None` when the name is redeclared, reassigned to another value so a read no longer
+        pins this one function (`SemanticModel.binding_pinned_to`), or resolved inside a dynamic scope a
+        `with` body governs, whose `dynamic_refs` entry is unorderable; this mirrors the escape verdict
+        `EffectModel.function_escapes` draws from the same fact. A surface lexically inside *function* is
+        dropped: it cannot trigger the function&#39;s first invocation, only a re-entrant one, so it never
+        bounds the ordering. A function pinned to no name but installed as a property of a non-escaping
+        local object (`SemanticModel.object_property_reference_points`) is enumerated instead by the read
+        sites of that property, the only way its callable can be obtained; this is consulted first, so a
+        namespace method ordered by its call sites is not mistaken for an anonymous closure ordered by its
+        creation. For a function bound to no name and matching neither pattern, the single point is the
+        function expression itself: the closure cannot be invoked before it is created.
+
+        Memoized by function identity: the enumeration is a pure function of *function* and the model,
+        both fixed for the model&#39;s lifetime — the whole DominanceModel is rebuilt when the tree version
+        advances — so every `runs_before*` caller shares one result per function instead of recomputing
+        it per reference and per query.
+        &#34;&#34;&#34;
+        key = id(function)
+        cache = self._reference_points_cache
+        if key not in cache:
+            cache[key] = self._compute_reference_points(function)
+        return cache[key]
+
+    def _compute_reference_points(self, function: Node) -&gt; list[Node] | None:
+        member_points = self.model.object_property_reference_points(function)
+        if member_points is not None:
+            return member_points
+        binding = self.model.invocation_binding(function)
+        if binding is None:
+            return [function]
+        if (
+            binding.dynamic_refs
+            or len(binding.declarations) != 1
+            or not self.model.binding_pinned_to(binding, function)
+        ):
+            return None
+        points: list[Node] = [*binding.reads]
+        points.extend(
+            site
+            for site in self.model.reflection_surface_sites(binding)
+            if not site.is_descendant_of(function)
+        )
+        return points
+
+    def _runs_after(
+        self,
+        definition: Node,
+        definition_owner: Node,
+        point: Node,
+        visiting: set[int],
+        memo: dict[int, bool],
+    ) -&gt; bool:
+        owner = self._activation_of(point)
+        if owner is definition_owner:
+            return self.strictly_dominates(definition, point)
+        if isinstance(owner, FUNCTION_NODES):
+            return self._runs_before_function(definition, definition_owner, owner, visiting, memo)
+        return False
+
+    def _activation_of(self, element: Node) -&gt; Node:
+        &#34;&#34;&#34;
+        The function or script whose invocation evaluates *element*: the nearest function that lexically
+        encloses it, or the script root when none does. This is the unit `runs_before_function` reasons
+        about — a reference in a function&#39;s body *or its parameter defaults* runs when that function is
+        invoked, so both must attribute to the function, never to the statement that merely declares it in
+        the enclosing graph.
+        &#34;&#34;&#34;
+        function = enclosing_function(element)
+        return function if function is not None else self.model.root</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.analysis.dominance.DominatorModel" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel">DominatorModel</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_function"><code class="name flex">
+<span>def <span class="ident">runs_before_function</span></span>(<span>self, definition, function)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>definition</em> is guaranteed to have executed before any invocation of <em>function</em> — so a
+value established at <em>definition</em> holds throughout every call of <em>function</em>, and may be inlined
+into its body. The reasoning rests on one fact: a function cannot be invoked before a reference
+to it has been evaluated. Its reference points are its own creation, for an anonymous function
+expression, or the uses of its name, for a named binding; no invocation can precede the earliest
+of them. So <em>definition</em> runs before every invocation exactly when it runs before every reference
+point — and that, per point, is strict dominance when the point lies in <em>definition</em>'s own
+function, or the same question applied to the function the point lies in, recursing up the call
+graph. The ordering is <em>strict</em>: a reference sharing the definition's statement — an earlier
+declarator or sequence operand evaluated before it — is not accepted, since statement-granularity
+dominance is reflexive and cannot order within one statement. A reference's function is its
+nearest enclosing function (its <code>_activation_of</code>), so a use in a function's parameter defaults is
+attributed to that function's invocation, not to the statement that declares it. This is the
+interprocedural counterpart of <code>dominates</code>, and the sound replacement for ordering a
+cross-function inline by statement position.</p>
+<p>Conservatively <code>False</code> when a reference point cannot be ordered or enumerated: the named binding
+is reassigned or redeclared (its references no longer pin one function), a reference lies in a
+function that itself runs too late or escapes, or the walk meets a call cycle it cannot bottom
+out. A function neither referenced nor within reflection's reach is vacuously safe.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L55-L79" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def runs_before_function(self, definition: Node, function: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *definition* is guaranteed to have executed before any invocation of *function* — so a
+    value established at *definition* holds throughout every call of *function*, and may be inlined
+    into its body. The reasoning rests on one fact: a function cannot be invoked before a reference
+    to it has been evaluated. Its reference points are its own creation, for an anonymous function
+    expression, or the uses of its name, for a named binding; no invocation can precede the earliest
+    of them. So *definition* runs before every invocation exactly when it runs before every reference
+    point — and that, per point, is strict dominance when the point lies in *definition*&#39;s own
+    function, or the same question applied to the function the point lies in, recursing up the call
+    graph. The ordering is *strict*: a reference sharing the definition&#39;s statement — an earlier
+    declarator or sequence operand evaluated before it — is not accepted, since statement-granularity
+    dominance is reflexive and cannot order within one statement. A reference&#39;s function is its
+    nearest enclosing function (its `_activation_of`), so a use in a function&#39;s parameter defaults is
+    attributed to that function&#39;s invocation, not to the statement that declares it. This is the
+    interprocedural counterpart of `dominates`, and the sound replacement for ordering a
+    cross-function inline by statement position.
+
+    Conservatively `False` when a reference point cannot be ordered or enumerated: the named binding
+    is reassigned or redeclared (its references no longer pin one function), a reference lies in a
+    function that itself runs too late or escapes, or the walk meets a call cycle it cannot bottom
+    out. A function neither referenced nor within reflection&#39;s reach is vacuously safe.
+    &#34;&#34;&#34;
+    definition_owner = self._activation_of(definition)
+    return self._runs_before_function(definition, definition_owner, function, set(), {})</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before"><code class="name flex">
+<span>def <span class="ident">runs_before</span></span>(<span>self, definition, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>definition</em> is guaranteed to have executed before <em>reference</em> is evaluated — the
+single-reference form of the ordering <code>runs_before_function</code> applies per reference point. When
+<em>reference</em> shares <em>definition</em>'s activation this is intraprocedural <em>strict</em> dominance (a
+reference sharing <em>definition</em>'s statement is not accepted, since statement-granularity
+dominance is reflexive and cannot order within one statement); when <em>reference</em> lies inside a
+function that cannot be invoked until after <em>definition</em>, it is the interprocedural
+runs-before-function query, recursing up the call graph. Conservatively <code>False</code> whenever the
+ordering cannot be established — a reference in an activation that may run before <em>definition</em>,
+or a reference point that cannot be enumerated — so a caller may treat <code>True</code> as a guarantee.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L81-L94" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def runs_before(self, definition: Node, reference: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *definition* is guaranteed to have executed before *reference* is evaluated — the
+    single-reference form of the ordering `runs_before_function` applies per reference point. When
+    *reference* shares *definition*&#39;s activation this is intraprocedural *strict* dominance (a
+    reference sharing *definition*&#39;s statement is not accepted, since statement-granularity
+    dominance is reflexive and cannot order within one statement); when *reference* lies inside a
+    function that cannot be invoked until after *definition*, it is the interprocedural
+    runs-before-function query, recursing up the call graph. Conservatively `False` whenever the
+    ordering cannot be established — a reference in an activation that may run before *definition*,
+    or a reference point that cannot be enumerated — so a caller may treat `True` as a guarantee.
+    &#34;&#34;&#34;
+    definition_owner = self._activation_of(definition)
+    return self._runs_after(definition, definition_owner, reference, set(), {})</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_all"><code class="name flex">
+<span>def <span class="ident">runs_before_all</span></span>(<span>self, definition, references)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>definition</em> is guaranteed to run before every reference in <em>references</em> — <code>runs_before</code>
+for each, vacuously <code>True</code> for an empty iterable. The definition's activation is resolved once
+and shared across the references.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L96-L106" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def runs_before_all(self, definition: Node, references: Iterable[Node]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *definition* is guaranteed to run before every reference in *references* — `runs_before`
+    for each, vacuously `True` for an empty iterable. The definition&#39;s activation is resolved once
+    and shared across the references.
+    &#34;&#34;&#34;
+    definition_owner = self._activation_of(definition)
+    return all(
+        self._runs_after(definition, definition_owner, reference, set(), {})
+        for reference in references
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.dominance.DominanceModel.established_before"><code class="name flex">
+<span>def <span class="ident">established_before</span></span>(<span>self, function, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>function</em>'s callable value is in place before <em>reference</em> runs. The
+function-invocation view of <code>binding_established_before</code>: <code>False</code> when <em>function</em> is not invoked
+through a single orderable name, so its presence cannot be ordered — the query a consumer needs
+before folding or dropping a call whose callee would otherwise read a temporal dead zone or a
+hoisted <code>undefined</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L108-L116" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def established_before(self, function: Node, reference: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *function*&#39;s callable value is in place before *reference* runs. The
+    function-invocation view of `binding_established_before`: `False` when *function* is not invoked
+    through a single orderable name, so its presence cannot be ordered — the query a consumer needs
+    before folding or dropping a call whose callee would otherwise read a temporal dead zone or a
+    hoisted `undefined`.
+    &#34;&#34;&#34;
+    return self.binding_established_before(self.model.invocation_binding(function), reference)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.dominance.DominanceModel.binding_established_before"><code class="name flex">
+<span>def <span class="ident">binding_established_before</span></span>(<span>self, binding, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>binding</em>'s <code>singular_value</code> is in place before <em>reference</em> runs: every node in its
+<code>SemanticModel.binding_establishment_sites</code> executes first. A hoisted function declaration has no
+sites and qualifies unconditionally; a <code>var</code>/<code>let</code>/<code>const</code> initializer, a class declaration, or a
+lone assignment (<code>f = function(){}</code>, the form namespace flattening leaves) qualifies only where
+each establishing node runs before <em>reference</em>. <code>False</code> when the binding holds no single orderable
+value, so its presence cannot be ordered — the query a consumer needs before trusting a value that
+would otherwise be read out of its temporal dead zone or before its establishing write.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/dominance.py#L118-L131" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def binding_established_before(self, binding: Binding | None, reference: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *binding*&#39;s `singular_value` is in place before *reference* runs: every node in its
+    `SemanticModel.binding_establishment_sites` executes first. A hoisted function declaration has no
+    sites and qualifies unconditionally; a `var`/`let`/`const` initializer, a class declaration, or a
+    lone assignment (`f = function(){}`, the form namespace flattening leaves) qualifies only where
+    each establishing node runs before *reference*. `False` when the binding holds no single orderable
+    value, so its presence cannot be ordered — the query a consumer needs before trusting a value that
+    would otherwise be read out of its temporal dead zone or before its establishing write.
+    &#34;&#34;&#34;
+    sites = self.model.binding_establishment_sites(binding)
+    if sites is None:
+        return False
+    return all(self.runs_before(site, reference) for site in sites)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.analysis.dominance.DominatorModel" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel">DominatorModel</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.cfg_node_of" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.cfg_node_of">cfg_node_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.dominates" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.dominates">dominates</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.dominates_node" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.dominates_node">dominates_node</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.locate" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.locate">locate</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.locate_pair" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.locate_pair">locate_pair</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.reachable" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.reachable">reachable</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.reached_from_entry" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.reached_from_entry">reached_from_entry</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.strictly_dominates" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.strictly_dominates">strictly_dominates</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.dominance.DominatorModel.tree_of" href="../../analysis/dominance.html#refinery.lib.scripts.analysis.dominance.DominatorModel.tree_of">tree_of</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.dominance.build_dominance" href="#refinery.lib.scripts.js.analysis.dominance.build_dominance">build_dominance</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel">DominanceModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_function" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_function">runs_before_function</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before">runs_before</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_all" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel.runs_before_all">runs_before_all</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.established_before" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel.established_before">established_before</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.dominance.DominanceModel.binding_established_before" href="#refinery.lib.scripts.js.analysis.dominance.DominanceModel.binding_established_before">binding_established_before</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

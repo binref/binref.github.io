@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.restunpack documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.restunpack</code></h1>
+</header>
+<section id="section-intro">
+<p>Unpack rest-parameter arrays that pack multiple variables into a single parameter.</p>
+<p>Some obfuscation transforms replace named function parameters and locals with indexed accesses
+on a single rest parameter array:</p>
+<pre><code>function(...stack) { stack.length = N; ... }
+</code></pre>
+<p>This transformer detects the pattern, builds a variable map from collected access keys, and
+replaces indexed accesses with fresh named identifiers.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/restunpack.py#L1-L442" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Unpack rest-parameter arrays that pack multiple variables into a single parameter.
+
+Some obfuscation transforms replace named function parameters and locals with indexed accesses
+on a single rest parameter array:
+
+    function(...stack) { stack.length = N; ... }
+
+This transformer detects the pattern, builds a variable map from collected access keys, and
+replaces indexed accesses with fresh named identifiers.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import NamedTuple
+
+from refinery.lib.scripts import Node, _replace_in_parent
+from refinery.lib.scripts.js.analysis.cache import model_cache
+from refinery.lib.scripts.js.analysis.model import SemanticModel, references_own_arguments
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    ScriptLevelTransformer,
+    insert_after_prologue,
+    member_key,
+    numeric_value,
+)
+from refinery.lib.scripts.js.model import (
+    JsAssignmentExpression,
+    JsBlockStatement,
+    JsExpressionStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsMemberExpression,
+    JsNumericLiteral,
+    JsRestElement,
+    JsScript,
+    JsStringLiteral,
+    JsUnaryExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+    JsVarKind,
+)
+from refinery.lib.scripts.js.numbers import (
+    canonical_array_index,
+    exact_integer,
+    js_number_to_string,
+)
+from refinery.lib.scripts.js.strict import strict_mode_at
+
+
+_MAX_PARAMETERS = 65535
+&#34;&#34;&#34;
+The largest truncation length this pass will rewrite into a formal parameter list. A larger one does
+not describe the pattern, and taking it at face value would spend the rest of the run minting names
+for parameters no engine would accept.
+
+The number is not itself an engine limit and should not be read as one: V8 refuses a function of
+more than 65525 formal parameters, so a length between that and this bound is still rewritten into a
+program the engine will not load. Nor is every larger length a runtime error to begin with — a
+non-uint32 length such as `1e300` throws `RangeError`, but any uint32 up to 4294967295 does not.
+&#34;&#34;&#34;
+
+
+class _TruncationInfo(NamedTuple):
+    param_count: int
+    stack_chain: str | None
+    length_access: JsMemberExpression
+
+
+class _NestedFrameAccess(Exception):
+    pass
+
+
+def _extract_truncation(
+    stmts: list,
+    rest_name: str,
+) -&gt; _TruncationInfo | None:
+    &#34;&#34;&#34;
+    Find the `.length = N` truncation statement in the function body. Returns the param count
+    and the stack chain key (None for simple case where rest param IS the stack). Returns None
+    if no truncation pattern is found.
+
+    The object decides which statement is the truncation, and the length is read afterwards: the
+    first write to the length of the rest array or of a resolvable chain is the one this rewrite is
+    about, and a length it cannot read as a parameter count means the rewrite cannot be done.
+    Reading the length first and moving on when it does not answer would let a later, unrelated
+    `.length =` stand in for the real one, and the parameter list would then be built from a count
+    belonging to something else.
+    &#34;&#34;&#34;
+    for stmt in stmts:
+        if not isinstance(stmt, JsExpressionStatement):
+            continue
+        expr = stmt.expression
+        if not isinstance(expr, JsAssignmentExpression) or expr.operator != &#39;=&#39;:
+            continue
+        lhs = expr.left
+        if not isinstance(lhs, JsMemberExpression):
+            continue
+        if lhs.computed:
+            continue
+        if not isinstance(lhs.property, JsIdentifier) or lhs.property.name != &#39;length&#39;:
+            continue
+        obj = lhs.object
+        if isinstance(obj, JsIdentifier) and obj.name == rest_name:
+            chain = None
+        elif isinstance(obj, JsMemberExpression):
+            chain = member_key(obj)
+            if chain is None:
+                continue
+        else:
+            continue
+        rhs = expr.right
+        n = None if rhs is None else numeric_value(rhs)
+        length = None if n is None else exact_integer(n)
+        if length is None or not (0 &lt;= length &lt;= _MAX_PARAMETERS):
+            return None
+        return _TruncationInfo(length, chain, lhs)
+    return None
+
+
+def _collect_accesses_simple(
+    body: JsBlockStatement,
+    rest_name: str,
+    length_access: JsMemberExpression,
+) -&gt; dict[str, list[JsMemberExpression]] | None:
+    &#34;&#34;&#34;
+    Collect all `restParam[key]` and `restParam.key` accesses in the immediate function body
+    (not descending into nested functions). Returns a map from string key to list of AST nodes.
+    Returns None if the rest param is used in a way that prevents demasking.
+
+    Only the one `.length` member that *length_access* names is skipped, because it is the one the
+    rewrite removes. Any other mention of the rest array&#39;s length is an ordinary read of a binding
+    the rewrite is about to delete, and answering it with a rewritten body would leave a reference
+    to a name that no longer exists.
+    &#34;&#34;&#34;
+    accesses: dict[str, list[JsMemberExpression]] = {}
+    if not _walk_collect_simple(body, rest_name, accesses, length_access):
+        return None
+    return accesses
+
+
+def _walk_collect_simple(
+    node: Node,
+    rest_name: str,
+    accesses: dict[str, list[JsMemberExpression]],
+    length_access: JsMemberExpression,
+) -&gt; bool:
+    for child in node.children():
+        if isinstance(child, (JsFunctionExpression, JsFunctionDeclaration)):
+            continue
+        if isinstance(child, JsMemberExpression):
+            obj = child.object
+            if isinstance(obj, JsIdentifier) and obj.name == rest_name:
+                if child is length_access:
+                    continue
+                key = _extract_access_key(child)
+                if key is None:
+                    return False
+                accesses.setdefault(key, []).append(child)
+                continue
+        if isinstance(child, JsIdentifier) and child.name == rest_name:
+            parent = child.parent
+            if isinstance(parent, JsMemberExpression) and parent.object is child:
+                continue
+            return False
+        if not _walk_collect_simple(child, rest_name, accesses, length_access):
+            return False
+    return True
+
+
+def _collect_accesses_frame(
+    body: JsBlockStatement,
+    stack_chain: str,
+) -&gt; dict[str, list[JsMemberExpression]] | None:
+    &#34;&#34;&#34;
+    Collect all accesses to the frame-qualified stack chain. Returns None if any access exists
+    inside a nested function (closure capture prevents demasking).
+    &#34;&#34;&#34;
+    accesses: dict[str, list[JsMemberExpression]] = {}
+    try:
+        _walk_collect_frame(body, stack_chain, accesses, depth=0)
+    except _NestedFrameAccess:
+        return None
+    return accesses
+
+
+def _walk_collect_frame(
+    node: Node,
+    stack_chain: str,
+    accesses: dict[str, list[JsMemberExpression]],
+    depth: int,
+) -&gt; None:
+    for child in node.children():
+        if isinstance(child, (JsFunctionExpression, JsFunctionDeclaration)):
+            _walk_collect_frame(child, stack_chain, accesses, depth + 1)
+            continue
+        if isinstance(child, JsMemberExpression):
+            obj = child.object
+            if isinstance(obj, JsMemberExpression):
+                chain = member_key(obj)
+                if chain == stack_chain:
+                    key = _extract_access_key(child)
+                    if key is not None:
+                        if depth &gt; 0:
+                            raise _NestedFrameAccess
+                        accesses.setdefault(key, []).append(child)
+                        continue
+        _walk_collect_frame(child, stack_chain, accesses, depth)
+
+
+def _numeric_key(value: float) -&gt; str | None:
+    &#34;&#34;&#34;
+    The property name a Number indexes, or `None` when it names no slot this pass rewrites. The
+    spelling is `Number.prototype.toString` and not `str` of a Python integer, because the two part
+    ways exactly where a double stops determining its own digits: `s[2 ** 60]` reads the property
+    `&#39;1152921504606847000&#39;`, which is not what the exact value spells.
+    &#34;&#34;&#34;
+    if exact_integer(value) is None:
+        return None
+    return js_number_to_string(value)
+
+
+def _extract_access_key(node: JsMemberExpression) -&gt; str | None:
+    &#34;&#34;&#34;
+    Extract the key from a stack access expression. Returns a string representation of the key
+    or None if the key cannot be statically resolved.
+    &#34;&#34;&#34;
+    if node.computed:
+        prop = node.property
+        if isinstance(prop, JsNumericLiteral):
+            return _numeric_key(prop.value)
+        if isinstance(prop, JsStringLiteral):
+            return prop.value
+        if (
+            isinstance(prop, JsUnaryExpression)
+            and prop.operator == &#39;-&#39;
+            and isinstance(prop.operand, JsNumericLiteral)
+        ):
+            return _numeric_key(-prop.operand.value)
+        return None
+    if isinstance(node.property, JsIdentifier):
+        if node.property.name == &#39;length&#39;:
+            return None
+        return node.property.name
+    return None
+
+
+def _mentioned_names(node: Node) -&gt; set[str]:
+    &#34;&#34;&#34;
+    Every identifier name the subtree mentions. A name this pass introduces has to avoid all of them
+    and not only the declared ones: one that matches a local the body declares shadows it, and one
+    that matches a name the body reads from an enclosing scope captures it.
+    &#34;&#34;&#34;
+    return {child.name for child in node.walk() if isinstance(child, JsIdentifier)}
+
+
+class _StackNames(NamedTuple):
+    &#34;&#34;&#34;
+    The identifier every stack key is rewritten to, together with the parameter list the function is
+    given and the locals it has to declare. The three are answered at once because they are one
+    classification, and a rewrite that re-derives it reaches a different verdict in each place it
+    asks.
+    &#34;&#34;&#34;
+    of_key: dict[str, str]
+    params: list[str]
+    local_names: list[str]
+
+
+def _generate_names(
+    param_count: int,
+    keys: set[str],
+    taken: set[str],
+) -&gt; _StackNames:
+    &#34;&#34;&#34;
+    Fresh identifier names for the stack keys, together with the whole parameter list they are drawn
+    from. A key naming an index below *param_count* is that parameter and takes its name from its
+    position, so that two keys can never land on one name; every other key names a local.
+
+    Naming an index is what `canonical_array_index` decides and not what `str.isdigit` accepts: an
+    array is indexed only by the canonical decimal spelling of its index, so `&#39;01&#39;`, `&#39;٢&#39;` and `&#39;²&#39;`
+    are ordinary property names that read `undefined`. Handing any of them the parameter it resembles
+    both collapses two properties onto one binding and mints one parameter name twice.
+    &#34;&#34;&#34;
+    used = set(taken)
+    params: list[str] = []
+    candidate = 0
+    while len(params) &lt; param_count:
+        name = F&#39;p{candidate}&#39;
+        candidate += 1
+        if name not in used:
+            used.add(name)
+            params.append(name)
+    of_key: dict[str, str] = {}
+    local_names: list[str] = []
+    candidate = 0
+    for key in sorted(keys, key=_sort_key):
+        index = canonical_array_index(key)
+        if index is not None and index &lt; param_count:
+            of_key[key] = params[index]
+            continue
+        while True:
+            name = F&#39;v{candidate}&#39;
+            candidate += 1
+            if name not in used:
+                break
+        used.add(name)
+        of_key[key] = name
+        local_names.append(name)
+    return _StackNames(of_key, params, local_names)
+
+
+def _sort_key(key: str) -&gt; tuple[int, int | str]:
+    index = canonical_array_index(key)
+    return (1, key) if index is None else (0, index)
+
+
+def _remove_truncation(body: JsBlockStatement, length_access: JsMemberExpression) -&gt; None:
+    &#34;&#34;&#34;
+    Remove the truncation statement from the function body. It is found by the member node the match
+    recorded rather than by re-running the match: a body may hold more than one `.length =` and only
+    the one that was read as the parameter count may be dropped.
+    &#34;&#34;&#34;
+    stmts = body.body
+    for i, stmt in enumerate(stmts):
+        if not isinstance(stmt, JsExpressionStatement):
+            continue
+        expr = stmt.expression
+        if isinstance(expr, JsAssignmentExpression) and expr.left is length_access:
+            stmts.pop(i)
+            return
+
+
+class JsRestArrayUnpacking(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Unpack rest-param arrays back into named identifiers. Detects functions where all parameters
+    and locals are packed into a single rest parameter accessed by index, and replaces indexed
+    accesses with fresh named variables.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        count = 0
+        model = model_cache(self, node).model
+        for fn_node in node.walk():
+            if not isinstance(fn_node, (JsFunctionExpression, JsFunctionDeclaration)):
+                continue
+            if self._demask_function(fn_node, model):
+                count += 1
+        if count &gt; 0:
+            self.mark_changed()
+
+    def _demask_function(
+        self,
+        fn: JsFunctionExpression | JsFunctionDeclaration,
+        model: SemanticModel,
+    ) -&gt; bool:
+        if len(fn.params) != 1:
+            return False
+        param = fn.params[0]
+        if not isinstance(param, JsRestElement):
+            return False
+        if not isinstance(param.argument, JsIdentifier):
+            return False
+        binding = model.binding_of(param.argument)
+        if binding is None or binding.captured or model.reflection_can_reach(binding):
+            return False
+        rest_name = param.argument.name
+        if fn.body is None or not isinstance(fn.body, JsBlockStatement):
+            return False
+        if not fn.body.body:
+            return False
+        result = _extract_truncation(fn.body.body, rest_name)
+        if result is None:
+            return False
+        param_count, stack_chain, length_access = result
+        if stack_chain is None:
+            accesses = _collect_accesses_simple(fn.body, rest_name, length_access)
+        else:
+            accesses = _collect_accesses_frame(fn.body, stack_chain)
+        if accesses is None:
+            return False
+        if param_count &gt; 0 and not any(str(i) in accesses for i in range(param_count)):
+            return False
+        if not accesses:
+            _remove_truncation(fn.body, length_access)
+            fn.params.clear()
+            return True
+        taken = _mentioned_names(fn.body)
+        names = _generate_names(param_count, set(accesses.keys()), taken)
+        if names.params and self._would_map_arguments(fn):
+            return False
+        for key, nodes in accesses.items():
+            name = names.of_key[key]
+            for access_node in nodes:
+                replacement = JsIdentifier(name=name)
+                _replace_in_parent(access_node, replacement)
+        _remove_truncation(fn.body, length_access)
+        fn.params.clear()
+        for name in names.params:
+            fn.params.append(JsIdentifier(name=name))
+        if stack_chain is None:
+            self._add_local_declarations(fn.body, names.local_names)
+        return True
+
+    @staticmethod
+    def _would_map_arguments(fn: JsFunctionExpression | JsFunctionDeclaration) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether unpacking *fn* would give it an `arguments` object aliasing the parameters it does not
+        have yet. A rest parameter is not a simple list, so the object *fn* has now is an independent
+        copy; the plain identifiers this pass puts in its place make the list simple, and a sloppy body
+        then reads and writes its parameters through that object as well as by name. A write the pass
+        leaves standing therefore means something afterwards that it did not mean before.
+
+        The question is about the function this pass would produce, and it is asked before that function
+        exists, because `_demask_function` rewrites in place with nothing to roll back to. It is
+        answerable early: the mode and whether the body reads its own `arguments` are both untouched by
+        the rewrite, and the result&#39;s parameter list is simple by construction, so the only part left to
+        the caller is whether the result keeps a parameter at all.
+        &#34;&#34;&#34;
+        return not strict_mode_at(fn) and references_own_arguments(fn)
+
+    def _add_local_declarations(
+        self,
+        body: JsBlockStatement,
+        locals_: list[str],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Insert `var` declarations for the locals the rewrite minted, behind the body&#39;s Directive
+        Prologue rather than ahead of it: a declaration written above a `&#39;use strict&#39;` ends the
+        prologue before it is reached and the unpacked function runs sloppy where the source wrote it
+        strict.
+        &#34;&#34;&#34;
+        if not locals_:
+            return
+        declarators = [
+            JsVariableDeclarator(id=JsIdentifier(name=n), init=None)
+            for n in locals_
+        ]
+        decl = JsVariableDeclaration(declarations=declarators, kind=JsVarKind.VAR)
+        for d in declarators:
+            d.parent = decl
+            if d.id is not None:
+                d.id.parent = d
+        insert_after_prologue(body, [decl])</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.restunpack.JsRestArrayUnpacking"><code class="flex name class">
+<span>class <span class="ident">JsRestArrayUnpacking</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Unpack rest-param arrays back into named identifiers. Detects functions where all parameters
+and locals are packed into a single rest parameter accessed by index, and replaces indexed
+accesses with fresh named variables.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/deobfuscation/restunpack.py#L332-L442" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsRestArrayUnpacking(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Unpack rest-param arrays back into named identifiers. Detects functions where all parameters
+    and locals are packed into a single rest parameter accessed by index, and replaces indexed
+    accesses with fresh named variables.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        count = 0
+        model = model_cache(self, node).model
+        for fn_node in node.walk():
+            if not isinstance(fn_node, (JsFunctionExpression, JsFunctionDeclaration)):
+                continue
+            if self._demask_function(fn_node, model):
+                count += 1
+        if count &gt; 0:
+            self.mark_changed()
+
+    def _demask_function(
+        self,
+        fn: JsFunctionExpression | JsFunctionDeclaration,
+        model: SemanticModel,
+    ) -&gt; bool:
+        if len(fn.params) != 1:
+            return False
+        param = fn.params[0]
+        if not isinstance(param, JsRestElement):
+            return False
+        if not isinstance(param.argument, JsIdentifier):
+            return False
+        binding = model.binding_of(param.argument)
+        if binding is None or binding.captured or model.reflection_can_reach(binding):
+            return False
+        rest_name = param.argument.name
+        if fn.body is None or not isinstance(fn.body, JsBlockStatement):
+            return False
+        if not fn.body.body:
+            return False
+        result = _extract_truncation(fn.body.body, rest_name)
+        if result is None:
+            return False
+        param_count, stack_chain, length_access = result
+        if stack_chain is None:
+            accesses = _collect_accesses_simple(fn.body, rest_name, length_access)
+        else:
+            accesses = _collect_accesses_frame(fn.body, stack_chain)
+        if accesses is None:
+            return False
+        if param_count &gt; 0 and not any(str(i) in accesses for i in range(param_count)):
+            return False
+        if not accesses:
+            _remove_truncation(fn.body, length_access)
+            fn.params.clear()
+            return True
+        taken = _mentioned_names(fn.body)
+        names = _generate_names(param_count, set(accesses.keys()), taken)
+        if names.params and self._would_map_arguments(fn):
+            return False
+        for key, nodes in accesses.items():
+            name = names.of_key[key]
+            for access_node in nodes:
+                replacement = JsIdentifier(name=name)
+                _replace_in_parent(access_node, replacement)
+        _remove_truncation(fn.body, length_access)
+        fn.params.clear()
+        for name in names.params:
+            fn.params.append(JsIdentifier(name=name))
+        if stack_chain is None:
+            self._add_local_declarations(fn.body, names.local_names)
+        return True
+
+    @staticmethod
+    def _would_map_arguments(fn: JsFunctionExpression | JsFunctionDeclaration) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether unpacking *fn* would give it an `arguments` object aliasing the parameters it does not
+        have yet. A rest parameter is not a simple list, so the object *fn* has now is an independent
+        copy; the plain identifiers this pass puts in its place make the list simple, and a sloppy body
+        then reads and writes its parameters through that object as well as by name. A write the pass
+        leaves standing therefore means something afterwards that it did not mean before.
+
+        The question is about the function this pass would produce, and it is asked before that function
+        exists, because `_demask_function` rewrites in place with nothing to roll back to. It is
+        answerable early: the mode and whether the body reads its own `arguments` are both untouched by
+        the rewrite, and the result&#39;s parameter list is simple by construction, so the only part left to
+        the caller is whether the result keeps a parameter at all.
+        &#34;&#34;&#34;
+        return not strict_mode_at(fn) and references_own_arguments(fn)
+
+    def _add_local_declarations(
+        self,
+        body: JsBlockStatement,
+        locals_: list[str],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Insert `var` declarations for the locals the rewrite minted, behind the body&#39;s Directive
+        Prologue rather than ahead of it: a declaration written above a `&#39;use strict&#39;` ends the
+        prologue before it is reached and the unpacked function runs sloppy where the source wrote it
+        strict.
+        &#34;&#34;&#34;
+        if not locals_:
+            return
+        declarators = [
+            JsVariableDeclarator(id=JsIdentifier(name=n), init=None)
+            for n in locals_
+        ]
+        decl = JsVariableDeclaration(declarations=declarators, kind=JsVarKind.VAR)
+        for d in declarators:
+            d.parent = decl
+            if d.id is not None:
+                d.id.parent = d
+        insert_after_prologue(body, [decl])</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.restunpack.JsRestArrayUnpacking" href="#refinery.lib.scripts.js.deobfuscation.restunpack.JsRestArrayUnpacking">JsRestArrayUnpacking</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

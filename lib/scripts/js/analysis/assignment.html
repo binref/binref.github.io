@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.assignment documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.assignment</code></h1>
+</header>
+<section id="section-intro">
+<p>Definite assignment for implicit globals: a forward must-analysis over the per-function control-flow
+graphs answering whether a write to a name the program never declares has certainly completed before
+a given reference runs. The consumers are the removal sweep and the alias collapse, both of which may
+treat a read of such a name as unable to throw only where this model vouches for it.</p>
+<p>The transfer function reasons about normal completion alone: a statement's gen set holds the bindings
+whose write is performed on <em>every</em> evaluation of the statement that completes normally, computed by
+an evaluation-order walk of the statement's own expressions, so a write guarded by a short-circuit, a
+ternary arm, an optional chain, a logical assignment's right-hand side, or a loop target contributes
+nothing. A write whose statement throws first is discarded structurally — the throw leaves along the
+raising edge, which carries no gens, and the meet at the join forgets the fact — except where the
+statement provably cannot throw at all, whose raising edge is never taken and may carry them
+vacuously. No throw analysis decides what the normal edge means.</p>
+<p>A bare write in sloppy script code creates the property; in strict code, or anywhere under the module
+reading, it throws instead, so it gens nothing there. A member write through this realm's global
+object creates the property in either mode; <code>top</code> and <code>frames</code> name another document's global and
+never qualify.</p>
+<p>Facts are monotone: a name is tracked only while nothing the analysis cannot see can unbind it. A
+binding a reflection surface can reach is not tracked; neither is one carried into a body this file
+does not read, which is what handing the global object to a call does
+(<code><a title="refinery.lib.scripts.js.analysis.model.Binding.reachable_through_a_handed_object" href="model.html#refinery.lib.scripts.js.analysis.model.Binding.reachable_through_a_handed_object">Binding.reachable_through_a_handed_object</a></code>), because such a
+body may <code>delete</code> the property or freeze the object it hangs on and the file spells neither; and
+neither is one any <code>delete</code> in the program addresses — through its bare name, through a member of
+that name on any base, or possibly through a computed key on a global-object spelling no scan can
+read, which untracks everything. What remains can only ever gain its property, so there
+are no kill sets, and a fact held at a call site still holds whenever a body invoked there runs —
+including a getter, an iterator, or an async continuation the text spells no call for.</p>
+<p>Interprocedurally, a call completing normally has run its callee to normal exit, so a call whose
+callee is one known non-async, non-generator function — resolved through its name, or spelled inline
+as the callee — adds that function's exit summary to the gen set; and a function whose every
+invocation site is a direct call of its one pinned name, or an immediately-invoked function
+expression, takes the meet of the facts at those sites as its entry fact. Both start empty and grow
+to a least fixpoint, so no fact ever rests on itself.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/assignment.py#L1-L733" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Definite assignment for implicit globals: a forward must-analysis over the per-function control-flow
+graphs answering whether a write to a name the program never declares has certainly completed before
+a given reference runs. The consumers are the removal sweep and the alias collapse, both of which may
+treat a read of such a name as unable to throw only where this model vouches for it.
+
+The transfer function reasons about normal completion alone: a statement&#39;s gen set holds the bindings
+whose write is performed on *every* evaluation of the statement that completes normally, computed by
+an evaluation-order walk of the statement&#39;s own expressions, so a write guarded by a short-circuit, a
+ternary arm, an optional chain, a logical assignment&#39;s right-hand side, or a loop target contributes
+nothing. A write whose statement throws first is discarded structurally — the throw leaves along the
+raising edge, which carries no gens, and the meet at the join forgets the fact — except where the
+statement provably cannot throw at all, whose raising edge is never taken and may carry them
+vacuously. No throw analysis decides what the normal edge means.
+
+A bare write in sloppy script code creates the property; in strict code, or anywhere under the module
+reading, it throws instead, so it gens nothing there. A member write through this realm&#39;s global
+object creates the property in either mode; `top` and `frames` name another document&#39;s global and
+never qualify.
+
+Facts are monotone: a name is tracked only while nothing the analysis cannot see can unbind it. A
+binding a reflection surface can reach is not tracked; neither is one carried into a body this file
+does not read, which is what handing the global object to a call does
+(`refinery.lib.scripts.js.analysis.model.Binding.reachable_through_a_handed_object`), because such a
+body may `delete` the property or freeze the object it hangs on and the file spells neither; and
+neither is one any `delete` in the program addresses — through its bare name, through a member of
+that name on any base, or possibly through a computed key on a global-object spelling no scan can
+read, which untracks everything. What remains can only ever gain its property, so there
+are no kill sets, and a fact held at a call site still holds whenever a body invoked there runs —
+including a getter, an iterator, or an async continuation the text spells no call for.
+
+Interprocedurally, a call completing normally has run its callee to normal exit, so a call whose
+callee is one known non-async, non-generator function — resolved through its name, or spelled inline
+as the callee — adds that function&#39;s exit summary to the gen set; and a function whose every
+invocation site is a direct call of its one pinned name, or an immediately-invoked function
+expression, takes the meet of the facts at those sites as its entry fact. Both start empty and grow
+to a least fixpoint, so no fact ever rests on itself.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Callable
+
+from refinery.lib.scripts import Node, Statement
+from refinery.lib.scripts.js.analysis.cfg import (
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+    build_control_flow_model,
+)
+from refinery.lib.scripts.js.analysis.model import (
+    FUNCTION_NODES,
+    GLOBAL_OBJECT_ALIASES,
+    SAME_REALM_GLOBAL_OBJECT_ALIASES,
+    Binding,
+    BindingKind,
+    SemanticModel,
+    enclosing_operator,
+    is_invocation_target,
+    member_property_name,
+)
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsArrayPattern,
+    JsAssignmentExpression,
+    JsAssignmentPattern,
+    JsBinaryExpression,
+    JsBooleanLiteral,
+    JsCallExpression,
+    JsConditionalExpression,
+    JsExpressionStatement,
+    JsForInStatement,
+    JsForOfStatement,
+    JsIdentifier,
+    JsLogicalExpression,
+    JsMemberExpression,
+    JsNewExpression,
+    JsNullLiteral,
+    JsNumericLiteral,
+    JsObjectExpression,
+    JsObjectPattern,
+    JsParenthesizedExpression,
+    JsProperty,
+    JsRestElement,
+    JsSequenceExpression,
+    JsSpreadElement,
+    JsStringLiteral,
+    JsTaggedTemplateExpression,
+    JsTemplateLiteral,
+    JsThrowStatement,
+    JsUnaryExpression,
+    JsUpdateExpression,
+    JsVariableDeclaration,
+    is_generator_function,
+    strip_parens,
+    wraps_return,
+)
+from refinery.lib.scripts.js.strict import strict_mode_at
+
+_OTHER_REALM_ALIASES = GLOBAL_OBJECT_ALIASES - SAME_REALM_GLOBAL_OBJECT_ALIASES
+
+_LOGICAL_ASSIGNMENT = frozenset({
+    &#39;&amp;&amp;=&#39;,
+    &#39;||=&#39;,
+    &#39;??=&#39;,
+})
+
+#: The statements whose control-flow node evaluates a head of its own rather than its children: a
+#: declaration evaluates its initializers and a `for-in`/`for-of` head its subject, while the target
+#: each writes is written once per iteration and by no evaluation of the head.
+_OWN_HEAD_NODES = (
+    JsVariableDeclaration,
+    JsForInStatement,
+    JsForOfStatement,
+)
+
+
+class DefiniteAssignmentModel:
+    &#34;&#34;&#34;
+    Build over a `refinery.lib.scripts.js.analysis.model.SemanticModel` and its
+    `refinery.lib.scripts.analysis.cfg.ControlFlowModel`; query with `definitely_assigned_at`.
+    *module_scope* is the run&#39;s execution model: under the module reading every region is strict and
+    a top-level `this` does not denote the global object, so no bare write and no `this` member
+    write establishes anything.
+    *host_entrypoint* names the top-level functions the analyst declared a host invokes by name;
+    such a function has a call site outside the file, so the meet over its spelled call sites does
+    not bound its entry facts and it gets none.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        model: SemanticModel,
+        control_flow: ControlFlowModel | None = None,
+        *,
+        module_scope: bool = False,
+        host_entrypoint: Callable[[str], bool] | None = None,
+    ):
+        self.model = model
+        self._flow = control_flow if control_flow is not None else build_control_flow_model(model.root)
+        self._module = module_scope
+        self._host_entrypoint = host_entrypoint
+        self._tracked: dict[int, Binding] = {}
+        self._by_name: dict[str, Binding] = {}
+        for binding in model.root_scope.bindings.values():
+            if binding.kind is not BindingKind.IMPLICIT_GLOBAL:
+                continue
+            if not binding.writes:
+                continue
+            if binding.reachable_through_a_handed_object:
+                continue
+            if model.reflection_can_reach(binding):
+                continue
+            self._tracked[id(binding)] = binding
+            self._by_name[binding.name] = binding
+        self._in_facts: dict[int, frozenset[Binding]] = {}
+        self._parts: dict[int, list[Node]] = {}
+        self._effects: dict[int, tuple[frozenset[Binding], bool]] = {}
+        self._summaries: dict[int, frozenset[Binding]] = {}
+        if self._tracked:
+            self._untrack_deleted()
+        if self._tracked:
+            self._solve()
+
+    def definitely_assigned_at(self, binding: Binding | None, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a write to *binding* has certainly completed before *reference* is evaluated. Facts
+        hold at statement entry, so a write in *reference*&#39;s own statement never vouches for it.
+        &#34;&#34;&#34;
+        if binding is None or id(binding) not in self._tracked:
+            return False
+        located = self._flow.locate(reference)
+        if located is None:
+            return False
+        _, node = located
+        return binding in self._in_facts.get(id(node), frozenset())
+
+    def read_established(self, node: JsIdentifier) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a write creating the name *node* spells has certainly completed before the read is
+        evaluated, so it cannot be the read that raises a `ReferenceError`.
+
+        The one composition every consumer of this model shares, and it lives here because the
+        binding a reference resolves to must come from the same semantic model the facts were built
+        over: a caller resolving against a model built after a rewrite would hand over a binding
+        this one has never seen, and every answer would silently be `False`.
+        &#34;&#34;&#34;
+        return self.definitely_assigned_at(self.model.resolve(node), node)
+
+    def _untrack_deleted(self):
+        &#34;&#34;&#34;
+        Remove from tracking every binding a `delete` in the program could unbind, wherever that
+        delete stands — a called function, a getter a member read fires, an iterator a spread drives.
+        Untracking is what makes the remaining facts monotone without enumerating who runs the code.
+
+        A member delete is keyed on the property name it spells rather than on whether the base is a
+        spelling of the global object, because the base need not be one to *be* one: `globalThis
+        .window.X` and any name a call was handed the object under both delete the global the file
+        reads bare. Untracking a name because some object&#39;s property of that name is deleted only
+        forgets a fact; trusting a base the scan cannot read is what deletes a read. The one base
+        that does not untrack is one that provably cannot be the global object — a literal, an
+        allocation, or a name pinned to one — and a computed key on any other base untracks
+        everything, since the key it deletes is one no scan can read.
+        &#34;&#34;&#34;
+        deleted: set[int] = set()
+        for node in self.model.root.walk():
+            if not isinstance(node, JsUnaryExpression) or node.operator != &#39;delete&#39;:
+                continue
+            target = strip_parens(node.operand) if node.operand is not None else None
+            if isinstance(target, JsIdentifier):
+                resolved = self.model.resolve(target)
+                if resolved is not None:
+                    deleted.add(id(resolved))
+                    continue
+                self._tracked = {}
+                return
+            if isinstance(target, JsMemberExpression):
+                if self._cannot_be_the_global_object(target.object):
+                    continue
+                name = self.model.global_alias_member_name(target, module_scope=self._module)
+                if name is None:
+                    name = member_property_name(target)
+                if name is not None:
+                    named = self._by_name.get(name)
+                    if named is not None:
+                        deleted.add(id(named))
+                    continue
+                self._tracked = {}
+                return
+            self._tracked = {}
+            return
+        if deleted:
+            self._tracked = {
+                key: binding for key, binding in self._tracked.items() if key not in deleted
+            }
+            self._by_name = {binding.name: binding for binding in self._tracked.values()}
+
+    def _cannot_be_the_global_object(self, base: Node | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the base of a member delete provably does not denote the global object, so the
+        delete cannot unbind a name the file reads bare: a literal, an allocation, a function, or a
+        name pinned to one of those. Everything else — an unresolved name, a multi-valued binding,
+        any expression the scan cannot evaluate — may be the object under another spelling and
+        answers `False`.
+        &#34;&#34;&#34;
+        value = strip_parens(base) if base is not None else None
+        if isinstance(value, JsIdentifier):
+            binding = self.model.resolve(value)
+            if binding is None or binding.dynamic_refs:
+                return False
+            pinned = self.model.singular_value(binding)
+            value = strip_parens(pinned) if pinned is not None else None
+        if isinstance(value, FUNCTION_NODES):
+            return True
+        return isinstance(value, (
+            JsArrayExpression,
+            JsObjectExpression,
+            JsStringLiteral,
+            JsNumericLiteral,
+            JsBooleanLiteral,
+            JsNullLiteral,
+            JsTemplateLiteral,
+        ))
+
+    def _solve(self):
+        &#34;&#34;&#34;
+        Grow the call summaries and entry facts to a least fixpoint, re-solving every graph under
+        the previous round&#39;s answers until neither moves.
+
+        Only the summary a call contributes changes between rounds, so the parts each node
+        evaluates and whether it can throw are settled once, before the first round: both are read
+        off the tree alone, and the tree does not move while a model is being built.
+        &#34;&#34;&#34;
+        graphs = list(self._flow.graphs.values())
+        elements = [
+            (graph, node) for graph in graphs for node in graph.nodes if node.element is not None
+        ]
+        for graph, node in elements:
+            assert node.element is not None
+            self._parts[id(node)] = self._evaluated_parts(graph, node.element)
+        cannot_throw = {
+            id(node): self._parts_cannot_throw(node.element, self._parts[id(node)])
+            for graph, node in elements
+        }
+        summaries: dict[int, frozenset[Binding]] = {}
+        entries: dict[int, frozenset[Binding]] = {}
+        while True:
+            self._summaries = summaries
+            self._effects = {
+                id(node): (self._parts_gen(self._parts[id(node)]), cannot_throw[id(node)])
+                for _, node in elements
+            }
+            facts: dict[int, frozenset[Binding]] = {}
+            for graph in graphs:
+                self._solve_graph(graph, entries.get(id(graph.owner), frozenset()), facts)
+            new_summaries = {id(graph.owner): self._exit_summary(graph, facts) for graph in graphs}
+            new_entries = {id(graph.owner): self._entry_fact(graph, facts) for graph in graphs}
+            if new_summaries == summaries and new_entries == entries:
+                self._in_facts = facts
+                return
+            summaries = new_summaries
+            entries = new_entries
+
+    def _edge_out(
+        self,
+        graph: ControlFlowGraph,
+        pred: CfgNode,
+        target: CfgNode,
+        state: dict[int, frozenset[Binding]],
+    ) -&gt; frozenset[Binding]:
+        gen, cannot_throw = self._effects.get(id(pred), (frozenset(), False))
+        out = state[id(pred)]
+        if cannot_throw or not graph.raise_taken(pred, target):
+            out = out | gen
+        return out
+
+    def _solve_graph(
+        self, graph: ControlFlowGraph, entry: frozenset[Binding], facts: dict[int, frozenset[Binding]],
+    ):
+        top = frozenset(self._tracked.values())
+        state: dict[int, frozenset[Binding]] = {id(node): top for node in graph.nodes}
+        state[id(graph.entry)] = entry
+        reachable: set[int] = set()
+        frontier = [graph.entry]
+        while frontier:
+            node = frontier.pop()
+            if id(node) in reachable:
+                continue
+            reachable.add(id(node))
+            frontier.extend(node.successors)
+        changed = True
+        while changed:
+            changed = False
+            for node in graph.nodes:
+                if node is graph.entry:
+                    continue
+                met: frozenset[Binding] | None = None
+                for pred in node.predecessors:
+                    out = self._edge_out(graph, pred, node, state)
+                    met = out if met is None else met &amp; out
+                if met is None:
+                    met = frozenset()
+                if met != state[id(node)]:
+                    state[id(node)] = met
+                    changed = True
+        for node in graph.nodes:
+            facts[id(node)] = state[id(node)] if id(node) in reachable else frozenset()
+
+    def _exit_summary(
+        self, graph: ControlFlowGraph, facts: dict[int, frozenset[Binding]],
+    ) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        What a call of this body&#39;s owner adds to the facts of a caller whose call completed
+        normally: the meet over every predecessor of the exit a normal completion may leave through,
+        minus the entry fact the caller already held.
+
+        A predecessor is dropped from the meet only where no normal completion reaches the exit from
+        it, which is a statement that never completes at all rather than an edge kind. An edge kind
+        is recorded per *pair* of nodes and two edges between one pair collapse to a single entry
+        (`refinery.lib.scripts.analysis.cfg.CfgBuilder.kind_edge`), so an empty `finally` — whose
+        entry both falls through to whatever follows the statement and carries the unwinding edge
+        outward — reads as raise-taken while the normal path runs through it. Dropping it took the
+        meet over the other predecessors alone and claimed a write the normal path never performed.
+        &#34;&#34;&#34;
+        met: frozenset[Binding] | None = None
+        for pred in graph.exit.predecessors:
+            if not self._completes_normally(pred) and graph.raise_taken(pred, graph.exit):
+                continue
+            out = self._edge_out(graph, pred, graph.exit, facts)
+            met = out if met is None else met &amp; out
+        entry = facts.get(id(graph.entry), frozenset())
+        return frozenset() if met is None else frozenset(met - entry)
+
+    @staticmethod
+    def _completes_normally(node: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the statement *node* stands for may complete normally at all. A `throw` never does,
+        so the edge it draws to the exit stands for the one run it has and carries no fact about a
+        normal return; every other node reaches the exit on some run that completed.
+        &#34;&#34;&#34;
+        return not isinstance(node.element, JsThrowStatement)
+
+    def _entry_fact(
+        self, graph: ControlFlowGraph, facts: dict[int, frozenset[Binding]],
+    ) -&gt; frozenset[Binding]:
+        owner = graph.owner
+        if not isinstance(owner, FUNCTION_NODES):
+            return frozenset()
+        if is_generator_function(owner):
+            return frozenset()
+        binding = self.model.invocation_binding(owner)
+        if binding is None:
+            immediate = self._immediate_call_of(owner)
+            if immediate is None:
+                return frozenset()
+            return self._fact_at(immediate, facts)
+        if binding.dynamic_refs or not self.model.binding_pinned_to(binding, owner):
+            return frozenset()
+        if self._host_entrypoint is not None and self._host_entrypoint(binding.name):
+            return frozenset()
+        met: frozenset[Binding] | None = None
+        for read in binding.reads:
+            if not is_invocation_target(read):
+                return frozenset()
+            met_here = self._fact_at(read, facts)
+            met = met_here if met is None else met &amp; met_here
+        return met or frozenset()
+
+    def _fact_at(self, site: Node, facts: dict[int, frozenset[Binding]]) -&gt; frozenset[Binding]:
+        located = self._flow.locate(site)
+        if located is None:
+            return frozenset()
+        return facts.get(id(located[1]), frozenset())
+
+    @staticmethod
+    def _immediate_call_of(function: Node) -&gt; JsCallExpression | None:
+        &#34;&#34;&#34;
+        The call that invokes *function* where it is written as that call&#39;s own callee, so its
+        every invocation is the one site — an immediately-invoked function expression. `None` for
+        any other position, a tagged template among them, whose call node the fact is not read off.
+        &#34;&#34;&#34;
+        governor = enclosing_operator(function)
+        if isinstance(governor, JsCallExpression) and is_invocation_target(function):
+            return governor
+        return None
+
+    def _evaluated_parts(self, graph: ControlFlowGraph, element: Node) -&gt; list[Node]:
+        &#34;&#34;&#34;
+        The expressions the control-flow node for *element* evaluates itself: the element where it is
+        an expression handed its own node (a loop header&#39;s init, test, or update), a declaration&#39;s
+        initializers, a `for-in`/`for-of` head&#39;s subject, and otherwise every child that is neither a
+        function body nor a statement owned by another node.
+        &#34;&#34;&#34;
+        if (
+            not isinstance(element, _OWN_HEAD_NODES)
+            and not self._is_statement(element)
+        ):
+            return [element]
+        if isinstance(element, JsVariableDeclaration):
+            inits: list[Node] = []
+            for declarator in element.declarations:
+                init = getattr(declarator, &#39;init&#39;, None)
+                if init is not None:
+                    inits.append(init)
+            return inits
+        if isinstance(element, (JsForInStatement, JsForOfStatement)):
+            subject = getattr(element, &#39;right&#39;, None)
+            return [subject] if subject is not None else []
+        parts: list[Node] = []
+        for child in element.children():
+            if isinstance(child, FUNCTION_NODES):
+                continue
+            if graph.node_of(child) is not None:
+                continue
+            parts.append(child)
+        return parts
+
+    @staticmethod
+    def _is_statement(element: Node) -&gt; bool:
+        return isinstance(element, Statement)
+
+    def _parts_gen(self, parts: list[Node]) -&gt; frozenset[Binding]:
+        gens: set[Binding] = set()
+        for part in parts:
+            gens |= self._gens(part)
+        return frozenset(gens)
+
+    def _parts_cannot_throw(self, element: Node | None, parts: list[Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the statement *element* provably throws on no run at all, so that its raising edge
+        is never taken and may carry its gens vacuously.
+
+        A declaration is more than the initializers `_evaluated_parts` reports: each declarator
+        binds its target once its initializer is evaluated, and binding a pattern destructures,
+        which is what `var {a} = null, b = (X = 1);` throws at — after `null` was read and before
+        the second declarator ran. So a declarator naming anything but a plain identifier answers
+        `False` here, while the gen it contributes on the *normal* edge stays what it was.
+        &#34;&#34;&#34;
+        if isinstance(element, JsVariableDeclaration):
+            if not all(
+                isinstance(declarator.id, JsIdentifier) for declarator in element.declarations
+            ):
+                return False
+        elif not isinstance(element, JsExpressionStatement):
+            return False
+        return all(self._cannot_throw(part) for part in parts)
+
+    def _cannot_throw(self, node: Node | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether evaluating *node* is guaranteed not to throw, so its statement&#39;s raising edge is never
+        taken and may vacuously carry its gens. Deliberately minimal: literals, function values, a
+        sloppy bare store of such a value to a tracked name, and a member store of one through this
+        realm&#39;s global object — the shapes a `try`-wrapped establishment scaffold is written in.
+        &#34;&#34;&#34;
+        if node is None:
+            return False
+        if isinstance(node, (
+            JsStringLiteral,
+            JsNumericLiteral,
+            JsBooleanLiteral,
+            JsNullLiteral,
+        )):
+            return True
+        if isinstance(node, FUNCTION_NODES):
+            return True
+        if isinstance(node, JsParenthesizedExpression):
+            return node.expression is not None and self._cannot_throw(node.expression)
+        if isinstance(node, JsSequenceExpression):
+            return all(self._cannot_throw(part) for part in node.expressions)
+        if isinstance(node, JsAssignmentExpression):
+            if node.operator != &#39;=&#39;:
+                return False
+            if not isinstance(strip_parens(node.left), JsIdentifier):
+                return False
+            if not self._target_gen(node):
+                return False
+            return self._cannot_throw(node.right)
+        return False
+
+    def _gens(self, node: Node | None) -&gt; frozenset[Binding]:
+        if node is None:
+            return frozenset()
+        if isinstance(node, JsParenthesizedExpression):
+            return self._gens(node.expression)
+        if isinstance(node, JsAssignmentExpression):
+            if node.operator in _LOGICAL_ASSIGNMENT:
+                return self._target_gen(node)
+            return self._gens(node.right) | self._target_gen(node)
+        if isinstance(node, JsUpdateExpression):
+            return self._gens(node.argument) | self._update_gen(node)
+        if isinstance(node, JsLogicalExpression):
+            return self._gens(node.left)
+        if isinstance(node, JsConditionalExpression):
+            return self._gens(node.test) | (
+                self._gens(node.consequent) &amp; self._gens(node.alternate))
+        if isinstance(node, JsBinaryExpression):
+            return self._gens(node.left) | self._gens(node.right)
+        if isinstance(node, JsSequenceExpression):
+            result: frozenset[Binding] = frozenset()
+            for expression in node.expressions:
+                result = result | self._gens(expression)
+            return result
+        if isinstance(node, JsUnaryExpression):
+            if node.operator == &#39;delete&#39;:
+                return frozenset()
+            return self._gens(node.operand)
+        if isinstance(node, JsMemberExpression):
+            result = self._gens(node.object)
+            if node.optional or self._chain_short_circuits(node.object):
+                return result
+            if node.computed:
+                result = result | self._gens(node.property)
+            return result
+        if isinstance(node, (JsCallExpression, JsNewExpression)):
+            result = self._gens(node.callee)
+            if getattr(node, &#39;optional&#39;, False) or self._chain_short_circuits(node.callee):
+                return result
+            for argument in node.arguments:
+                result = result | self._gens(argument)
+            if isinstance(node, JsCallExpression):
+                result = result | self._callee_summary(node)
+            return result
+        if isinstance(node, JsSpreadElement):
+            return self._gens(node.argument)
+        if isinstance(node, JsArrayExpression):
+            result = frozenset()
+            for element in node.elements:
+                if element is not None:
+                    result = result | self._gens(element)
+            return result
+        if isinstance(node, JsObjectExpression):
+            result = frozenset()
+            for prop in node.properties:
+                if isinstance(prop, JsProperty):
+                    if prop.computed and prop.key is not None:
+                        result = result | self._gens(prop.key)
+                    if prop.value is not None and not isinstance(prop.value, FUNCTION_NODES):
+                        result = result | self._gens(prop.value)
+                elif isinstance(prop, JsSpreadElement):
+                    result = result | self._gens(prop.argument)
+            return result
+        if isinstance(node, JsTemplateLiteral):
+            result = frozenset()
+            for expression in node.expressions:
+                result = result | self._gens(expression)
+            return result
+        if isinstance(node, JsTaggedTemplateExpression):
+            return self._gens(node.tag) | self._gens(node.quasi)
+        return frozenset()
+
+    def _update_gen(self, update: JsUpdateExpression) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The binding an increment or decrement leaves written when the expression completes normally.
+
+        Neither spelling is mode-dependent the way a bare store is. `X++` reads `X` before it writes
+        it, so a run that got past the read had the name already, in strict code as much as in
+        sloppy; and a member update through this realm&#39;s global object reads `undefined` off a
+        missing property and stores the result, which creates it.
+        &#34;&#34;&#34;
+        target = strip_parens(update.argument)
+        if isinstance(target, JsIdentifier):
+            binding = self.model.resolve(target)
+            if binding is None or id(binding) not in self._tracked:
+                return frozenset()
+            return frozenset({binding})
+        if isinstance(target, JsMemberExpression):
+            return self._member_target_gen(target)
+        return frozenset()
+
+    def _target_gen(self, assignment: JsAssignmentExpression) -&gt; frozenset[Binding]:
+        target = strip_parens(assignment.left)
+        if isinstance(target, JsIdentifier):
+            binding = self.model.resolve(target)
+            if binding is None or id(binding) not in self._tracked:
+                return frozenset()
+            if assignment.operator != &#39;=&#39;:
+                return frozenset({binding})
+            return self._bare_target_gen(target, binding)
+        if isinstance(target, JsMemberExpression):
+            if assignment.operator in _LOGICAL_ASSIGNMENT:
+                return frozenset()
+            return self._member_target_gen(target)
+        if isinstance(target, (JsArrayPattern, JsObjectPattern)):
+            return self._pattern_target_gen(target)
+        return frozenset()
+
+    def _bare_target_gen(self, target: JsIdentifier, binding: Binding) -&gt; frozenset[Binding]:
+        if self._module or strict_mode_at(target):
+            return frozenset()
+        return frozenset({binding})
+
+    def _pattern_target_gen(self, pattern: Node | None) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The tracked bindings a destructuring assignment writes when it completes normally, which is
+        every target the pattern holds however deep: an iteration or a property read that throws
+        does so before the statement completes, and a default only replaces the value assigned, so a
+        normal completion has assigned them all. A default&#39;s own expression runs conditionally and
+        contributes nothing here; it is not a target. A nested pattern is read in both the pattern
+        and the expression spelling, because the parser converts only the positions the grammar
+        forces and leaves a pattern in an object property&#39;s value written as the expression it
+        lexed.
+        &#34;&#34;&#34;
+        target = strip_parens(pattern) if pattern is not None else None
+        if isinstance(target, JsIdentifier):
+            binding = self.model.resolve(target)
+            if binding is None or id(binding) not in self._tracked:
+                return frozenset()
+            return self._bare_target_gen(target, binding)
+        if isinstance(target, JsMemberExpression):
+            return self._member_target_gen(target)
+        if isinstance(target, JsAssignmentPattern):
+            return self._pattern_target_gen(target.left)
+        if isinstance(target, (JsRestElement, JsSpreadElement)):
+            return self._pattern_target_gen(target.argument)
+        if isinstance(target, (JsArrayPattern, JsArrayExpression)):
+            result: frozenset[Binding] = frozenset()
+            for element in target.elements:
+                if element is not None:
+                    result = result | self._pattern_target_gen(element)
+            return result
+        if isinstance(target, (JsObjectPattern, JsObjectExpression)):
+            result = frozenset()
+            for prop in target.properties:
+                if isinstance(prop, JsProperty):
+                    result = result | self._pattern_target_gen(prop.value)
+                elif isinstance(prop, (JsRestElement, JsSpreadElement)):
+                    result = result | self._pattern_target_gen(prop.argument)
+            return result
+        return frozenset()
+
+    def _member_target_gen(self, target: JsMemberExpression) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The tracked binding a member write to *target* creates the property of, which is one only
+        where the base names *this* realm&#39;s global object: `top` and `frames` name another
+        document&#39;s and create nothing a bare name in this file reads.
+        &#34;&#34;&#34;
+        base = strip_parens(target.object) if target.object is not None else None
+        if isinstance(base, JsIdentifier) and base.name in _OTHER_REALM_ALIASES:
+            return frozenset()
+        name = self.model.global_alias_member_name(target, module_scope=self._module)
+        if name is None:
+            return frozenset()
+        binding = self._by_name.get(name)
+        if binding is None:
+            return frozenset()
+        return frozenset({binding})
+
+    @staticmethod
+    def _chain_short_circuits(callee: Node | None) -&gt; bool:
+        cursor = callee
+        while cursor is not None:
+            if isinstance(cursor, JsParenthesizedExpression):
+                cursor = cursor.expression
+                continue
+            if isinstance(cursor, (JsMemberExpression, JsCallExpression)):
+                if getattr(cursor, &#39;optional&#39;, False):
+                    return True
+                cursor = cursor.object if isinstance(cursor, JsMemberExpression) else cursor.callee
+                continue
+            return False
+        return False
+
+    def _callee_summary(self, call: JsCallExpression) -&gt; frozenset[Binding]:
+        callee = strip_parens(call.callee) if call.callee is not None else None
+        function: Node | None = None
+        if isinstance(callee, FUNCTION_NODES):
+            function = callee
+        elif isinstance(callee, JsIdentifier):
+            binding = self.model.resolve(callee)
+            if binding is None or binding.dynamic_refs:
+                return frozenset()
+            function = self.model.singular_value(binding)
+        if function is None or not isinstance(function, FUNCTION_NODES):
+            return frozenset()
+        if wraps_return(function):
+            return frozenset()
+        return self._summaries.get(id(function), frozenset())
+
+
+def build_definite_assignment(
+    model: SemanticModel,
+    control_flow: ControlFlowModel | None = None,
+    *,
+    module_scope: bool = False,
+    host_entrypoint: Callable[[str], bool] | None = None,
+) -&gt; DefiniteAssignmentModel:
+    &#34;&#34;&#34;
+    Build the `DefiniteAssignmentModel` for *model*&#39;s script.
+    &#34;&#34;&#34;
+    return DefiniteAssignmentModel(
+        model,
+        control_flow,
+        module_scope=module_scope,
+        host_entrypoint=host_entrypoint,
+    )</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.assignment.build_definite_assignment"><code class="name flex">
+<span>def <span class="ident">build_definite_assignment</span></span>(<span>model, control_flow=None, *, module_scope=False, host_entrypoint=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build the <code><a title="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel" href="#refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel">DefiniteAssignmentModel</a></code> for <em>model</em>'s script.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/assignment.py#L718-L733" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_definite_assignment(
+    model: SemanticModel,
+    control_flow: ControlFlowModel | None = None,
+    *,
+    module_scope: bool = False,
+    host_entrypoint: Callable[[str], bool] | None = None,
+) -&gt; DefiniteAssignmentModel:
+    &#34;&#34;&#34;
+    Build the `DefiniteAssignmentModel` for *model*&#39;s script.
+    &#34;&#34;&#34;
+    return DefiniteAssignmentModel(
+        model,
+        control_flow,
+        module_scope=module_scope,
+        host_entrypoint=host_entrypoint,
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel"><code class="flex name class">
+<span>class <span class="ident">DefiniteAssignmentModel</span></span>
+<span>(</span><span>model, control_flow=None, *, module_scope=False, host_entrypoint=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Build over a <code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel" href="model.html#refinery.lib.scripts.js.analysis.model.SemanticModel">SemanticModel</a></code> and its
+<code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></code>; query with <code>definitely_assigned_at</code>.
+<em>module_scope</em> is the run's execution model: under the module reading every region is strict and
+a top-level <code>this</code> does not denote the global object, so no bare write and no <code>this</code> member
+write establishes anything.
+<em>host_entrypoint</em> names the top-level functions the analyst declared a host invokes by name;
+such a function has a call site outside the file, so the meet over its spelled call sites does
+not bound its entry facts and it gets none.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/assignment.py#L117-L715" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class DefiniteAssignmentModel:
+    &#34;&#34;&#34;
+    Build over a `refinery.lib.scripts.js.analysis.model.SemanticModel` and its
+    `refinery.lib.scripts.analysis.cfg.ControlFlowModel`; query with `definitely_assigned_at`.
+    *module_scope* is the run&#39;s execution model: under the module reading every region is strict and
+    a top-level `this` does not denote the global object, so no bare write and no `this` member
+    write establishes anything.
+    *host_entrypoint* names the top-level functions the analyst declared a host invokes by name;
+    such a function has a call site outside the file, so the meet over its spelled call sites does
+    not bound its entry facts and it gets none.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        model: SemanticModel,
+        control_flow: ControlFlowModel | None = None,
+        *,
+        module_scope: bool = False,
+        host_entrypoint: Callable[[str], bool] | None = None,
+    ):
+        self.model = model
+        self._flow = control_flow if control_flow is not None else build_control_flow_model(model.root)
+        self._module = module_scope
+        self._host_entrypoint = host_entrypoint
+        self._tracked: dict[int, Binding] = {}
+        self._by_name: dict[str, Binding] = {}
+        for binding in model.root_scope.bindings.values():
+            if binding.kind is not BindingKind.IMPLICIT_GLOBAL:
+                continue
+            if not binding.writes:
+                continue
+            if binding.reachable_through_a_handed_object:
+                continue
+            if model.reflection_can_reach(binding):
+                continue
+            self._tracked[id(binding)] = binding
+            self._by_name[binding.name] = binding
+        self._in_facts: dict[int, frozenset[Binding]] = {}
+        self._parts: dict[int, list[Node]] = {}
+        self._effects: dict[int, tuple[frozenset[Binding], bool]] = {}
+        self._summaries: dict[int, frozenset[Binding]] = {}
+        if self._tracked:
+            self._untrack_deleted()
+        if self._tracked:
+            self._solve()
+
+    def definitely_assigned_at(self, binding: Binding | None, reference: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a write to *binding* has certainly completed before *reference* is evaluated. Facts
+        hold at statement entry, so a write in *reference*&#39;s own statement never vouches for it.
+        &#34;&#34;&#34;
+        if binding is None or id(binding) not in self._tracked:
+            return False
+        located = self._flow.locate(reference)
+        if located is None:
+            return False
+        _, node = located
+        return binding in self._in_facts.get(id(node), frozenset())
+
+    def read_established(self, node: JsIdentifier) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a write creating the name *node* spells has certainly completed before the read is
+        evaluated, so it cannot be the read that raises a `ReferenceError`.
+
+        The one composition every consumer of this model shares, and it lives here because the
+        binding a reference resolves to must come from the same semantic model the facts were built
+        over: a caller resolving against a model built after a rewrite would hand over a binding
+        this one has never seen, and every answer would silently be `False`.
+        &#34;&#34;&#34;
+        return self.definitely_assigned_at(self.model.resolve(node), node)
+
+    def _untrack_deleted(self):
+        &#34;&#34;&#34;
+        Remove from tracking every binding a `delete` in the program could unbind, wherever that
+        delete stands — a called function, a getter a member read fires, an iterator a spread drives.
+        Untracking is what makes the remaining facts monotone without enumerating who runs the code.
+
+        A member delete is keyed on the property name it spells rather than on whether the base is a
+        spelling of the global object, because the base need not be one to *be* one: `globalThis
+        .window.X` and any name a call was handed the object under both delete the global the file
+        reads bare. Untracking a name because some object&#39;s property of that name is deleted only
+        forgets a fact; trusting a base the scan cannot read is what deletes a read. The one base
+        that does not untrack is one that provably cannot be the global object — a literal, an
+        allocation, or a name pinned to one — and a computed key on any other base untracks
+        everything, since the key it deletes is one no scan can read.
+        &#34;&#34;&#34;
+        deleted: set[int] = set()
+        for node in self.model.root.walk():
+            if not isinstance(node, JsUnaryExpression) or node.operator != &#39;delete&#39;:
+                continue
+            target = strip_parens(node.operand) if node.operand is not None else None
+            if isinstance(target, JsIdentifier):
+                resolved = self.model.resolve(target)
+                if resolved is not None:
+                    deleted.add(id(resolved))
+                    continue
+                self._tracked = {}
+                return
+            if isinstance(target, JsMemberExpression):
+                if self._cannot_be_the_global_object(target.object):
+                    continue
+                name = self.model.global_alias_member_name(target, module_scope=self._module)
+                if name is None:
+                    name = member_property_name(target)
+                if name is not None:
+                    named = self._by_name.get(name)
+                    if named is not None:
+                        deleted.add(id(named))
+                    continue
+                self._tracked = {}
+                return
+            self._tracked = {}
+            return
+        if deleted:
+            self._tracked = {
+                key: binding for key, binding in self._tracked.items() if key not in deleted
+            }
+            self._by_name = {binding.name: binding for binding in self._tracked.values()}
+
+    def _cannot_be_the_global_object(self, base: Node | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the base of a member delete provably does not denote the global object, so the
+        delete cannot unbind a name the file reads bare: a literal, an allocation, a function, or a
+        name pinned to one of those. Everything else — an unresolved name, a multi-valued binding,
+        any expression the scan cannot evaluate — may be the object under another spelling and
+        answers `False`.
+        &#34;&#34;&#34;
+        value = strip_parens(base) if base is not None else None
+        if isinstance(value, JsIdentifier):
+            binding = self.model.resolve(value)
+            if binding is None or binding.dynamic_refs:
+                return False
+            pinned = self.model.singular_value(binding)
+            value = strip_parens(pinned) if pinned is not None else None
+        if isinstance(value, FUNCTION_NODES):
+            return True
+        return isinstance(value, (
+            JsArrayExpression,
+            JsObjectExpression,
+            JsStringLiteral,
+            JsNumericLiteral,
+            JsBooleanLiteral,
+            JsNullLiteral,
+            JsTemplateLiteral,
+        ))
+
+    def _solve(self):
+        &#34;&#34;&#34;
+        Grow the call summaries and entry facts to a least fixpoint, re-solving every graph under
+        the previous round&#39;s answers until neither moves.
+
+        Only the summary a call contributes changes between rounds, so the parts each node
+        evaluates and whether it can throw are settled once, before the first round: both are read
+        off the tree alone, and the tree does not move while a model is being built.
+        &#34;&#34;&#34;
+        graphs = list(self._flow.graphs.values())
+        elements = [
+            (graph, node) for graph in graphs for node in graph.nodes if node.element is not None
+        ]
+        for graph, node in elements:
+            assert node.element is not None
+            self._parts[id(node)] = self._evaluated_parts(graph, node.element)
+        cannot_throw = {
+            id(node): self._parts_cannot_throw(node.element, self._parts[id(node)])
+            for graph, node in elements
+        }
+        summaries: dict[int, frozenset[Binding]] = {}
+        entries: dict[int, frozenset[Binding]] = {}
+        while True:
+            self._summaries = summaries
+            self._effects = {
+                id(node): (self._parts_gen(self._parts[id(node)]), cannot_throw[id(node)])
+                for _, node in elements
+            }
+            facts: dict[int, frozenset[Binding]] = {}
+            for graph in graphs:
+                self._solve_graph(graph, entries.get(id(graph.owner), frozenset()), facts)
+            new_summaries = {id(graph.owner): self._exit_summary(graph, facts) for graph in graphs}
+            new_entries = {id(graph.owner): self._entry_fact(graph, facts) for graph in graphs}
+            if new_summaries == summaries and new_entries == entries:
+                self._in_facts = facts
+                return
+            summaries = new_summaries
+            entries = new_entries
+
+    def _edge_out(
+        self,
+        graph: ControlFlowGraph,
+        pred: CfgNode,
+        target: CfgNode,
+        state: dict[int, frozenset[Binding]],
+    ) -&gt; frozenset[Binding]:
+        gen, cannot_throw = self._effects.get(id(pred), (frozenset(), False))
+        out = state[id(pred)]
+        if cannot_throw or not graph.raise_taken(pred, target):
+            out = out | gen
+        return out
+
+    def _solve_graph(
+        self, graph: ControlFlowGraph, entry: frozenset[Binding], facts: dict[int, frozenset[Binding]],
+    ):
+        top = frozenset(self._tracked.values())
+        state: dict[int, frozenset[Binding]] = {id(node): top for node in graph.nodes}
+        state[id(graph.entry)] = entry
+        reachable: set[int] = set()
+        frontier = [graph.entry]
+        while frontier:
+            node = frontier.pop()
+            if id(node) in reachable:
+                continue
+            reachable.add(id(node))
+            frontier.extend(node.successors)
+        changed = True
+        while changed:
+            changed = False
+            for node in graph.nodes:
+                if node is graph.entry:
+                    continue
+                met: frozenset[Binding] | None = None
+                for pred in node.predecessors:
+                    out = self._edge_out(graph, pred, node, state)
+                    met = out if met is None else met &amp; out
+                if met is None:
+                    met = frozenset()
+                if met != state[id(node)]:
+                    state[id(node)] = met
+                    changed = True
+        for node in graph.nodes:
+            facts[id(node)] = state[id(node)] if id(node) in reachable else frozenset()
+
+    def _exit_summary(
+        self, graph: ControlFlowGraph, facts: dict[int, frozenset[Binding]],
+    ) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        What a call of this body&#39;s owner adds to the facts of a caller whose call completed
+        normally: the meet over every predecessor of the exit a normal completion may leave through,
+        minus the entry fact the caller already held.
+
+        A predecessor is dropped from the meet only where no normal completion reaches the exit from
+        it, which is a statement that never completes at all rather than an edge kind. An edge kind
+        is recorded per *pair* of nodes and two edges between one pair collapse to a single entry
+        (`refinery.lib.scripts.analysis.cfg.CfgBuilder.kind_edge`), so an empty `finally` — whose
+        entry both falls through to whatever follows the statement and carries the unwinding edge
+        outward — reads as raise-taken while the normal path runs through it. Dropping it took the
+        meet over the other predecessors alone and claimed a write the normal path never performed.
+        &#34;&#34;&#34;
+        met: frozenset[Binding] | None = None
+        for pred in graph.exit.predecessors:
+            if not self._completes_normally(pred) and graph.raise_taken(pred, graph.exit):
+                continue
+            out = self._edge_out(graph, pred, graph.exit, facts)
+            met = out if met is None else met &amp; out
+        entry = facts.get(id(graph.entry), frozenset())
+        return frozenset() if met is None else frozenset(met - entry)
+
+    @staticmethod
+    def _completes_normally(node: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the statement *node* stands for may complete normally at all. A `throw` never does,
+        so the edge it draws to the exit stands for the one run it has and carries no fact about a
+        normal return; every other node reaches the exit on some run that completed.
+        &#34;&#34;&#34;
+        return not isinstance(node.element, JsThrowStatement)
+
+    def _entry_fact(
+        self, graph: ControlFlowGraph, facts: dict[int, frozenset[Binding]],
+    ) -&gt; frozenset[Binding]:
+        owner = graph.owner
+        if not isinstance(owner, FUNCTION_NODES):
+            return frozenset()
+        if is_generator_function(owner):
+            return frozenset()
+        binding = self.model.invocation_binding(owner)
+        if binding is None:
+            immediate = self._immediate_call_of(owner)
+            if immediate is None:
+                return frozenset()
+            return self._fact_at(immediate, facts)
+        if binding.dynamic_refs or not self.model.binding_pinned_to(binding, owner):
+            return frozenset()
+        if self._host_entrypoint is not None and self._host_entrypoint(binding.name):
+            return frozenset()
+        met: frozenset[Binding] | None = None
+        for read in binding.reads:
+            if not is_invocation_target(read):
+                return frozenset()
+            met_here = self._fact_at(read, facts)
+            met = met_here if met is None else met &amp; met_here
+        return met or frozenset()
+
+    def _fact_at(self, site: Node, facts: dict[int, frozenset[Binding]]) -&gt; frozenset[Binding]:
+        located = self._flow.locate(site)
+        if located is None:
+            return frozenset()
+        return facts.get(id(located[1]), frozenset())
+
+    @staticmethod
+    def _immediate_call_of(function: Node) -&gt; JsCallExpression | None:
+        &#34;&#34;&#34;
+        The call that invokes *function* where it is written as that call&#39;s own callee, so its
+        every invocation is the one site — an immediately-invoked function expression. `None` for
+        any other position, a tagged template among them, whose call node the fact is not read off.
+        &#34;&#34;&#34;
+        governor = enclosing_operator(function)
+        if isinstance(governor, JsCallExpression) and is_invocation_target(function):
+            return governor
+        return None
+
+    def _evaluated_parts(self, graph: ControlFlowGraph, element: Node) -&gt; list[Node]:
+        &#34;&#34;&#34;
+        The expressions the control-flow node for *element* evaluates itself: the element where it is
+        an expression handed its own node (a loop header&#39;s init, test, or update), a declaration&#39;s
+        initializers, a `for-in`/`for-of` head&#39;s subject, and otherwise every child that is neither a
+        function body nor a statement owned by another node.
+        &#34;&#34;&#34;
+        if (
+            not isinstance(element, _OWN_HEAD_NODES)
+            and not self._is_statement(element)
+        ):
+            return [element]
+        if isinstance(element, JsVariableDeclaration):
+            inits: list[Node] = []
+            for declarator in element.declarations:
+                init = getattr(declarator, &#39;init&#39;, None)
+                if init is not None:
+                    inits.append(init)
+            return inits
+        if isinstance(element, (JsForInStatement, JsForOfStatement)):
+            subject = getattr(element, &#39;right&#39;, None)
+            return [subject] if subject is not None else []
+        parts: list[Node] = []
+        for child in element.children():
+            if isinstance(child, FUNCTION_NODES):
+                continue
+            if graph.node_of(child) is not None:
+                continue
+            parts.append(child)
+        return parts
+
+    @staticmethod
+    def _is_statement(element: Node) -&gt; bool:
+        return isinstance(element, Statement)
+
+    def _parts_gen(self, parts: list[Node]) -&gt; frozenset[Binding]:
+        gens: set[Binding] = set()
+        for part in parts:
+            gens |= self._gens(part)
+        return frozenset(gens)
+
+    def _parts_cannot_throw(self, element: Node | None, parts: list[Node]) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the statement *element* provably throws on no run at all, so that its raising edge
+        is never taken and may carry its gens vacuously.
+
+        A declaration is more than the initializers `_evaluated_parts` reports: each declarator
+        binds its target once its initializer is evaluated, and binding a pattern destructures,
+        which is what `var {a} = null, b = (X = 1);` throws at — after `null` was read and before
+        the second declarator ran. So a declarator naming anything but a plain identifier answers
+        `False` here, while the gen it contributes on the *normal* edge stays what it was.
+        &#34;&#34;&#34;
+        if isinstance(element, JsVariableDeclaration):
+            if not all(
+                isinstance(declarator.id, JsIdentifier) for declarator in element.declarations
+            ):
+                return False
+        elif not isinstance(element, JsExpressionStatement):
+            return False
+        return all(self._cannot_throw(part) for part in parts)
+
+    def _cannot_throw(self, node: Node | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether evaluating *node* is guaranteed not to throw, so its statement&#39;s raising edge is never
+        taken and may vacuously carry its gens. Deliberately minimal: literals, function values, a
+        sloppy bare store of such a value to a tracked name, and a member store of one through this
+        realm&#39;s global object — the shapes a `try`-wrapped establishment scaffold is written in.
+        &#34;&#34;&#34;
+        if node is None:
+            return False
+        if isinstance(node, (
+            JsStringLiteral,
+            JsNumericLiteral,
+            JsBooleanLiteral,
+            JsNullLiteral,
+        )):
+            return True
+        if isinstance(node, FUNCTION_NODES):
+            return True
+        if isinstance(node, JsParenthesizedExpression):
+            return node.expression is not None and self._cannot_throw(node.expression)
+        if isinstance(node, JsSequenceExpression):
+            return all(self._cannot_throw(part) for part in node.expressions)
+        if isinstance(node, JsAssignmentExpression):
+            if node.operator != &#39;=&#39;:
+                return False
+            if not isinstance(strip_parens(node.left), JsIdentifier):
+                return False
+            if not self._target_gen(node):
+                return False
+            return self._cannot_throw(node.right)
+        return False
+
+    def _gens(self, node: Node | None) -&gt; frozenset[Binding]:
+        if node is None:
+            return frozenset()
+        if isinstance(node, JsParenthesizedExpression):
+            return self._gens(node.expression)
+        if isinstance(node, JsAssignmentExpression):
+            if node.operator in _LOGICAL_ASSIGNMENT:
+                return self._target_gen(node)
+            return self._gens(node.right) | self._target_gen(node)
+        if isinstance(node, JsUpdateExpression):
+            return self._gens(node.argument) | self._update_gen(node)
+        if isinstance(node, JsLogicalExpression):
+            return self._gens(node.left)
+        if isinstance(node, JsConditionalExpression):
+            return self._gens(node.test) | (
+                self._gens(node.consequent) &amp; self._gens(node.alternate))
+        if isinstance(node, JsBinaryExpression):
+            return self._gens(node.left) | self._gens(node.right)
+        if isinstance(node, JsSequenceExpression):
+            result: frozenset[Binding] = frozenset()
+            for expression in node.expressions:
+                result = result | self._gens(expression)
+            return result
+        if isinstance(node, JsUnaryExpression):
+            if node.operator == &#39;delete&#39;:
+                return frozenset()
+            return self._gens(node.operand)
+        if isinstance(node, JsMemberExpression):
+            result = self._gens(node.object)
+            if node.optional or self._chain_short_circuits(node.object):
+                return result
+            if node.computed:
+                result = result | self._gens(node.property)
+            return result
+        if isinstance(node, (JsCallExpression, JsNewExpression)):
+            result = self._gens(node.callee)
+            if getattr(node, &#39;optional&#39;, False) or self._chain_short_circuits(node.callee):
+                return result
+            for argument in node.arguments:
+                result = result | self._gens(argument)
+            if isinstance(node, JsCallExpression):
+                result = result | self._callee_summary(node)
+            return result
+        if isinstance(node, JsSpreadElement):
+            return self._gens(node.argument)
+        if isinstance(node, JsArrayExpression):
+            result = frozenset()
+            for element in node.elements:
+                if element is not None:
+                    result = result | self._gens(element)
+            return result
+        if isinstance(node, JsObjectExpression):
+            result = frozenset()
+            for prop in node.properties:
+                if isinstance(prop, JsProperty):
+                    if prop.computed and prop.key is not None:
+                        result = result | self._gens(prop.key)
+                    if prop.value is not None and not isinstance(prop.value, FUNCTION_NODES):
+                        result = result | self._gens(prop.value)
+                elif isinstance(prop, JsSpreadElement):
+                    result = result | self._gens(prop.argument)
+            return result
+        if isinstance(node, JsTemplateLiteral):
+            result = frozenset()
+            for expression in node.expressions:
+                result = result | self._gens(expression)
+            return result
+        if isinstance(node, JsTaggedTemplateExpression):
+            return self._gens(node.tag) | self._gens(node.quasi)
+        return frozenset()
+
+    def _update_gen(self, update: JsUpdateExpression) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The binding an increment or decrement leaves written when the expression completes normally.
+
+        Neither spelling is mode-dependent the way a bare store is. `X++` reads `X` before it writes
+        it, so a run that got past the read had the name already, in strict code as much as in
+        sloppy; and a member update through this realm&#39;s global object reads `undefined` off a
+        missing property and stores the result, which creates it.
+        &#34;&#34;&#34;
+        target = strip_parens(update.argument)
+        if isinstance(target, JsIdentifier):
+            binding = self.model.resolve(target)
+            if binding is None or id(binding) not in self._tracked:
+                return frozenset()
+            return frozenset({binding})
+        if isinstance(target, JsMemberExpression):
+            return self._member_target_gen(target)
+        return frozenset()
+
+    def _target_gen(self, assignment: JsAssignmentExpression) -&gt; frozenset[Binding]:
+        target = strip_parens(assignment.left)
+        if isinstance(target, JsIdentifier):
+            binding = self.model.resolve(target)
+            if binding is None or id(binding) not in self._tracked:
+                return frozenset()
+            if assignment.operator != &#39;=&#39;:
+                return frozenset({binding})
+            return self._bare_target_gen(target, binding)
+        if isinstance(target, JsMemberExpression):
+            if assignment.operator in _LOGICAL_ASSIGNMENT:
+                return frozenset()
+            return self._member_target_gen(target)
+        if isinstance(target, (JsArrayPattern, JsObjectPattern)):
+            return self._pattern_target_gen(target)
+        return frozenset()
+
+    def _bare_target_gen(self, target: JsIdentifier, binding: Binding) -&gt; frozenset[Binding]:
+        if self._module or strict_mode_at(target):
+            return frozenset()
+        return frozenset({binding})
+
+    def _pattern_target_gen(self, pattern: Node | None) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The tracked bindings a destructuring assignment writes when it completes normally, which is
+        every target the pattern holds however deep: an iteration or a property read that throws
+        does so before the statement completes, and a default only replaces the value assigned, so a
+        normal completion has assigned them all. A default&#39;s own expression runs conditionally and
+        contributes nothing here; it is not a target. A nested pattern is read in both the pattern
+        and the expression spelling, because the parser converts only the positions the grammar
+        forces and leaves a pattern in an object property&#39;s value written as the expression it
+        lexed.
+        &#34;&#34;&#34;
+        target = strip_parens(pattern) if pattern is not None else None
+        if isinstance(target, JsIdentifier):
+            binding = self.model.resolve(target)
+            if binding is None or id(binding) not in self._tracked:
+                return frozenset()
+            return self._bare_target_gen(target, binding)
+        if isinstance(target, JsMemberExpression):
+            return self._member_target_gen(target)
+        if isinstance(target, JsAssignmentPattern):
+            return self._pattern_target_gen(target.left)
+        if isinstance(target, (JsRestElement, JsSpreadElement)):
+            return self._pattern_target_gen(target.argument)
+        if isinstance(target, (JsArrayPattern, JsArrayExpression)):
+            result: frozenset[Binding] = frozenset()
+            for element in target.elements:
+                if element is not None:
+                    result = result | self._pattern_target_gen(element)
+            return result
+        if isinstance(target, (JsObjectPattern, JsObjectExpression)):
+            result = frozenset()
+            for prop in target.properties:
+                if isinstance(prop, JsProperty):
+                    result = result | self._pattern_target_gen(prop.value)
+                elif isinstance(prop, (JsRestElement, JsSpreadElement)):
+                    result = result | self._pattern_target_gen(prop.argument)
+            return result
+        return frozenset()
+
+    def _member_target_gen(self, target: JsMemberExpression) -&gt; frozenset[Binding]:
+        &#34;&#34;&#34;
+        The tracked binding a member write to *target* creates the property of, which is one only
+        where the base names *this* realm&#39;s global object: `top` and `frames` name another
+        document&#39;s and create nothing a bare name in this file reads.
+        &#34;&#34;&#34;
+        base = strip_parens(target.object) if target.object is not None else None
+        if isinstance(base, JsIdentifier) and base.name in _OTHER_REALM_ALIASES:
+            return frozenset()
+        name = self.model.global_alias_member_name(target, module_scope=self._module)
+        if name is None:
+            return frozenset()
+        binding = self._by_name.get(name)
+        if binding is None:
+            return frozenset()
+        return frozenset({binding})
+
+    @staticmethod
+    def _chain_short_circuits(callee: Node | None) -&gt; bool:
+        cursor = callee
+        while cursor is not None:
+            if isinstance(cursor, JsParenthesizedExpression):
+                cursor = cursor.expression
+                continue
+            if isinstance(cursor, (JsMemberExpression, JsCallExpression)):
+                if getattr(cursor, &#39;optional&#39;, False):
+                    return True
+                cursor = cursor.object if isinstance(cursor, JsMemberExpression) else cursor.callee
+                continue
+            return False
+        return False
+
+    def _callee_summary(self, call: JsCallExpression) -&gt; frozenset[Binding]:
+        callee = strip_parens(call.callee) if call.callee is not None else None
+        function: Node | None = None
+        if isinstance(callee, FUNCTION_NODES):
+            function = callee
+        elif isinstance(callee, JsIdentifier):
+            binding = self.model.resolve(callee)
+            if binding is None or binding.dynamic_refs:
+                return frozenset()
+            function = self.model.singular_value(binding)
+        if function is None or not isinstance(function, FUNCTION_NODES):
+            return frozenset()
+        if wraps_return(function):
+            return frozenset()
+        return self._summaries.get(id(function), frozenset())</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel.definitely_assigned_at"><code class="name flex">
+<span>def <span class="ident">definitely_assigned_at</span></span>(<span>self, binding, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a write to <em>binding</em> has certainly completed before <em>reference</em> is evaluated. Facts
+hold at statement entry, so a write in <em>reference</em>'s own statement never vouches for it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/assignment.py#L163-L174" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def definitely_assigned_at(self, binding: Binding | None, reference: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a write to *binding* has certainly completed before *reference* is evaluated. Facts
+    hold at statement entry, so a write in *reference*&#39;s own statement never vouches for it.
+    &#34;&#34;&#34;
+    if binding is None or id(binding) not in self._tracked:
+        return False
+    located = self._flow.locate(reference)
+    if located is None:
+        return False
+    _, node = located
+    return binding in self._in_facts.get(id(node), frozenset())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel.read_established"><code class="name flex">
+<span>def <span class="ident">read_established</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a write creating the name <em>node</em> spells has certainly completed before the read is
+evaluated, so it cannot be the read that raises a <code>ReferenceError</code>.</p>
+<p>The one composition every consumer of this model shares, and it lives here because the
+binding a reference resolves to must come from the same semantic model the facts were built
+over: a caller resolving against a model built after a rewrite would hand over a binding
+this one has never seen, and every answer would silently be <code>False</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/60dd1301ddbccbe2e54f1bac1b6a80ea3d93c125/refinery/lib/scripts/js/analysis/assignment.py#L176-L186" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def read_established(self, node: JsIdentifier) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a write creating the name *node* spells has certainly completed before the read is
+    evaluated, so it cannot be the read that raises a `ReferenceError`.
+
+    The one composition every consumer of this model shares, and it lives here because the
+    binding a reference resolves to must come from the same semantic model the facts were built
+    over: a caller resolving against a model built after a rewrite would hand over a binding
+    this one has never seen, and every answer would silently be `False`.
+    &#34;&#34;&#34;
+    return self.definitely_assigned_at(self.model.resolve(node), node)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.assignment.build_definite_assignment" href="#refinery.lib.scripts.js.analysis.assignment.build_definite_assignment">build_definite_assignment</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel" href="#refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel">DefiniteAssignmentModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel.definitely_assigned_at" href="#refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel.definitely_assigned_at">definitely_assigned_at</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel.read_established" href="#refinery.lib.scripts.js.analysis.assignment.DefiniteAssignmentModel.read_established">read_established</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
