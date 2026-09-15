@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.errorstate documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.errorstate</code></h1>
+</header>
+<section id="section-intro">
+<p>Whether a raise's error record is read back where the raise is observed.</p>
+<p>Windows PowerShell 5.1 records every terminating error in <code>$Error</code> (and its stack trace in
+<code>$StackTrace</code>) session-globally, whether or not a handler ran, so a script can read it and branch on
+a raise having happened. Deleting such a raise as junk empties a record a later read observes. This
+model is the peer of <code><a title="refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow">Ps1OutputFlow</a></code> for that channel: it
+composes the read sites <code><a title="refinery.lib.scripts.ps1.analysis.commands" href="commands.html">refinery.lib.scripts.ps1.analysis.commands</a></code> names with the positional
+reachability <code><a title="refinery.lib.scripts.ps1.analysis.dominance" href="dominance.html">refinery.lib.scripts.ps1.analysis.dominance</a></code> owns.</p>
+<p>The record has two channels. <code>$Error</code>/<code>$StackTrace</code> persist, so a read observes a raise from
+anywhere forward-reachable before it (<code>persistent_read_observed_after</code>). <code>$?</code> resets on every
+statement, so only a read running immediately after a write observes it; the model owns both
+directions — the fold <code>success_flag_at</code> removes a decidable reader, the veto
+<code>success_flag_write_observed</code> keeps a writer a live reader observes.</p>
+<p>Only nodes the control-flow graph places are read; a read spelled in string text has no position and
+stays with the whole-script scan. Reachability is taken under
+<code><a title="refinery.lib.scripts.analysis.cfg.Projection.MAY" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.Projection.MAY">Projection.MAY</a></code>, keeping a read the raise reaches only on a later
+loop iteration. Every query is deny-side toward keeping: an unplaceable or unreachable node answers
+<code>False</code>, withholding a removal rather than performing one.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L1-L293" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Whether a raise&#39;s error record is read back where the raise is observed.
+
+Windows PowerShell 5.1 records every terminating error in `$Error` (and its stack trace in
+`$StackTrace`) session-globally, whether or not a handler ran, so a script can read it and branch on
+a raise having happened. Deleting such a raise as junk empties a record a later read observes. This
+model is the peer of `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow` for that channel: it
+composes the read sites `refinery.lib.scripts.ps1.analysis.commands` names with the positional
+reachability `refinery.lib.scripts.ps1.analysis.dominance` owns.
+
+The record has two channels. `$Error`/`$StackTrace` persist, so a read observes a raise from
+anywhere forward-reachable before it (`persistent_read_observed_after`). `$?` resets on every
+statement, so only a read running immediately after a write observes it; the model owns both
+directions — the fold `success_flag_at` removes a decidable reader, the veto
+`success_flag_write_observed` keeps a writer a live reader observes.
+
+Only nodes the control-flow graph places are read; a read spelled in string text has no position and
+stays with the whole-script scan. Reachability is taken under
+`refinery.lib.scripts.analysis.cfg.Projection.MAY`, keeping a read the raise reaches only on a later
+loop iteration. Every query is deny-side toward keeping: an unplaceable or unreachable node answers
+`False`, withholding a removal rather than performing one.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.analysis.cfg import CfgEdge, CfgNode, ControlFlowModel, Projection
+from refinery.lib.scripts.analysis.dominance import DominatorModel
+from refinery.lib.scripts.analysis.reaching import ReachabilityQuery
+from refinery.lib.scripts.ps1.analysis.commands import Ps1ErrorReadSites
+from refinery.lib.scripts.ps1.analysis.values import statement_certainly_throws
+from refinery.lib.scripts.ps1.model import Ps1ExpressionStatement, Ps1Script
+
+
+class Ps1ErrorStateReach:
+    &#34;&#34;&#34;
+    Where each read of the error record stands, and whether one is reachable after a raise. Built by
+    `build_error_state_reach` and held in a `refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache`
+    slot. With no sites it answers `False` everywhere.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        persistent_by_graph: dict[int, tuple[CfgNode, ...]],
+        success_sites: frozenset[Node],
+        control_flow: ControlFlowModel,
+        reach: ReachabilityQuery,
+    ):
+        &#34;&#34;&#34;
+        `persistent_by_graph` groups each placed `$Error`/`$StackTrace` read by the graph that
+        places it, so a read in a separate body is never mistaken for one reachable in the raiser&#39;s
+        own. `reach` is the shared `Projection.MAY` forward-reachability memo. `success_sites` is the
+        `$?` channel, placed and queried by the reset rule below.
+        &#34;&#34;&#34;
+        self._persistent_by_graph = persistent_by_graph
+        self._success_sites = success_sites
+        self._control_flow = control_flow
+        self._reach = reach
+        self._success_site_nodes_by_graph: dict[int, set[int]] | None = None
+
+    def persistent_read_observed_after(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a read of the persistent error record can run after evaluating *node*, so a raise it
+        leaves in the record would be observed and deleting *node* is not meaning-preserving. True
+        when a placed `$Error`/`$StackTrace` read other than *node*&#39;s own is forward-reachable from
+        *node* in its graph.
+
+        Reachability is per body: a read the graphs place in a different body — a called function, an
+        inline or pipeline scriptblock, a dot-sourced block — is not seen, an interprocedural limit
+        the fixture tests track by xfail. A *node* placed nowhere answers `False`.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return False
+        graph, start = located
+        sites = self._persistent_by_graph.get(id(graph))
+        if not sites:
+            return False
+        forward = self._reach.reachable(start, forward=True)
+        return any(site is not start and id(site) in forward for site in sites)
+
+    def success_flag_at(self, node: Node) -&gt; bool | None:
+        &#34;&#34;&#34;
+        The value of `$?` where *node* reads it, or `None` when it cannot be decided. `$?` is
+        `$true` after a statement succeeds and `$false` after one fails, and resets on every
+        statement, so its value is a property of what runs immediately before the read — a
+        positional query, not a fixed truth value in `is_truthy`.
+
+        **True** — the read is the first thing the script does: it stands in the root script&#39;s own
+        graph, no element-bearing statement precedes it over plain control flow, control reaches it
+        from the entry, the script runs no `param`/`dynamicparam` computation that could fail before
+        the body, and it is not inside the `process` block (which the engine re-enters once per
+        pipeline input).
+
+        **False** — every nearest statement running immediately before the read is certain to raise
+        (`statement_certainly_throws`) and no plain path reaches the read from the entry. A `throw`
+        or Stop-disposition failure draws no plain edge onward, so it is never such a predecessor,
+        and the entry guard keeps a live loop condition — reached both from the entry and a raising
+        back-edge — out of this pole.
+
+        **None** — anything else: an unprovable predecessor, a mix of raising and non-raising
+        predecessors, a live loop back-edge, a handler-body entry, or a non-root body.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return None
+        graph, placed = located
+        elements, reaches_entry = self._nearest_normal_element_predecessors(placed)
+        if (
+            not elements
+            and reaches_entry
+            and isinstance(graph.owner, Ps1Script)
+            and not self._root_may_fail_before_body(graph.owner)
+            and not self._reads_at_the_top_of_a_rerunning_block(node, graph.owner)
+        ):
+            return True
+        if (
+            elements
+            and not reaches_entry
+            and all(statement_certainly_throws(element) for element in elements)
+        ):
+            return False
+        return None
+
+    @staticmethod
+    def writes_success_flag(statement: Node | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *statement* is certain to reset `$?` — the KILL set of the success-flag register.
+        True for a leaf `refinery.lib.scripts.ps1.model.Ps1ExpressionStatement` (an assignment,
+        discard, command, pipeline, or bare expression); False, transparent, for every compound
+        statement, a function definition, and the synthetic entry and exit, each of which leaves `$?`
+        untouched on at least one path.
+
+        Reading a writer as transparent over-keeps (withholds a removal); reading a transparent
+        statement as a writer deletes a live write. Only a leaf expression-statement, a writer on
+        every path, blocks or gates the reaching-definition walk.
+        &#34;&#34;&#34;
+        return isinstance(statement, Ps1ExpressionStatement)
+
+    def success_flag_write_observed(self, statement: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether removing *statement* would change the value a live `$?` read sees — the success-flag
+        removal veto, the reset-channel peer of `persistent_read_observed_after` and dual of the
+        `success_flag_at` fold. `$?` resets on every statement, so a write is observed only by a read
+        that runs before the next writer overwrites it.
+
+        *statement* must itself write `$?` (`writes_success_flag`); a transparent one is never kept
+        here. Observed means a placed `$?` read is reachable over plain
+        (`refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL`) control flow through only transparent
+        nodes, blocking at any other writer since it overwrites `$?` first. A script that reads `$?`
+        nowhere short-circuits. Deny-side toward keeping: an unplaceable or unreachable *statement*
+        answers `False`.
+        &#34;&#34;&#34;
+        if not self.writes_success_flag(statement):
+            return False
+        sites_by_graph = self._success_site_nodes()
+        if not sites_by_graph:
+            return False
+        located = self._control_flow.locate(statement)
+        if located is None:
+            return False
+        graph, start = located
+        sites = sites_by_graph.get(id(graph))
+        if not sites:
+            return False
+        seen: set[int] = {id(start)}
+        stack: list[CfgNode] = [start]
+        while stack:
+            current = stack.pop()
+            for successor in current.successors:
+                if id(successor) in seen:
+                    continue
+                if graph.edge_kind(current, successor) is not CfgEdge.NORMAL:
+                    continue
+                seen.add(id(successor))
+                if id(successor) in sites:
+                    return True
+                if self.writes_success_flag(successor.element):
+                    continue
+                stack.append(successor)
+        return False
+
+    def _success_site_nodes(self) -&gt; dict[int, set[int]]:
+        &#34;&#34;&#34;
+        The graph nodes that place a `$?` read, grouped by graph and memoized so the veto&#39;s cost is
+        the walk rather than a per-proposal re-scan. A read placed nowhere is dropped; an empty map
+        short-circuits a script that reads `$?` nowhere.
+        &#34;&#34;&#34;
+        if self._success_site_nodes_by_graph is None:
+            by_graph: dict[int, set[int]] = {}
+            for site in self._success_sites:
+                located = self._control_flow.locate(site)
+                if located is not None:
+                    graph, node = located
+                    by_graph.setdefault(id(graph), set()).add(id(node))
+            self._success_site_nodes_by_graph = by_graph
+        return self._success_site_nodes_by_graph
+
+    @staticmethod
+    def _nearest_normal_element_predecessors(node: CfgNode) -&gt; tuple[list[Node], bool]:
+        &#34;&#34;&#34;
+        The AST elements of the nearest statements running immediately before *node* over plain
+        (`refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL`) control flow, and whether the backward
+        walk reaches the graph&#39;s synthetic entry. The walk steps through element-less synthetic nodes
+        to the first real predecessor on each path. Resumption edges are not `NORMAL`, so it never
+        leaves plain control flow into a handler body.
+        &#34;&#34;&#34;
+        graph = node.graph
+        entry = graph.entry
+        elements: list[Node] = []
+        seen_elements: set[int] = set()
+        reaches_entry = False
+        seen: set[int] = {id(node)}
+        stack: list[CfgNode] = [node]
+        while stack:
+            current = stack.pop()
+            for pred in current.predecessors:
+                if id(pred) in seen:
+                    continue
+                if graph.edge_kind(pred, current) is not CfgEdge.NORMAL:
+                    continue
+                seen.add(id(pred))
+                if pred is entry:
+                    reaches_entry = True
+                elif pred.element is None:
+                    stack.append(pred)
+                elif id(pred.element) not in seen_elements:
+                    seen_elements.add(id(pred.element))
+                    elements.append(pred.element)
+        return elements, reaches_entry
+
+    @staticmethod
+    def _root_may_fail_before_body(script: Ps1Script) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the root script runs a `param` default, a parameter attribute, or a `dynamicparam`
+        block before its first body statement — any of which can raise, which 5.1 records in `$?` as
+        a failure the body&#39;s first read observes, so the &#34;first statement is `$true`&#34; rule stands
+        down wherever such a pre-body computation is present.
+        &#34;&#34;&#34;
+        param_block = script.param_block
+        if param_block is not None:
+            if param_block.attributes:
+                return True
+            for parameter in param_block.parameters:
+                if parameter.default_value is not None or parameter.attributes:
+                    return True
+        dynamicparam = script.dynamicparam_block
+        return dynamicparam is not None and bool(dynamicparam.body)
+
+    @staticmethod
+    def _reads_at_the_top_of_a_rerunning_block(node: Node, script: Ps1Script) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *node* is written inside *script*&#39;s `process` block, which the engine re-enters once
+        per pipeline input with `$?` persisting across entries — so a read at its top is not the
+        first thing the script does, and the `$true` verdict stands down. The graph sequences the
+        block once and draws no per-input back-edge, so this lexical check supplies the distinction
+        it does not.
+        &#34;&#34;&#34;
+        process = script.process_block
+        if process is None:
+            return False
+        cursor: Node | None = node
+        while cursor is not None and cursor is not script:
+            if cursor is process:
+                return True
+            cursor = cursor.parent
+        return False
+
+
+def build_error_state_reach(
+    read_sites: Ps1ErrorReadSites,
+    control_flow: ControlFlowModel,
+    dominance: DominatorModel,
+) -&gt; Ps1ErrorStateReach:
+    &#34;&#34;&#34;
+    Place every persistent error-record read into the graph that evaluates it, grouped by graph so a
+    raiser in a body that places none is answered without a flood. A read placed nowhere is dropped:
+    it has no position to order against a raise, and the whole-script scan already keeps the shapes
+    with no node. `read_sites.success` — the `$?` channel — is passed through unplaced for the reset
+    rule to place and query. Reachability uses the shared, memoized `Projection.MAY` forward walk of
+    `refinery.lib.scripts.analysis.reaching.ReachabilityQuery`.
+    &#34;&#34;&#34;
+    by_graph: dict[int, list[CfgNode]] = {}
+    for site in read_sites.persistent:
+        located = control_flow.locate(site)
+        if located is not None:
+            graph, node = located
+            by_graph.setdefault(id(graph), []).append(node)
+    return Ps1ErrorStateReach(
+        {graph_id: tuple(nodes) for graph_id, nodes in by_graph.items()},
+        read_sites.success,
+        control_flow,
+        ReachabilityQuery(dominance, Projection.MAY),
+    )</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.errorstate.build_error_state_reach"><code class="name flex">
+<span>def <span class="ident">build_error_state_reach</span></span>(<span>read_sites, control_flow, dominance)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Place every persistent error-record read into the graph that evaluates it, grouped by graph so a
+raiser in a body that places none is answered without a flood. A read placed nowhere is dropped:
+it has no position to order against a raise, and the whole-script scan already keeps the shapes
+with no node. <code>read_sites.success</code> — the <code>$?</code> channel — is passed through unplaced for the reset
+rule to place and query. Reachability uses the shared, memoized <code>Projection.MAY</code> forward walk of
+<code><a title="refinery.lib.scripts.analysis.reaching.ReachabilityQuery" href="../../analysis/reaching.html#refinery.lib.scripts.analysis.reaching.ReachabilityQuery">ReachabilityQuery</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L269-L293" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_error_state_reach(
+    read_sites: Ps1ErrorReadSites,
+    control_flow: ControlFlowModel,
+    dominance: DominatorModel,
+) -&gt; Ps1ErrorStateReach:
+    &#34;&#34;&#34;
+    Place every persistent error-record read into the graph that evaluates it, grouped by graph so a
+    raiser in a body that places none is answered without a flood. A read placed nowhere is dropped:
+    it has no position to order against a raise, and the whole-script scan already keeps the shapes
+    with no node. `read_sites.success` — the `$?` channel — is passed through unplaced for the reset
+    rule to place and query. Reachability uses the shared, memoized `Projection.MAY` forward walk of
+    `refinery.lib.scripts.analysis.reaching.ReachabilityQuery`.
+    &#34;&#34;&#34;
+    by_graph: dict[int, list[CfgNode]] = {}
+    for site in read_sites.persistent:
+        located = control_flow.locate(site)
+        if located is not None:
+            graph, node = located
+            by_graph.setdefault(id(graph), []).append(node)
+    return Ps1ErrorStateReach(
+        {graph_id: tuple(nodes) for graph_id, nodes in by_graph.items()},
+        read_sites.success,
+        control_flow,
+        ReachabilityQuery(dominance, Projection.MAY),
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach"><code class="flex name class">
+<span>class <span class="ident">Ps1ErrorStateReach</span></span>
+<span>(</span><span>persistent_by_graph, success_sites, control_flow, reach)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Where each read of the error record stands, and whether one is reachable after a raise. Built by
+<code><a title="refinery.lib.scripts.ps1.analysis.errorstate.build_error_state_reach" href="#refinery.lib.scripts.ps1.analysis.errorstate.build_error_state_reach">build_error_state_reach()</a></code> and held in a <code><a title="refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache" href="cache.html#refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache">Ps1ModelCache</a></code>
+slot. With no sites it answers <code>False</code> everywhere.</p>
+<p><code>persistent_by_graph</code> groups each placed <code>$Error</code>/<code>$StackTrace</code> read by the graph that
+places it, so a read in a separate body is never mistaken for one reachable in the raiser's
+own. <code>reach</code> is the shared <code>Projection.MAY</code> forward-reachability memo. <code>success_sites</code> is the
+<code>$?</code> channel, placed and queried by the reset rule below.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L34-L266" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1ErrorStateReach:
+    &#34;&#34;&#34;
+    Where each read of the error record stands, and whether one is reachable after a raise. Built by
+    `build_error_state_reach` and held in a `refinery.lib.scripts.ps1.analysis.cache.Ps1ModelCache`
+    slot. With no sites it answers `False` everywhere.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        persistent_by_graph: dict[int, tuple[CfgNode, ...]],
+        success_sites: frozenset[Node],
+        control_flow: ControlFlowModel,
+        reach: ReachabilityQuery,
+    ):
+        &#34;&#34;&#34;
+        `persistent_by_graph` groups each placed `$Error`/`$StackTrace` read by the graph that
+        places it, so a read in a separate body is never mistaken for one reachable in the raiser&#39;s
+        own. `reach` is the shared `Projection.MAY` forward-reachability memo. `success_sites` is the
+        `$?` channel, placed and queried by the reset rule below.
+        &#34;&#34;&#34;
+        self._persistent_by_graph = persistent_by_graph
+        self._success_sites = success_sites
+        self._control_flow = control_flow
+        self._reach = reach
+        self._success_site_nodes_by_graph: dict[int, set[int]] | None = None
+
+    def persistent_read_observed_after(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a read of the persistent error record can run after evaluating *node*, so a raise it
+        leaves in the record would be observed and deleting *node* is not meaning-preserving. True
+        when a placed `$Error`/`$StackTrace` read other than *node*&#39;s own is forward-reachable from
+        *node* in its graph.
+
+        Reachability is per body: a read the graphs place in a different body — a called function, an
+        inline or pipeline scriptblock, a dot-sourced block — is not seen, an interprocedural limit
+        the fixture tests track by xfail. A *node* placed nowhere answers `False`.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return False
+        graph, start = located
+        sites = self._persistent_by_graph.get(id(graph))
+        if not sites:
+            return False
+        forward = self._reach.reachable(start, forward=True)
+        return any(site is not start and id(site) in forward for site in sites)
+
+    def success_flag_at(self, node: Node) -&gt; bool | None:
+        &#34;&#34;&#34;
+        The value of `$?` where *node* reads it, or `None` when it cannot be decided. `$?` is
+        `$true` after a statement succeeds and `$false` after one fails, and resets on every
+        statement, so its value is a property of what runs immediately before the read — a
+        positional query, not a fixed truth value in `is_truthy`.
+
+        **True** — the read is the first thing the script does: it stands in the root script&#39;s own
+        graph, no element-bearing statement precedes it over plain control flow, control reaches it
+        from the entry, the script runs no `param`/`dynamicparam` computation that could fail before
+        the body, and it is not inside the `process` block (which the engine re-enters once per
+        pipeline input).
+
+        **False** — every nearest statement running immediately before the read is certain to raise
+        (`statement_certainly_throws`) and no plain path reaches the read from the entry. A `throw`
+        or Stop-disposition failure draws no plain edge onward, so it is never such a predecessor,
+        and the entry guard keeps a live loop condition — reached both from the entry and a raising
+        back-edge — out of this pole.
+
+        **None** — anything else: an unprovable predecessor, a mix of raising and non-raising
+        predecessors, a live loop back-edge, a handler-body entry, or a non-root body.
+        &#34;&#34;&#34;
+        located = self._control_flow.locate(node)
+        if located is None:
+            return None
+        graph, placed = located
+        elements, reaches_entry = self._nearest_normal_element_predecessors(placed)
+        if (
+            not elements
+            and reaches_entry
+            and isinstance(graph.owner, Ps1Script)
+            and not self._root_may_fail_before_body(graph.owner)
+            and not self._reads_at_the_top_of_a_rerunning_block(node, graph.owner)
+        ):
+            return True
+        if (
+            elements
+            and not reaches_entry
+            and all(statement_certainly_throws(element) for element in elements)
+        ):
+            return False
+        return None
+
+    @staticmethod
+    def writes_success_flag(statement: Node | None) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *statement* is certain to reset `$?` — the KILL set of the success-flag register.
+        True for a leaf `refinery.lib.scripts.ps1.model.Ps1ExpressionStatement` (an assignment,
+        discard, command, pipeline, or bare expression); False, transparent, for every compound
+        statement, a function definition, and the synthetic entry and exit, each of which leaves `$?`
+        untouched on at least one path.
+
+        Reading a writer as transparent over-keeps (withholds a removal); reading a transparent
+        statement as a writer deletes a live write. Only a leaf expression-statement, a writer on
+        every path, blocks or gates the reaching-definition walk.
+        &#34;&#34;&#34;
+        return isinstance(statement, Ps1ExpressionStatement)
+
+    def success_flag_write_observed(self, statement: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether removing *statement* would change the value a live `$?` read sees — the success-flag
+        removal veto, the reset-channel peer of `persistent_read_observed_after` and dual of the
+        `success_flag_at` fold. `$?` resets on every statement, so a write is observed only by a read
+        that runs before the next writer overwrites it.
+
+        *statement* must itself write `$?` (`writes_success_flag`); a transparent one is never kept
+        here. Observed means a placed `$?` read is reachable over plain
+        (`refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL`) control flow through only transparent
+        nodes, blocking at any other writer since it overwrites `$?` first. A script that reads `$?`
+        nowhere short-circuits. Deny-side toward keeping: an unplaceable or unreachable *statement*
+        answers `False`.
+        &#34;&#34;&#34;
+        if not self.writes_success_flag(statement):
+            return False
+        sites_by_graph = self._success_site_nodes()
+        if not sites_by_graph:
+            return False
+        located = self._control_flow.locate(statement)
+        if located is None:
+            return False
+        graph, start = located
+        sites = sites_by_graph.get(id(graph))
+        if not sites:
+            return False
+        seen: set[int] = {id(start)}
+        stack: list[CfgNode] = [start]
+        while stack:
+            current = stack.pop()
+            for successor in current.successors:
+                if id(successor) in seen:
+                    continue
+                if graph.edge_kind(current, successor) is not CfgEdge.NORMAL:
+                    continue
+                seen.add(id(successor))
+                if id(successor) in sites:
+                    return True
+                if self.writes_success_flag(successor.element):
+                    continue
+                stack.append(successor)
+        return False
+
+    def _success_site_nodes(self) -&gt; dict[int, set[int]]:
+        &#34;&#34;&#34;
+        The graph nodes that place a `$?` read, grouped by graph and memoized so the veto&#39;s cost is
+        the walk rather than a per-proposal re-scan. A read placed nowhere is dropped; an empty map
+        short-circuits a script that reads `$?` nowhere.
+        &#34;&#34;&#34;
+        if self._success_site_nodes_by_graph is None:
+            by_graph: dict[int, set[int]] = {}
+            for site in self._success_sites:
+                located = self._control_flow.locate(site)
+                if located is not None:
+                    graph, node = located
+                    by_graph.setdefault(id(graph), set()).add(id(node))
+            self._success_site_nodes_by_graph = by_graph
+        return self._success_site_nodes_by_graph
+
+    @staticmethod
+    def _nearest_normal_element_predecessors(node: CfgNode) -&gt; tuple[list[Node], bool]:
+        &#34;&#34;&#34;
+        The AST elements of the nearest statements running immediately before *node* over plain
+        (`refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL`) control flow, and whether the backward
+        walk reaches the graph&#39;s synthetic entry. The walk steps through element-less synthetic nodes
+        to the first real predecessor on each path. Resumption edges are not `NORMAL`, so it never
+        leaves plain control flow into a handler body.
+        &#34;&#34;&#34;
+        graph = node.graph
+        entry = graph.entry
+        elements: list[Node] = []
+        seen_elements: set[int] = set()
+        reaches_entry = False
+        seen: set[int] = {id(node)}
+        stack: list[CfgNode] = [node]
+        while stack:
+            current = stack.pop()
+            for pred in current.predecessors:
+                if id(pred) in seen:
+                    continue
+                if graph.edge_kind(pred, current) is not CfgEdge.NORMAL:
+                    continue
+                seen.add(id(pred))
+                if pred is entry:
+                    reaches_entry = True
+                elif pred.element is None:
+                    stack.append(pred)
+                elif id(pred.element) not in seen_elements:
+                    seen_elements.add(id(pred.element))
+                    elements.append(pred.element)
+        return elements, reaches_entry
+
+    @staticmethod
+    def _root_may_fail_before_body(script: Ps1Script) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the root script runs a `param` default, a parameter attribute, or a `dynamicparam`
+        block before its first body statement — any of which can raise, which 5.1 records in `$?` as
+        a failure the body&#39;s first read observes, so the &#34;first statement is `$true`&#34; rule stands
+        down wherever such a pre-body computation is present.
+        &#34;&#34;&#34;
+        param_block = script.param_block
+        if param_block is not None:
+            if param_block.attributes:
+                return True
+            for parameter in param_block.parameters:
+                if parameter.default_value is not None or parameter.attributes:
+                    return True
+        dynamicparam = script.dynamicparam_block
+        return dynamicparam is not None and bool(dynamicparam.body)
+
+    @staticmethod
+    def _reads_at_the_top_of_a_rerunning_block(node: Node, script: Ps1Script) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *node* is written inside *script*&#39;s `process` block, which the engine re-enters once
+        per pipeline input with `$?` persisting across entries — so a read at its top is not the
+        first thing the script does, and the `$true` verdict stands down. The graph sequences the
+        block once and draws no per-input back-edge, so this lexical check supplies the distinction
+        it does not.
+        &#34;&#34;&#34;
+        process = script.process_block
+        if process is None:
+            return False
+        cursor: Node | None = node
+        while cursor is not None and cursor is not script:
+            if cursor is process:
+                return True
+            cursor = cursor.parent
+        return False</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.writes_success_flag"><code class="name flex">
+<span>def <span class="ident">writes_success_flag</span></span>(<span>statement)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>statement</em> is certain to reset <code>$?</code> — the KILL set of the success-flag register.
+True for a leaf <code><a title="refinery.lib.scripts.ps1.model.Ps1ExpressionStatement" href="../model.html#refinery.lib.scripts.ps1.model.Ps1ExpressionStatement">Ps1ExpressionStatement</a></code> (an assignment,
+discard, command, pipeline, or bare expression); False, transparent, for every compound
+statement, a function definition, and the synthetic entry and exit, each of which leaves <code>$?</code>
+untouched on at least one path.</p>
+<p>Reading a writer as transparent over-keeps (withholds a removal); reading a transparent
+statement as a writer deletes a live write. Only a leaf expression-statement, a writer on
+every path, blocks or gates the reaching-definition walk.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L124-L137" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@staticmethod
+def writes_success_flag(statement: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *statement* is certain to reset `$?` — the KILL set of the success-flag register.
+    True for a leaf `refinery.lib.scripts.ps1.model.Ps1ExpressionStatement` (an assignment,
+    discard, command, pipeline, or bare expression); False, transparent, for every compound
+    statement, a function definition, and the synthetic entry and exit, each of which leaves `$?`
+    untouched on at least one path.
+
+    Reading a writer as transparent over-keeps (withholds a removal); reading a transparent
+    statement as a writer deletes a live write. Only a leaf expression-statement, a writer on
+    every path, blocks or gates the reaching-definition walk.
+    &#34;&#34;&#34;
+    return isinstance(statement, Ps1ExpressionStatement)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.persistent_read_observed_after"><code class="name flex">
+<span>def <span class="ident">persistent_read_observed_after</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a read of the persistent error record can run after evaluating <em>node</em>, so a raise it
+leaves in the record would be observed and deleting <em>node</em> is not meaning-preserving. True
+when a placed <code>$Error</code>/<code>$StackTrace</code> read other than <em>node</em>'s own is forward-reachable from
+<em>node</em> in its graph.</p>
+<p>Reachability is per body: a read the graphs place in a different body — a called function, an
+inline or pipeline scriptblock, a dot-sourced block — is not seen, an interprocedural limit
+the fixture tests track by xfail. A <em>node</em> placed nowhere answers <code>False</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L60-L79" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def persistent_read_observed_after(self, node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a read of the persistent error record can run after evaluating *node*, so a raise it
+    leaves in the record would be observed and deleting *node* is not meaning-preserving. True
+    when a placed `$Error`/`$StackTrace` read other than *node*&#39;s own is forward-reachable from
+    *node* in its graph.
+
+    Reachability is per body: a read the graphs place in a different body — a called function, an
+    inline or pipeline scriptblock, a dot-sourced block — is not seen, an interprocedural limit
+    the fixture tests track by xfail. A *node* placed nowhere answers `False`.
+    &#34;&#34;&#34;
+    located = self._control_flow.locate(node)
+    if located is None:
+        return False
+    graph, start = located
+    sites = self._persistent_by_graph.get(id(graph))
+    if not sites:
+        return False
+    forward = self._reach.reachable(start, forward=True)
+    return any(site is not start and id(site) in forward for site in sites)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.success_flag_at"><code class="name flex">
+<span>def <span class="ident">success_flag_at</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The value of <code>$?</code> where <em>node</em> reads it, or <code>None</code> when it cannot be decided. <code>$?</code> is
+<code>$true</code> after a statement succeeds and <code>$false</code> after one fails, and resets on every
+statement, so its value is a property of what runs immediately before the read — a
+positional query, not a fixed truth value in <code>is_truthy</code>.</p>
+<p><strong>True</strong> — the read is the first thing the script does: it stands in the root script's own
+graph, no element-bearing statement precedes it over plain control flow, control reaches it
+from the entry, the script runs no <code>param</code>/<code>dynamicparam</code> computation that could fail before
+the body, and it is not inside the <code>process</code> block (which the engine re-enters once per
+pipeline input).</p>
+<p><strong>False</strong> — every nearest statement running immediately before the read is certain to raise
+(<code>statement_certainly_throws</code>) and no plain path reaches the read from the entry. A <code>throw</code>
+or Stop-disposition failure draws no plain edge onward, so it is never such a predecessor,
+and the entry guard keeps a live loop condition — reached both from the entry and a raising
+back-edge — out of this pole.</p>
+<p><strong>None</strong> — anything else: an unprovable predecessor, a mix of raising and non-raising
+predecessors, a live loop back-edge, a handler-body entry, or a non-root body.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L81-L122" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def success_flag_at(self, node: Node) -&gt; bool | None:
+    &#34;&#34;&#34;
+    The value of `$?` where *node* reads it, or `None` when it cannot be decided. `$?` is
+    `$true` after a statement succeeds and `$false` after one fails, and resets on every
+    statement, so its value is a property of what runs immediately before the read — a
+    positional query, not a fixed truth value in `is_truthy`.
+
+    **True** — the read is the first thing the script does: it stands in the root script&#39;s own
+    graph, no element-bearing statement precedes it over plain control flow, control reaches it
+    from the entry, the script runs no `param`/`dynamicparam` computation that could fail before
+    the body, and it is not inside the `process` block (which the engine re-enters once per
+    pipeline input).
+
+    **False** — every nearest statement running immediately before the read is certain to raise
+    (`statement_certainly_throws`) and no plain path reaches the read from the entry. A `throw`
+    or Stop-disposition failure draws no plain edge onward, so it is never such a predecessor,
+    and the entry guard keeps a live loop condition — reached both from the entry and a raising
+    back-edge — out of this pole.
+
+    **None** — anything else: an unprovable predecessor, a mix of raising and non-raising
+    predecessors, a live loop back-edge, a handler-body entry, or a non-root body.
+    &#34;&#34;&#34;
+    located = self._control_flow.locate(node)
+    if located is None:
+        return None
+    graph, placed = located
+    elements, reaches_entry = self._nearest_normal_element_predecessors(placed)
+    if (
+        not elements
+        and reaches_entry
+        and isinstance(graph.owner, Ps1Script)
+        and not self._root_may_fail_before_body(graph.owner)
+        and not self._reads_at_the_top_of_a_rerunning_block(node, graph.owner)
+    ):
+        return True
+    if (
+        elements
+        and not reaches_entry
+        and all(statement_certainly_throws(element) for element in elements)
+    ):
+        return False
+    return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.success_flag_write_observed"><code class="name flex">
+<span>def <span class="ident">success_flag_write_observed</span></span>(<span>self, statement)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether removing <em>statement</em> would change the value a live <code>$?</code> read sees — the success-flag
+removal veto, the reset-channel peer of <code>persistent_read_observed_after</code> and dual of the
+<code>success_flag_at</code> fold. <code>$?</code> resets on every statement, so a write is observed only by a read
+that runs before the next writer overwrites it.</p>
+<p><em>statement</em> must itself write <code>$?</code> (<code>writes_success_flag</code>); a transparent one is never kept
+here. Observed means a placed <code>$?</code> read is reachable over plain
+(<code><a title="refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL">CfgEdge.NORMAL</a></code>) control flow through only transparent
+nodes, blocking at any other writer since it overwrites <code>$?</code> first. A script that reads <code>$?</code>
+nowhere short-circuits. Deny-side toward keeping: an unplaceable or unreachable <em>statement</em>
+answers <code>False</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/9a799a118b1f58c7a84dec12b3cd5dd262c41854/refinery/lib/scripts/ps1/analysis/errorstate.py#L139-L180" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def success_flag_write_observed(self, statement: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether removing *statement* would change the value a live `$?` read sees — the success-flag
+    removal veto, the reset-channel peer of `persistent_read_observed_after` and dual of the
+    `success_flag_at` fold. `$?` resets on every statement, so a write is observed only by a read
+    that runs before the next writer overwrites it.
+
+    *statement* must itself write `$?` (`writes_success_flag`); a transparent one is never kept
+    here. Observed means a placed `$?` read is reachable over plain
+    (`refinery.lib.scripts.analysis.cfg.CfgEdge.NORMAL`) control flow through only transparent
+    nodes, blocking at any other writer since it overwrites `$?` first. A script that reads `$?`
+    nowhere short-circuits. Deny-side toward keeping: an unplaceable or unreachable *statement*
+    answers `False`.
+    &#34;&#34;&#34;
+    if not self.writes_success_flag(statement):
+        return False
+    sites_by_graph = self._success_site_nodes()
+    if not sites_by_graph:
+        return False
+    located = self._control_flow.locate(statement)
+    if located is None:
+        return False
+    graph, start = located
+    sites = sites_by_graph.get(id(graph))
+    if not sites:
+        return False
+    seen: set[int] = {id(start)}
+    stack: list[CfgNode] = [start]
+    while stack:
+        current = stack.pop()
+        for successor in current.successors:
+            if id(successor) in seen:
+                continue
+            if graph.edge_kind(current, successor) is not CfgEdge.NORMAL:
+                continue
+            seen.add(id(successor))
+            if id(successor) in sites:
+                return True
+            if self.writes_success_flag(successor.element):
+                continue
+            stack.append(successor)
+    return False</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.errorstate.build_error_state_reach" href="#refinery.lib.scripts.ps1.analysis.errorstate.build_error_state_reach">build_error_state_reach</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach" href="#refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach">Ps1ErrorStateReach</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.writes_success_flag" href="#refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.writes_success_flag">writes_success_flag</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.persistent_read_observed_after" href="#refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.persistent_read_observed_after">persistent_read_observed_after</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.success_flag_at" href="#refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.success_flag_at">success_flag_at</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.success_flag_write_observed" href="#refinery.lib.scripts.ps1.analysis.errorstate.Ps1ErrorStateReach.success_flag_write_observed">success_flag_write_observed</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
