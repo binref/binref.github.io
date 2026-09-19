@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.analysis.environment documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.analysis.environment</code></h1>
+</header>
+<section id="section-intro">
+<p>The host environment a script is assumed to run in, and the set of global names that environment
+guarantees a bare read resolves rather than throwing a <code>ReferenceError</code>.</p>
+<p>A bare read of a name the program neither declares nor assigns reaches the host's global object. Which
+names are there is not a language fact but a host one: <code>window</code> exists in a browser and throws under
+Node, <code>global</code> the other way around. The deobfuscator's sound default asserts only what every host
+shares — <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code>, the names the ECMAScript specification mandates — and answers every other
+bare read may-throw, so no pass drops the <code>ReferenceError</code> an absent host raises. An analyst who knows
+where a sample runs pins the host with the <code>js</code> unit's <code>-e</code> switch, and the reads that host guarantees
+become certain, recovering the folds the sound default refuses.</p>
+<p>This module is the single datum those decisions read. <code><a title="refinery.lib.scripts.js.analysis.environment.HostEnvironment.provides" href="#refinery.lib.scripts.js.analysis.environment.HostEnvironment.provides">HostEnvironment.provides()</a></code> answers, from data
+alone, whether a host resolves a name; <code>SemanticModel.read_may_throw</code> is the one seam that consults it.
+The data is host-partitioned and, per host, built from the language floor (<code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code>) plus a
+conservative set of host-conditional globals: a name is listed only where its presence is certain, since
+under-listing costs at most a fold a wider table would recover while over-listing would drop a real
+throw. The <code>node</code> set was established by reading the globals out of Node v24 (benign introspection, no
+sample executed); the <code>browser</code> and <code>worker</code> sets are the web-platform globals every implementation of
+those scopes exposes.</p>
+<p>Each pinned host models its <em>current mainstream</em> version — the analyst asserting <code>-e node</code>/<code>-e browser</code>
+is asserting a present-day runtime, so recently standardized globals (<code>fetch</code>, <code>structuredClone</code>,
+<code>navigator</code> under Node) are treated as present; a sample targeting an older engine is not the case a pin
+serves. <code>worker</code> models a <em>dedicated</em> worker: its present set carries the dedicated-worker surface
+(<code>XMLHttpRequest</code>, the nested <code>Worker</code> constructor), which a service worker does not share, so <code>-e worker</code>
+is the pin for a dedicated worker rather than a service worker.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L1-L510" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The host environment a script is assumed to run in, and the set of global names that environment
+guarantees a bare read resolves rather than throwing a `ReferenceError`.
+
+A bare read of a name the program neither declares nor assigns reaches the host&#39;s global object. Which
+names are there is not a language fact but a host one: `window` exists in a browser and throws under
+Node, `global` the other way around. The deobfuscator&#39;s sound default asserts only what every host
+shares — `GUARANTEED_GLOBALS`, the names the ECMAScript specification mandates — and answers every other
+bare read may-throw, so no pass drops the `ReferenceError` an absent host raises. An analyst who knows
+where a sample runs pins the host with the `js` unit&#39;s `-e` switch, and the reads that host guarantees
+become certain, recovering the folds the sound default refuses.
+
+This module is the single datum those decisions read. `HostEnvironment.provides` answers, from data
+alone, whether a host resolves a name; `SemanticModel.read_may_throw` is the one seam that consults it.
+The data is host-partitioned and, per host, built from the language floor (`GUARANTEED_GLOBALS`) plus a
+conservative set of host-conditional globals: a name is listed only where its presence is certain, since
+under-listing costs at most a fold a wider table would recover while over-listing would drop a real
+throw. The `node` set was established by reading the globals out of Node v24 (benign introspection, no
+sample executed); the `browser` and `worker` sets are the web-platform globals every implementation of
+those scopes exposes.
+
+Each pinned host models its *current mainstream* version — the analyst asserting `-e node`/`-e browser`
+is asserting a present-day runtime, so recently standardized globals (`fetch`, `structuredClone`,
+`navigator` under Node) are treated as present; a sample targeting an older engine is not the case a pin
+serves. `worker` models a *dedicated* worker: its present set carries the dedicated-worker surface
+(`XMLHttpRequest`, the nested `Worker` constructor), which a service worker does not share, so `-e worker`
+is the pin for a dedicated worker rather than a service worker.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import enum
+
+from dataclasses import dataclass
+
+
+class Presence(enum.Enum):
+    &#34;&#34;&#34;
+    What a pinned host knows about whether a global name resolves. `PRESENT` and `ABSENT` are the two
+    certain answers a `typeof` fold may act on — present names fold to their type, absent names to
+    `&#39;undefined&#39;`; `UNKNOWN` means the host neither guarantees nor rules out the name, so a fold that
+    would assert either abstains. The default `universal` host answers `PRESENT` only for the language
+    floor and `UNKNOWN` for every other name, since some host defines it and some does not.
+    &#34;&#34;&#34;
+    PRESENT = &#39;present&#39;
+    ABSENT = &#39;absent&#39;
+    UNKNOWN = &#39;unknown&#39;
+
+
+GUARANTEED_GLOBAL_TYPEOF: dict[str, str] = {
+    &#39;globalThis&#39;: &#39;object&#39;,
+    &#39;NaN&#39;: &#39;number&#39;,
+    &#39;Infinity&#39;: &#39;number&#39;,
+    &#39;undefined&#39;: &#39;undefined&#39;,
+    &#39;eval&#39;: &#39;function&#39;,
+    &#39;isFinite&#39;: &#39;function&#39;,
+    &#39;isNaN&#39;: &#39;function&#39;,
+    &#39;parseFloat&#39;: &#39;function&#39;,
+    &#39;parseInt&#39;: &#39;function&#39;,
+    &#39;decodeURI&#39;: &#39;function&#39;,
+    &#39;decodeURIComponent&#39;: &#39;function&#39;,
+    &#39;encodeURI&#39;: &#39;function&#39;,
+    &#39;encodeURIComponent&#39;: &#39;function&#39;,
+    &#39;Object&#39;: &#39;function&#39;,
+    &#39;Function&#39;: &#39;function&#39;,
+    &#39;Boolean&#39;: &#39;function&#39;,
+    &#39;Symbol&#39;: &#39;function&#39;,
+    &#39;BigInt&#39;: &#39;function&#39;,
+    &#39;Error&#39;: &#39;function&#39;,
+    &#39;AggregateError&#39;: &#39;function&#39;,
+    &#39;EvalError&#39;: &#39;function&#39;,
+    &#39;RangeError&#39;: &#39;function&#39;,
+    &#39;ReferenceError&#39;: &#39;function&#39;,
+    &#39;SyntaxError&#39;: &#39;function&#39;,
+    &#39;TypeError&#39;: &#39;function&#39;,
+    &#39;URIError&#39;: &#39;function&#39;,
+    &#39;Number&#39;: &#39;function&#39;,
+    &#39;Math&#39;: &#39;object&#39;,
+    &#39;Date&#39;: &#39;function&#39;,
+    &#39;String&#39;: &#39;function&#39;,
+    &#39;RegExp&#39;: &#39;function&#39;,
+    &#39;Array&#39;: &#39;function&#39;,
+    &#39;Int8Array&#39;: &#39;function&#39;,
+    &#39;Uint8Array&#39;: &#39;function&#39;,
+    &#39;Uint8ClampedArray&#39;: &#39;function&#39;,
+    &#39;Int16Array&#39;: &#39;function&#39;,
+    &#39;Uint16Array&#39;: &#39;function&#39;,
+    &#39;Int32Array&#39;: &#39;function&#39;,
+    &#39;Uint32Array&#39;: &#39;function&#39;,
+    &#39;Float32Array&#39;: &#39;function&#39;,
+    &#39;Float64Array&#39;: &#39;function&#39;,
+    &#39;BigInt64Array&#39;: &#39;function&#39;,
+    &#39;BigUint64Array&#39;: &#39;function&#39;,
+    &#39;Map&#39;: &#39;function&#39;,
+    &#39;Set&#39;: &#39;function&#39;,
+    &#39;WeakMap&#39;: &#39;function&#39;,
+    &#39;WeakSet&#39;: &#39;function&#39;,
+    &#39;WeakRef&#39;: &#39;function&#39;,
+    &#39;FinalizationRegistry&#39;: &#39;function&#39;,
+    &#39;ArrayBuffer&#39;: &#39;function&#39;,
+    &#39;DataView&#39;: &#39;function&#39;,
+    &#39;JSON&#39;: &#39;object&#39;,
+    &#39;Promise&#39;: &#39;function&#39;,
+    &#39;Reflect&#39;: &#39;object&#39;,
+    &#39;Proxy&#39;: &#39;function&#39;,
+}
+&#34;&#34;&#34;
+Maps each `GUARANTEED_GLOBALS` name to the string its `typeof` yields. Because the name resolves in
+every host to a value of a fixed type — a constructor or built-in function (`&#39;function&#39;`), a namespace
+object such as `Math`/`JSON`/`Reflect` or `globalThis` itself (`&#39;object&#39;`), the two numeric constants
+(`&#39;number&#39;`), or `undefined` — the operator&#39;s result is host-independent, unlike a host-conditional
+alias (`window`, `self`, …) whose `typeof` is `&#39;undefined&#39;` where the host omits the name. This is what
+lets a simplification fold `typeof globalThis !== &#39;undefined&#39;` to `true` for a name it can prove
+pristine; the values were established under Node 24. `GUARANTEED_GLOBALS` is the key set of this map, so
+the two cannot drift.
+&#34;&#34;&#34;
+
+GUARANTEED_GLOBALS = frozenset(GUARANTEED_GLOBAL_TYPEOF)
+&#34;&#34;&#34;
+Names the ECMAScript specification mandates as properties of the global object and that every mainstream
+engine exposes unconditionally, so a bare read of one is guaranteed to resolve rather than throw a
+`ReferenceError`. This is an *existence* allowlist — distinct from the getter-purity and host-presence
+sets in `refinery.lib.scripts.js.analysis.effects` — used to decide whether `&lt;global-alias&gt;.name` may be
+collapsed to the bare `name` without turning the member read&#39;s `undefined` into a throw. It excludes host
+and alias names (`window`, `self`, `global`, `top`, `frames`, `console`, timers, `Buffer`, …) that are not
+universal, and `SharedArrayBuffer`/`Atomics`, which a conformant host may withhold outside a
+cross-origin-isolated context. `GUARANTEED_GLOBAL_TYPEOF` additionally records the `typeof` of each. It is
+the provide-set of the `UNIVERSAL` host and the language floor every pinned host builds on.
+&#34;&#34;&#34;
+
+UNIVERSAL_TYPEOF: dict[str, str] = {**GUARANTEED_GLOBAL_TYPEOF, &#39;escape&#39;: &#39;function&#39;, &#39;unescape&#39;: &#39;function&#39;}
+&#34;&#34;&#34;
+The `typeof` of every name whose result is the same in every host, so a `typeof` of one folds without a
+host pin. It is `GUARANTEED_GLOBAL_TYPEOF` plus `escape` and `unescape`, the Annex B pair every mainstream
+engine defines but the existence floor omits: their `typeof` is `&#39;function&#39;` everywhere even though a bare
+read of one is not part of the language-mandated `GUARANTEED_GLOBALS` set.
+&#34;&#34;&#34;
+
+_HOST_CONDITIONAL_TYPEOF: dict[str, str] = {
+    &#39;global&#39;: &#39;object&#39;,
+    &#39;process&#39;: &#39;object&#39;,
+    &#39;console&#39;: &#39;object&#39;,
+    &#39;window&#39;: &#39;object&#39;,
+    &#39;self&#39;: &#39;object&#39;,
+    &#39;top&#39;: &#39;object&#39;,
+    &#39;parent&#39;: &#39;object&#39;,
+    &#39;frames&#39;: &#39;object&#39;,
+    &#39;document&#39;: &#39;object&#39;,
+    &#39;location&#39;: &#39;object&#39;,
+    &#39;navigator&#39;: &#39;object&#39;,
+    &#39;history&#39;: &#39;object&#39;,
+    &#39;screen&#39;: &#39;object&#39;,
+    &#39;localStorage&#39;: &#39;object&#39;,
+    &#39;sessionStorage&#39;: &#39;object&#39;,
+    &#39;performance&#39;: &#39;object&#39;,
+    &#39;crypto&#39;: &#39;object&#39;,
+    &#39;Atomics&#39;: &#39;object&#39;,
+    &#39;WebAssembly&#39;: &#39;object&#39;,
+    &#39;Intl&#39;: &#39;object&#39;,
+    &#39;Buffer&#39;: &#39;function&#39;,
+    &#39;importScripts&#39;: &#39;function&#39;,
+    &#39;setTimeout&#39;: &#39;function&#39;,
+    &#39;setInterval&#39;: &#39;function&#39;,
+    &#39;setImmediate&#39;: &#39;function&#39;,
+    &#39;clearTimeout&#39;: &#39;function&#39;,
+    &#39;clearInterval&#39;: &#39;function&#39;,
+    &#39;clearImmediate&#39;: &#39;function&#39;,
+    &#39;queueMicrotask&#39;: &#39;function&#39;,
+    &#39;requestAnimationFrame&#39;: &#39;function&#39;,
+    &#39;cancelAnimationFrame&#39;: &#39;function&#39;,
+    &#39;btoa&#39;: &#39;function&#39;,
+    &#39;atob&#39;: &#39;function&#39;,
+    &#39;fetch&#39;: &#39;function&#39;,
+    &#39;structuredClone&#39;: &#39;function&#39;,
+    &#39;SharedArrayBuffer&#39;: &#39;function&#39;,
+    &#39;TextEncoder&#39;: &#39;function&#39;,
+    &#39;TextDecoder&#39;: &#39;function&#39;,
+    &#39;URL&#39;: &#39;function&#39;,
+    &#39;URLSearchParams&#39;: &#39;function&#39;,
+    &#39;XMLHttpRequest&#39;: &#39;function&#39;,
+    &#39;WebSocket&#39;: &#39;function&#39;,
+    &#39;Blob&#39;: &#39;function&#39;,
+    &#39;File&#39;: &#39;function&#39;,
+    &#39;FileReader&#39;: &#39;function&#39;,
+    &#39;FormData&#39;: &#39;function&#39;,
+    &#39;Headers&#39;: &#39;function&#39;,
+    &#39;Request&#39;: &#39;function&#39;,
+    &#39;Response&#39;: &#39;function&#39;,
+    &#39;Event&#39;: &#39;function&#39;,
+    &#39;CustomEvent&#39;: &#39;function&#39;,
+    &#39;MessageChannel&#39;: &#39;function&#39;,
+    &#39;AbortController&#39;: &#39;function&#39;,
+    &#39;Worker&#39;: &#39;function&#39;,
+    &#39;Image&#39;: &#39;function&#39;,
+    &#39;alert&#39;: &#39;function&#39;,
+    &#39;confirm&#39;: &#39;function&#39;,
+    &#39;prompt&#39;: &#39;function&#39;,
+}
+&#34;&#34;&#34;
+The `typeof` of each host-conditional global when the host defines it: a `typeof` of one folds only under
+a pin that answers `Presence.PRESENT` for it, to the string recorded here, or `Presence.ABSENT`, to
+`&#39;undefined&#39;`. A namespace or DOM object is `&#39;object&#39;`; a constructor, timer, or plain function is
+`&#39;function&#39;`. A present name absent from this map has an unrecorded type, so its `typeof` abstains rather
+than guess.
+&#34;&#34;&#34;
+
+_NODE_GLOBALS = frozenset({
+    &#39;global&#39;,
+    &#39;Buffer&#39;,
+    &#39;process&#39;,
+    &#39;navigator&#39;,
+    &#39;console&#39;,
+    &#39;setTimeout&#39;,
+    &#39;setInterval&#39;,
+    &#39;setImmediate&#39;,
+    &#39;clearTimeout&#39;,
+    &#39;clearInterval&#39;,
+    &#39;clearImmediate&#39;,
+    &#39;queueMicrotask&#39;,
+    &#39;TextEncoder&#39;,
+    &#39;TextDecoder&#39;,
+    &#39;atob&#39;,
+    &#39;btoa&#39;,
+    &#39;URL&#39;,
+    &#39;URLSearchParams&#39;,
+    &#39;fetch&#39;,
+    &#39;structuredClone&#39;,
+    &#39;performance&#39;,
+    &#39;crypto&#39;,
+    &#39;SharedArrayBuffer&#39;,
+    &#39;Atomics&#39;,
+    &#39;WebAssembly&#39;,
+    &#39;Intl&#39;,
+})
+&#34;&#34;&#34;
+Global names a current Node exposes beyond `GUARANTEED_GLOBALS`, read out of Node v24. `global` is Node&#39;s
+same-realm global-object alias. The CommonJS wrapper locals `require`, `module`, `exports`, `__dirname`,
+and `__filename` are deliberately absent: they are injected into a CommonJS file&#39;s function scope rather
+than being properties of the global object, and an ES module does not see them at all, so whether a bare
+read of one resolves is the module-versus-script question `DeobfuscationOptions.module` answers, not a
+host-existence one.
+&#34;&#34;&#34;
+
+_BROWSER_GLOBALS = frozenset({
+    &#39;window&#39;,
+    &#39;self&#39;,
+    &#39;top&#39;,
+    &#39;parent&#39;,
+    &#39;frames&#39;,
+    &#39;document&#39;,
+    &#39;location&#39;,
+    &#39;navigator&#39;,
+    &#39;history&#39;,
+    &#39;screen&#39;,
+    &#39;localStorage&#39;,
+    &#39;sessionStorage&#39;,
+    &#39;console&#39;,
+    &#39;alert&#39;,
+    &#39;confirm&#39;,
+    &#39;prompt&#39;,
+    &#39;setTimeout&#39;,
+    &#39;setInterval&#39;,
+    &#39;clearTimeout&#39;,
+    &#39;clearInterval&#39;,
+    &#39;requestAnimationFrame&#39;,
+    &#39;cancelAnimationFrame&#39;,
+    &#39;queueMicrotask&#39;,
+    &#39;fetch&#39;,
+    &#39;XMLHttpRequest&#39;,
+    &#39;WebSocket&#39;,
+    &#39;URL&#39;,
+    &#39;URLSearchParams&#39;,
+    &#39;btoa&#39;,
+    &#39;atob&#39;,
+    &#39;TextEncoder&#39;,
+    &#39;TextDecoder&#39;,
+    &#39;performance&#39;,
+    &#39;crypto&#39;,
+    &#39;structuredClone&#39;,
+    &#39;Blob&#39;,
+    &#39;File&#39;,
+    &#39;FileReader&#39;,
+    &#39;FormData&#39;,
+    &#39;Headers&#39;,
+    &#39;Request&#39;,
+    &#39;Response&#39;,
+    &#39;Event&#39;,
+    &#39;CustomEvent&#39;,
+    &#39;MessageChannel&#39;,
+    &#39;AbortController&#39;,
+    &#39;Worker&#39;,
+    &#39;Image&#39;,
+    &#39;Intl&#39;,
+    &#39;WebAssembly&#39;,
+})
+&#34;&#34;&#34;
+Global names a browser window exposes beyond `GUARANTEED_GLOBALS`. `window` and `self` are the same-realm
+aliases of the window&#39;s own global object; `top`, `parent`, and `frames` resolve too, but in a framed
+document they name another realm&#39;s global object, which is why the global-object finder keys its
+substitution to `refinery.lib.scripts.js.analysis.model.SAME_REALM_GLOBAL_OBJECT_ALIASES` — which admits
+`window` and `self` but not `top`, `parent`, or `frames` — rather than to mere existence. The set is
+conservative: a name is listed only where every current browser provides it.
+&#34;&#34;&#34;
+
+_WORKER_GLOBALS = frozenset({
+    &#39;self&#39;,
+    &#39;location&#39;,
+    &#39;navigator&#39;,
+    &#39;console&#39;,
+    &#39;setTimeout&#39;,
+    &#39;setInterval&#39;,
+    &#39;clearTimeout&#39;,
+    &#39;clearInterval&#39;,
+    &#39;queueMicrotask&#39;,
+    &#39;fetch&#39;,
+    &#39;XMLHttpRequest&#39;,
+    &#39;WebSocket&#39;,
+    &#39;URL&#39;,
+    &#39;URLSearchParams&#39;,
+    &#39;btoa&#39;,
+    &#39;atob&#39;,
+    &#39;TextEncoder&#39;,
+    &#39;TextDecoder&#39;,
+    &#39;performance&#39;,
+    &#39;crypto&#39;,
+    &#39;structuredClone&#39;,
+    &#39;Blob&#39;,
+    &#39;File&#39;,
+    &#39;FileReader&#39;,
+    &#39;FormData&#39;,
+    &#39;Headers&#39;,
+    &#39;Request&#39;,
+    &#39;Response&#39;,
+    &#39;Event&#39;,
+    &#39;CustomEvent&#39;,
+    &#39;MessageChannel&#39;,
+    &#39;AbortController&#39;,
+    &#39;Worker&#39;,
+    &#39;importScripts&#39;,
+    &#39;Intl&#39;,
+    &#39;WebAssembly&#39;,
+})
+&#34;&#34;&#34;
+Global names a worker global scope exposes beyond `GUARANTEED_GLOBALS`. `self` is the worker&#39;s own
+same-realm global-object alias; the window-only names `window`, `top`, `parent`, `frames`, `document`,
+and the DOM and storage surface are absent, because a worker has no document and no window to frame.
+&#34;&#34;&#34;
+
+_NODE_ABSENT = frozenset({
+    &#39;window&#39;,
+    &#39;self&#39;,
+    &#39;top&#39;,
+    &#39;parent&#39;,
+    &#39;frames&#39;,
+    &#39;document&#39;,
+    &#39;location&#39;,
+    &#39;history&#39;,
+    &#39;screen&#39;,
+    &#39;localStorage&#39;,
+    &#39;sessionStorage&#39;,
+    &#39;alert&#39;,
+    &#39;confirm&#39;,
+    &#39;prompt&#39;,
+    &#39;XMLHttpRequest&#39;,
+    &#39;requestAnimationFrame&#39;,
+    &#39;Image&#39;,
+})
+&#34;&#34;&#34;
+Well-known browser globals a bare read of which is certain to throw under Node, read out of Node v24 as
+`typeof` `&#39;undefined&#39;`. `navigator` is deliberately absent from this set: Node exposes it, so it is a
+present name, not an absent one — the trap a `typeof` fold must not fall into. The set is used only to fold
+`typeof &lt;name&gt;` to `&#39;undefined&#39;` under `-e node`; a name neither provided nor listed here stays unknown.
+&#34;&#34;&#34;
+
+_BROWSER_ABSENT = frozenset({
+    &#39;global&#39;,
+    &#39;Buffer&#39;,
+    &#39;process&#39;,
+    &#39;require&#39;,
+    &#39;module&#39;,
+    &#39;exports&#39;,
+    &#39;__dirname&#39;,
+    &#39;__filename&#39;,
+    &#39;setImmediate&#39;,
+    &#39;clearImmediate&#39;,
+    &#39;importScripts&#39;,
+})
+&#34;&#34;&#34;
+The Node and worker globals a browser window is certain to lack. These are the names that separate a
+Node target from a browser one, so `typeof global`/`typeof Buffer`/`typeof require` fold to `&#39;undefined&#39;`
+under `-e browser`.
+&#34;&#34;&#34;
+
+_WORKER_ABSENT = _BROWSER_ABSENT - frozenset({&#39;importScripts&#39;}) | frozenset({
+    &#39;window&#39;,
+    &#39;top&#39;,
+    &#39;parent&#39;,
+    &#39;frames&#39;,
+    &#39;document&#39;,
+    &#39;history&#39;,
+    &#39;screen&#39;,
+    &#39;localStorage&#39;,
+    &#39;sessionStorage&#39;,
+    &#39;alert&#39;,
+    &#39;confirm&#39;,
+    &#39;prompt&#39;,
+    &#39;Image&#39;,
+})
+&#34;&#34;&#34;
+The window-only and Node-only globals a dedicated worker global scope is certain to lack: it has no
+document and no window to frame, and it is not Node. `importScripts` is a worker global, so it is excluded
+from the Node/browser-absent base this builds on. `requestAnimationFrame` is deliberately *not* listed: a
+dedicated worker exposes it through the `AnimationFrameProvider` mixin, so it is left `UNKNOWN` rather than
+asserted absent — which would fold `typeof requestAnimationFrame` to `&#39;undefined&#39;` where the host in fact
+yields `&#39;function&#39;`.
+&#34;&#34;&#34;
+
+
+@dataclass(frozen=True)
+class _EnvironmentSpec:
+    &#34;&#34;&#34;
+    The existence answer for one host: *provided* is every name a bare read resolves in it, and
+    *mandated* is the subset the language guarantees, which the delete guard never retracts. A
+    host-conditional global is a configurable, deletable property of the global object, so a program
+    that deletes one makes a later bare read of it throw; a language-mandated name is treated as present
+    regardless, preserving the sound default&#39;s behavior exactly where the host adds nothing.
+    &#34;&#34;&#34;
+    provided: frozenset[str]
+    mandated: frozenset[str]
+    absent: frozenset[str] = frozenset()
+
+    def provides(self, name: str) -&gt; bool:
+        return name in self.provided
+
+    def withholds_on_delete(self, name: str) -&gt; bool:
+        return name in self.provided and name not in self.mandated
+
+    def presence(self, name: str) -&gt; Presence:
+        if name in self.provided:
+            return Presence.PRESENT
+        if name in self.absent:
+            return Presence.ABSENT
+        return Presence.UNKNOWN
+
+
+class HostEnvironment(enum.Enum):
+    &#34;&#34;&#34;
+    The host a script is assumed to run in, selected by the `js` unit&#39;s `-e` switch. `universal` is the
+    default and asserts only `GUARANTEED_GLOBALS`, so deobfuscation stays byte-identical to an unpinned
+    run; each other member adds the globals that host guarantees, recovering the folds the sound default
+    refuses for a name no universal host defines.
+    &#34;&#34;&#34;
+    universal = &#39;universal&#39;
+    node = &#39;node&#39;
+    browser = &#39;browser&#39;
+    worker = &#39;worker&#39;
+
+    def provides(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a bare read of *name* is guaranteed to resolve in this host rather than throw a
+        `ReferenceError`, judged from the host&#39;s global-name data alone.
+        &#34;&#34;&#34;
+        return _SPECS[self].provides(name)
+
+    def withholds_on_delete(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *name* is a host-conditional global whose presence a `delete` of it retracts, as opposed
+        to a language-mandated name the guard leaves present. A name this answers `True` for is withheld
+        program-wide once the program deletes it off a same-realm global alias anywhere, which over-keeps
+        a read&#39;s throw rather than dropping one, and so stays sound.
+        &#34;&#34;&#34;
+        return _SPECS[self].withholds_on_delete(name)
+
+    def presence(self, name: str) -&gt; Presence:
+        &#34;&#34;&#34;
+        Whether this host is certain *name* resolves (`PRESENT`), certain it does not (`ABSENT`), or
+        neither (`UNKNOWN`). `provides` is the `PRESENT` half; the `ABSENT` half names the well-known
+        globals of *other* hosts this one is characterized to lack, so that `typeof &lt;name&gt;` folds to
+        `&#39;undefined&#39;` under a pin without asserting absence for a name merely left off the present set.
+        &#34;&#34;&#34;
+        return _SPECS[self].presence(name)
+
+
+def typeof_of_global(name: str, environment: HostEnvironment) -&gt; str | None:
+    &#34;&#34;&#34;
+    The string `typeof name` yields for a global *name* under *environment*, or `None` when the answer is
+    host-dependent and the host is not pinned to one that settles it. A name whose `typeof` is the same in
+    every host (`UNIVERSAL_TYPEOF`) folds always; a host-conditional name folds only where the pin makes
+    it certainly present — to its recorded type — or certainly absent — to `&#39;undefined&#39;`. The default
+    `universal` host settles only the universal names, so `typeof Buffer` and `typeof window` abstain
+    unpinned, exactly as a bare read of either is answered may-throw.
+    &#34;&#34;&#34;
+    if name in UNIVERSAL_TYPEOF:
+        return UNIVERSAL_TYPEOF[name]
+    presence = environment.presence(name)
+    if presence is Presence.ABSENT:
+        return &#39;undefined&#39;
+    if presence is Presence.PRESENT:
+        return _HOST_CONDITIONAL_TYPEOF.get(name)
+    return None
+
+
+_SPECS: dict[HostEnvironment, _EnvironmentSpec] = {
+    HostEnvironment.universal: _EnvironmentSpec(GUARANTEED_GLOBALS, GUARANTEED_GLOBALS),
+    HostEnvironment.node: _EnvironmentSpec(
+        GUARANTEED_GLOBALS | _NODE_GLOBALS, GUARANTEED_GLOBALS, _NODE_ABSENT),
+    HostEnvironment.browser: _EnvironmentSpec(
+        GUARANTEED_GLOBALS | _BROWSER_GLOBALS, GUARANTEED_GLOBALS, _BROWSER_ABSENT),
+    HostEnvironment.worker: _EnvironmentSpec(
+        GUARANTEED_GLOBALS | _WORKER_GLOBALS, GUARANTEED_GLOBALS, _WORKER_ABSENT),
+}</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF"><code class="name">var <span class="ident">GUARANTEED_GLOBAL_TYPEOF</span></code></dt>
+<dd>
+<section class="desc"><p>Maps each <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code> name to the string its <code>typeof</code> yields. Because the name resolves in
+every host to a value of a fixed type — a constructor or built-in function (<code>'function'</code>), a namespace
+object such as <code>Math</code>/<code>JSON</code>/<code>Reflect</code> or <code>globalThis</code> itself (<code>'object'</code>), the two numeric constants
+(<code>'number'</code>), or <code>undefined</code> — the operator's result is host-independent, unlike a host-conditional
+alias (<code>window</code>, <code>self</code>, …) whose <code>typeof</code> is <code>'undefined'</code> where the host omits the name. This is what
+lets a simplification fold <code>typeof globalThis !== 'undefined'</code> to <code>true</code> for a name it can prove
+pristine; the values were established under Node 24. <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code> is the key set of this map, so
+the two cannot drift.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS"><code class="name">var <span class="ident">GUARANTEED_GLOBALS</span></code></dt>
+<dd>
+<section class="desc"><p>Names the ECMAScript specification mandates as properties of the global object and that every mainstream
+engine exposes unconditionally, so a bare read of one is guaranteed to resolve rather than throw a
+<code>ReferenceError</code>. This is an <em>existence</em> allowlist — distinct from the getter-purity and host-presence
+sets in <code><a title="refinery.lib.scripts.js.analysis.effects" href="effects.html">refinery.lib.scripts.js.analysis.effects</a></code> — used to decide whether <code>&lt;global-alias&gt;.name</code> may be
+collapsed to the bare <code>name</code> without turning the member read's <code>undefined</code> into a throw. It excludes host
+and alias names (<code>window</code>, <code>self</code>, <code>global</code>, <code>top</code>, <code>frames</code>, <code>console</code>, timers, <code>Buffer</code>, …) that are not
+universal, and <code>SharedArrayBuffer</code>/<code>Atomics</code>, which a conformant host may withhold outside a
+cross-origin-isolated context. <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF">GUARANTEED_GLOBAL_TYPEOF</a></code> additionally records the <code>typeof</code> of each. It is
+the provide-set of the <code>UNIVERSAL</code> host and the language floor every pinned host builds on.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.UNIVERSAL_TYPEOF"><code class="name">var <span class="ident">UNIVERSAL_TYPEOF</span></code></dt>
+<dd>
+<section class="desc"><p>The <code>typeof</code> of every name whose result is the same in every host, so a <code>typeof</code> of one folds without a
+host pin. It is <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF">GUARANTEED_GLOBAL_TYPEOF</a></code> plus <code>escape</code> and <code>unescape</code>, the Annex B pair every mainstream
+engine defines but the existence floor omits: their <code>typeof</code> is <code>'function'</code> everywhere even though a bare
+read of one is not part of the language-mandated <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code> set.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.environment.typeof_of_global"><code class="name flex">
+<span>def <span class="ident">typeof_of_global</span></span>(<span>name, environment)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The string <code>typeof name</code> yields for a global <em>name</em> under <em>environment</em>, or <code>None</code> when the answer is
+host-dependent and the host is not pinned to one that settles it. A name whose <code>typeof</code> is the same in
+every host (<code><a title="refinery.lib.scripts.js.analysis.environment.UNIVERSAL_TYPEOF" href="#refinery.lib.scripts.js.analysis.environment.UNIVERSAL_TYPEOF">UNIVERSAL_TYPEOF</a></code>) folds always; a host-conditional name folds only where the pin makes
+it certainly present — to its recorded type — or certainly absent — to <code>'undefined'</code>. The default
+<code>universal</code> host settles only the universal names, so <code>typeof Buffer</code> and <code>typeof window</code> abstain
+unpinned, exactly as a bare read of either is answered may-throw.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L483-L499" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def typeof_of_global(name: str, environment: HostEnvironment) -&gt; str | None:
+    &#34;&#34;&#34;
+    The string `typeof name` yields for a global *name* under *environment*, or `None` when the answer is
+    host-dependent and the host is not pinned to one that settles it. A name whose `typeof` is the same in
+    every host (`UNIVERSAL_TYPEOF`) folds always; a host-conditional name folds only where the pin makes
+    it certainly present — to its recorded type — or certainly absent — to `&#39;undefined&#39;`. The default
+    `universal` host settles only the universal names, so `typeof Buffer` and `typeof window` abstain
+    unpinned, exactly as a bare read of either is answered may-throw.
+    &#34;&#34;&#34;
+    if name in UNIVERSAL_TYPEOF:
+        return UNIVERSAL_TYPEOF[name]
+    presence = environment.presence(name)
+    if presence is Presence.ABSENT:
+        return &#39;undefined&#39;
+    if presence is Presence.PRESENT:
+        return _HOST_CONDITIONAL_TYPEOF.get(name)
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.environment.Presence"><code class="flex name class">
+<span>class <span class="ident">Presence</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What a pinned host knows about whether a global name resolves. <code>PRESENT</code> and <code>ABSENT</code> are the two
+certain answers a <code>typeof</code> fold may act on — present names fold to their type, absent names to
+<code>'undefined'</code>; <code>UNKNOWN</code> means the host neither guarantees nor rules out the name, so a fold that
+would assert either abstains. The default <code>universal</code> host answers <code>PRESENT</code> only for the language
+floor and <code>UNKNOWN</code> for every other name, since some host defines it and some does not.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L36-L46" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Presence(enum.Enum):
+    &#34;&#34;&#34;
+    What a pinned host knows about whether a global name resolves. `PRESENT` and `ABSENT` are the two
+    certain answers a `typeof` fold may act on — present names fold to their type, absent names to
+    `&#39;undefined&#39;`; `UNKNOWN` means the host neither guarantees nor rules out the name, so a fold that
+    would assert either abstains. The default `universal` host answers `PRESENT` only for the language
+    floor and `UNKNOWN` for every other name, since some host defines it and some does not.
+    &#34;&#34;&#34;
+    PRESENT = &#39;present&#39;
+    ABSENT = &#39;absent&#39;
+    UNKNOWN = &#39;unknown&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.environment.Presence.PRESENT"><code class="name">var <span class="ident">PRESENT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.Presence.ABSENT"><code class="name">var <span class="ident">ABSENT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.Presence.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment"><code class="flex name class">
+<span>class <span class="ident">HostEnvironment</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The host a script is assumed to run in, selected by the <code>js</code> unit's <code>-e</code> switch. <code>universal</code> is the
+default and asserts only <code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code>, so deobfuscation stays byte-identical to an unpinned
+run; each other member adds the globals that host guarantees, recovering the folds the sound default
+refuses for a name no universal host defines.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L445-L480" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class HostEnvironment(enum.Enum):
+    &#34;&#34;&#34;
+    The host a script is assumed to run in, selected by the `js` unit&#39;s `-e` switch. `universal` is the
+    default and asserts only `GUARANTEED_GLOBALS`, so deobfuscation stays byte-identical to an unpinned
+    run; each other member adds the globals that host guarantees, recovering the folds the sound default
+    refuses for a name no universal host defines.
+    &#34;&#34;&#34;
+    universal = &#39;universal&#39;
+    node = &#39;node&#39;
+    browser = &#39;browser&#39;
+    worker = &#39;worker&#39;
+
+    def provides(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a bare read of *name* is guaranteed to resolve in this host rather than throw a
+        `ReferenceError`, judged from the host&#39;s global-name data alone.
+        &#34;&#34;&#34;
+        return _SPECS[self].provides(name)
+
+    def withholds_on_delete(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *name* is a host-conditional global whose presence a `delete` of it retracts, as opposed
+        to a language-mandated name the guard leaves present. A name this answers `True` for is withheld
+        program-wide once the program deletes it off a same-realm global alias anywhere, which over-keeps
+        a read&#39;s throw rather than dropping one, and so stays sound.
+        &#34;&#34;&#34;
+        return _SPECS[self].withholds_on_delete(name)
+
+    def presence(self, name: str) -&gt; Presence:
+        &#34;&#34;&#34;
+        Whether this host is certain *name* resolves (`PRESENT`), certain it does not (`ABSENT`), or
+        neither (`UNKNOWN`). `provides` is the `PRESENT` half; the `ABSENT` half names the well-known
+        globals of *other* hosts this one is characterized to lack, so that `typeof &lt;name&gt;` folds to
+        `&#39;undefined&#39;` under a pin without asserting absence for a name merely left off the present set.
+        &#34;&#34;&#34;
+        return _SPECS[self].presence(name)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.universal"><code class="name">var <span class="ident">universal</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.node"><code class="name">var <span class="ident">node</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.browser"><code class="name">var <span class="ident">browser</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.worker"><code class="name">var <span class="ident">worker</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.provides"><code class="name flex">
+<span>def <span class="ident">provides</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a bare read of <em>name</em> is guaranteed to resolve in this host rather than throw a
+<code>ReferenceError</code>, judged from the host's global-name data alone.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L457-L462" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def provides(self, name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a bare read of *name* is guaranteed to resolve in this host rather than throw a
+    `ReferenceError`, judged from the host&#39;s global-name data alone.
+    &#34;&#34;&#34;
+    return _SPECS[self].provides(name)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.withholds_on_delete"><code class="name flex">
+<span>def <span class="ident">withholds_on_delete</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>name</em> is a host-conditional global whose presence a <code>delete</code> of it retracts, as opposed
+to a language-mandated name the guard leaves present. A name this answers <code>True</code> for is withheld
+program-wide once the program deletes it off a same-realm global alias anywhere, which over-keeps
+a read's throw rather than dropping one, and so stays sound.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L464-L471" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def withholds_on_delete(self, name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *name* is a host-conditional global whose presence a `delete` of it retracts, as opposed
+    to a language-mandated name the guard leaves present. A name this answers `True` for is withheld
+    program-wide once the program deletes it off a same-realm global alias anywhere, which over-keeps
+    a read&#39;s throw rather than dropping one, and so stays sound.
+    &#34;&#34;&#34;
+    return _SPECS[self].withholds_on_delete(name)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.js.analysis.environment.HostEnvironment.presence"><code class="name flex">
+<span>def <span class="ident">presence</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether this host is certain <em>name</em> resolves (<code>PRESENT</code>), certain it does not (<code>ABSENT</code>), or
+neither (<code>UNKNOWN</code>). <code>provides</code> is the <code>PRESENT</code> half; the <code>ABSENT</code> half names the well-known
+globals of <em>other</em> hosts this one is characterized to lack, so that <code>typeof &lt;name&gt;</code> folds to
+<code>'undefined'</code> under a pin without asserting absence for a name merely left off the present set.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/708f1c405658ee7c0ae25dd710880df8873615a8/refinery/lib/scripts/js/analysis/environment.py#L473-L480" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def presence(self, name: str) -&gt; Presence:
+    &#34;&#34;&#34;
+    Whether this host is certain *name* resolves (`PRESENT`), certain it does not (`ABSENT`), or
+    neither (`UNKNOWN`). `provides` is the `PRESENT` half; the `ABSENT` half names the well-known
+    globals of *other* hosts this one is characterized to lack, so that `typeof &lt;name&gt;` folds to
+    `&#39;undefined&#39;` under a pin without asserting absence for a name merely left off the present set.
+    &#34;&#34;&#34;
+    return _SPECS[self].presence(name)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.analysis" href="index.html">refinery.lib.scripts.js.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBAL_TYPEOF">GUARANTEED_GLOBAL_TYPEOF</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS" href="#refinery.lib.scripts.js.analysis.environment.GUARANTEED_GLOBALS">GUARANTEED_GLOBALS</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.UNIVERSAL_TYPEOF" href="#refinery.lib.scripts.js.analysis.environment.UNIVERSAL_TYPEOF">UNIVERSAL_TYPEOF</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.typeof_of_global" href="#refinery.lib.scripts.js.analysis.environment.typeof_of_global">typeof_of_global</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.environment.Presence" href="#refinery.lib.scripts.js.analysis.environment.Presence">Presence</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.analysis.environment.HostEnvironment" href="#refinery.lib.scripts.js.analysis.environment.HostEnvironment">HostEnvironment</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.HostEnvironment.provides" href="#refinery.lib.scripts.js.analysis.environment.HostEnvironment.provides">provides</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.HostEnvironment.withholds_on_delete" href="#refinery.lib.scripts.js.analysis.environment.HostEnvironment.withholds_on_delete">withholds_on_delete</a></code></li>
+<li><code><a title="refinery.lib.scripts.js.analysis.environment.HostEnvironment.presence" href="#refinery.lib.scripts.js.analysis.environment.HostEnvironment.presence">presence</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
