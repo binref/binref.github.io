@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.excel.workbook documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.excel.workbook</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L1-L198" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import enum
+import zipfile
+import zlib
+
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
+from typing import IO, Iterator
+
+from defusedxml.ElementTree import fromstring
+
+from refinery.lib.excel.common import (
+    XML_DEFECTS,
+    Cell,
+    DefinedName,
+    ExcelFormatError,
+    FormulaSource,
+    SheetKind,
+    local_name,
+)
+from refinery.lib.excel.formula.model import Expression
+from refinery.lib.id import Fmt, get_microsoft_format
+from refinery.lib.structures import MemoryFile
+
+
+class ExcelFormat(enum.Enum):
+    &#34;&#34;&#34;
+    The container family of an Excel workbook.
+    &#34;&#34;&#34;
+    OOXML = enum.auto()
+    XLSB = enum.auto()
+    BIFF = enum.auto()
+
+
+class ExcelSheet(ABC):
+    &#34;&#34;&#34;
+    A single sheet of an `ExcelWorkbook`.
+    &#34;&#34;&#34;
+    name: str
+    kind: SheetKind
+
+    @abstractmethod
+    def cells(self) -&gt; Iterator[Cell]:
+        &#34;&#34;&#34;
+        Iterate over every cell of the sheet, in document order.
+        &#34;&#34;&#34;
+
+
+class ExcelWorkbook(ABC):
+    &#34;&#34;&#34;
+    A workbook of arbitrary Excel format, exposing its sheets without interpreting or
+    rendering any of the values they contain.
+    &#34;&#34;&#34;
+
+    format: ExcelFormat
+
+    @abstractmethod
+    def sheets(self) -&gt; Sequence[ExcelSheet]:
+        &#34;&#34;&#34;
+        All sheets of the workbook in document order.
+        &#34;&#34;&#34;
+
+    def formula(self, source: FormulaSource) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Decode the formula source of a cell or a defined name of this workbook into the
+        formula model. A source the format cannot decode yields the unparsed carrier rather
+        than an error, and `None` — a cell that is not a formula — yields `None`.
+        &#34;&#34;&#34;
+        raise NotImplementedError
+
+    def defined_names(self) -&gt; Sequence[DefinedName]:
+        &#34;&#34;&#34;
+        All defined names of the workbook, in the order their records appear; the position
+        of a name in this list is the index its format&#39;s name token carries.
+        &#34;&#34;&#34;
+        raise NotImplementedError
+
+
+_RAW_BIFF_VERSIONS = b&#39;\x00\x02\x04\x08&#39;
+_RAW_BIFF_LENGTHS = frozenset((0x0004, 0x0006, 0x0008, 0x0010))
+
+_PACKAGE_DEFECTS = (zipfile.BadZipFile, zlib.error, EOFError, RuntimeError)
+
+
+class _PartStream:
+    &#34;&#34;&#34;
+    A package part as a read-only binary stream. Reading a defective entry of the archive
+    raises `ExcelFormatError` instead of the exception class of the `zipfile` module.
+    &#34;&#34;&#34;
+
+    def __init__(self, stream: IO[bytes]):
+        self._stream = stream
+
+    def read(self, size: int = -1) -&gt; bytes:
+        try:
+            return self._stream.read(size)
+        except _PACKAGE_DEFECTS as error:
+            raise ExcelFormatError(&#39;the package contains a defective part&#39;) from error
+
+
+class _Package:
+    &#34;&#34;&#34;
+    The zip container of an OOXML or XLSB workbook. Parts are looked up case-insensitively
+    and with normalized slashes because workbooks written by non-Microsoft software
+    frequently deviate from the conventional part names. A part that is stored under the
+    same name more than once resolves to its last entry, as it does for `zipfile`.
+    &#34;&#34;&#34;
+
+    def __init__(self, data: bytes | bytearray | memoryview):
+        self._zip = zipfile.ZipFile(MemoryFile(data, bytes))
+        self._entries: dict[str, zipfile.ZipInfo] = {}
+        for info in self._zip.infolist():
+            if not info.is_dir():
+                self._entries[self._key(info.filename)] = info
+
+    @staticmethod
+    def _key(name: str) -&gt; str:
+        return name.replace(&#39;\\&#39;, &#39;/&#39;).lower()
+
+    def __contains__(self, part: str) -&gt; bool:
+        return self._key(part) in self._entries
+
+    def open(self, part: str) -&gt; _PartStream | None:
+        info = self._entries.get(self._key(part))
+        if info is None:
+            return None
+        try:
+            return _PartStream(self._zip.open(info))
+        except _PACKAGE_DEFECTS as error:
+            raise ExcelFormatError(&#39;the package contains a defective part&#39;) from error
+
+
+def detect_format(data: bytes | bytearray | memoryview) -&gt; ExcelFormat | None:
+    &#34;&#34;&#34;
+    Determine the Excel container family of the input: a zip archive containing an OOXML
+    workbook part, a zip archive containing an XLSB workbook part, an OLE compound file with
+    a workbook stream, or a raw BIFF record stream that is not wrapped in any container.
+    The zip detection accepts a part at its conventional location or one that the content
+    types of the package declare as the main document part, which is exactly what the readers
+    resolve; any other zip is not a workbook.
+    &#34;&#34;&#34;
+    view = memoryview(data)
+    if view[:2] == b&#39;PK&#39;:
+        try:
+            package = _Package(view)
+        except zipfile.BadZipFile:
+            return None
+        if &#39;xl/workbook.xml&#39; in package:
+            return ExcelFormat.OOXML
+        if &#39;xl/workbook.bin&#39; in package:
+            return ExcelFormat.XLSB
+        try:
+            content_types = package.open(&#39;[Content_Types].xml&#39;)
+        except ExcelFormatError:
+            return None
+        if content_types is not None:
+            try:
+                root = fromstring(content_types.read())
+            except (*XML_DEFECTS, ExcelFormatError):
+                return None
+            for element in root.iter():
+                if (
+                    local_name(element.tag) == &#39;Override&#39;
+                    and &#39;sheet.main+xml&#39; in (element.get(&#39;ContentType&#39;) or &#39;&#39;)
+                ):
+                    return ExcelFormat.OOXML
+        return None
+    if get_microsoft_format(view) == Fmt.XLS:
+        return ExcelFormat.BIFF
+    if (
+        view[:1] == b&#39;\x09&#39;
+        and view[1:2] in _RAW_BIFF_VERSIONS
+        and int.from_bytes(view[2:4], &#39;little&#39;) in _RAW_BIFF_LENGTHS
+    ):
+        return ExcelFormat.BIFF
+    return None
+
+
+def open_workbook(data: bytes | bytearray | memoryview) -&gt; ExcelWorkbook:
+    &#34;&#34;&#34;
+    Read a workbook of any supported Excel format. Raises `ExcelFormatError` when the input
+    is not a workbook at all; sheets that are defective are reported while iterating their
+    cells rather than when opening the workbook.
+    &#34;&#34;&#34;
+    detected = detect_format(data)
+    if detected is ExcelFormat.OOXML:
+        from refinery.lib.excel.ooxml import OoxmlWorkbook
+        return OoxmlWorkbook(data)
+    if detected is ExcelFormat.BIFF:
+        from refinery.lib.excel.biff import BiffWorkbook
+        return BiffWorkbook(data)
+    if detected is ExcelFormat.XLSB:
+        from refinery.lib.excel.xlsb import XlsbWorkbook
+        return XlsbWorkbook(data)
+    if detected is None:
+        raise ExcelFormatError(&#39;Input not recognized as Excel workbook.&#39;)
+    raise ExcelFormatError(F&#39;The {detected.name} format is not implemented yet.&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.excel.workbook.detect_format"><code class="name flex">
+<span>def <span class="ident">detect_format</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Determine the Excel container family of the input: a zip archive containing an OOXML
+workbook part, a zip archive containing an XLSB workbook part, an OLE compound file with
+a workbook stream, or a raw BIFF record stream that is not wrapped in any container.
+The zip detection accepts a part at its conventional location or one that the content
+types of the package declare as the main document part, which is exactly what the readers
+resolve; any other zip is not a workbook.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L134-L177" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def detect_format(data: bytes | bytearray | memoryview) -&gt; ExcelFormat | None:
+    &#34;&#34;&#34;
+    Determine the Excel container family of the input: a zip archive containing an OOXML
+    workbook part, a zip archive containing an XLSB workbook part, an OLE compound file with
+    a workbook stream, or a raw BIFF record stream that is not wrapped in any container.
+    The zip detection accepts a part at its conventional location or one that the content
+    types of the package declare as the main document part, which is exactly what the readers
+    resolve; any other zip is not a workbook.
+    &#34;&#34;&#34;
+    view = memoryview(data)
+    if view[:2] == b&#39;PK&#39;:
+        try:
+            package = _Package(view)
+        except zipfile.BadZipFile:
+            return None
+        if &#39;xl/workbook.xml&#39; in package:
+            return ExcelFormat.OOXML
+        if &#39;xl/workbook.bin&#39; in package:
+            return ExcelFormat.XLSB
+        try:
+            content_types = package.open(&#39;[Content_Types].xml&#39;)
+        except ExcelFormatError:
+            return None
+        if content_types is not None:
+            try:
+                root = fromstring(content_types.read())
+            except (*XML_DEFECTS, ExcelFormatError):
+                return None
+            for element in root.iter():
+                if (
+                    local_name(element.tag) == &#39;Override&#39;
+                    and &#39;sheet.main+xml&#39; in (element.get(&#39;ContentType&#39;) or &#39;&#39;)
+                ):
+                    return ExcelFormat.OOXML
+        return None
+    if get_microsoft_format(view) == Fmt.XLS:
+        return ExcelFormat.BIFF
+    if (
+        view[:1] == b&#39;\x09&#39;
+        and view[1:2] in _RAW_BIFF_VERSIONS
+        and int.from_bytes(view[2:4], &#39;little&#39;) in _RAW_BIFF_LENGTHS
+    ):
+        return ExcelFormat.BIFF
+    return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.workbook.open_workbook"><code class="name flex">
+<span>def <span class="ident">open_workbook</span></span>(<span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Read a workbook of any supported Excel format. Raises <code>ExcelFormatError</code> when the input
+is not a workbook at all; sheets that are defective are reported while iterating their
+cells rather than when opening the workbook.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L180-L198" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def open_workbook(data: bytes | bytearray | memoryview) -&gt; ExcelWorkbook:
+    &#34;&#34;&#34;
+    Read a workbook of any supported Excel format. Raises `ExcelFormatError` when the input
+    is not a workbook at all; sheets that are defective are reported while iterating their
+    cells rather than when opening the workbook.
+    &#34;&#34;&#34;
+    detected = detect_format(data)
+    if detected is ExcelFormat.OOXML:
+        from refinery.lib.excel.ooxml import OoxmlWorkbook
+        return OoxmlWorkbook(data)
+    if detected is ExcelFormat.BIFF:
+        from refinery.lib.excel.biff import BiffWorkbook
+        return BiffWorkbook(data)
+    if detected is ExcelFormat.XLSB:
+        from refinery.lib.excel.xlsb import XlsbWorkbook
+        return XlsbWorkbook(data)
+    if detected is None:
+        raise ExcelFormatError(&#39;Input not recognized as Excel workbook.&#39;)
+    raise ExcelFormatError(F&#39;The {detected.name} format is not implemented yet.&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.excel.workbook.ExcelFormat"><code class="flex name class">
+<span>class <span class="ident">ExcelFormat</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The container family of an Excel workbook.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L27-L33" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ExcelFormat(enum.Enum):
+    &#34;&#34;&#34;
+    The container family of an Excel workbook.
+    &#34;&#34;&#34;
+    OOXML = enum.auto()
+    XLSB = enum.auto()
+    BIFF = enum.auto()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.excel.workbook.ExcelFormat.OOXML"><code class="name">var <span class="ident">OOXML</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelFormat.XLSB"><code class="name">var <span class="ident">XLSB</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelFormat.BIFF"><code class="name">var <span class="ident">BIFF</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelSheet"><code class="flex name class">
+<span>class <span class="ident">ExcelSheet</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>A single sheet of an <code><a title="refinery.lib.excel.workbook.ExcelWorkbook" href="#refinery.lib.excel.workbook.ExcelWorkbook">ExcelWorkbook</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L36-L47" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ExcelSheet(ABC):
+    &#34;&#34;&#34;
+    A single sheet of an `ExcelWorkbook`.
+    &#34;&#34;&#34;
+    name: str
+    kind: SheetKind
+
+    @abstractmethod
+    def cells(self) -&gt; Iterator[Cell]:
+        &#34;&#34;&#34;
+        Iterate over every cell of the sheet, in document order.
+        &#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.excel.biff.BiffSheet" href="biff.html#refinery.lib.excel.biff.BiffSheet">BiffSheet</a></li>
+<li><a title="refinery.lib.excel.ooxml.OoxmlSheet" href="ooxml.html#refinery.lib.excel.ooxml.OoxmlSheet">OoxmlSheet</a></li>
+<li><a title="refinery.lib.excel.xlsb.XlsbSheet" href="xlsb.html#refinery.lib.excel.xlsb.XlsbSheet">XlsbSheet</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.excel.workbook.ExcelSheet.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelSheet.kind"><code class="name">var <span class="ident">kind</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.excel.workbook.ExcelSheet.cells"><code class="name flex">
+<span>def <span class="ident">cells</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Iterate over every cell of the sheet, in document order.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L43-L47" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@abstractmethod
+def cells(self) -&gt; Iterator[Cell]:
+    &#34;&#34;&#34;
+    Iterate over every cell of the sheet, in document order.
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelWorkbook"><code class="flex name class">
+<span>class <span class="ident">ExcelWorkbook</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>A workbook of arbitrary Excel format, exposing its sheets without interpreting or
+rendering any of the values they contain.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L50-L77" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class ExcelWorkbook(ABC):
+    &#34;&#34;&#34;
+    A workbook of arbitrary Excel format, exposing its sheets without interpreting or
+    rendering any of the values they contain.
+    &#34;&#34;&#34;
+
+    format: ExcelFormat
+
+    @abstractmethod
+    def sheets(self) -&gt; Sequence[ExcelSheet]:
+        &#34;&#34;&#34;
+        All sheets of the workbook in document order.
+        &#34;&#34;&#34;
+
+    def formula(self, source: FormulaSource) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Decode the formula source of a cell or a defined name of this workbook into the
+        formula model. A source the format cannot decode yields the unparsed carrier rather
+        than an error, and `None` — a cell that is not a formula — yields `None`.
+        &#34;&#34;&#34;
+        raise NotImplementedError
+
+    def defined_names(self) -&gt; Sequence[DefinedName]:
+        &#34;&#34;&#34;
+        All defined names of the workbook, in the order their records appear; the position
+        of a name in this list is the index its format&#39;s name token carries.
+        &#34;&#34;&#34;
+        raise NotImplementedError</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abc.ABC</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.excel.biff.BiffWorkbook" href="biff.html#refinery.lib.excel.biff.BiffWorkbook">BiffWorkbook</a></li>
+<li><a title="refinery.lib.excel.ooxml.OoxmlWorkbook" href="ooxml.html#refinery.lib.excel.ooxml.OoxmlWorkbook">OoxmlWorkbook</a></li>
+<li><a title="refinery.lib.excel.xlsb.XlsbWorkbook" href="xlsb.html#refinery.lib.excel.xlsb.XlsbWorkbook">XlsbWorkbook</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.excel.workbook.ExcelWorkbook.format"><code class="name">var <span class="ident">format</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.excel.workbook.ExcelWorkbook.sheets"><code class="name flex">
+<span>def <span class="ident">sheets</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>All sheets of the workbook in document order.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L58-L62" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@abstractmethod
+def sheets(self) -&gt; Sequence[ExcelSheet]:
+    &#34;&#34;&#34;
+    All sheets of the workbook in document order.
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelWorkbook.formula"><code class="name flex">
+<span>def <span class="ident">formula</span></span>(<span>self, source)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode the formula source of a cell or a defined name of this workbook into the
+formula model. A source the format cannot decode yields the unparsed carrier rather
+than an error, and <code>None</code> — a cell that is not a formula — yields <code>None</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L64-L70" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def formula(self, source: FormulaSource) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    Decode the formula source of a cell or a defined name of this workbook into the
+    formula model. A source the format cannot decode yields the unparsed carrier rather
+    than an error, and `None` — a cell that is not a formula — yields `None`.
+    &#34;&#34;&#34;
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.workbook.ExcelWorkbook.defined_names"><code class="name flex">
+<span>def <span class="ident">defined_names</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>All defined names of the workbook, in the order their records appear; the position
+of a name in this list is the index its format's name token carries.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/excel/workbook.py#L72-L77" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def defined_names(self) -&gt; Sequence[DefinedName]:
+    &#34;&#34;&#34;
+    All defined names of the workbook, in the order their records appear; the position
+    of a name in this list is the index its format&#39;s name token carries.
+    &#34;&#34;&#34;
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.excel" href="index.html">refinery.lib.excel</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.excel.workbook.detect_format" href="#refinery.lib.excel.workbook.detect_format">detect_format</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.open_workbook" href="#refinery.lib.excel.workbook.open_workbook">open_workbook</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.excel.workbook.ExcelFormat" href="#refinery.lib.excel.workbook.ExcelFormat">ExcelFormat</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.excel.workbook.ExcelSheet" href="#refinery.lib.excel.workbook.ExcelSheet">ExcelSheet</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.excel.workbook.ExcelSheet.cells" href="#refinery.lib.excel.workbook.ExcelSheet.cells">cells</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.excel.workbook.ExcelWorkbook" href="#refinery.lib.excel.workbook.ExcelWorkbook">ExcelWorkbook</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.sheets" href="#refinery.lib.excel.workbook.ExcelWorkbook.sheets">sheets</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.formula" href="#refinery.lib.excel.workbook.ExcelWorkbook.formula">formula</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.defined_names" href="#refinery.lib.excel.workbook.ExcelWorkbook.defined_names">defined_names</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

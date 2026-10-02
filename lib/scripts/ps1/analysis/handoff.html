@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.handoff documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.handoff</code></h1>
+</header>
+<section id="section-intro">
+<p>Where the object a variable occurrence reads goes once the expression around it has run.</p>
+<p>A read hands over the object a name holds and not a copy of it, and PowerShell keeps that object in
+many more places than a second variable: an element of an array literal, the value of a hash entry,
+a slot of a container that already exists, the parameter of a body it is passed to, the pipeline
+variable of a block it is piped into, a <code>foreach</code> variable, and the output a caller of a body
+collects. A store reaching the object through any of those places changes what the name holds, and
+none of them is an occurrence of the name. <code><a title="refinery.lib.scripts.ps1.analysis.handoff.object_handoff" href="#refinery.lib.scripts.ps1.analysis.handoff.object_handoff">object_handoff()</a></code> classifies a read by which of those it
+reaches; <code><a title="refinery.lib.scripts.ps1.analysis.objects.Ps1ObjectFlow" href="objects.html#refinery.lib.scripts.ps1.analysis.objects.Ps1ObjectFlow">Ps1ObjectFlow</a></code> orders the stores against it.</p>
+<p>The climb follows the object outwards and counts how deep inside the value at the cursor it sits.
+An expression that may give back the very object it was handed passes it on at the same depth;
+which expressions those are is <code><a title="refinery.lib.scripts.ps1.analysis.identity.passage_out_of" href="identity.html#refinery.lib.scripts.ps1.analysis.identity.passage_out_of">passage_out_of()</a></code>'s to
+say. Building a container around it puts it one level deeper; unrolling a value — a pipeline,
+<code>@( )</code>, an operator, the output of a body — takes the elements out of their container, so the object
+itself survives only if it was inside one, and otherwise only its elements go on. Taking an index or
+a member hands on a part of the value and no more. Where the climb ends, a place that keeps what it
+is handed keeps the object itself if the depth is not negative and only objects inside it if it is.</p>
+<p>Objects a command writes are collected when a value is made of them, and the collection is a
+container around them: <code>@(,$x)</code> holds the array <code>$x</code> holds as its one element, and a <code>foreach</code> over
+it hands that very array to the loop variable.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L1-L532" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Where the object a variable occurrence reads goes once the expression around it has run.
+
+A read hands over the object a name holds and not a copy of it, and PowerShell keeps that object in
+many more places than a second variable: an element of an array literal, the value of a hash entry,
+a slot of a container that already exists, the parameter of a body it is passed to, the pipeline
+variable of a block it is piped into, a `foreach` variable, and the output a caller of a body
+collects. A store reaching the object through any of those places changes what the name holds, and
+none of them is an occurrence of the name. `object_handoff` classifies a read by which of those it
+reaches; `refinery.lib.scripts.ps1.analysis.objects.Ps1ObjectFlow` orders the stores against it.
+
+The climb follows the object outwards and counts how deep inside the value at the cursor it sits.
+An expression that may give back the very object it was handed passes it on at the same depth;
+which expressions those are is `refinery.lib.scripts.ps1.analysis.identity.passage_out_of`&#39;s to
+say. Building a container around it puts it one level deeper; unrolling a value — a pipeline,
+`@( )`, an operator, the output of a body — takes the elements out of their container, so the object
+itself survives only if it was inside one, and otherwise only its elements go on. Taking an index or
+a member hands on a part of the value and no more. Where the climb ends, a place that keeps what it
+is handed keeps the object itself if the depth is not negative and only objects inside it if it is.
+
+Objects a command writes are collected when a value is made of them, and the collection is a
+container around them: `@(,$x)` holds the array `$x` holds as its one element, and a `foreach` over
+it hands that very array to the loop variable.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import enum
+import typing
+
+from typing import Callable
+
+from refinery.lib.scripts import Expression, Node
+from refinery.lib.scripts.ps1 import data
+from refinery.lib.scripts.ps1.analysis.arguments import RECEIVER, keeps_nothing
+from refinery.lib.scripts.ps1.analysis.identity import passage_out_of
+from refinery.lib.scripts.ps1.analysis.model import written_slots_of
+from refinery.lib.scripts.ps1.analysis.naming import Ps1NameRole, named_references
+from refinery.lib.scripts.ps1.analysis.values import UNKNOWN, read, resolve_expression_type
+from refinery.lib.scripts.ps1.ast import (
+    binds_parameter,
+    get_command_name,
+    get_member_name,
+    unwrap_assignment_target,
+)
+from refinery.lib.scripts.ps1.model import (
+    Ps1AccessKind,
+    Ps1ArrayExpression,
+    Ps1ArrayLiteral,
+    Ps1AssignmentExpression,
+    Ps1BinaryExpression,
+    Ps1CastExpression,
+    Ps1CommandArgument,
+    Ps1CommandArgumentKind,
+    Ps1CommandInvocation,
+    Ps1ExpandableString,
+    Ps1ExpressionStatement,
+    Ps1ForEachLoop,
+    Ps1FunctionDefinition,
+    Ps1HashLiteral,
+    Ps1IndexExpression,
+    Ps1InvokeMember,
+    Ps1MemberAccess,
+    Ps1MethodMember,
+    Ps1ParameterDeclaration,
+    Ps1ParenExpression,
+    Ps1Pipeline,
+    Ps1PipelineElement,
+    Ps1PropertyMember,
+    Ps1RangeExpression,
+    Ps1ReturnStatement,
+    Ps1Script,
+    Ps1ScriptBlock,
+    Ps1SubExpression,
+    Ps1SwitchStatement,
+    Ps1ThrowStatement,
+    Ps1TypeExpression,
+    Ps1UnaryExpression,
+    Ps1Variable,
+)
+
+
+class Ps1Handoff(enum.Enum):
+    &#34;&#34;&#34;
+    What keeps the object a read produces once the expression around the read has run.
+
+    `NOWHERE` — nothing keeps the object or anything inside it.
+    `PARTS` — something keeps objects the value holds but not the value itself: `$y = @($x)`,
+    `foreach ($e in $x)`, `$q = $x[0]`.
+    `OBJECT` — something keeps the object itself: a second name, as `$y = $x` gives it one, an
+    element of a new array, a hash entry, a slot of another container, a callee, a caller
+    collecting the output of a body.
+    &#34;&#34;&#34;
+    NOWHERE = 0
+    PARTS   = 1  # noqa
+    OBJECT  = 2  # noqa
+
+    def widest(self, other: Ps1Handoff) -&gt; Ps1Handoff:
+        &#34;&#34;&#34;
+        Whichever of the two keeps more of the object.
+        &#34;&#34;&#34;
+        return self if self.value &gt;= other.value else other
+
+
+#: Commands that consume what they are handed and keep nothing of it: each writes a rendering of it
+#: somewhere that is not a value of the script. `Write-Information` is not one of them, because the
+#: record it writes holds the object itself and `6&gt;&amp;1` hands that record to whoever collects it.
+_CONSUMING_COMMANDS = frozenset({
+    &#39;out-host&#39;,
+    &#39;out-null&#39;,
+    &#39;out-string&#39;,
+    &#39;write-debug&#39;,
+    &#39;write-host&#39;,
+    &#39;write-verbose&#39;,
+    &#39;write-warning&#39;,
+})
+
+#: Commands that write out the objects they are handed and keep none of them. What they write goes
+#: wherever their own output goes. `Write-Output` writes the elements of a value handed to it as an
+#: argument unless it is told `-NoEnumerate`.
+_PASSING_COMMANDS = frozenset({
+    &#39;write-output&#39;,
+})
+
+#: Commands that write out the objects piped into them, one at a time, and keep none of them while
+#: every argument they are given is a constant. A script block or a calculated property among the
+#: arguments runs with `$_` bound to each object, and a value handed as `-InputObject` is written as
+#: one record rather than element by element; either is a place that keeps what it is handed.
+_FILTERING_COMMANDS = frozenset({
+    &#39;select-object&#39;,
+    &#39;sort-object&#39;,
+    &#39;where-object&#39;,
+})
+
+
+def binds_a_name(cmd: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *cmd* gives one of the values it is handed to a name that outlives it, as
+    `Set-Variable y $x` and `New-Variable y $x` do.
+    &#34;&#34;&#34;
+    return any(
+        reference.role is not Ps1NameRole.READS
+        for reference in named_references(cmd)
+    )
+
+
+class Ps1CallTrust(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What the classifier may believe about the code a read is handed to. `trusts` says whether a
+    command name still runs the command it names: a name the script may have taken over runs code
+    this cannot see, which may keep anything. `closed_at` says whether no code this analysis cannot
+    read has run by the time a node is evaluated, so that a type still names the type the metadata
+    describes: such code can put another type behind `[string]`, and what a call on it keeps is then
+    anything at all.
+    &#34;&#34;&#34;
+    trusts: Callable[[str], bool]
+    closed_at: Callable[[Node], bool]
+
+
+def object_handoff(var: Ps1Variable, trust: Ps1CallTrust) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What keeps the object *var* reads once the expression around it has run. What a command or a
+    call is believed to let go of is what *trust* allows.
+    &#34;&#34;&#34;
+    return _climb(var, _Position(0, streamed=False), trust)
+
+
+def assignment_handoff(
+    assignment: Ps1AssignmentExpression,
+    trust: Ps1CallTrust,
+) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What keeps the object *assignment* stores, apart from its own target, once the assignment is
+    used as a value. `$y = $x = 1, 2, 3` gives the one array to both names, and
+    `@{ k = ($x = 1, 2, 3) }` puts it into the table. `Ps1Handoff.NOWHERE` for an assignment that
+    stands as a statement of its own, which writes nothing out.
+    &#34;&#34;&#34;
+    if not _yields_its_value(assignment):
+        return Ps1Handoff.NOWHERE
+    return _climb(assignment, _Position(0, streamed=False), trust)
+
+
+class _Position(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What the climb knows about the value at its cursor. `depth` is how deep inside that value the
+    object sits, negative where only objects inside it are there; `streamed` says that the value is
+    the objects a command wrote rather than the value of an expression, so writing it out does not
+    take it apart again, and making a value of it collects it.
+    &#34;&#34;&#34;
+    depth: int
+    streamed: bool
+
+
+#: The places that hand on the objects a command wrote as they are, without collecting them into a
+#: value first: the next element of a pipeline, and a statement writing them out.
+_STREAMING_PARENTS = (
+    Ps1Pipeline,
+    Ps1PipelineElement,
+    Ps1ExpressionStatement,
+    Ps1ReturnStatement,
+)
+
+
+def _wrapped(depth: int) -&gt; int:
+    &#34;&#34;&#34;
+    The depth once the value is made an element of a new container. Parts stay parts.
+    &#34;&#34;&#34;
+    return depth + 1 if depth &gt;= 0 else depth
+
+
+def _unrolled(depth: int) -&gt; int:
+    &#34;&#34;&#34;
+    The depth relative to one element once a value is taken apart into its elements: the object
+    stays whole only if it was inside the value, and otherwise only its elements go on.
+    &#34;&#34;&#34;
+    return depth - 1 if depth &gt; 0 else min(depth, -1)
+
+
+def _kept(depth: int) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What a place that keeps the value at *depth* keeps of the object.
+    &#34;&#34;&#34;
+    return Ps1Handoff.OBJECT if depth &gt;= 0 else Ps1Handoff.PARTS
+
+
+def _takes_a_part(node: Ps1IndexExpression | Ps1MemberAccess | Ps1InvokeMember) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether reading *node* off its object yields something inside that object rather than the
+    object itself. A member that may be the object is a passage and never reaches this; a method
+    whose name the source does not spell may be one that gives back its receiver.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1InvokeMember):
+        return get_member_name(node.member) is not None
+    return True
+
+
+def _is_no_enumerate(cmd: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *cmd* is told to write what it is handed as one object rather than element by element.
+    &#34;&#34;&#34;
+    return any(
+        isinstance(argument, Ps1CommandArgument)
+        and argument.kind is not Ps1CommandArgumentKind.POSITIONAL
+        and binds_parameter(argument.name, &#39;noenumerate&#39;)
+        for argument in cmd.arguments
+    )
+
+
+def _hands_only_constants(cmd: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether every argument *cmd* is given is a switch or a constant, so that no block it is given
+    runs for the objects it is handed and none of them is handed to it as an argument.
+    &#34;&#34;&#34;
+    for argument in cmd.arguments:
+        value = argument.value if isinstance(argument, Ps1CommandArgument) else argument
+        if value is not None and read(value) is UNKNOWN:
+            return False
+    return True
+
+
+def _yields_its_value(assignment: Ps1AssignmentExpression) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *assignment* is used as a value. One standing as a statement of its own writes nothing
+    out; anywhere else it is the value it stored, the very object and not a copy of it.
+    &#34;&#34;&#34;
+    return not isinstance(assignment.parent, Ps1ExpressionStatement)
+
+
+def _is_a_store_target(index: Ps1IndexExpression) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *index* is a place an assignment stores into, so that the index is handed to the store:
+    a hashtable keeps the key `$h[$x] = &#39;v&#39;` is given, and hands it back through `Keys`.
+    &#34;&#34;&#34;
+    cursor: Node = index
+    parent = cursor.parent
+    while isinstance(parent, (Ps1ParenExpression, Ps1CastExpression, Ps1ArrayLiteral)):
+        cursor = parent
+        parent = cursor.parent
+    return isinstance(parent, Ps1AssignmentExpression) and parent.target is cursor
+
+
+def _is_a_method_body(block: Ps1ScriptBlock) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *block* is the body of a method of a class, which writes out nothing but what it
+    returns and returns that whole.
+    &#34;&#34;&#34;
+    definition = block.parent
+    return isinstance(definition, Ps1FunctionDefinition) and isinstance(
+        definition.parent, Ps1MethodMember)
+
+
+def _assigned(assignment: Ps1AssignmentExpression, at: _Position) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What an assignment keeps of the object its value holds. Every target keeps what it is given,
+    a second name as much as a container, and a multi-assignment gives each target one element of
+    it.
+    &#34;&#34;&#34;
+    target = unwrap_assignment_target(assignment.target)
+    if assignment.operator == &#39;=&#39; and isinstance(target, Ps1ArrayLiteral):
+        return _kept(_unrolled(at.depth))
+    return _kept(at.depth)
+
+
+def _climb(start: Node, at: _Position, trust: Ps1CallTrust) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What keeps the object once the expression around *start* has run, the value at *start* holding
+    it as *at* says.
+    &#34;&#34;&#34;
+    depth, streamed = at
+    cursor: Node = start
+    while True:
+        parent = cursor.parent
+        if parent is None:
+            return Ps1Handoff.NOWHERE
+        if streamed and not isinstance(parent, _STREAMING_PARENTS):
+            depth = _wrapped(depth)
+            streamed = False
+        if isinstance(parent, Ps1AssignmentExpression):
+            if parent.value is not cursor:
+                return Ps1Handoff.NOWHERE
+            kept = _assigned(parent, _Position(depth, streamed))
+            if not _yields_its_value(parent):
+                return kept
+            return kept.widest(_climb(parent, _Position(depth, False), trust))
+        passage = passage_out_of(cursor)
+        if passage is not None:
+            cursor = passage.expression
+            continue
+        if isinstance(parent, Ps1BinaryExpression) and parent.operator.lower() == &#39;-as&#39;:
+            return Ps1Handoff.NOWHERE
+        if isinstance(parent, (Ps1ArrayLiteral, Ps1HashLiteral)):
+            depth = _wrapped(depth)
+        elif isinstance(parent, (Ps1IndexExpression, Ps1MemberAccess, Ps1InvokeMember)):
+            if parent.object is not cursor:
+                if isinstance(parent, Ps1InvokeMember):
+                    if any(argument is cursor for argument in parent.arguments):
+                        return _kept_by_callee(parent, cursor, depth, trust)
+                elif isinstance(parent, Ps1IndexExpression):
+                    if parent.index is cursor and _is_a_store_target(parent):
+                        return _kept(depth)
+                return Ps1Handoff.NOWHERE
+            if isinstance(parent, Ps1InvokeMember) and _hands_its_receiver_on(parent):
+                return _kept(_unrolled(depth))
+            if _takes_a_part(parent):
+                depth = _unrolled(depth)
+        elif isinstance(parent, (Ps1BinaryExpression, Ps1UnaryExpression)):
+            if depth &lt;= 0:
+                depth = _unrolled(depth)
+        elif isinstance(parent, Ps1CommandInvocation):
+            if parent.name is cursor:
+                return Ps1Handoff.NOWHERE
+            kept = _handed_to_command(parent, depth, trust)
+            if kept is not None:
+                return kept
+            if not _is_no_enumerate(parent):
+                depth = _unrolled(depth)
+            streamed = True
+        elif isinstance(parent, Ps1Pipeline):
+            return _piped(parent, cursor, _Position(depth, streamed), trust)
+        elif isinstance(parent, (Ps1ExpressionStatement, Ps1ReturnStatement)):
+            return _written_out(parent, _Position(depth, streamed), trust)
+        elif isinstance(parent, (Ps1ForEachLoop, Ps1SwitchStatement)):
+            iterated = parent.iterable if isinstance(parent, Ps1ForEachLoop) else parent.value
+            return _kept(_unrolled(depth)) if iterated is cursor else Ps1Handoff.NOWHERE
+        elif isinstance(parent, Ps1ParameterDeclaration):
+            return _kept(depth) if parent.default_value is cursor else Ps1Handoff.NOWHERE
+        elif isinstance(parent, Ps1PropertyMember):
+            return _kept(depth) if parent.initial_value is cursor else Ps1Handoff.NOWHERE
+        elif isinstance(parent, Ps1ThrowStatement):
+            return _kept(depth)
+        elif isinstance(parent, (Ps1ExpandableString, Ps1RangeExpression)):
+            return Ps1Handoff.NOWHERE
+        elif isinstance(parent, (Ps1CommandArgument, Ps1PipelineElement)):
+            pass
+        elif isinstance(parent, Expression):
+            return _kept(depth)
+        else:
+            return Ps1Handoff.NOWHERE
+        cursor = parent
+
+
+def _hands_its_receiver_on(call: Ps1InvokeMember) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *call* may hand what its receiver holds to a place other than its own result: a call
+    that writes through an argument slot may fill it from the receiver, as `$a.CopyTo($b, 0)` puts
+    the elements of `$a` into `$b`, and a block among the arguments may be run with `$_` bound to
+    each of them, as `.ForEach({ })` and `.Where({ })` do.
+    &#34;&#34;&#34;
+    if any(isinstance(argument, Ps1ScriptBlock) for argument in call.arguments):
+        return True
+    member = call.member
+    return not isinstance(member, str) or bool(written_slots_of(call, member).slots)
+
+
+def _kept_by_callee(
+    call: Ps1InvokeMember,
+    argument: Node,
+    depth: int,
+    trust: Ps1CallTrust,
+) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What a .NET call keeps of an object handed to it as *argument*.
+
+    A call is code this does not read, so in general it may keep anything — `$list.Add($x)` keeps
+    `$x` inside the list. Two kinds of call are the exception, because what they do is known. One
+    keeps nothing at all: `refinery.lib.scripts.ps1.analysis.arguments.keeps_nothing` names it —
+    `[string]::Join(&#39; &#39;, $b)` and `[Text.Encoding]::UTF8.GetString($b)` return a String built from
+    what `$b` holds. The other is a call
+    `refinery.lib.scripts.ps1.analysis.arguments.written_slots` knows to write through a slot: each
+    fills or rearranges the buffer in a slot it writes, and an argument it does not write is read
+    for what it holds. `[Array]::Copy($a, $b, 3)` puts the elements of `$a` into `$b` and never `$a`
+    itself, and `[Buffer]::BlockCopy` copies bytes. A call that writes its *receiver* — `SetValue` —
+    stores an argument into it whole, and one that writes the slot *argument* stands in changes
+    the very object it is handed.
+
+    Both hold only where no code this cannot read has run by the time the call is evaluated, since
+    such code can put another type behind the name the call is spelled on.
+    &#34;&#34;&#34;
+    member = call.member
+    if not isinstance(member, str) or not trust.closed_at(call):
+        return _kept(depth)
+    if _keeps_nothing(call, member):
+        return Ps1Handoff.NOWHERE
+    written = written_slots_of(call, member).slots
+    slot = next(
+        (position for position, candidate in enumerate(call.arguments) if candidate is argument),
+        None,
+    )
+    if not written or RECEIVER in written or slot in written:
+        return _kept(depth)
+    return _kept(_unrolled(depth))
+
+
+def _keeps_nothing(call: Ps1InvokeMember, member: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *call* is a call of a member that keeps nothing it is handed: a static one on the type
+    it spells, or one on a value whose type the spelling of the receiver names, as
+    `[Text.Encoding]::UTF8.GetString($b)` names an `Encoding`.
+    &#34;&#34;&#34;
+    named = call.object
+    if named is None:
+        return False
+    if call.access is Ps1AccessKind.STATIC:
+        if not isinstance(named, Ps1TypeExpression):
+            return False
+        resolved = data.resolve_type(named.name)
+        return resolved is not None and keeps_nothing(resolved, member, static=True)
+    resolved = resolve_expression_type(named)
+    return resolved is not None and keeps_nothing(resolved, member, static=False)
+
+
+def _handed_to_command(
+    cmd: Ps1CommandInvocation,
+    depth: int,
+    trust: Ps1CallTrust,
+) -&gt; Ps1Handoff | None:
+    &#34;&#34;&#34;
+    What *cmd* keeps of an object it is handed, as an argument or as pipeline input. `None` where
+    the command only writes what it is handed out again, so that the question moves on to wherever
+    its output goes.
+    &#34;&#34;&#34;
+    if binds_a_name(cmd):
+        return _kept(depth)
+    name = get_command_name(cmd)
+    if name is None or not trust.trusts(name.lower()):
+        return _kept(depth)
+    name = name.lower()
+    if name in _CONSUMING_COMMANDS:
+        return Ps1Handoff.NOWHERE
+    if name in _PASSING_COMMANDS:
+        return None
+    if name in _FILTERING_COMMANDS and _hands_only_constants(cmd):
+        return None
+    return _kept(depth)
+
+
+def _piped(
+    pipeline: Ps1Pipeline,
+    element: Node,
+    at: _Position,
+    trust: Ps1CallTrust,
+) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    Where the objects a pipeline element writes go: into the next element, one at a time, or out of
+    the pipeline as its value where the element is the last one. The value of an expression is
+    taken apart on its way into the next element; what a command wrote already is its objects.
+    &#34;&#34;&#34;
+    depth, streamed = at
+    elements = pipeline.elements
+    for position, candidate in enumerate(elements):
+        if candidate is not element:
+            continue
+        for following in elements[position + 1:]:
+            if not streamed:
+                depth = _unrolled(depth)
+                streamed = True
+            command = following.expression
+            if not isinstance(command, Ps1CommandInvocation):
+                return _kept(depth)
+            kept = _handed_to_command(command, depth, trust)
+            if kept is not None:
+                return kept
+        return _climb(pipeline, _Position(depth, streamed), trust)
+    return _kept(depth)
+
+
+def _written_out(statement: Node, at: _Position, trust: Ps1CallTrust) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    Where a value a statement writes to the output goes: nowhere at the top of the script, to
+    whoever runs a body, and into the value around it where the statement stands in an expression.
+    The value of an expression is taken apart as it is written; what a command wrote is not.
+
+    A method of a class is the exception on both counts. It writes out nothing but what it returns,
+    and its `return` hands the value back whole rather than element by element.
+    &#34;&#34;&#34;
+    depth = at.depth if at.streamed else _unrolled(at.depth)
+    written = _Position(depth, True)
+    cursor = statement
+    while True:
+        parent = cursor.parent
+        if parent is None or isinstance(parent, Ps1Script):
+            return Ps1Handoff.NOWHERE
+        if isinstance(parent, Ps1ScriptBlock):
+            if not _is_a_method_body(parent):
+                return _kept(depth)
+            if isinstance(statement, Ps1ReturnStatement):
+                return _kept(at.depth)
+            return Ps1Handoff.NOWHERE
+        if isinstance(parent, (Ps1ArrayExpression, Ps1SubExpression)):
+            return _climb(parent, written, trust)
+        if isinstance(parent, Expression):
+            return _climb(cursor, written, trust)
+        cursor = parent</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.binds_a_name"><code class="name flex">
+<span>def <span class="ident">binds_a_name</span></span>(<span>cmd)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>cmd</em> gives one of the values it is handed to a name that outlives it, as
+<code>Set-Variable y $x</code> and <code>New-Variable y $x</code> do.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L135-L143" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def binds_a_name(cmd: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *cmd* gives one of the values it is handed to a name that outlives it, as
+    `Set-Variable y $x` and `New-Variable y $x` do.
+    &#34;&#34;&#34;
+    return any(
+        reference.role is not Ps1NameRole.READS
+        for reference in named_references(cmd)
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.object_handoff"><code class="name flex">
+<span>def <span class="ident">object_handoff</span></span>(<span>var, trust)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What keeps the object <em>var</em> reads once the expression around it has run. What a command or a
+call is believed to let go of is what <em>trust</em> allows.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L159-L164" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def object_handoff(var: Ps1Variable, trust: Ps1CallTrust) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What keeps the object *var* reads once the expression around it has run. What a command or a
+    call is believed to let go of is what *trust* allows.
+    &#34;&#34;&#34;
+    return _climb(var, _Position(0, streamed=False), trust)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.assignment_handoff"><code class="name flex">
+<span>def <span class="ident">assignment_handoff</span></span>(<span>assignment, trust)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What keeps the object <em>assignment</em> stores, apart from its own target, once the assignment is
+used as a value. <code>$y = $x = 1, 2, 3</code> gives the one array to both names, and
+<code>@{ k = ($x = 1, 2, 3) }</code> puts it into the table. <code><a title="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.NOWHERE" href="#refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.NOWHERE">Ps1Handoff.NOWHERE</a></code> for an assignment that
+stands as a statement of its own, which writes nothing out.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L167-L179" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def assignment_handoff(
+    assignment: Ps1AssignmentExpression,
+    trust: Ps1CallTrust,
+) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    What keeps the object *assignment* stores, apart from its own target, once the assignment is
+    used as a value. `$y = $x = 1, 2, 3` gives the one array to both names, and
+    `@{ k = ($x = 1, 2, 3) }` puts it into the table. `Ps1Handoff.NOWHERE` for an assignment that
+    stands as a statement of its own, which writes nothing out.
+    &#34;&#34;&#34;
+    if not _yields_its_value(assignment):
+        return Ps1Handoff.NOWHERE
+    return _climb(assignment, _Position(0, streamed=False), trust)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff"><code class="flex name class">
+<span>class <span class="ident">Ps1Handoff</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What keeps the object a read produces once the expression around the read has run.</p>
+<p><code>NOWHERE</code> — nothing keeps the object or anything inside it.
+<code>PARTS</code> — something keeps objects the value holds but not the value itself: <code>$y = @($x)</code>,
+<code>foreach ($e in $x)</code>, <code>$q = $x[0]</code>.
+<code>OBJECT</code> — something keeps the object itself: a second name, as <code>$y = $x</code> gives it one, an
+element of a new array, a hash entry, a slot of another container, a callee, a caller
+collecting the output of a body.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L82-L101" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Handoff(enum.Enum):
+    &#34;&#34;&#34;
+    What keeps the object a read produces once the expression around the read has run.
+
+    `NOWHERE` — nothing keeps the object or anything inside it.
+    `PARTS` — something keeps objects the value holds but not the value itself: `$y = @($x)`,
+    `foreach ($e in $x)`, `$q = $x[0]`.
+    `OBJECT` — something keeps the object itself: a second name, as `$y = $x` gives it one, an
+    element of a new array, a hash entry, a slot of another container, a callee, a caller
+    collecting the output of a body.
+    &#34;&#34;&#34;
+    NOWHERE = 0
+    PARTS   = 1  # noqa
+    OBJECT  = 2  # noqa
+
+    def widest(self, other: Ps1Handoff) -&gt; Ps1Handoff:
+        &#34;&#34;&#34;
+        Whichever of the two keeps more of the object.
+        &#34;&#34;&#34;
+        return self if self.value &gt;= other.value else other</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.NOWHERE"><code class="name">var <span class="ident">NOWHERE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.PARTS"><code class="name">var <span class="ident">PARTS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.OBJECT"><code class="name">var <span class="ident">OBJECT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.widest"><code class="name flex">
+<span>def <span class="ident">widest</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whichever of the two keeps more of the object.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L97-L101" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def widest(self, other: Ps1Handoff) -&gt; Ps1Handoff:
+    &#34;&#34;&#34;
+    Whichever of the two keeps more of the object.
+    &#34;&#34;&#34;
+    return self if self.value &gt;= other.value else other</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1CallTrust"><code class="flex name class">
+<span>class <span class="ident">Ps1CallTrust</span></span>
+<span>(</span><span>trusts, closed_at)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What the classifier may believe about the code a read is handed to. <code>trusts</code> says whether a
+command name still runs the command it names: a name the script may have taken over runs code
+this cannot see, which may keep anything. <code>closed_at</code> says whether no code this analysis cannot
+read has run by the time a node is evaluated, so that a type still names the type the metadata
+describes: such code can put another type behind <code>[string]</code>, and what a call on it keeps is then
+anything at all.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L146-L156" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallTrust(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What the classifier may believe about the code a read is handed to. `trusts` says whether a
+    command name still runs the command it names: a name the script may have taken over runs code
+    this cannot see, which may keep anything. `closed_at` says whether no code this analysis cannot
+    read has run by the time a node is evaluated, so that a type still names the type the metadata
+    describes: such code can put another type behind `[string]`, and what a call on it keeps is then
+    anything at all.
+    &#34;&#34;&#34;
+    trusts: Callable[[str], bool]
+    closed_at: Callable[[Node], bool]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1CallTrust.trusts"><code class="name">var <span class="ident">trusts</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L146-L156" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallTrust(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What the classifier may believe about the code a read is handed to. `trusts` says whether a
+    command name still runs the command it names: a name the script may have taken over runs code
+    this cannot see, which may keep anything. `closed_at` says whether no code this analysis cannot
+    read has run by the time a node is evaluated, so that a type still names the type the metadata
+    describes: such code can put another type behind `[string]`, and what a call on it keeps is then
+    anything at all.
+    &#34;&#34;&#34;
+    trusts: Callable[[str], bool]
+    closed_at: Callable[[Node], bool]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.handoff.Ps1CallTrust.closed_at"><code class="name">var <span class="ident">closed_at</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/lib/scripts/ps1/analysis/handoff.py#L146-L156" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallTrust(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What the classifier may believe about the code a read is handed to. `trusts` says whether a
+    command name still runs the command it names: a name the script may have taken over runs code
+    this cannot see, which may keep anything. `closed_at` says whether no code this analysis cannot
+    read has run by the time a node is evaluated, so that a type still names the type the metadata
+    describes: such code can put another type behind `[string]`, and what a call on it keeps is then
+    anything at all.
+    &#34;&#34;&#34;
+    trusts: Callable[[str], bool]
+    closed_at: Callable[[Node], bool]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handoff.binds_a_name" href="#refinery.lib.scripts.ps1.analysis.handoff.binds_a_name">binds_a_name</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handoff.object_handoff" href="#refinery.lib.scripts.ps1.analysis.handoff.object_handoff">object_handoff</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handoff.assignment_handoff" href="#refinery.lib.scripts.ps1.analysis.handoff.assignment_handoff">assignment_handoff</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff" href="#refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff">Ps1Handoff</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.widest" href="#refinery.lib.scripts.ps1.analysis.handoff.Ps1Handoff.widest">widest</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.handoff.Ps1CallTrust" href="#refinery.lib.scripts.ps1.analysis.handoff.Ps1CallTrust">Ps1CallTrust</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

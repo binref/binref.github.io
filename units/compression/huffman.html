@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.units.compression.huffman documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.units.compression.huffman</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/units/compression/huffman.py#L1-L230" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">#!/usr/bin/env python3
+# -*- coding:utf-8 -*-
+from __future__ import annotations
+
+import heapq
+
+from refinery.lib.meta import MV, metavars
+from refinery.lib.types import Param, asbuffer, buf
+from refinery.units import Arg, RefineryCriticalException, Unit
+
+_LENS_VAR = &#39;lens&#39;
+
+
+class huffman(Unit):
+    &#34;&#34;&#34;
+    Compress and decompress data with a canonical Huffman code.
+
+    The codes are assigned canonically, following the algorithm from RFC 1951; in ascending order
+    of code length and, within the same length, in ascending order of the symbol value. This
+    convention is used by DEFLATE, JPEG, and many bespoke implementations.
+
+    By default, the table is expected in &#34;lengths&#34; layout: one byte per symbol, where the byte at
+    offset `i` is the code length of the symbol `i`, and a length of zero means that the symbol is
+    not in the alphabet. In &#34;pairs&#34; layout, the table is a sequence of two-byte pairs of symbol and
+    code length, which allows the alphabet to be sparse.
+
+    In reverse mode, the code length table is computed from the byte frequencies of the input when
+    none is provided, and attached to the output chunk as the `{}` meta variable, along with the
+    `count` of encoded symbols. In decoding mode, both meta variables on the input chunk are used
+    when the corresponding arguments are not given.
+    &#34;&#34;&#34;
+
+    _REVERSED_BITS = bytes(int(&#39;{:08b}&#39;.format(k)[::-1], 2) for k in range(256))
+
+    def __init__(
+        self,
+        lens: Param[buf, Arg.Binary(help=(
+            &#39;The code length table data.&#39;))] = b&#39;&#39;,
+        pairs: Param[bool, Arg.Switch(&#39;-p&#39;, help=(
+            &#39;Specify when the code length data uses pairs layout; the default is lengths-based.&#39;
+        ))] = False,
+        lsb: Param[bool, Arg.Switch(&#39;-l&#39;, help=(
+            &#39;Use least significant bit (LSB) packing order; default is MSB. Most formats pack&#39;
+            &#39; codes MSB-first, but e.g. DEFLATE and LZX pack them LSB-first.&#39;
+        ))] = False,
+        count: Param[int, Arg.Number(&#39;-c&#39;, help=(
+            &#39;Number of symbols to decode; by default, this number is taken from the count meta &#39;
+            &#39;variable when present, and the unit otherwise decodes until the stream is exhausted, &#39;
+            &#39;i.e. until fewer bits remain than the shortest code is long. Since padding bits at &#39;
+            &#39;the end of the stream can accidentally form a valid code, it is safer to provide &#39;
+            &#39;this count when it is known.&#39;
+        ))] = 0,
+    ):
+        super().__init__(lens=lens, pairs=pairs, lsb=lsb, count=count)
+
+    def _parse_lengths(self, table: buf) -&gt; list[tuple[int, int]]:
+        &#34;&#34;&#34;
+        Returns the (symbol, code length) pairs from the table in the requested layout.
+        &#34;&#34;&#34;
+        if not self.args.pairs:
+            return [(s, l) for s, l in enumerate(table) if l &gt; 0]
+        if len(table) % 2:
+            raise RefineryCriticalException(&#39;a table in pairs layout must have an even number of bytes&#39;)
+        return [(table[k], table[k + 1]) for k in range(0, len(table), 2) if table[k + 1] &gt; 0]
+
+    def _canonical_codes(self, lengths: list[tuple[int, int]]) -&gt; dict[int, tuple[int, int]]:
+        &#34;&#34;&#34;
+        Given a list of (symbol, code length) pairs, returns a dictionary mapping each
+        symbol to a (code length, code) tuple, using canonical code assignment (RFC 1951).
+        &#34;&#34;&#34;
+        if not lengths:
+            return {}
+        max_len = max(l for _, l in lengths)
+        if max_len &gt; 64:
+            raise RefineryCriticalException(&#39;a code length of more than 64 bits is not supported&#39;)
+        count = [0] * (max_len + 1)
+        for _, length in lengths:
+            count[length] += 1
+        if sum(count[k] &lt;&lt; (max_len - k) for k in range(1, max_len + 1)) &gt; (1 &lt;&lt; max_len):
+            raise RefineryCriticalException(&#39;the code length table is over-subscribed&#39;)
+        code = -1
+        prev = 0
+        codes: dict[int, tuple[int, int]] = {}
+        for symbol, length in sorted(lengths, key=lambda p: (p[1], p[0])):
+            code = (code + 1) &lt;&lt; (length - prev)
+            codes[symbol] = (length, code)
+            prev = length
+        return codes
+
+    def _optimal_lengths(self, data: buf) -&gt; dict[int, tuple[int, int]]:
+        &#34;&#34;&#34;
+        Computes an optimal code length for each byte value occurring in the input and
+        returns the canonical codes, i.e. the same dictionary as `_canonical_codes`.
+        &#34;&#34;&#34;
+        frequency: dict[int, int] = {}
+        for byte in data:
+            frequency[byte] = frequency.get(byte, 0) + 1
+        if not frequency:
+            return {}
+        if len(frequency) == 1:
+            return {next(iter(frequency)): (1, 0)}
+        # build the Huffman tree with a priority queue over (weight, tie breaker,
+        # symbols); the depth of each symbol in that tree is its code length
+        forest: list[tuple[int, int, list[int]]] = [
+            (weight, k, [symbol]) for k, (symbol, weight) in enumerate(frequency.items())]
+        heapq.heapify(forest)
+        depth = dict.fromkeys(frequency, 0)
+        while len(forest) &gt; 1:
+            weight_a, _, a = heapq.heappop(forest)
+            weight_b, _, b = heapq.heappop(forest)
+            for symbol in a + b:
+                depth[symbol] += 1
+            forest.append((weight_a + weight_b, -1, a + b))
+        return self._canonical_codes([(symbol, length) for symbol, length in depth.items()])
+
+    def _decode(self, data: buf, codes: dict[int, tuple[int, int]], count: int) -&gt; tuple[bytes, int]:
+        &#34;&#34;&#34;
+        Decode a bit-packed Huffman stream using the given canonical codes; returns the
+        decoded data and the number of decoded symbols.
+        &#34;&#34;&#34;
+        if not codes:
+            return b&#39;&#39;, 0
+        max_len = max(length for length, _ in codes.values())
+        min_len = min(length for length, _ in codes.values())
+        if self.args.lsb:
+            # after reversing the bits of every byte, the first bit of the stream is the
+            # most significant bit of the first byte, and the same extraction code as for
+            # MSB-first streams applies
+            data = bytes(self._REVERSED_BITS[b] for b in data)
+        total = len(data) * 8
+        size = len(data)
+        fast: list[int] | None = None
+        if max_len &lt;= 16:
+            fast = [-1] * (1 &lt;&lt; max_len)
+            for symbol, (length, code) in codes.items():
+                shift = max_len - length
+                for index in range(code &lt;&lt; shift, (code + 1) &lt;&lt; shift):
+                    fast[index] = symbol
+        lookup = {(length, code): symbol for symbol, (length, code) in codes.items()}
+        out = bytearray()
+        pos = 0
+        decoded = 0
+        while True:
+            if count and decoded &gt;= count:
+                break
+            if pos + min_len &gt; total:
+                break
+            symbol = None
+            if fast is not None and pos + max_len &lt;= total and (pos &gt;&gt; 3) + 3 &lt;= size:
+                # read max_len bits starting at the current position; the first bit of
+                # the code is the most significant bit of the extracted value
+                offset = pos &gt;&gt; 3
+                window = data[offset] &lt;&lt; 16 | data[offset + 1] &lt;&lt; 8 | data[offset + 2]
+                index = (window &gt;&gt; (24 - (pos &amp; 7) - max_len)) &amp; ((1 &lt;&lt; max_len) - 1)
+                symbol = fast[index]
+                if symbol &lt; 0:
+                    symbol = None
+                else:
+                    pos += codes[symbol][0]
+            else:
+                code = 0
+                length = 0
+                while length &lt; max_len and pos &lt; total:
+                    bit = data[pos &gt;&gt; 3] &gt;&gt; (7 - (pos &amp; 7)) &amp; 1
+                    code = code &lt;&lt; 1 | bit
+                    pos += 1
+                    length += 1
+                    symbol = lookup.get((length, code))
+                    if symbol is not None:
+                        break
+            if symbol is None:
+                # either the padding at the end of the stream or a code that is not in
+                # the table; without an explicit count, this is treated as the end
+                break
+            decoded += 1
+            out.append(symbol)
+        if count and decoded &lt; count:
+            self.log_warn(F&#39;decoded only {decoded} of {count} requested symbols&#39;)
+        return bytes(out), decoded
+
+    def _encode(self, data: buf, codes: dict[int, tuple[int, int]]) -&gt; buf:
+        out = bytearray()
+        accumulator = 0
+        bits = 0
+        lsb = self.args.lsb
+        for symbol in data:
+            try:
+                length, code = codes[symbol]
+            except KeyError:
+                raise RefineryCriticalException(F&#39;the symbol {symbol:#04x} is not in the alphabet&#39;)
+            accumulator = accumulator &lt;&lt; length | code
+            bits += length
+            while bits &gt;= 8:
+                bits -= 8
+                byte = accumulator &gt;&gt; bits &amp; 0xFF
+                out.append(self._REVERSED_BITS[byte] if lsb else byte)
+            accumulator &amp;= (1 &lt;&lt; bits) - 1
+        if bits:
+            byte = accumulator &lt;&lt; 8 - bits &amp; 0xFF
+            out.append(self._REVERSED_BITS[byte] if lsb else byte)
+        return bytes(out)
+
+    def process(self, data):
+        meta = metavars(data)
+        lens = self.args.lens
+        if not lens:
+            lens = meta.get(_LENS_VAR)
+        if not (_lens := asbuffer(lens)):
+            raise RefineryCriticalException(
+                &#39;no code length table was provided, neither as an argument nor as a meta variable&#39;)
+        codes = self._canonical_codes(self._parse_lengths(_lens))
+        count = self.args.count or meta.get(MV.COUNT, 0)
+        if not isinstance(count, int):
+            raise RefineryCriticalException(
+                F&#39;the specified code count was not an integer but an instance of type {type(count).__name__}&#39;)
+        out, decoded = self._decode(bytes(data), codes, count)
+        return self.labelled(out, **{MV.COUNT: decoded})
+
+    def reverse(self, data):
+        if self.args.lens:
+            codes = self._canonical_codes(self._parse_lengths(bytes(self.args.lens)))
+        else:
+            codes = self._optimal_lengths(data)
+        lens = bytes(codes.get(s, (0, 0))[0] for s in range(256))
+        chunk = self._encode(data, codes)
+        return self.labelled(chunk, **{MV.COUNT: len(data), _LENS_VAR: lens})
+
+
+if __d := huffman.__doc__:
+    huffman.__doc__ = __d.format(_LENS_VAR)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.units.compression.huffman.huffman"><code class="flex name class">
+<span>class <span class="ident">huffman</span></span>
+<span>(</span><span>lens=b'', pairs=False, lsb=False, count=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Compress and decompress data with a canonical Huffman code.</p>
+<p>The codes are assigned canonically, following the algorithm from RFC 1951; in ascending order
+of code length and, within the same length, in ascending order of the symbol value. This
+convention is used by DEFLATE, JPEG, and many bespoke implementations.</p>
+<p>By default, the table is expected in "lengths" layout: one byte per symbol, where the byte at
+offset <code>i</code> is the code length of the symbol <code>i</code>, and a length of zero means that the symbol is
+not in the alphabet. In "pairs" layout, the table is a sequence of two-byte pairs of symbol and
+code length, which allows the alphabet to be sparse.</p>
+<p>In reverse mode, the code length table is computed from the byte frequencies of the input when
+none is provided, and attached to the output chunk as the <code>lens</code> meta variable, along with the
+<code>count</code> of encoded symbols. In decoding mode, both meta variables on the input chunk are used
+when the corresponding arguments are not given.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/02e4f655f44416e2212a21d38fc6130ee0c7a263/refinery/units/compression/huffman.py#L14-L226" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class huffman(Unit):
+    &#34;&#34;&#34;
+    Compress and decompress data with a canonical Huffman code.
+
+    The codes are assigned canonically, following the algorithm from RFC 1951; in ascending order
+    of code length and, within the same length, in ascending order of the symbol value. This
+    convention is used by DEFLATE, JPEG, and many bespoke implementations.
+
+    By default, the table is expected in &#34;lengths&#34; layout: one byte per symbol, where the byte at
+    offset `i` is the code length of the symbol `i`, and a length of zero means that the symbol is
+    not in the alphabet. In &#34;pairs&#34; layout, the table is a sequence of two-byte pairs of symbol and
+    code length, which allows the alphabet to be sparse.
+
+    In reverse mode, the code length table is computed from the byte frequencies of the input when
+    none is provided, and attached to the output chunk as the `{}` meta variable, along with the
+    `count` of encoded symbols. In decoding mode, both meta variables on the input chunk are used
+    when the corresponding arguments are not given.
+    &#34;&#34;&#34;
+
+    _REVERSED_BITS = bytes(int(&#39;{:08b}&#39;.format(k)[::-1], 2) for k in range(256))
+
+    def __init__(
+        self,
+        lens: Param[buf, Arg.Binary(help=(
+            &#39;The code length table data.&#39;))] = b&#39;&#39;,
+        pairs: Param[bool, Arg.Switch(&#39;-p&#39;, help=(
+            &#39;Specify when the code length data uses pairs layout; the default is lengths-based.&#39;
+        ))] = False,
+        lsb: Param[bool, Arg.Switch(&#39;-l&#39;, help=(
+            &#39;Use least significant bit (LSB) packing order; default is MSB. Most formats pack&#39;
+            &#39; codes MSB-first, but e.g. DEFLATE and LZX pack them LSB-first.&#39;
+        ))] = False,
+        count: Param[int, Arg.Number(&#39;-c&#39;, help=(
+            &#39;Number of symbols to decode; by default, this number is taken from the count meta &#39;
+            &#39;variable when present, and the unit otherwise decodes until the stream is exhausted, &#39;
+            &#39;i.e. until fewer bits remain than the shortest code is long. Since padding bits at &#39;
+            &#39;the end of the stream can accidentally form a valid code, it is safer to provide &#39;
+            &#39;this count when it is known.&#39;
+        ))] = 0,
+    ):
+        super().__init__(lens=lens, pairs=pairs, lsb=lsb, count=count)
+
+    def _parse_lengths(self, table: buf) -&gt; list[tuple[int, int]]:
+        &#34;&#34;&#34;
+        Returns the (symbol, code length) pairs from the table in the requested layout.
+        &#34;&#34;&#34;
+        if not self.args.pairs:
+            return [(s, l) for s, l in enumerate(table) if l &gt; 0]
+        if len(table) % 2:
+            raise RefineryCriticalException(&#39;a table in pairs layout must have an even number of bytes&#39;)
+        return [(table[k], table[k + 1]) for k in range(0, len(table), 2) if table[k + 1] &gt; 0]
+
+    def _canonical_codes(self, lengths: list[tuple[int, int]]) -&gt; dict[int, tuple[int, int]]:
+        &#34;&#34;&#34;
+        Given a list of (symbol, code length) pairs, returns a dictionary mapping each
+        symbol to a (code length, code) tuple, using canonical code assignment (RFC 1951).
+        &#34;&#34;&#34;
+        if not lengths:
+            return {}
+        max_len = max(l for _, l in lengths)
+        if max_len &gt; 64:
+            raise RefineryCriticalException(&#39;a code length of more than 64 bits is not supported&#39;)
+        count = [0] * (max_len + 1)
+        for _, length in lengths:
+            count[length] += 1
+        if sum(count[k] &lt;&lt; (max_len - k) for k in range(1, max_len + 1)) &gt; (1 &lt;&lt; max_len):
+            raise RefineryCriticalException(&#39;the code length table is over-subscribed&#39;)
+        code = -1
+        prev = 0
+        codes: dict[int, tuple[int, int]] = {}
+        for symbol, length in sorted(lengths, key=lambda p: (p[1], p[0])):
+            code = (code + 1) &lt;&lt; (length - prev)
+            codes[symbol] = (length, code)
+            prev = length
+        return codes
+
+    def _optimal_lengths(self, data: buf) -&gt; dict[int, tuple[int, int]]:
+        &#34;&#34;&#34;
+        Computes an optimal code length for each byte value occurring in the input and
+        returns the canonical codes, i.e. the same dictionary as `_canonical_codes`.
+        &#34;&#34;&#34;
+        frequency: dict[int, int] = {}
+        for byte in data:
+            frequency[byte] = frequency.get(byte, 0) + 1
+        if not frequency:
+            return {}
+        if len(frequency) == 1:
+            return {next(iter(frequency)): (1, 0)}
+        # build the Huffman tree with a priority queue over (weight, tie breaker,
+        # symbols); the depth of each symbol in that tree is its code length
+        forest: list[tuple[int, int, list[int]]] = [
+            (weight, k, [symbol]) for k, (symbol, weight) in enumerate(frequency.items())]
+        heapq.heapify(forest)
+        depth = dict.fromkeys(frequency, 0)
+        while len(forest) &gt; 1:
+            weight_a, _, a = heapq.heappop(forest)
+            weight_b, _, b = heapq.heappop(forest)
+            for symbol in a + b:
+                depth[symbol] += 1
+            forest.append((weight_a + weight_b, -1, a + b))
+        return self._canonical_codes([(symbol, length) for symbol, length in depth.items()])
+
+    def _decode(self, data: buf, codes: dict[int, tuple[int, int]], count: int) -&gt; tuple[bytes, int]:
+        &#34;&#34;&#34;
+        Decode a bit-packed Huffman stream using the given canonical codes; returns the
+        decoded data and the number of decoded symbols.
+        &#34;&#34;&#34;
+        if not codes:
+            return b&#39;&#39;, 0
+        max_len = max(length for length, _ in codes.values())
+        min_len = min(length for length, _ in codes.values())
+        if self.args.lsb:
+            # after reversing the bits of every byte, the first bit of the stream is the
+            # most significant bit of the first byte, and the same extraction code as for
+            # MSB-first streams applies
+            data = bytes(self._REVERSED_BITS[b] for b in data)
+        total = len(data) * 8
+        size = len(data)
+        fast: list[int] | None = None
+        if max_len &lt;= 16:
+            fast = [-1] * (1 &lt;&lt; max_len)
+            for symbol, (length, code) in codes.items():
+                shift = max_len - length
+                for index in range(code &lt;&lt; shift, (code + 1) &lt;&lt; shift):
+                    fast[index] = symbol
+        lookup = {(length, code): symbol for symbol, (length, code) in codes.items()}
+        out = bytearray()
+        pos = 0
+        decoded = 0
+        while True:
+            if count and decoded &gt;= count:
+                break
+            if pos + min_len &gt; total:
+                break
+            symbol = None
+            if fast is not None and pos + max_len &lt;= total and (pos &gt;&gt; 3) + 3 &lt;= size:
+                # read max_len bits starting at the current position; the first bit of
+                # the code is the most significant bit of the extracted value
+                offset = pos &gt;&gt; 3
+                window = data[offset] &lt;&lt; 16 | data[offset + 1] &lt;&lt; 8 | data[offset + 2]
+                index = (window &gt;&gt; (24 - (pos &amp; 7) - max_len)) &amp; ((1 &lt;&lt; max_len) - 1)
+                symbol = fast[index]
+                if symbol &lt; 0:
+                    symbol = None
+                else:
+                    pos += codes[symbol][0]
+            else:
+                code = 0
+                length = 0
+                while length &lt; max_len and pos &lt; total:
+                    bit = data[pos &gt;&gt; 3] &gt;&gt; (7 - (pos &amp; 7)) &amp; 1
+                    code = code &lt;&lt; 1 | bit
+                    pos += 1
+                    length += 1
+                    symbol = lookup.get((length, code))
+                    if symbol is not None:
+                        break
+            if symbol is None:
+                # either the padding at the end of the stream or a code that is not in
+                # the table; without an explicit count, this is treated as the end
+                break
+            decoded += 1
+            out.append(symbol)
+        if count and decoded &lt; count:
+            self.log_warn(F&#39;decoded only {decoded} of {count} requested symbols&#39;)
+        return bytes(out), decoded
+
+    def _encode(self, data: buf, codes: dict[int, tuple[int, int]]) -&gt; buf:
+        out = bytearray()
+        accumulator = 0
+        bits = 0
+        lsb = self.args.lsb
+        for symbol in data:
+            try:
+                length, code = codes[symbol]
+            except KeyError:
+                raise RefineryCriticalException(F&#39;the symbol {symbol:#04x} is not in the alphabet&#39;)
+            accumulator = accumulator &lt;&lt; length | code
+            bits += length
+            while bits &gt;= 8:
+                bits -= 8
+                byte = accumulator &gt;&gt; bits &amp; 0xFF
+                out.append(self._REVERSED_BITS[byte] if lsb else byte)
+            accumulator &amp;= (1 &lt;&lt; bits) - 1
+        if bits:
+            byte = accumulator &lt;&lt; 8 - bits &amp; 0xFF
+            out.append(self._REVERSED_BITS[byte] if lsb else byte)
+        return bytes(out)
+
+    def process(self, data):
+        meta = metavars(data)
+        lens = self.args.lens
+        if not lens:
+            lens = meta.get(_LENS_VAR)
+        if not (_lens := asbuffer(lens)):
+            raise RefineryCriticalException(
+                &#39;no code length table was provided, neither as an argument nor as a meta variable&#39;)
+        codes = self._canonical_codes(self._parse_lengths(_lens))
+        count = self.args.count or meta.get(MV.COUNT, 0)
+        if not isinstance(count, int):
+            raise RefineryCriticalException(
+                F&#39;the specified code count was not an integer but an instance of type {type(count).__name__}&#39;)
+        out, decoded = self._decode(bytes(data), codes, count)
+        return self.labelled(out, **{MV.COUNT: decoded})
+
+    def reverse(self, data):
+        if self.args.lens:
+            codes = self._canonical_codes(self._parse_lengths(bytes(self.args.lens)))
+        else:
+            codes = self._optimal_lengths(data)
+        lens = bytes(codes.get(s, (0, 0))[0] for s in range(256))
+        chunk = self._encode(data, codes)
+        return self.labelled(chunk, **{MV.COUNT: len(data), _LENS_VAR: lens})</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></li>
+<li><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></li>
+<li><a title="refinery.units.Entry" href="../index.html#refinery.units.Entry">Entry</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.units.compression.huffman.huffman" href="#refinery.units.compression.huffman.huffman">huffman</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.console" href="../index.html#refinery.units.Unit.console">console</a></code></li>
+<li><code><a title="refinery.units.Unit.optional_dependencies" href="../index.html#refinery.units.Unit.optional_dependencies">optional_dependencies</a></code></li>
+<li><code><a title="refinery.units.Unit.required_dependencies" href="../index.html#refinery.units.Unit.required_dependencies">required_dependencies</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.Unit" href="../index.html#refinery.units.Unit">Unit</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.Unit.FilterEverything" href="../index.html#refinery.units.UnitBase.FilterEverything">FilterEverything</a></code></li>
+<li><code><a title="refinery.units.Unit.Requires" href="../index.html#refinery.units.Unit.Requires">Requires</a></code></li>
+<li><code><a title="refinery.units.Unit.act" href="../index.html#refinery.units.Unit.act">act</a></code></li>
+<li><code><a title="refinery.units.Unit.assemble" href="../index.html#refinery.units.Unit.assemble">assemble</a></code></li>
+<li><code><a title="refinery.units.Unit.carved" href="../index.html#refinery.units.Unit.carved">carved</a></code></li>
+<li><code><a title="refinery.units.Unit.codec" href="../index.html#refinery.units.Unit.codec">codec</a></code></li>
+<li><code><a title="refinery.units.Unit.finish" href="../index.html#refinery.units.UnitBase.finish">finish</a></code></li>
+<li><code><a title="refinery.units.Unit.handles" href="../index.html#refinery.units.UnitBase.handles">handles</a></code></li>
+<li><code><a title="refinery.units.Unit.is_quiet" href="../index.html#refinery.units.Unit.is_quiet">is_quiet</a></code></li>
+<li><code><a title="refinery.units.Unit.is_reversible" href="../index.html#refinery.units.Unit.is_reversible">is_reversible</a></code></li>
+<li><code><a title="refinery.units.Unit.isatty" href="../index.html#refinery.units.Unit.isatty">isatty</a></code></li>
+<li><code><a title="refinery.units.Unit.labelled" href="../index.html#refinery.units.Unit.labelled">labelled</a></code></li>
+<li><code><a title="refinery.units.Unit.leniency" href="../index.html#refinery.units.Unit.leniency">leniency</a></code></li>
+<li><code><a title="refinery.units.Unit.log_always" href="../index.html#refinery.units.Unit.log_always">log_always</a></code></li>
+<li><code><a title="refinery.units.Unit.log_debug" href="../index.html#refinery.units.Unit.log_debug">log_debug</a></code></li>
+<li><code><a title="refinery.units.Unit.log_detach" href="../index.html#refinery.units.Unit.log_detach">log_detach</a></code></li>
+<li><code><a title="refinery.units.Unit.log_fail" href="../index.html#refinery.units.Unit.log_fail">log_fail</a></code></li>
+<li><code><a title="refinery.units.Unit.log_info" href="../index.html#refinery.units.Unit.log_info">log_info</a></code></li>
+<li><code><a title="refinery.units.Unit.log_level" href="../index.html#refinery.units.Unit.log_level">log_level</a></code></li>
+<li><code><a title="refinery.units.Unit.log_warn" href="../index.html#refinery.units.Unit.log_warn">log_warn</a></code></li>
+<li><code><a title="refinery.units.Unit.logger" href="../index.html#refinery.units.Unit.logger">logger</a></code></li>
+<li><code><a title="refinery.units.Unit.name" href="../index.html#refinery.units.Unit.name">name</a></code></li>
+<li><code><a title="refinery.units.Unit.nozzle" href="../index.html#refinery.units.Unit.nozzle">nozzle</a></code></li>
+<li><code><a title="refinery.units.Unit.read" href="../index.html#refinery.units.Unit.read">read</a></code></li>
+<li><code><a title="refinery.units.Unit.read1" href="../index.html#refinery.units.Unit.read1">read1</a></code></li>
+<li><code><a title="refinery.units.Unit.reset" href="../index.html#refinery.units.Unit.reset">reset</a></code></li>
+<li><code><a title="refinery.units.Unit.reverse" href="../index.html#refinery.units.UnitBase.reverse">reverse</a></code></li>
+<li><code><a title="refinery.units.Unit.run" href="../index.html#refinery.units.Unit.run">run</a></code></li>
+<li><code><a title="refinery.units.Unit.source" href="../index.html#refinery.units.Unit.source">source</a></code></li>
+<li><code><a title="refinery.units.Unit.superinit" href="../index.html#refinery.units.Unit.superinit">superinit</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.process" href="../index.html#refinery.units.UnitBase.process">process</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="refinery.units.UnitBase" href="../index.html#refinery.units.UnitBase">UnitBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.units.UnitBase.filter" href="../index.html#refinery.units.UnitBase.filter">filter</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.units.compression" href="index.html">refinery.units.compression</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.units.compression.huffman.huffman" href="#refinery.units.compression.huffman.huffman">huffman</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
