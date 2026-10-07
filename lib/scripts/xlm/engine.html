@@ -1,0 +1,3182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.xlm.engine documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.xlm.engine</code></h1>
+</header>
+<section id="section-intro">
+<p>The engine of the emulator: it owns the mutable state of a run — the coordinate indexes the
+cell reads and the row fall-through consult, the values the run left in its cells, the undo
+journal behind the branch snapshots, the registered function aliases, and the branch, loop,
+and call stacks — runs the program of a workbook entry point by entry point, and dispatches
+the function calls a formula makes to the handlers that answer them.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L1-L1207" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The engine of the emulator: it owns the mutable state of a run — the coordinate indexes the
+cell reads and the row fall-through consult, the values the run left in its cells, the undo
+journal behind the branch snapshots, the registered function aliases, and the branch, loop,
+and call stacks — runs the program of a workbook entry point by entry point, and dispatches
+the function calls a formula makes to the handlers that answer them.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import bisect
+import dataclasses
+import hashlib
+import time
+
+from typing import Any, Iterator, NamedTuple, Protocol
+
+from refinery.lib.excel import CellKind, parse_formula, synthesize_formula
+from refinery.lib.excel.common import column_letters
+from refinery.lib.excel.formula.model import (
+    XlA1Reference,
+    XlBinaryExpression,
+    XlBinaryOperator,
+    XlDefinedName,
+    XlFunctionCall,
+    XlR1C1Reference,
+    XlString,
+)
+from refinery.lib.scripts import TREE_RECURSION_DEPTH, BodyEdit, set_body, set_child, set_value
+from refinery.lib.scripts.xlm.blocks import XlmBlock, marker_of, pair_blocks
+from refinery.lib.scripts.xlm.commands import severity
+from refinery.lib.scripts.xlm.environment import XlmEnvironment
+from refinery.lib.scripts.xlm.evaluate import evaluate_expression
+from refinery.lib.scripts.xlm.handlers import EXPRESSION_HANDLERS, HANDLERS
+from refinery.lib.scripts.xlm.memory import XlmFiles, XlmMemory
+from refinery.lib.scripts.xlm.model import XlmCell
+from refinery.lib.scripts.xlm.names import XlmNameEntry
+from refinery.lib.scripts.xlm.references import (
+    XlmArrival,
+    XlmCursor,
+    XlmFrame,
+    XlmLoop,
+    XlmReturnSlot,
+    XlmSnapshot,
+    resolve_reference,
+)
+from refinery.lib.scripts.xlm.trace import XlmSeverity, XlmStatus, XlmStep
+from refinery.lib.scripts.xlm.values import XlmOutcome, XlmReference, XlmValue
+from refinery.lib.tools import RecursionDepth
+
+_FALL_THROUGH = frozenset((
+    XlmStatus.FullEvaluation,
+    XlmStatus.PartialEvaluation,
+    XlmStatus.NotImplemented,
+    XlmStatus.IGNORED,
+))
+
+_ROW_FALL_THROUGH_LIMIT = 10000
+
+#: The commands that still run while the engine skips the body of a loop: the heads and the end
+#: of a loop, because a skipped body ends at the `NEXT` that pairs with its own head.
+_LOOP_COMMANDS = frozenset((
+    &#39;FOR.CELL&#39;,
+    &#39;NEXT&#39;,
+    &#39;WHILE&#39;,
+))
+
+#: How deeply macro calls inside expressions may nest: a deeper call is left unfinished, which
+#: bounds a subroutine that calls itself from inside a formula.
+_SUBROUTINE_DEPTH_LIMIT = 64
+
+#: How many formula cells the reads of one evaluation may evaluate: a read past the budget
+#: answers the value the cell was stored with, which bounds a formula whose references fan out
+#: over cells that read each other.
+_READ_BUDGET = 100_000
+
+
+#: How many steps the loop detector leaves between two computations of the state digest, so
+#: that a window that repeats keeps the run cheap until a comparison can tell frozen from
+#: moving.
+_DIGEST_STEPS = 1000
+
+#: How many addresses a run observes before its window of the last ten addresses starts.
+_WINDOW_WARMUP = 20
+
+
+class _Exhausted(Exception):
+    &#34;&#34;&#34;
+    Raised once a run used up its step budget or its deadline: the run of the entry ends at the
+    step that exhausted it, even when that step runs inside a subroutine an expression called.
+    &#34;&#34;&#34;
+
+
+def callee_name(call: XlFunctionCall) -&gt; str:
+    &#34;&#34;&#34;
+    The name the callee of a call spells, without the quotes of a string literal; a callee
+    that is a reference or another call is not named at all.
+    &#34;&#34;&#34;
+    callee = call.callee
+    if isinstance(callee, str):
+        return callee.strip(&#39;&#34;&#39;)
+    if isinstance(callee, XlDefinedName):
+        return callee.name
+    return &#39;&#39;
+
+
+def _blank(reference: XlmReference) -&gt; XlmValue:
+    &#34;&#34;&#34;
+    The value of a cell that holds nothing: the empty text, which an arithmetic operator reads
+    as zero.
+    &#34;&#34;&#34;
+    return XlmValue(value=&#39;&#39;, text=&#39;&#39;, reference=reference)
+
+
+def _held(value: XlmValue) -&gt; XlmValue:
+    &#34;&#34;&#34;
+    The value a cell holds once a step, a value command, or a return left a value in it. The
+    trace spells a command by its call, but a read of the cell spells what the command computed,
+    so a complete value is respelled from the value itself; an unfinished one keeps the spelling
+    of what was left unfinished. A value that computes nothing leaves the cell blank.
+    &#34;&#34;&#34;
+    if value.partial:
+        return XlmValue(
+            value=value.value,
+            text=value.text,
+            partial=True,
+            date=value.date,
+            cells=value.cells,
+        )
+    if value.value is None:
+        return XlmValue(value=&#39;&#39;, text=&#39;&#39;)
+    return XlmValue(
+        value=value.value,
+        date=value.date,
+        cells=value.cells,
+        error=value.error,
+    )
+
+
+class _CellIndex:
+    &#34;&#34;&#34;
+    The coordinate indexes over the macrosheet cells of a view, and the values the runs left in
+    them: the cell at every position of every sheet, the rows of every column that hold a
+    formula — the rows the fall-through walks — the sheet every cell sits on, and the value a
+    step, a value command, or a return left in a cell, which a later read of the cell answers
+    instead of evaluating its formula again.
+    &#34;&#34;&#34;
+
+    def __init__(self, view):
+        self.cells: dict[str, dict[tuple[int, int], XlmCell]] = {}
+        self.formula_rows: dict[str, dict[int, list[int]]] = {}
+        self.sheet_of: dict[int, str] = {}
+        self.held: dict[int, XlmValue] = {}
+        for macrosheet in view.macrosheets():
+            sheet = macrosheet.name.lower()
+            for cell in macrosheet.body:
+                self.insert(sheet, cell)
+
+    def insert(self, sheet: str, cell: XlmCell) -&gt; None:
+        self.sheet_of[id(cell)] = sheet
+        self.cells.setdefault(sheet, {})[(cell.row, cell.col)] = cell
+        if cell.formula is not None:
+            rows = self.formula_rows.setdefault(sheet, {}).setdefault(cell.col, [])
+            bisect.insort(rows, cell.row)
+
+    def remove(self, sheet: str, cell: XlmCell) -&gt; None:
+        cells = self.cells.get(sheet)
+        if cells is not None:
+            cells.pop((cell.row, cell.col), None)
+        self.sheet_of.pop(id(cell), None)
+        self.held.pop(id(cell), None)
+
+    def find(self, sheet: str, row: int, col: int) -&gt; XlmCell | None:
+        cells = self.cells.get(sheet.lower())
+        if cells is None:
+            return None
+        return cells.get((row, col))
+
+    def hold(self, cell: XlmCell, value: XlmValue | None) -&gt; None:
+        if value is None:
+            self.held.pop(id(cell), None)
+        else:
+            self.held[id(cell)] = value
+
+    def update_formula_rows(self, sheet: str, cell: XlmCell, had: bool, has: bool) -&gt; None:
+        if had == has:
+            return
+        rows = self.formula_rows.setdefault(sheet, {}).setdefault(cell.col, [])
+        if has:
+            bisect.insort(rows, cell.row)
+        elif cell.row in rows:
+            rows.remove(cell.row)
+
+    def fall_through(self, sheet: str, col: int, row: int) -&gt; int | None:
+        rows = self.formula_rows.get(sheet.lower(), {}).get(col)
+        if not rows:
+            return None
+        position = bisect.bisect_left(rows, row)
+        if position &gt;= len(rows):
+            return None
+        found = rows[position]
+        if found - row &gt; _ROW_FALL_THROUGH_LIMIT:
+            return None
+        return found
+
+
+class _Undo(Protocol):
+    &#34;&#34;&#34;
+    One change the journal undoes: every state a run mutates — cells, names, aliases, files,
+    memory regions, failed-write marks — lands in the journal as one record that knows how to
+    take the state it found back.
+    &#34;&#34;&#34;
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        ...
+
+
+class _Write(NamedTuple):
+    &#34;&#34;&#34;
+    One cell write the journal undoes: the sheet the cell sits on, the cell, the value and the
+    formula it carried before, the value the runs had left in it, and whether the write created
+    it.
+    &#34;&#34;&#34;
+
+    sheet: str
+    cell: XlmCell
+    old_value: Any
+    old_formula: Any
+    old_held: XlmValue | None
+    created: bool
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        index = engine._index
+        index.update_formula_rows(
+            self.sheet,
+            self.cell,
+            self.cell.formula is not None,
+            self.old_formula is not None,
+        )
+        set_value(self.cell, &#39;value&#39;, self.old_value)
+        set_child(self.cell, &#39;formula&#39;, self.old_formula)
+        index.hold(self.cell, self.old_held)
+        if self.created:
+            index.remove(self.sheet, self.cell)
+            macrosheet = engine.view.macrosheet(self.sheet)
+            if macrosheet is not None:
+                edit = BodyEdit(macrosheet)
+                edit.splice(self.cell, [])
+                edit.apply()
+
+
+class _NameDefine(NamedTuple):
+    &#34;&#34;&#34;
+    One name definition the journal undoes: every entry the table held before the definition.
+    &#34;&#34;&#34;
+
+    before: list[XlmNameEntry]
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        engine.view.names.restore(self.before)
+
+
+class _AliasRegistration(NamedTuple):
+    &#34;&#34;&#34;
+    One registered alias the journal undoes: the target the name dispatched to before, if any.
+    &#34;&#34;&#34;
+
+    name: str
+    before: str | None
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        if self.before is None:
+            engine.aliases.pop(self.name, None)
+        else:
+            engine.aliases[self.name] = self.before
+
+
+class _FileOpen(NamedTuple):
+    &#34;&#34;&#34;
+    One file the program opened, the journal undoes by closing it again.
+    &#34;&#34;&#34;
+
+    name: str
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        engine.files.close(self.name)
+
+
+class _FileWrite(NamedTuple):
+    &#34;&#34;&#34;
+    One append to a file the journal undoes: the length of the content before the append.
+    &#34;&#34;&#34;
+
+    name: str
+    length: int
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        engine.files.truncate(self.name, self.length)
+
+
+class _RegionAlloc(NamedTuple):
+    &#34;&#34;&#34;
+    One region of memory a command reserved, the journal undoes by releasing it.
+    &#34;&#34;&#34;
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        engine.memory.release()
+
+
+class _MemoryWrite(NamedTuple):
+    &#34;&#34;&#34;
+    One write into a region of memory the journal undoes: the bytes the slice held before.
+    &#34;&#34;&#34;
+
+    base: int
+    before: bytes
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        engine.memory.restore(self.base, self.before)
+
+
+class _FailedMark(NamedTuple):
+    &#34;&#34;&#34;
+    One failed-write mark the journal undoes, in the direction the mark was made.
+    &#34;&#34;&#34;
+
+    reference: XlmReference
+    added: bool
+
+    def undo(self, engine: XlmEngine) -&gt; None:
+        if self.added:
+            engine.failed_writes.discard(self.reference)
+        else:
+            engine.failed_writes.add(self.reference)
+
+
+class XlmEngine:
+    &#34;&#34;&#34;
+    The interpreter of a workbook view. The macrosheet model is read through coordinate indexes
+    the engine maintains itself, so that cells the program writes at run time stay visible to
+    every reference that reads them afterwards; every write lands in an undo journal that a
+    false branch of a partial `IF` rolls back from. The start point and the deadline of the
+    latest run are kept on the engine, because the trial runs of the day guess share them.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        view,
+        output_level: int = 0,
+        day: int = -1,
+        timeout: int = 0,
+        max_steps: int = 1_000_000,
+        *,
+        cells: _CellIndex | None = None,
+    ):
+        self.view = view
+        self.output_level = output_level
+        self.day = day
+        self.timeout = timeout
+        self.max_steps = max_steps
+        self.start_point = &#39;&#39;
+        self.deadline: float | None = None
+        self.aliases: dict[str, str] = {}
+        self.indent_level = 0
+        self.indent_current_line = False
+        self.arrival = XlmArrival.JUMP
+        self.now_count = 0
+        self.char_errors = 0
+        self.iserror_at: XlmCursor | None = None
+        self.iserror_flag = False
+        self.iserror_repeats = 0
+        self.files = XlmFiles()
+        self.memory = XlmMemory()
+        self.environment = XlmEnvironment()
+        self.active_cell: XlmReference | None = None
+        self.failed_writes: set[XlmReference] = set()
+        self.call_stack: list[XlmCursor | XlmReturnSlot] = []
+        self.branch_stack: list[XlmFrame] = []
+        self.while_stack: list[XlmLoop] = []
+        self._index = _CellIndex(view) if cells is None else cells
+        self._journal: list[_Undo] = []
+        self._evaluating: set[int] = set()
+        self._resolving: set[tuple[str, int | None]] = set()
+        self._buffers: list[list[XlmStep]] = []
+        self._depth = 0
+        self._steps = 0
+        self._reads = 0
+        self._halted = False
+
+    @property
+    def ignore_processing(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the engine skips the body of a loop: true while any open loop does not hold.
+        &#34;&#34;&#34;
+        return any(not loop.holds for loop in self.while_stack)
+
+    def run(self, start_point: str = &#39;&#39;) -&gt; Iterator[XlmStep]:
+        &#34;&#34;&#34;
+        The trace of running the program: one step per executed cell. The entry points are the
+        defined names that fuzzy-spell `auto_open` or `auto_close`; without one, the start point
+        a caller named is the only entry. The run of an entry that exhausts its step budget ends
+        with a step that says so, and a run that exhausts its deadline ends the same way and
+        runs no further entry. An engine without a timeout of its own keeps the deadline it was
+        given.
+        &#34;&#34;&#34;
+        self.start_point = start_point
+        if self.timeout &gt; 0:
+            self.deadline = time.monotonic() + self.timeout
+        return self._run()
+
+    def trial(self, day: int) -&gt; XlmEngine:
+        &#34;&#34;&#34;
+        A fresh engine for one trial run of the day guess: it shares this engine&#39;s view and the
+        index over its cells — the cells, values, and names the runs so far have written — and
+        the deadline of this engine&#39;s run, and answers the given day, but starts with no files,
+        no memory, and no registered names of its own.
+        &#34;&#34;&#34;
+        trial = XlmEngine(
+            self.view,
+            self.output_level,
+            day,
+            0,
+            self.max_steps,
+            cells=self._index,
+        )
+        trial.deadline = self.deadline
+        return trial
+
+    def read_reference(self, reference: XlmReference, cursor: XlmCursor) -&gt; XlmValue:
+        &#34;&#34;&#34;
+        The value a cell address holds. The sheet the reference fails to name is the sheet the
+        cursor sits on. A cell the run left a value in — by a step that executed it, a value
+        command, or a return — holds that value. Any other formula cell is evaluated with itself
+        as the cursor its relative references resolve against, unless its evaluation is already
+        under way, the reads of the running evaluation exhausted their budget, or it nests too
+        deeply; such a cell, and a cell that holds only a value, reads as the value it was
+        stored with, with the date flag a date cell carries. An address the workbook does not
+        hold is blank.
+        &#34;&#34;&#34;
+        sheet = reference.sheet or cursor.sheet
+        reference = XlmReference(sheet, reference.row, reference.col)
+        cell = self._find_cell(sheet, reference.row, reference.col)
+        if cell is None:
+            if reference in self.failed_writes:
+                address = F&#39;{column_letters(reference.col)}{reference.row}&#39;
+                return XlmValue(value=address, partial=True)
+            return _blank(reference)
+        held = self._index.held.get(id(cell))
+        if held is not None:
+            return dataclasses.replace(held, reference=reference)
+        if not self._evaluating:
+            self._reads = 0
+        if (
+            cell.formula is not None
+            and id(cell) not in self._evaluating
+            and self._reads &lt; _READ_BUDGET
+        ):
+            self.check_deadline()
+            self._reads += 1
+            self._evaluating.add(id(cell))
+            try:
+                value = evaluate_expression(
+                    self,
+                    cell.formula,
+                    XlmCursor(sheet, cell.row, cell.col),
+                )
+            except RecursionError:
+                return self._stored(cell, reference)
+            finally:
+                self._evaluating.discard(id(cell))
+            value.reference = reference
+            return value
+        return self._stored(cell, reference)
+
+    def resolve_name(self, node: XlDefinedName, cursor: XlmCursor) -&gt; XlmValue:
+        &#34;&#34;&#34;
+        The value a defined name stands for: the formula the entry for it holds, evaluated
+        through the evaluator with the scope of the reading cell. A name the workbook does not
+        define, or one whose formula resolves no further, answers its own spelling; a formula
+        that reads the name it defines, or nests too deeply, answers the spelling of the formula.
+        &#34;&#34;&#34;
+        entry = self._resolve_entry(node.name, node.sheet, cursor)
+        if entry is None or entry.formula is None:
+            return XlmValue(value=node.name, text=node.name)
+        key = (entry.name.lower(), entry.sheet)
+        if key in self._resolving:
+            return XlmValue(value=synthesize_formula(entry.formula))
+        self._resolving.add(key)
+        try:
+            return evaluate_expression(self, entry.formula, cursor)
+        except RecursionError:
+            return XlmValue(value=synthesize_formula(entry.formula))
+        finally:
+            self._resolving.discard(key)
+
+    def call(self, call: XlFunctionCall, cursor: XlmCursor, nested: bool = False) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The outcome of one function call. While the engine skips the body of a loop, every call
+        but the heads and ends of loops is ignored. A call whose callee is itself a call answers
+        what the inner call computed, spelled as the outer one; a registered alias dispatches
+        under the name it was registered for; a callee that names a cell — directly or through
+        a defined name — calls the macro there. A call is nested when an expression reads it
+        instead of a step running it as the whole formula of its cell: a nested macro call runs
+        its subroutine to the value it returns, and a nested command answers through the
+        handler an expression reads it by, where it has one. Once the deadline of the run
+        passed, no call answers.
+        &#34;&#34;&#34;
+        self.check_deadline()
+        name = callee_name(call)
+        if self.ignore_processing and name not in _LOOP_COMMANDS:
+            return XlmOutcome(
+                value=XlmValue(value=0, text=&#39;&#39;, partial=True),
+                status=XlmStatus.IGNORED,
+            )
+        if isinstance(call.callee, XlFunctionCall):
+            inner = self.call(call.callee, cursor, nested)
+            spelled = synthesize_formula(call)
+            if inner.value.partial:
+                return XlmOutcome(value=XlmValue(value=spelled, partial=True))
+            inner.value.text = spelled
+            return inner
+        target = self.aliases.get(name)
+        if target is not None:
+            return self.dispatch(target, call, cursor, nested)
+        if isinstance(call.callee, (XlA1Reference, XlR1C1Reference)):
+            reference = resolve_reference(call.callee, cursor)
+            return self._call_cell(reference, cursor, call, nested)
+        if isinstance(call.callee, XlDefinedName):
+            reference = self._name_reference(call.callee, cursor)
+            if reference is not None:
+                return self._call_cell(reference, cursor, call, nested)
+        else:
+            entry = self._resolve_entry(name, None, cursor)
+            reference = self._reference_of(entry.formula if entry else None, cursor)
+            if reference is not None:
+                return self._call_cell(reference, cursor, call, nested)
+        return self.dispatch(name, call, cursor, nested)
+
+    def dispatch(
+        self,
+        name: str,
+        call: XlFunctionCall,
+        cursor: XlmCursor,
+        nested: bool = False,
+    ) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The outcome of a call under a name no alias rewrote. A nested call answers through the
+        handler an expression reads its command by, where the command has one; every other
+        command the handler table holds answers through its handler, and a command without one
+        answers the spelled fallback.
+        &#34;&#34;&#34;
+        handler = EXPRESSION_HANDLERS.get(name) if nested else None
+        if handler is None:
+            handler = HANDLERS.get(name)
+        if handler is not None:
+            return handler(self, call, cursor)
+        return self._unknown_command(name, call, cursor)
+
+    def return_value(self, value: XlmValue) -&gt; tuple[XlmCursor | None, bool]:
+        &#34;&#34;&#34;
+        Hand the value a `RETURN` computes to the macro call it returns from: a call that is the
+        whole formula of its cell leaves the value in that cell and continues below it, and a
+        call inside an expression takes the value as its own, which ends the run of the
+        subroutine. A return without a call to return from continues below itself. The answer
+        is the cursor to continue at and whether the run of a subroutine ended.
+        &#34;&#34;&#34;
+        if not self.call_stack:
+            return None, False
+        caller = self.call_stack.pop()
+        if isinstance(caller, XlmReturnSlot):
+            caller.value = value
+            return None, True
+        cell = self._find_cell(caller.sheet, caller.row, caller.col)
+        if cell is not None:
+            self.write_value(cell, value)
+        return self.next_formula_cell(caller), False
+
+    def anchor(self, reference: XlmReference) -&gt; XlmCursor | None:
+        &#34;&#34;&#34;
+        The cursor the program continues at from an address: the first formula cell at or below
+        it on the same column of the same macrosheet, or `None` when the sheet is no macrosheet,
+        is not named at all, or holds no formula cell within the row bound.
+        &#34;&#34;&#34;
+        sheet = reference.sheet
+        if sheet is None or self.view.macrosheet(sheet) is None:
+            return None
+        row = self._index.fall_through(sheet, reference.col, reference.row)
+        if row is None:
+            return None
+        return XlmCursor(sheet, row, reference.col)
+
+    def next_formula_cell(self, cursor: XlmCursor) -&gt; XlmCursor | None:
+        &#34;&#34;&#34;
+        The cursor the row fall-through moves to: the first formula cell below the given one on
+        the same column, bounded by the row bound.
+        &#34;&#34;&#34;
+        row = self._index.fall_through(cursor.sheet, cursor.col, cursor.row + 1)
+        if row is None:
+            return None
+        return XlmCursor(cursor.sheet, row, cursor.col)
+
+    def column_blocks(self, cursor: XlmCursor) -&gt; dict[int, XlmBlock]:
+        &#34;&#34;&#34;
+        The block structure of the column of the cursor: every marker row mapped to the block
+        `IF` it belongs to, paired over the live formula rows of the column, so that cells the
+        program wrote at run time take part in the pairing.
+        &#34;&#34;&#34;
+        sheet = cursor.sheet.lower()
+        markers: list[tuple[int, str]] = []
+        for row in self._index.formula_rows.get(sheet, {}).get(cursor.col, ()):
+            cell = self._index.find(sheet, row, cursor.col)
+            if cell is None or cell.formula is None:
+                continue
+            marker = marker_of(cell.formula)
+            if marker is not None:
+                markers.append((row, marker))
+        return pair_blocks(markers)
+
+    def argument_reference(
+        self,
+        call: XlFunctionCall,
+        index: int,
+        cursor: XlmCursor,
+    ) -&gt; XlmReference | None:
+        &#34;&#34;&#34;
+        The cell address one argument of a call names, as `XlmEngine.node_reference` reads it.
+        &#34;&#34;&#34;
+        if index &gt;= len(call.arguments):
+            return None
+        return self.node_reference(call.arguments[index], cursor)
+
+    def node_reference(self, node, cursor: XlmCursor) -&gt; XlmReference | None:
+        &#34;&#34;&#34;
+        The cell address a node names, with the sheet of a local reference filled in from the
+        cursor: a reference resolves against it, a defined name through the reference its entry
+        holds, and a string literal parses as a formula. Any other expression evaluates to the
+        reference its value carries, or to the address its text spells.
+        &#34;&#34;&#34;
+        if isinstance(node, (XlA1Reference, XlR1C1Reference)):
+            return self._local(resolve_reference(node, cursor), cursor)
+        if isinstance(node, XlDefinedName):
+            reference = self._name_reference(node, cursor)
+            if reference is not None:
+                return self._local(reference, cursor)
+        if isinstance(node, XlString):
+            return self._spelled_reference(node.value, cursor)
+        value = evaluate_expression(self, node, cursor)
+        if value.reference is not None:
+            return self._local(value.reference, cursor)
+        if value.partial or not isinstance(value.value, str):
+            return None
+        return self._spelled_reference(value.value, cursor)
+
+    def range_corners(self, node, cursor: XlmCursor) -&gt; tuple[XlmReference, XlmReference] | None:
+        &#34;&#34;&#34;
+        The corners a range argument names, or `None` when the argument is no range.
+        &#34;&#34;&#34;
+        if not isinstance(node, XlBinaryExpression) or node.operator is not XlBinaryOperator.RANGE:
+            return None
+        corners = []
+        for side in (node.left, node.right):
+            reference = self.node_reference(side, cursor)
+            if reference is None:
+                return None
+            corners.append(reference)
+        return corners[0], corners[1]
+
+    def range_cells(self, corners: tuple[XlmReference, XlmReference]) -&gt; Iterator[XlmReference]:
+        &#34;&#34;&#34;
+        The addresses of the cells a range spans that the workbook holds, in row-major order:
+        the cells the index holds on the sheet of the range, the cells of that sheet where it
+        is a worksheet, and the failed writes inside it, which read as the values the program
+        left unfinished. The walk counts the cells the workbook holds, not the coordinates the
+        rectangle spans.
+        &#34;&#34;&#34;
+        first, last = corners
+        sheet = first.sheet
+        if sheet is None:
+            return
+        key = sheet.lower()
+        row_min = min(first.row, last.row)
+        row_max = max(first.row, last.row)
+        col_min = min(first.col, last.col)
+        col_max = max(first.col, last.col)
+        held = self._index.cells.get(key, {})
+        worksheet = self.view.worksheet(sheet)
+        coordinates = set(held) | set(worksheet or ())
+        coordinates.update(
+            (reference.row, reference.col)
+            for reference in self.failed_writes
+            if (reference.sheet or &#39;&#39;).lower() == key
+        )
+        inside = (
+            coordinate
+            for coordinate in coordinates
+            if row_min &lt;= coordinate[0] &lt;= row_max
+            and col_min &lt;= coordinate[1] &lt;= col_max
+        )
+        for row, col in sorted(inside):
+            yield XlmReference(sheet, row, col)
+
+    def snapshot(self) -&gt; XlmSnapshot:
+        &#34;&#34;&#34;
+        The state a false branch of a partial `IF` rolls back to: the position of the journal,
+        and the state of the run the journal does not hold.
+        &#34;&#34;&#34;
+        return XlmSnapshot(
+            len(self._journal),
+            tuple(self.call_stack),
+            tuple(loop.copy() for loop in self.while_stack),
+            self.active_cell,
+        )
+
+    def state_digest(self) -&gt; bytes:
+        &#34;&#34;&#34;
+        The digest of the whole state a run can observe: the cells its index holds, with the
+        value each holds and the formula it spells, the entries of the name table, the
+        registered aliases, the failed-write marks, the content of every open file, every
+        region of memory, and the cell the program selected. A run that returns to the digest
+        it anchored changes nothing the program can see.
+        &#34;&#34;&#34;
+        parts: list[str] = []
+        for sheet in sorted(self._index.cells):
+            cells = self._index.cells[sheet]
+            for row, col in sorted(cells):
+                cell = cells[(row, col)]
+                held = self._index.held.get(id(cell))
+                value = held.text if held is not None else repr(cell.value)
+                formula = cell.formula
+                spelling = synthesize_formula(formula) if formula is not None else &#39;&#39;
+                parts.append(F&#39;{sheet}!{row}!{col}={value}|{spelling}&#39;)
+        for entry in self.view.names.entries():
+            formula = entry.formula
+            spelling = synthesize_formula(formula) if formula is not None else &#39;&#39;
+            parts.append(F&#39;name:{entry.name.lower()}@{entry.sheet}={spelling}&#39;)
+        for name in sorted(self.aliases):
+            parts.append(F&#39;alias:{name}={self.aliases[name]}&#39;)
+        for reference in sorted(self.failed_writes):
+            parts.append(F&#39;failed:{reference.a1()}&#39;)
+        for name, content in self.files.snapshot():
+            parts.append(F&#39;file:{name}={content}&#39;)
+        for base, data in self.memory.snapshot():
+            parts.append(F&#39;memory:{base}={len(data)}:{data.hex()}&#39;)
+        parts.append(F&#39;active:{self.active_cell}&#39;)
+        return hashlib.sha256(&#39;\n&#39;.join(parts).encode()).digest()
+
+    def rollback(self, snapshot: XlmSnapshot) -&gt; None:
+        &#34;&#34;&#34;
+        Return to a snapshot: every change the journal holds past its position is undone —
+        cells, names, aliases, files, memory regions, and failed-write marks return to what they
+        carried, and cells the writes created leave their sheet again — and the call stack, the
+        open loops, and the selected cell are what they were.
+        &#34;&#34;&#34;
+        while len(self._journal) &gt; snapshot.journal:
+            self._journal.pop().undo(self)
+        self.call_stack = list(snapshot.call_stack)
+        self.while_stack = [loop.copy() for loop in snapshot.loops]
+        self.active_cell = snapshot.active_cell
+
+    def write_value(self, cell: XlmCell, value: XlmValue) -&gt; None:
+        &#34;&#34;&#34;
+        Leave the value a step computed — or a macro call returned — in the cell it belongs to,
+        undoable by a branch that rolls back: a later read of the cell answers that value
+        instead of evaluating the formula of the cell again.
+        &#34;&#34;&#34;
+        self._journal.append(_Write(
+            self._index.sheet_of.get(id(cell), &#39;&#39;),
+            cell,
+            cell.value,
+            cell.formula,
+            self._index.held.get(id(cell)),
+            False,
+        ))
+        held = _held(value)
+        set_value(cell, &#39;value&#39;, held.value)
+        self._index.hold(cell, held)
+
+    def write_cell(
+        self,
+        reference: XlmReference,
+        value: XlmValue,
+        cursor: XlmCursor,
+        value_only: bool = False,
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Write a value into the macrosheet cell an address names, as the mutation commands do,
+        undoable by a branch that rolls back; a cell that does not exist is created. A
+        value-only write changes the value the cell holds and leaves its formula in place. Any
+        other write enters the value the way a typed entry does: a text that starts with `=`
+        installs a formula, which a later read of the cell evaluates, and anything else replaces
+        the formula of the cell by a constant. An address off every macrosheet is not written.
+        &#34;&#34;&#34;
+        sheet = reference.sheet or cursor.sheet
+        macrosheet = self.view.macrosheet(sheet)
+        if macrosheet is None:
+            return
+        key = macrosheet.name.lower()
+        cell = self._index.find(key, reference.row, reference.col)
+        created = cell is None
+        if cell is None:
+            cell = XlmCell(row=reference.row, col=reference.col)
+            self._index.insert(key, cell)
+            if macrosheet.body:
+                edit = BodyEdit(macrosheet)
+                edit.splice(macrosheet.body[-1], [macrosheet.body[-1], cell])
+                edit.apply()
+            else:
+                set_body(macrosheet, [cell])
+        self._journal.append(_Write(
+            key,
+            cell,
+            cell.value,
+            cell.formula,
+            self._index.held.get(id(cell)),
+            created,
+        ))
+        held: XlmValue | None = _held(value)
+        formula = cell.formula
+        if not value_only:
+            formula = None
+            if isinstance(value.value, str) and value.value.startswith(&#39;=&#39;):
+                formula = parse_formula(value.value)
+                held = None
+        self._index.update_formula_rows(key, cell, cell.formula is not None, formula is not None)
+        set_value(cell, &#39;value&#39;, value.value if held is None else held.value)
+        set_child(cell, &#39;formula&#39;, formula)
+        self._index.hold(cell, held)
+
+    def define_name(self, entry: XlmNameEntry) -&gt; None:
+        &#34;&#34;&#34;
+        Define the name an entry carries, as the name commands do, undoable by a branch that
+        rolls back.
+        &#34;&#34;&#34;
+        self._journal.append(_NameDefine(self.view.names.entries()))
+        self.view.names.define(entry)
+
+    def assign_name(self, name: str, formula, cursor: XlmCursor) -&gt; None:
+        &#34;&#34;&#34;
+        Define a name as `SET.NAME` and the `FOR.CELL` loop do, undoable by a branch that rolls
+        back: the definition replaces the entry a read on the sheet of the cursor resolves the
+        name to, so that the sheet reads back what it assigned, and a name the sheet resolves to
+        no entry is defined for the whole workbook. A name assigned no formula reads as one the
+        workbook does not define.
+        &#34;&#34;&#34;
+        entry = self.view.names.resolve(name, self.view.sheet_index(cursor.sheet))
+        sheet = None if entry is None else entry.sheet
+        self.define_name(XlmNameEntry(name=name, sheet=sheet, formula=formula))
+
+    def register_alias(self, name: str, target: str) -&gt; None:
+        &#34;&#34;&#34;
+        Register the target a command name dispatches to, as `REGISTER` does, undoable by a
+        branch that rolls back.
+        &#34;&#34;&#34;
+        self._journal.append(_AliasRegistration(name, self.aliases.get(name)))
+        self.aliases[name] = target
+
+    def open_file(self, name: str, access: str = &#39;1&#39;) -&gt; None:
+        &#34;&#34;&#34;
+        Open the name as a file, as `FOPEN` does, undoable by a branch that rolls back; a name
+        that already answers a file changes nothing.
+        &#34;&#34;&#34;
+        if self.files.opened(name):
+            return
+        self._journal.append(_FileOpen(name))
+        self.files.open(name, access)
+
+    def write_file(self, name: str, text: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Append to a file the program opened, as `FWRITE` does, undoable by a branch that rolls
+        back, reporting whether the file took the write.
+        &#34;&#34;&#34;
+        length = self.files.size(name)
+        if length is None:
+            return False
+        self._journal.append(_FileWrite(name, length))
+        self.files.write(name, text)
+        return True
+
+    def allocate_memory(self, base: int, size: int) -&gt; int:
+        &#34;&#34;&#34;
+        Reserve a region of memory, as `Kernel32.VirtualAlloc` does, undoable by a branch that
+        rolls back.
+        &#34;&#34;&#34;
+        self._journal.append(_RegionAlloc())
+        return self.memory.allocate(base, size)
+
+    def write_memory(self, base: int, data: bytes, size: int) -&gt; bool:
+        &#34;&#34;&#34;
+        Write bytes into a region of memory, as the Kernel32 write commands do, undoable by a
+        branch that rolls back, reporting whether a region took the whole write.
+        &#34;&#34;&#34;
+        before = self.memory.peek(base, size)
+        if before is None:
+            return False
+        self.memory.write(base, data, size)
+        self._journal.append(_MemoryWrite(base, before))
+        return True
+
+    def mark_failed(self, reference: XlmReference) -&gt; None:
+        &#34;&#34;&#34;
+        Mark an address as the destination of a write that never finished, undoable by a
+        branch that rolls back.
+        &#34;&#34;&#34;
+        if reference in self.failed_writes:
+            return
+        self._journal.append(_FailedMark(reference, True))
+        self.failed_writes.add(reference)
+
+    def unmark_failed(self, reference: XlmReference) -&gt; None:
+        &#34;&#34;&#34;
+        Drop the failed-write mark of an address, undoable by a branch that rolls back.
+        &#34;&#34;&#34;
+        if reference not in self.failed_writes:
+            return
+        self._journal.append(_FailedMark(reference, False))
+        self.failed_writes.discard(reference)
+
+    def _run(self) -&gt; Iterator[XlmStep]:
+        for reference in self.view.entry_points(self.start_point):
+            if self._expired():
+                return
+            anchor = self.anchor(reference)
+            if anchor is None:
+                continue
+            self._steps = 0
+            self._halted = False
+            self.while_stack.clear()
+            self.call_stack.clear()
+            yield from self._run_entry(anchor)
+
+    def _run_entry(
+        self,
+        anchor: XlmCursor,
+        caller: XlmReturnSlot | None = None,
+    ) -&gt; Iterator[XlmStep]:
+        &#34;&#34;&#34;
+        The steps of running the program from one anchor until every branch it opened ran out.
+        The run of a subroutine names the call it returns to: its branches are its own, it ends
+        with the first value it returns, and a halt ends it together with the branch of every
+        run that called it, each after its calling step; a budget or deadline it exhausts ends
+        the run that called it at once. The steps of the subroutines a step called precede the
+        step.
+        &#34;&#34;&#34;
+        observed: list[tuple[str, int, int]] = []
+        anchors: dict[tuple[tuple[str, int, int], ...], bytes] = {}
+        digest_step = 0
+        buffer: list[XlmStep] = []
+        branches = self.branch_stack
+        indent = 0 if caller is None else self.indent_level
+        self.branch_stack = [XlmFrame(anchor, None, None, indent, &#39;&#39;)]
+        self._buffers.append(buffer)
+        cursor = anchor
+        try:
+            while self.branch_stack:
+                frame = self.branch_stack.pop()
+                if frame.snapshot is not None:
+                    self.rollback(frame.snapshot)
+                    anchors.clear()
+                cursor = frame.cursor
+                node = frame.branch
+                self.indent_level = frame.indent
+                self.arrival = XlmArrival.REPLAY if frame.replays else XlmArrival.RESUME
+                stack_record = True
+                while cursor is not None:
+                    self._steps += 1
+                    if self._steps &gt; self.max_steps:
+                        raise _Exhausted(F&#39;step budget of {self.max_steps} exhausted&#39;)
+                    cell = self._find_cell(cursor.sheet, cursor.row, cursor.col)
+                    if cell is None:
+                        break
+                    if node is None:
+                        node = cell.formula
+                        if node is None:
+                            break
+                    if stack_record:
+                        previous_indent = self.indent_level - 1 if self.indent_level &gt; 0 else 0
+                    else:
+                        previous_indent = self.indent_level
+                    if caller is None:
+                        self._reads = 0
+                    self._evaluating.add(id(cell))
+                    try:
+                        with RecursionDepth(TREE_RECURSION_DEPTH):
+                            outcome = self._execute(node, cursor)
+                    finally:
+                        self._evaluating.discard(id(cell))
+                    status = outcome.status
+                    if status is None:
+                        partial = outcome.value.partial
+                        status = (
+                            XlmStatus.PartialEvaluation if partial else XlmStatus.FullEvaluation
+                        )
+                    text = outcome.value.text or &#39;&#39;
+                    if not self.while_stack and text != &#39;NEXT&#39;:
+                        observed.append((cursor.sheet.lower(), cursor.row, cursor.col))
+                        if len(observed) &gt;= _WINDOW_WARMUP:
+                            window = tuple(observed[-10:])
+                            if window in anchors:
+                                if self._steps - digest_step &gt;= _DIGEST_STEPS:
+                                    digest_step = self._steps
+                                    if self.state_digest() == anchors[window]:
+                                        break
+                            else:
+                                anchors[window] = self.state_digest()
+                                digest_step = self._steps
+                    if status is not XlmStatus.IGNORED:
+                        self.write_value(cell, outcome.value)
+                    if stack_record:
+                        text = (frame.desc + &#39; &#39; + text).strip()
+                    if self.indent_current_line:
+                        previous_indent = self.indent_level
+                        self.indent_current_line = False
+                    yield from buffer
+                    buffer.clear()
+                    if status is not XlmStatus.IGNORED:
+                        yield XlmStep(
+                            cursor.sheet,
+                            cursor.row,
+                            cursor.col,
+                            status,
+                            text,
+                            previous_indent,
+                            self._step_severity(node),
+                        )
+                    if caller is not None:
+                        if outcome.halts:
+                            self._halted = True
+                        if caller.value is not None or self._halted:
+                            return
+                    elif self._halted:
+                        self._halted = False
+                        break
+                    self.check_deadline()
+                    if outcome.jump is not None:
+                        cursor = outcome.jump
+                        self.arrival = (
+                            XlmArrival.JUMP if outcome.arrival is None else outcome.arrival
+                        )
+                    elif status in _FALL_THROUGH:
+                        cursor = self.next_formula_cell(cursor)
+                        self.arrival = XlmArrival.FALL
+                    else:
+                        break
+                    node = None
+                    stack_record = False
+        except _Exhausted as exhausted:
+            yield from buffer
+            if caller is not None:
+                raise
+            yield self._error_step(cursor or anchor, str(exhausted))
+        except Exception as error:
+            yield from buffer
+            yield self._error_step(cursor or anchor, F&#39;{type(error).__name__}: {error}&#39;)
+        finally:
+            self._buffers.pop()
+            self.branch_stack = branches
+
+    def _subroutine(self, reference: XlmReference, spelled: str) -&gt; XlmValue:
+        &#34;&#34;&#34;
+        The value a macro call inside an expression computes: the subroutine runs from where
+        the call names it until it returns, its steps join the trace ahead of the step that
+        called it, and the value it returns is the value of the call. Calls and loops the
+        subroutine leaves open end with it. A subroutine that never returns — it halts, runs out
+        of formulas, or nests too deeply — leaves the call unfinished.
+        &#34;&#34;&#34;
+        anchor = self.anchor(reference)
+        if anchor is None or self._depth &gt;= _SUBROUTINE_DEPTH_LIMIT:
+            return XlmValue(value=spelled, partial=True)
+        caller = XlmReturnSlot()
+        indent = self.indent_level
+        calls = len(self.call_stack)
+        loops = len(self.while_stack)
+        steps: list[XlmStep] = []
+        self.call_stack.append(caller)
+        self._depth += 1
+        try:
+            steps.extend(self._run_entry(anchor, caller))
+        finally:
+            self._depth -= 1
+            self.indent_level = indent
+            del self.call_stack[calls:]
+            del self.while_stack[loops:]
+            if self._buffers:
+                self._buffers[-1].extend(steps)
+        if caller.value is None:
+            return XlmValue(value=spelled, partial=True)
+        return _held(caller.value)
+
+    def _expired(self) -&gt; bool:
+        return self.deadline is not None and time.monotonic() &gt; self.deadline
+
+    def check_deadline(self) -&gt; None:
+        &#34;&#34;&#34;
+        Raise the exhaustion of the run&#39;s deadline, for the walks a command takes inside one
+        step, so that a walk over a rectangle the workbook barely fills still answers to the
+        deadline of the run.
+        &#34;&#34;&#34;
+        if self._expired():
+            raise _Exhausted(&#39;the run exceeded its timeout&#39;)
+
+    def _execute(self, node, cursor: XlmCursor) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The outcome of the step that runs a node as the whole formula of its cell. A call runs
+        as a command, and any other expression is evaluated. A step that starts inside the body
+        of a loop the engine skips is ignored like every command there, even when the expression
+        holds the loop end that stops the skipping.
+        &#34;&#34;&#34;
+        if isinstance(node, XlFunctionCall):
+            return self.call(node, cursor)
+        skipping = self.ignore_processing
+        value = evaluate_expression(self, node, cursor)
+        if skipping:
+            return XlmOutcome(value=value, status=XlmStatus.IGNORED)
+        return XlmOutcome(value=value)
+
+    def _stored(self, cell: XlmCell, reference: XlmReference) -&gt; XlmValue:
+        if cell.value is None:
+            return _blank(reference)
+        return XlmValue(
+            value=cell.value,
+            date=cell.kind is CellKind.DATE,
+            reference=reference,
+        )
+
+    def _step_severity(self, node) -&gt; XlmSeverity:
+        if isinstance(node, XlFunctionCall) and isinstance(node.callee, str):
+            return severity(node.callee.strip(&#39;&#34;&#39;))
+        return XlmSeverity.JUMP
+
+    def _error_step(self, cursor: XlmCursor, message: str) -&gt; XlmStep:
+        return XlmStep(
+            cursor.sheet,
+            cursor.row,
+            cursor.col,
+            XlmStatus.Error,
+            message,
+            self.indent_level,
+            XlmSeverity.JUMP,
+        )
+
+    def _unknown_command(self, name: str, call: XlFunctionCall, cursor: XlmCursor) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The fallback for a command no handler answers: the call spelled unevaluated, with
+        every argument evaluated for the side effects it may have had and a missing argument
+        spelling the empty slot the call wrote.
+        &#34;&#34;&#34;
+        arguments = [
+            evaluate_expression(self, argument, cursor).text or &#39;&#39;
+            for argument in call.arguments
+        ]
+        text = F&#39;={name}({&#34;,&#34;.join(arguments)})&#39;
+        return XlmOutcome(value=XlmValue(value=text, partial=True))
+
+    def _call_cell(
+        self,
+        reference: XlmReference,
+        cursor: XlmCursor,
+        call: XlFunctionCall,
+        nested: bool,
+    ) -&gt; XlmOutcome:
+        spelled = synthesize_formula(call)
+        if reference.sheet is None:
+            reference = XlmReference(cursor.sheet, reference.row, reference.col)
+        if self.view.macrosheet(reference.sheet) is None:
+            return XlmOutcome(value=XlmValue(value=0, text=spelled), status=XlmStatus.Error)
+        if nested:
+            return XlmOutcome(value=self._subroutine(reference, spelled))
+        self.call_stack.append(cursor)
+        return XlmOutcome(
+            value=XlmValue(value=0, text=spelled),
+            jump=self.anchor(reference),
+            arrival=XlmArrival.RESUME,
+        )
+
+    def _resolve_entry(self, name: str, sheet: str | None, cursor: XlmCursor):
+        if sheet is not None:
+            return self.view.names.resolve(name, self.view.sheet_index(sheet))
+        return self.view.names.resolve(name, self.view.sheet_index(cursor.sheet))
+
+    def _name_reference(self, node: XlDefinedName, cursor: XlmCursor) -&gt; XlmReference | None:
+        entry = self._resolve_entry(node.name, node.sheet, cursor)
+        if entry is None:
+            return None
+        return self._reference_of(entry.formula, cursor)
+
+    def _reference_of(self, formula, cursor: XlmCursor) -&gt; XlmReference | None:
+        if isinstance(formula, (XlA1Reference, XlR1C1Reference)):
+            return resolve_reference(formula, cursor)
+        return None
+
+    def _spelled_reference(self, text: str, cursor: XlmCursor) -&gt; XlmReference | None:
+        return self._local(self._reference_of(parse_formula(text), cursor), cursor)
+
+    def _local(self, reference: XlmReference | None, cursor: XlmCursor) -&gt; XlmReference | None:
+        if reference is None:
+            return None
+        if reference.sheet is not None:
+            return reference
+        return XlmReference(cursor.sheet, reference.row, reference.col)
+
+    def _find_cell(self, sheet: str, row: int, col: int) -&gt; XlmCell | None:
+        cell = self._index.find(sheet, row, col)
+        if cell is not None:
+            return cell
+        worksheet = self.view.worksheet(sheet)
+        if worksheet is not None:
+            return worksheet.get((row, col))
+        return None</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.xlm.engine.callee_name"><code class="name flex">
+<span>def <span class="ident">callee_name</span></span>(<span>call)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The name the callee of a call spells, without the quotes of a string literal; a callee
+that is a reference or another call is not named at all.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L93-L103" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def callee_name(call: XlFunctionCall) -&gt; str:
+    &#34;&#34;&#34;
+    The name the callee of a call spells, without the quotes of a string literal; a callee
+    that is a reference or another call is not named at all.
+    &#34;&#34;&#34;
+    callee = call.callee
+    if isinstance(callee, str):
+        return callee.strip(&#39;&#34;&#39;)
+    if isinstance(callee, XlDefinedName):
+        return callee.name
+    return &#39;&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine"><code class="flex name class">
+<span>class <span class="ident">XlmEngine</span></span>
+<span>(</span><span>view, output_level=0, day=-1, timeout=0, max_steps=1000000, *, cells=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The interpreter of a workbook view. The macrosheet model is read through coordinate indexes
+the engine maintains itself, so that cells the program writes at run time stay visible to
+every reference that reads them afterwards; every write lands in an undo journal that a
+false branch of a partial <code>IF</code> rolls back from. The start point and the deadline of the
+latest run are kept on the engine, because the trial runs of the day guess share them.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L336-L1207" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class XlmEngine:
+    &#34;&#34;&#34;
+    The interpreter of a workbook view. The macrosheet model is read through coordinate indexes
+    the engine maintains itself, so that cells the program writes at run time stay visible to
+    every reference that reads them afterwards; every write lands in an undo journal that a
+    false branch of a partial `IF` rolls back from. The start point and the deadline of the
+    latest run are kept on the engine, because the trial runs of the day guess share them.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        view,
+        output_level: int = 0,
+        day: int = -1,
+        timeout: int = 0,
+        max_steps: int = 1_000_000,
+        *,
+        cells: _CellIndex | None = None,
+    ):
+        self.view = view
+        self.output_level = output_level
+        self.day = day
+        self.timeout = timeout
+        self.max_steps = max_steps
+        self.start_point = &#39;&#39;
+        self.deadline: float | None = None
+        self.aliases: dict[str, str] = {}
+        self.indent_level = 0
+        self.indent_current_line = False
+        self.arrival = XlmArrival.JUMP
+        self.now_count = 0
+        self.char_errors = 0
+        self.iserror_at: XlmCursor | None = None
+        self.iserror_flag = False
+        self.iserror_repeats = 0
+        self.files = XlmFiles()
+        self.memory = XlmMemory()
+        self.environment = XlmEnvironment()
+        self.active_cell: XlmReference | None = None
+        self.failed_writes: set[XlmReference] = set()
+        self.call_stack: list[XlmCursor | XlmReturnSlot] = []
+        self.branch_stack: list[XlmFrame] = []
+        self.while_stack: list[XlmLoop] = []
+        self._index = _CellIndex(view) if cells is None else cells
+        self._journal: list[_Undo] = []
+        self._evaluating: set[int] = set()
+        self._resolving: set[tuple[str, int | None]] = set()
+        self._buffers: list[list[XlmStep]] = []
+        self._depth = 0
+        self._steps = 0
+        self._reads = 0
+        self._halted = False
+
+    @property
+    def ignore_processing(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the engine skips the body of a loop: true while any open loop does not hold.
+        &#34;&#34;&#34;
+        return any(not loop.holds for loop in self.while_stack)
+
+    def run(self, start_point: str = &#39;&#39;) -&gt; Iterator[XlmStep]:
+        &#34;&#34;&#34;
+        The trace of running the program: one step per executed cell. The entry points are the
+        defined names that fuzzy-spell `auto_open` or `auto_close`; without one, the start point
+        a caller named is the only entry. The run of an entry that exhausts its step budget ends
+        with a step that says so, and a run that exhausts its deadline ends the same way and
+        runs no further entry. An engine without a timeout of its own keeps the deadline it was
+        given.
+        &#34;&#34;&#34;
+        self.start_point = start_point
+        if self.timeout &gt; 0:
+            self.deadline = time.monotonic() + self.timeout
+        return self._run()
+
+    def trial(self, day: int) -&gt; XlmEngine:
+        &#34;&#34;&#34;
+        A fresh engine for one trial run of the day guess: it shares this engine&#39;s view and the
+        index over its cells — the cells, values, and names the runs so far have written — and
+        the deadline of this engine&#39;s run, and answers the given day, but starts with no files,
+        no memory, and no registered names of its own.
+        &#34;&#34;&#34;
+        trial = XlmEngine(
+            self.view,
+            self.output_level,
+            day,
+            0,
+            self.max_steps,
+            cells=self._index,
+        )
+        trial.deadline = self.deadline
+        return trial
+
+    def read_reference(self, reference: XlmReference, cursor: XlmCursor) -&gt; XlmValue:
+        &#34;&#34;&#34;
+        The value a cell address holds. The sheet the reference fails to name is the sheet the
+        cursor sits on. A cell the run left a value in — by a step that executed it, a value
+        command, or a return — holds that value. Any other formula cell is evaluated with itself
+        as the cursor its relative references resolve against, unless its evaluation is already
+        under way, the reads of the running evaluation exhausted their budget, or it nests too
+        deeply; such a cell, and a cell that holds only a value, reads as the value it was
+        stored with, with the date flag a date cell carries. An address the workbook does not
+        hold is blank.
+        &#34;&#34;&#34;
+        sheet = reference.sheet or cursor.sheet
+        reference = XlmReference(sheet, reference.row, reference.col)
+        cell = self._find_cell(sheet, reference.row, reference.col)
+        if cell is None:
+            if reference in self.failed_writes:
+                address = F&#39;{column_letters(reference.col)}{reference.row}&#39;
+                return XlmValue(value=address, partial=True)
+            return _blank(reference)
+        held = self._index.held.get(id(cell))
+        if held is not None:
+            return dataclasses.replace(held, reference=reference)
+        if not self._evaluating:
+            self._reads = 0
+        if (
+            cell.formula is not None
+            and id(cell) not in self._evaluating
+            and self._reads &lt; _READ_BUDGET
+        ):
+            self.check_deadline()
+            self._reads += 1
+            self._evaluating.add(id(cell))
+            try:
+                value = evaluate_expression(
+                    self,
+                    cell.formula,
+                    XlmCursor(sheet, cell.row, cell.col),
+                )
+            except RecursionError:
+                return self._stored(cell, reference)
+            finally:
+                self._evaluating.discard(id(cell))
+            value.reference = reference
+            return value
+        return self._stored(cell, reference)
+
+    def resolve_name(self, node: XlDefinedName, cursor: XlmCursor) -&gt; XlmValue:
+        &#34;&#34;&#34;
+        The value a defined name stands for: the formula the entry for it holds, evaluated
+        through the evaluator with the scope of the reading cell. A name the workbook does not
+        define, or one whose formula resolves no further, answers its own spelling; a formula
+        that reads the name it defines, or nests too deeply, answers the spelling of the formula.
+        &#34;&#34;&#34;
+        entry = self._resolve_entry(node.name, node.sheet, cursor)
+        if entry is None or entry.formula is None:
+            return XlmValue(value=node.name, text=node.name)
+        key = (entry.name.lower(), entry.sheet)
+        if key in self._resolving:
+            return XlmValue(value=synthesize_formula(entry.formula))
+        self._resolving.add(key)
+        try:
+            return evaluate_expression(self, entry.formula, cursor)
+        except RecursionError:
+            return XlmValue(value=synthesize_formula(entry.formula))
+        finally:
+            self._resolving.discard(key)
+
+    def call(self, call: XlFunctionCall, cursor: XlmCursor, nested: bool = False) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The outcome of one function call. While the engine skips the body of a loop, every call
+        but the heads and ends of loops is ignored. A call whose callee is itself a call answers
+        what the inner call computed, spelled as the outer one; a registered alias dispatches
+        under the name it was registered for; a callee that names a cell — directly or through
+        a defined name — calls the macro there. A call is nested when an expression reads it
+        instead of a step running it as the whole formula of its cell: a nested macro call runs
+        its subroutine to the value it returns, and a nested command answers through the
+        handler an expression reads it by, where it has one. Once the deadline of the run
+        passed, no call answers.
+        &#34;&#34;&#34;
+        self.check_deadline()
+        name = callee_name(call)
+        if self.ignore_processing and name not in _LOOP_COMMANDS:
+            return XlmOutcome(
+                value=XlmValue(value=0, text=&#39;&#39;, partial=True),
+                status=XlmStatus.IGNORED,
+            )
+        if isinstance(call.callee, XlFunctionCall):
+            inner = self.call(call.callee, cursor, nested)
+            spelled = synthesize_formula(call)
+            if inner.value.partial:
+                return XlmOutcome(value=XlmValue(value=spelled, partial=True))
+            inner.value.text = spelled
+            return inner
+        target = self.aliases.get(name)
+        if target is not None:
+            return self.dispatch(target, call, cursor, nested)
+        if isinstance(call.callee, (XlA1Reference, XlR1C1Reference)):
+            reference = resolve_reference(call.callee, cursor)
+            return self._call_cell(reference, cursor, call, nested)
+        if isinstance(call.callee, XlDefinedName):
+            reference = self._name_reference(call.callee, cursor)
+            if reference is not None:
+                return self._call_cell(reference, cursor, call, nested)
+        else:
+            entry = self._resolve_entry(name, None, cursor)
+            reference = self._reference_of(entry.formula if entry else None, cursor)
+            if reference is not None:
+                return self._call_cell(reference, cursor, call, nested)
+        return self.dispatch(name, call, cursor, nested)
+
+    def dispatch(
+        self,
+        name: str,
+        call: XlFunctionCall,
+        cursor: XlmCursor,
+        nested: bool = False,
+    ) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The outcome of a call under a name no alias rewrote. A nested call answers through the
+        handler an expression reads its command by, where the command has one; every other
+        command the handler table holds answers through its handler, and a command without one
+        answers the spelled fallback.
+        &#34;&#34;&#34;
+        handler = EXPRESSION_HANDLERS.get(name) if nested else None
+        if handler is None:
+            handler = HANDLERS.get(name)
+        if handler is not None:
+            return handler(self, call, cursor)
+        return self._unknown_command(name, call, cursor)
+
+    def return_value(self, value: XlmValue) -&gt; tuple[XlmCursor | None, bool]:
+        &#34;&#34;&#34;
+        Hand the value a `RETURN` computes to the macro call it returns from: a call that is the
+        whole formula of its cell leaves the value in that cell and continues below it, and a
+        call inside an expression takes the value as its own, which ends the run of the
+        subroutine. A return without a call to return from continues below itself. The answer
+        is the cursor to continue at and whether the run of a subroutine ended.
+        &#34;&#34;&#34;
+        if not self.call_stack:
+            return None, False
+        caller = self.call_stack.pop()
+        if isinstance(caller, XlmReturnSlot):
+            caller.value = value
+            return None, True
+        cell = self._find_cell(caller.sheet, caller.row, caller.col)
+        if cell is not None:
+            self.write_value(cell, value)
+        return self.next_formula_cell(caller), False
+
+    def anchor(self, reference: XlmReference) -&gt; XlmCursor | None:
+        &#34;&#34;&#34;
+        The cursor the program continues at from an address: the first formula cell at or below
+        it on the same column of the same macrosheet, or `None` when the sheet is no macrosheet,
+        is not named at all, or holds no formula cell within the row bound.
+        &#34;&#34;&#34;
+        sheet = reference.sheet
+        if sheet is None or self.view.macrosheet(sheet) is None:
+            return None
+        row = self._index.fall_through(sheet, reference.col, reference.row)
+        if row is None:
+            return None
+        return XlmCursor(sheet, row, reference.col)
+
+    def next_formula_cell(self, cursor: XlmCursor) -&gt; XlmCursor | None:
+        &#34;&#34;&#34;
+        The cursor the row fall-through moves to: the first formula cell below the given one on
+        the same column, bounded by the row bound.
+        &#34;&#34;&#34;
+        row = self._index.fall_through(cursor.sheet, cursor.col, cursor.row + 1)
+        if row is None:
+            return None
+        return XlmCursor(cursor.sheet, row, cursor.col)
+
+    def column_blocks(self, cursor: XlmCursor) -&gt; dict[int, XlmBlock]:
+        &#34;&#34;&#34;
+        The block structure of the column of the cursor: every marker row mapped to the block
+        `IF` it belongs to, paired over the live formula rows of the column, so that cells the
+        program wrote at run time take part in the pairing.
+        &#34;&#34;&#34;
+        sheet = cursor.sheet.lower()
+        markers: list[tuple[int, str]] = []
+        for row in self._index.formula_rows.get(sheet, {}).get(cursor.col, ()):
+            cell = self._index.find(sheet, row, cursor.col)
+            if cell is None or cell.formula is None:
+                continue
+            marker = marker_of(cell.formula)
+            if marker is not None:
+                markers.append((row, marker))
+        return pair_blocks(markers)
+
+    def argument_reference(
+        self,
+        call: XlFunctionCall,
+        index: int,
+        cursor: XlmCursor,
+    ) -&gt; XlmReference | None:
+        &#34;&#34;&#34;
+        The cell address one argument of a call names, as `XlmEngine.node_reference` reads it.
+        &#34;&#34;&#34;
+        if index &gt;= len(call.arguments):
+            return None
+        return self.node_reference(call.arguments[index], cursor)
+
+    def node_reference(self, node, cursor: XlmCursor) -&gt; XlmReference | None:
+        &#34;&#34;&#34;
+        The cell address a node names, with the sheet of a local reference filled in from the
+        cursor: a reference resolves against it, a defined name through the reference its entry
+        holds, and a string literal parses as a formula. Any other expression evaluates to the
+        reference its value carries, or to the address its text spells.
+        &#34;&#34;&#34;
+        if isinstance(node, (XlA1Reference, XlR1C1Reference)):
+            return self._local(resolve_reference(node, cursor), cursor)
+        if isinstance(node, XlDefinedName):
+            reference = self._name_reference(node, cursor)
+            if reference is not None:
+                return self._local(reference, cursor)
+        if isinstance(node, XlString):
+            return self._spelled_reference(node.value, cursor)
+        value = evaluate_expression(self, node, cursor)
+        if value.reference is not None:
+            return self._local(value.reference, cursor)
+        if value.partial or not isinstance(value.value, str):
+            return None
+        return self._spelled_reference(value.value, cursor)
+
+    def range_corners(self, node, cursor: XlmCursor) -&gt; tuple[XlmReference, XlmReference] | None:
+        &#34;&#34;&#34;
+        The corners a range argument names, or `None` when the argument is no range.
+        &#34;&#34;&#34;
+        if not isinstance(node, XlBinaryExpression) or node.operator is not XlBinaryOperator.RANGE:
+            return None
+        corners = []
+        for side in (node.left, node.right):
+            reference = self.node_reference(side, cursor)
+            if reference is None:
+                return None
+            corners.append(reference)
+        return corners[0], corners[1]
+
+    def range_cells(self, corners: tuple[XlmReference, XlmReference]) -&gt; Iterator[XlmReference]:
+        &#34;&#34;&#34;
+        The addresses of the cells a range spans that the workbook holds, in row-major order:
+        the cells the index holds on the sheet of the range, the cells of that sheet where it
+        is a worksheet, and the failed writes inside it, which read as the values the program
+        left unfinished. The walk counts the cells the workbook holds, not the coordinates the
+        rectangle spans.
+        &#34;&#34;&#34;
+        first, last = corners
+        sheet = first.sheet
+        if sheet is None:
+            return
+        key = sheet.lower()
+        row_min = min(first.row, last.row)
+        row_max = max(first.row, last.row)
+        col_min = min(first.col, last.col)
+        col_max = max(first.col, last.col)
+        held = self._index.cells.get(key, {})
+        worksheet = self.view.worksheet(sheet)
+        coordinates = set(held) | set(worksheet or ())
+        coordinates.update(
+            (reference.row, reference.col)
+            for reference in self.failed_writes
+            if (reference.sheet or &#39;&#39;).lower() == key
+        )
+        inside = (
+            coordinate
+            for coordinate in coordinates
+            if row_min &lt;= coordinate[0] &lt;= row_max
+            and col_min &lt;= coordinate[1] &lt;= col_max
+        )
+        for row, col in sorted(inside):
+            yield XlmReference(sheet, row, col)
+
+    def snapshot(self) -&gt; XlmSnapshot:
+        &#34;&#34;&#34;
+        The state a false branch of a partial `IF` rolls back to: the position of the journal,
+        and the state of the run the journal does not hold.
+        &#34;&#34;&#34;
+        return XlmSnapshot(
+            len(self._journal),
+            tuple(self.call_stack),
+            tuple(loop.copy() for loop in self.while_stack),
+            self.active_cell,
+        )
+
+    def state_digest(self) -&gt; bytes:
+        &#34;&#34;&#34;
+        The digest of the whole state a run can observe: the cells its index holds, with the
+        value each holds and the formula it spells, the entries of the name table, the
+        registered aliases, the failed-write marks, the content of every open file, every
+        region of memory, and the cell the program selected. A run that returns to the digest
+        it anchored changes nothing the program can see.
+        &#34;&#34;&#34;
+        parts: list[str] = []
+        for sheet in sorted(self._index.cells):
+            cells = self._index.cells[sheet]
+            for row, col in sorted(cells):
+                cell = cells[(row, col)]
+                held = self._index.held.get(id(cell))
+                value = held.text if held is not None else repr(cell.value)
+                formula = cell.formula
+                spelling = synthesize_formula(formula) if formula is not None else &#39;&#39;
+                parts.append(F&#39;{sheet}!{row}!{col}={value}|{spelling}&#39;)
+        for entry in self.view.names.entries():
+            formula = entry.formula
+            spelling = synthesize_formula(formula) if formula is not None else &#39;&#39;
+            parts.append(F&#39;name:{entry.name.lower()}@{entry.sheet}={spelling}&#39;)
+        for name in sorted(self.aliases):
+            parts.append(F&#39;alias:{name}={self.aliases[name]}&#39;)
+        for reference in sorted(self.failed_writes):
+            parts.append(F&#39;failed:{reference.a1()}&#39;)
+        for name, content in self.files.snapshot():
+            parts.append(F&#39;file:{name}={content}&#39;)
+        for base, data in self.memory.snapshot():
+            parts.append(F&#39;memory:{base}={len(data)}:{data.hex()}&#39;)
+        parts.append(F&#39;active:{self.active_cell}&#39;)
+        return hashlib.sha256(&#39;\n&#39;.join(parts).encode()).digest()
+
+    def rollback(self, snapshot: XlmSnapshot) -&gt; None:
+        &#34;&#34;&#34;
+        Return to a snapshot: every change the journal holds past its position is undone —
+        cells, names, aliases, files, memory regions, and failed-write marks return to what they
+        carried, and cells the writes created leave their sheet again — and the call stack, the
+        open loops, and the selected cell are what they were.
+        &#34;&#34;&#34;
+        while len(self._journal) &gt; snapshot.journal:
+            self._journal.pop().undo(self)
+        self.call_stack = list(snapshot.call_stack)
+        self.while_stack = [loop.copy() for loop in snapshot.loops]
+        self.active_cell = snapshot.active_cell
+
+    def write_value(self, cell: XlmCell, value: XlmValue) -&gt; None:
+        &#34;&#34;&#34;
+        Leave the value a step computed — or a macro call returned — in the cell it belongs to,
+        undoable by a branch that rolls back: a later read of the cell answers that value
+        instead of evaluating the formula of the cell again.
+        &#34;&#34;&#34;
+        self._journal.append(_Write(
+            self._index.sheet_of.get(id(cell), &#39;&#39;),
+            cell,
+            cell.value,
+            cell.formula,
+            self._index.held.get(id(cell)),
+            False,
+        ))
+        held = _held(value)
+        set_value(cell, &#39;value&#39;, held.value)
+        self._index.hold(cell, held)
+
+    def write_cell(
+        self,
+        reference: XlmReference,
+        value: XlmValue,
+        cursor: XlmCursor,
+        value_only: bool = False,
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        Write a value into the macrosheet cell an address names, as the mutation commands do,
+        undoable by a branch that rolls back; a cell that does not exist is created. A
+        value-only write changes the value the cell holds and leaves its formula in place. Any
+        other write enters the value the way a typed entry does: a text that starts with `=`
+        installs a formula, which a later read of the cell evaluates, and anything else replaces
+        the formula of the cell by a constant. An address off every macrosheet is not written.
+        &#34;&#34;&#34;
+        sheet = reference.sheet or cursor.sheet
+        macrosheet = self.view.macrosheet(sheet)
+        if macrosheet is None:
+            return
+        key = macrosheet.name.lower()
+        cell = self._index.find(key, reference.row, reference.col)
+        created = cell is None
+        if cell is None:
+            cell = XlmCell(row=reference.row, col=reference.col)
+            self._index.insert(key, cell)
+            if macrosheet.body:
+                edit = BodyEdit(macrosheet)
+                edit.splice(macrosheet.body[-1], [macrosheet.body[-1], cell])
+                edit.apply()
+            else:
+                set_body(macrosheet, [cell])
+        self._journal.append(_Write(
+            key,
+            cell,
+            cell.value,
+            cell.formula,
+            self._index.held.get(id(cell)),
+            created,
+        ))
+        held: XlmValue | None = _held(value)
+        formula = cell.formula
+        if not value_only:
+            formula = None
+            if isinstance(value.value, str) and value.value.startswith(&#39;=&#39;):
+                formula = parse_formula(value.value)
+                held = None
+        self._index.update_formula_rows(key, cell, cell.formula is not None, formula is not None)
+        set_value(cell, &#39;value&#39;, value.value if held is None else held.value)
+        set_child(cell, &#39;formula&#39;, formula)
+        self._index.hold(cell, held)
+
+    def define_name(self, entry: XlmNameEntry) -&gt; None:
+        &#34;&#34;&#34;
+        Define the name an entry carries, as the name commands do, undoable by a branch that
+        rolls back.
+        &#34;&#34;&#34;
+        self._journal.append(_NameDefine(self.view.names.entries()))
+        self.view.names.define(entry)
+
+    def assign_name(self, name: str, formula, cursor: XlmCursor) -&gt; None:
+        &#34;&#34;&#34;
+        Define a name as `SET.NAME` and the `FOR.CELL` loop do, undoable by a branch that rolls
+        back: the definition replaces the entry a read on the sheet of the cursor resolves the
+        name to, so that the sheet reads back what it assigned, and a name the sheet resolves to
+        no entry is defined for the whole workbook. A name assigned no formula reads as one the
+        workbook does not define.
+        &#34;&#34;&#34;
+        entry = self.view.names.resolve(name, self.view.sheet_index(cursor.sheet))
+        sheet = None if entry is None else entry.sheet
+        self.define_name(XlmNameEntry(name=name, sheet=sheet, formula=formula))
+
+    def register_alias(self, name: str, target: str) -&gt; None:
+        &#34;&#34;&#34;
+        Register the target a command name dispatches to, as `REGISTER` does, undoable by a
+        branch that rolls back.
+        &#34;&#34;&#34;
+        self._journal.append(_AliasRegistration(name, self.aliases.get(name)))
+        self.aliases[name] = target
+
+    def open_file(self, name: str, access: str = &#39;1&#39;) -&gt; None:
+        &#34;&#34;&#34;
+        Open the name as a file, as `FOPEN` does, undoable by a branch that rolls back; a name
+        that already answers a file changes nothing.
+        &#34;&#34;&#34;
+        if self.files.opened(name):
+            return
+        self._journal.append(_FileOpen(name))
+        self.files.open(name, access)
+
+    def write_file(self, name: str, text: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Append to a file the program opened, as `FWRITE` does, undoable by a branch that rolls
+        back, reporting whether the file took the write.
+        &#34;&#34;&#34;
+        length = self.files.size(name)
+        if length is None:
+            return False
+        self._journal.append(_FileWrite(name, length))
+        self.files.write(name, text)
+        return True
+
+    def allocate_memory(self, base: int, size: int) -&gt; int:
+        &#34;&#34;&#34;
+        Reserve a region of memory, as `Kernel32.VirtualAlloc` does, undoable by a branch that
+        rolls back.
+        &#34;&#34;&#34;
+        self._journal.append(_RegionAlloc())
+        return self.memory.allocate(base, size)
+
+    def write_memory(self, base: int, data: bytes, size: int) -&gt; bool:
+        &#34;&#34;&#34;
+        Write bytes into a region of memory, as the Kernel32 write commands do, undoable by a
+        branch that rolls back, reporting whether a region took the whole write.
+        &#34;&#34;&#34;
+        before = self.memory.peek(base, size)
+        if before is None:
+            return False
+        self.memory.write(base, data, size)
+        self._journal.append(_MemoryWrite(base, before))
+        return True
+
+    def mark_failed(self, reference: XlmReference) -&gt; None:
+        &#34;&#34;&#34;
+        Mark an address as the destination of a write that never finished, undoable by a
+        branch that rolls back.
+        &#34;&#34;&#34;
+        if reference in self.failed_writes:
+            return
+        self._journal.append(_FailedMark(reference, True))
+        self.failed_writes.add(reference)
+
+    def unmark_failed(self, reference: XlmReference) -&gt; None:
+        &#34;&#34;&#34;
+        Drop the failed-write mark of an address, undoable by a branch that rolls back.
+        &#34;&#34;&#34;
+        if reference not in self.failed_writes:
+            return
+        self._journal.append(_FailedMark(reference, False))
+        self.failed_writes.discard(reference)
+
+    def _run(self) -&gt; Iterator[XlmStep]:
+        for reference in self.view.entry_points(self.start_point):
+            if self._expired():
+                return
+            anchor = self.anchor(reference)
+            if anchor is None:
+                continue
+            self._steps = 0
+            self._halted = False
+            self.while_stack.clear()
+            self.call_stack.clear()
+            yield from self._run_entry(anchor)
+
+    def _run_entry(
+        self,
+        anchor: XlmCursor,
+        caller: XlmReturnSlot | None = None,
+    ) -&gt; Iterator[XlmStep]:
+        &#34;&#34;&#34;
+        The steps of running the program from one anchor until every branch it opened ran out.
+        The run of a subroutine names the call it returns to: its branches are its own, it ends
+        with the first value it returns, and a halt ends it together with the branch of every
+        run that called it, each after its calling step; a budget or deadline it exhausts ends
+        the run that called it at once. The steps of the subroutines a step called precede the
+        step.
+        &#34;&#34;&#34;
+        observed: list[tuple[str, int, int]] = []
+        anchors: dict[tuple[tuple[str, int, int], ...], bytes] = {}
+        digest_step = 0
+        buffer: list[XlmStep] = []
+        branches = self.branch_stack
+        indent = 0 if caller is None else self.indent_level
+        self.branch_stack = [XlmFrame(anchor, None, None, indent, &#39;&#39;)]
+        self._buffers.append(buffer)
+        cursor = anchor
+        try:
+            while self.branch_stack:
+                frame = self.branch_stack.pop()
+                if frame.snapshot is not None:
+                    self.rollback(frame.snapshot)
+                    anchors.clear()
+                cursor = frame.cursor
+                node = frame.branch
+                self.indent_level = frame.indent
+                self.arrival = XlmArrival.REPLAY if frame.replays else XlmArrival.RESUME
+                stack_record = True
+                while cursor is not None:
+                    self._steps += 1
+                    if self._steps &gt; self.max_steps:
+                        raise _Exhausted(F&#39;step budget of {self.max_steps} exhausted&#39;)
+                    cell = self._find_cell(cursor.sheet, cursor.row, cursor.col)
+                    if cell is None:
+                        break
+                    if node is None:
+                        node = cell.formula
+                        if node is None:
+                            break
+                    if stack_record:
+                        previous_indent = self.indent_level - 1 if self.indent_level &gt; 0 else 0
+                    else:
+                        previous_indent = self.indent_level
+                    if caller is None:
+                        self._reads = 0
+                    self._evaluating.add(id(cell))
+                    try:
+                        with RecursionDepth(TREE_RECURSION_DEPTH):
+                            outcome = self._execute(node, cursor)
+                    finally:
+                        self._evaluating.discard(id(cell))
+                    status = outcome.status
+                    if status is None:
+                        partial = outcome.value.partial
+                        status = (
+                            XlmStatus.PartialEvaluation if partial else XlmStatus.FullEvaluation
+                        )
+                    text = outcome.value.text or &#39;&#39;
+                    if not self.while_stack and text != &#39;NEXT&#39;:
+                        observed.append((cursor.sheet.lower(), cursor.row, cursor.col))
+                        if len(observed) &gt;= _WINDOW_WARMUP:
+                            window = tuple(observed[-10:])
+                            if window in anchors:
+                                if self._steps - digest_step &gt;= _DIGEST_STEPS:
+                                    digest_step = self._steps
+                                    if self.state_digest() == anchors[window]:
+                                        break
+                            else:
+                                anchors[window] = self.state_digest()
+                                digest_step = self._steps
+                    if status is not XlmStatus.IGNORED:
+                        self.write_value(cell, outcome.value)
+                    if stack_record:
+                        text = (frame.desc + &#39; &#39; + text).strip()
+                    if self.indent_current_line:
+                        previous_indent = self.indent_level
+                        self.indent_current_line = False
+                    yield from buffer
+                    buffer.clear()
+                    if status is not XlmStatus.IGNORED:
+                        yield XlmStep(
+                            cursor.sheet,
+                            cursor.row,
+                            cursor.col,
+                            status,
+                            text,
+                            previous_indent,
+                            self._step_severity(node),
+                        )
+                    if caller is not None:
+                        if outcome.halts:
+                            self._halted = True
+                        if caller.value is not None or self._halted:
+                            return
+                    elif self._halted:
+                        self._halted = False
+                        break
+                    self.check_deadline()
+                    if outcome.jump is not None:
+                        cursor = outcome.jump
+                        self.arrival = (
+                            XlmArrival.JUMP if outcome.arrival is None else outcome.arrival
+                        )
+                    elif status in _FALL_THROUGH:
+                        cursor = self.next_formula_cell(cursor)
+                        self.arrival = XlmArrival.FALL
+                    else:
+                        break
+                    node = None
+                    stack_record = False
+        except _Exhausted as exhausted:
+            yield from buffer
+            if caller is not None:
+                raise
+            yield self._error_step(cursor or anchor, str(exhausted))
+        except Exception as error:
+            yield from buffer
+            yield self._error_step(cursor or anchor, F&#39;{type(error).__name__}: {error}&#39;)
+        finally:
+            self._buffers.pop()
+            self.branch_stack = branches
+
+    def _subroutine(self, reference: XlmReference, spelled: str) -&gt; XlmValue:
+        &#34;&#34;&#34;
+        The value a macro call inside an expression computes: the subroutine runs from where
+        the call names it until it returns, its steps join the trace ahead of the step that
+        called it, and the value it returns is the value of the call. Calls and loops the
+        subroutine leaves open end with it. A subroutine that never returns — it halts, runs out
+        of formulas, or nests too deeply — leaves the call unfinished.
+        &#34;&#34;&#34;
+        anchor = self.anchor(reference)
+        if anchor is None or self._depth &gt;= _SUBROUTINE_DEPTH_LIMIT:
+            return XlmValue(value=spelled, partial=True)
+        caller = XlmReturnSlot()
+        indent = self.indent_level
+        calls = len(self.call_stack)
+        loops = len(self.while_stack)
+        steps: list[XlmStep] = []
+        self.call_stack.append(caller)
+        self._depth += 1
+        try:
+            steps.extend(self._run_entry(anchor, caller))
+        finally:
+            self._depth -= 1
+            self.indent_level = indent
+            del self.call_stack[calls:]
+            del self.while_stack[loops:]
+            if self._buffers:
+                self._buffers[-1].extend(steps)
+        if caller.value is None:
+            return XlmValue(value=spelled, partial=True)
+        return _held(caller.value)
+
+    def _expired(self) -&gt; bool:
+        return self.deadline is not None and time.monotonic() &gt; self.deadline
+
+    def check_deadline(self) -&gt; None:
+        &#34;&#34;&#34;
+        Raise the exhaustion of the run&#39;s deadline, for the walks a command takes inside one
+        step, so that a walk over a rectangle the workbook barely fills still answers to the
+        deadline of the run.
+        &#34;&#34;&#34;
+        if self._expired():
+            raise _Exhausted(&#39;the run exceeded its timeout&#39;)
+
+    def _execute(self, node, cursor: XlmCursor) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The outcome of the step that runs a node as the whole formula of its cell. A call runs
+        as a command, and any other expression is evaluated. A step that starts inside the body
+        of a loop the engine skips is ignored like every command there, even when the expression
+        holds the loop end that stops the skipping.
+        &#34;&#34;&#34;
+        if isinstance(node, XlFunctionCall):
+            return self.call(node, cursor)
+        skipping = self.ignore_processing
+        value = evaluate_expression(self, node, cursor)
+        if skipping:
+            return XlmOutcome(value=value, status=XlmStatus.IGNORED)
+        return XlmOutcome(value=value)
+
+    def _stored(self, cell: XlmCell, reference: XlmReference) -&gt; XlmValue:
+        if cell.value is None:
+            return _blank(reference)
+        return XlmValue(
+            value=cell.value,
+            date=cell.kind is CellKind.DATE,
+            reference=reference,
+        )
+
+    def _step_severity(self, node) -&gt; XlmSeverity:
+        if isinstance(node, XlFunctionCall) and isinstance(node.callee, str):
+            return severity(node.callee.strip(&#39;&#34;&#39;))
+        return XlmSeverity.JUMP
+
+    def _error_step(self, cursor: XlmCursor, message: str) -&gt; XlmStep:
+        return XlmStep(
+            cursor.sheet,
+            cursor.row,
+            cursor.col,
+            XlmStatus.Error,
+            message,
+            self.indent_level,
+            XlmSeverity.JUMP,
+        )
+
+    def _unknown_command(self, name: str, call: XlFunctionCall, cursor: XlmCursor) -&gt; XlmOutcome:
+        &#34;&#34;&#34;
+        The fallback for a command no handler answers: the call spelled unevaluated, with
+        every argument evaluated for the side effects it may have had and a missing argument
+        spelling the empty slot the call wrote.
+        &#34;&#34;&#34;
+        arguments = [
+            evaluate_expression(self, argument, cursor).text or &#39;&#39;
+            for argument in call.arguments
+        ]
+        text = F&#39;={name}({&#34;,&#34;.join(arguments)})&#39;
+        return XlmOutcome(value=XlmValue(value=text, partial=True))
+
+    def _call_cell(
+        self,
+        reference: XlmReference,
+        cursor: XlmCursor,
+        call: XlFunctionCall,
+        nested: bool,
+    ) -&gt; XlmOutcome:
+        spelled = synthesize_formula(call)
+        if reference.sheet is None:
+            reference = XlmReference(cursor.sheet, reference.row, reference.col)
+        if self.view.macrosheet(reference.sheet) is None:
+            return XlmOutcome(value=XlmValue(value=0, text=spelled), status=XlmStatus.Error)
+        if nested:
+            return XlmOutcome(value=self._subroutine(reference, spelled))
+        self.call_stack.append(cursor)
+        return XlmOutcome(
+            value=XlmValue(value=0, text=spelled),
+            jump=self.anchor(reference),
+            arrival=XlmArrival.RESUME,
+        )
+
+    def _resolve_entry(self, name: str, sheet: str | None, cursor: XlmCursor):
+        if sheet is not None:
+            return self.view.names.resolve(name, self.view.sheet_index(sheet))
+        return self.view.names.resolve(name, self.view.sheet_index(cursor.sheet))
+
+    def _name_reference(self, node: XlDefinedName, cursor: XlmCursor) -&gt; XlmReference | None:
+        entry = self._resolve_entry(node.name, node.sheet, cursor)
+        if entry is None:
+            return None
+        return self._reference_of(entry.formula, cursor)
+
+    def _reference_of(self, formula, cursor: XlmCursor) -&gt; XlmReference | None:
+        if isinstance(formula, (XlA1Reference, XlR1C1Reference)):
+            return resolve_reference(formula, cursor)
+        return None
+
+    def _spelled_reference(self, text: str, cursor: XlmCursor) -&gt; XlmReference | None:
+        return self._local(self._reference_of(parse_formula(text), cursor), cursor)
+
+    def _local(self, reference: XlmReference | None, cursor: XlmCursor) -&gt; XlmReference | None:
+        if reference is None:
+            return None
+        if reference.sheet is not None:
+            return reference
+        return XlmReference(cursor.sheet, reference.row, reference.col)
+
+    def _find_cell(self, sheet: str, row: int, col: int) -&gt; XlmCell | None:
+        cell = self._index.find(sheet, row, col)
+        if cell is not None:
+            return cell
+        worksheet = self.view.worksheet(sheet)
+        if worksheet is not None:
+            return worksheet.get((row, col))
+        return None</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li>refinery.lib.scripts.xlm.deobfuscation.fold._StaticEngine</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.ignore_processing"><code class="name">var <span class="ident">ignore_processing</span></code></dt>
+<dd>
+<section class="desc"><p>Whether the engine skips the body of a loop: true while any open loop does not hold.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L389-L394" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def ignore_processing(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the engine skips the body of a loop: true while any open loop does not hold.
+    &#34;&#34;&#34;
+    return any(not loop.holds for loop in self.while_stack)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self, start_point='')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The trace of running the program: one step per executed cell. The entry points are the
+defined names that fuzzy-spell <code>auto_open</code> or <code>auto_close</code>; without one, the start point
+a caller named is the only entry. The run of an entry that exhausts its step budget ends
+with a step that says so, and a run that exhausts its deadline ends the same way and
+runs no further entry. An engine without a timeout of its own keeps the deadline it was
+given.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L396-L408" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def run(self, start_point: str = &#39;&#39;) -&gt; Iterator[XlmStep]:
+    &#34;&#34;&#34;
+    The trace of running the program: one step per executed cell. The entry points are the
+    defined names that fuzzy-spell `auto_open` or `auto_close`; without one, the start point
+    a caller named is the only entry. The run of an entry that exhausts its step budget ends
+    with a step that says so, and a run that exhausts its deadline ends the same way and
+    runs no further entry. An engine without a timeout of its own keeps the deadline it was
+    given.
+    &#34;&#34;&#34;
+    self.start_point = start_point
+    if self.timeout &gt; 0:
+        self.deadline = time.monotonic() + self.timeout
+    return self._run()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.trial"><code class="name flex">
+<span>def <span class="ident">trial</span></span>(<span>self, day)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A fresh engine for one trial run of the day guess: it shares this engine's view and the
+index over its cells — the cells, values, and names the runs so far have written — and
+the deadline of this engine's run, and answers the given day, but starts with no files,
+no memory, and no registered names of its own.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L410-L426" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trial(self, day: int) -&gt; XlmEngine:
+    &#34;&#34;&#34;
+    A fresh engine for one trial run of the day guess: it shares this engine&#39;s view and the
+    index over its cells — the cells, values, and names the runs so far have written — and
+    the deadline of this engine&#39;s run, and answers the given day, but starts with no files,
+    no memory, and no registered names of its own.
+    &#34;&#34;&#34;
+    trial = XlmEngine(
+        self.view,
+        self.output_level,
+        day,
+        0,
+        self.max_steps,
+        cells=self._index,
+    )
+    trial.deadline = self.deadline
+    return trial</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.read_reference"><code class="name flex">
+<span>def <span class="ident">read_reference</span></span>(<span>self, reference, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The value a cell address holds. The sheet the reference fails to name is the sheet the
+cursor sits on. A cell the run left a value in — by a step that executed it, a value
+command, or a return — holds that value. Any other formula cell is evaluated with itself
+as the cursor its relative references resolve against, unless its evaluation is already
+under way, the reads of the running evaluation exhausted their budget, or it nests too
+deeply; such a cell, and a cell that holds only a value, reads as the value it was
+stored with, with the date flag a date cell carries. An address the workbook does not
+hold is blank.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L428-L472" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def read_reference(self, reference: XlmReference, cursor: XlmCursor) -&gt; XlmValue:
+    &#34;&#34;&#34;
+    The value a cell address holds. The sheet the reference fails to name is the sheet the
+    cursor sits on. A cell the run left a value in — by a step that executed it, a value
+    command, or a return — holds that value. Any other formula cell is evaluated with itself
+    as the cursor its relative references resolve against, unless its evaluation is already
+    under way, the reads of the running evaluation exhausted their budget, or it nests too
+    deeply; such a cell, and a cell that holds only a value, reads as the value it was
+    stored with, with the date flag a date cell carries. An address the workbook does not
+    hold is blank.
+    &#34;&#34;&#34;
+    sheet = reference.sheet or cursor.sheet
+    reference = XlmReference(sheet, reference.row, reference.col)
+    cell = self._find_cell(sheet, reference.row, reference.col)
+    if cell is None:
+        if reference in self.failed_writes:
+            address = F&#39;{column_letters(reference.col)}{reference.row}&#39;
+            return XlmValue(value=address, partial=True)
+        return _blank(reference)
+    held = self._index.held.get(id(cell))
+    if held is not None:
+        return dataclasses.replace(held, reference=reference)
+    if not self._evaluating:
+        self._reads = 0
+    if (
+        cell.formula is not None
+        and id(cell) not in self._evaluating
+        and self._reads &lt; _READ_BUDGET
+    ):
+        self.check_deadline()
+        self._reads += 1
+        self._evaluating.add(id(cell))
+        try:
+            value = evaluate_expression(
+                self,
+                cell.formula,
+                XlmCursor(sheet, cell.row, cell.col),
+            )
+        except RecursionError:
+            return self._stored(cell, reference)
+        finally:
+            self._evaluating.discard(id(cell))
+        value.reference = reference
+        return value
+    return self._stored(cell, reference)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.resolve_name"><code class="name flex">
+<span>def <span class="ident">resolve_name</span></span>(<span>self, node, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The value a defined name stands for: the formula the entry for it holds, evaluated
+through the evaluator with the scope of the reading cell. A name the workbook does not
+define, or one whose formula resolves no further, answers its own spelling; a formula
+that reads the name it defines, or nests too deeply, answers the spelling of the formula.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L474-L493" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def resolve_name(self, node: XlDefinedName, cursor: XlmCursor) -&gt; XlmValue:
+    &#34;&#34;&#34;
+    The value a defined name stands for: the formula the entry for it holds, evaluated
+    through the evaluator with the scope of the reading cell. A name the workbook does not
+    define, or one whose formula resolves no further, answers its own spelling; a formula
+    that reads the name it defines, or nests too deeply, answers the spelling of the formula.
+    &#34;&#34;&#34;
+    entry = self._resolve_entry(node.name, node.sheet, cursor)
+    if entry is None or entry.formula is None:
+        return XlmValue(value=node.name, text=node.name)
+    key = (entry.name.lower(), entry.sheet)
+    if key in self._resolving:
+        return XlmValue(value=synthesize_formula(entry.formula))
+    self._resolving.add(key)
+    try:
+        return evaluate_expression(self, entry.formula, cursor)
+    except RecursionError:
+        return XlmValue(value=synthesize_formula(entry.formula))
+    finally:
+        self._resolving.discard(key)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.call"><code class="name flex">
+<span>def <span class="ident">call</span></span>(<span>self, call, cursor, nested=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The outcome of one function call. While the engine skips the body of a loop, every call
+but the heads and ends of loops is ignored. A call whose callee is itself a call answers
+what the inner call computed, spelled as the outer one; a registered alias dispatches
+under the name it was registered for; a callee that names a cell — directly or through
+a defined name — calls the macro there. A call is nested when an expression reads it
+instead of a step running it as the whole formula of its cell: a nested macro call runs
+its subroutine to the value it returns, and a nested command answers through the
+handler an expression reads it by, where it has one. Once the deadline of the run
+passed, no call answers.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L495-L536" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call(self, call: XlFunctionCall, cursor: XlmCursor, nested: bool = False) -&gt; XlmOutcome:
+    &#34;&#34;&#34;
+    The outcome of one function call. While the engine skips the body of a loop, every call
+    but the heads and ends of loops is ignored. A call whose callee is itself a call answers
+    what the inner call computed, spelled as the outer one; a registered alias dispatches
+    under the name it was registered for; a callee that names a cell — directly or through
+    a defined name — calls the macro there. A call is nested when an expression reads it
+    instead of a step running it as the whole formula of its cell: a nested macro call runs
+    its subroutine to the value it returns, and a nested command answers through the
+    handler an expression reads it by, where it has one. Once the deadline of the run
+    passed, no call answers.
+    &#34;&#34;&#34;
+    self.check_deadline()
+    name = callee_name(call)
+    if self.ignore_processing and name not in _LOOP_COMMANDS:
+        return XlmOutcome(
+            value=XlmValue(value=0, text=&#39;&#39;, partial=True),
+            status=XlmStatus.IGNORED,
+        )
+    if isinstance(call.callee, XlFunctionCall):
+        inner = self.call(call.callee, cursor, nested)
+        spelled = synthesize_formula(call)
+        if inner.value.partial:
+            return XlmOutcome(value=XlmValue(value=spelled, partial=True))
+        inner.value.text = spelled
+        return inner
+    target = self.aliases.get(name)
+    if target is not None:
+        return self.dispatch(target, call, cursor, nested)
+    if isinstance(call.callee, (XlA1Reference, XlR1C1Reference)):
+        reference = resolve_reference(call.callee, cursor)
+        return self._call_cell(reference, cursor, call, nested)
+    if isinstance(call.callee, XlDefinedName):
+        reference = self._name_reference(call.callee, cursor)
+        if reference is not None:
+            return self._call_cell(reference, cursor, call, nested)
+    else:
+        entry = self._resolve_entry(name, None, cursor)
+        reference = self._reference_of(entry.formula if entry else None, cursor)
+        if reference is not None:
+            return self._call_cell(reference, cursor, call, nested)
+    return self.dispatch(name, call, cursor, nested)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.dispatch"><code class="name flex">
+<span>def <span class="ident">dispatch</span></span>(<span>self, name, call, cursor, nested=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The outcome of a call under a name no alias rewrote. A nested call answers through the
+handler an expression reads its command by, where the command has one; every other
+command the handler table holds answers through its handler, and a command without one
+answers the spelled fallback.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L538-L556" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dispatch(
+    self,
+    name: str,
+    call: XlFunctionCall,
+    cursor: XlmCursor,
+    nested: bool = False,
+) -&gt; XlmOutcome:
+    &#34;&#34;&#34;
+    The outcome of a call under a name no alias rewrote. A nested call answers through the
+    handler an expression reads its command by, where the command has one; every other
+    command the handler table holds answers through its handler, and a command without one
+    answers the spelled fallback.
+    &#34;&#34;&#34;
+    handler = EXPRESSION_HANDLERS.get(name) if nested else None
+    if handler is None:
+        handler = HANDLERS.get(name)
+    if handler is not None:
+        return handler(self, call, cursor)
+    return self._unknown_command(name, call, cursor)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.return_value"><code class="name flex">
+<span>def <span class="ident">return_value</span></span>(<span>self, value)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Hand the value a <code>RETURN</code> computes to the macro call it returns from: a call that is the
+whole formula of its cell leaves the value in that cell and continues below it, and a
+call inside an expression takes the value as its own, which ends the run of the
+subroutine. A return without a call to return from continues below itself. The answer
+is the cursor to continue at and whether the run of a subroutine ended.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L558-L575" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def return_value(self, value: XlmValue) -&gt; tuple[XlmCursor | None, bool]:
+    &#34;&#34;&#34;
+    Hand the value a `RETURN` computes to the macro call it returns from: a call that is the
+    whole formula of its cell leaves the value in that cell and continues below it, and a
+    call inside an expression takes the value as its own, which ends the run of the
+    subroutine. A return without a call to return from continues below itself. The answer
+    is the cursor to continue at and whether the run of a subroutine ended.
+    &#34;&#34;&#34;
+    if not self.call_stack:
+        return None, False
+    caller = self.call_stack.pop()
+    if isinstance(caller, XlmReturnSlot):
+        caller.value = value
+        return None, True
+    cell = self._find_cell(caller.sheet, caller.row, caller.col)
+    if cell is not None:
+        self.write_value(cell, value)
+    return self.next_formula_cell(caller), False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.anchor"><code class="name flex">
+<span>def <span class="ident">anchor</span></span>(<span>self, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The cursor the program continues at from an address: the first formula cell at or below
+it on the same column of the same macrosheet, or <code>None</code> when the sheet is no macrosheet,
+is not named at all, or holds no formula cell within the row bound.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L577-L589" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def anchor(self, reference: XlmReference) -&gt; XlmCursor | None:
+    &#34;&#34;&#34;
+    The cursor the program continues at from an address: the first formula cell at or below
+    it on the same column of the same macrosheet, or `None` when the sheet is no macrosheet,
+    is not named at all, or holds no formula cell within the row bound.
+    &#34;&#34;&#34;
+    sheet = reference.sheet
+    if sheet is None or self.view.macrosheet(sheet) is None:
+        return None
+    row = self._index.fall_through(sheet, reference.col, reference.row)
+    if row is None:
+        return None
+    return XlmCursor(sheet, row, reference.col)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.next_formula_cell"><code class="name flex">
+<span>def <span class="ident">next_formula_cell</span></span>(<span>self, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The cursor the row fall-through moves to: the first formula cell below the given one on
+the same column, bounded by the row bound.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L591-L599" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def next_formula_cell(self, cursor: XlmCursor) -&gt; XlmCursor | None:
+    &#34;&#34;&#34;
+    The cursor the row fall-through moves to: the first formula cell below the given one on
+    the same column, bounded by the row bound.
+    &#34;&#34;&#34;
+    row = self._index.fall_through(cursor.sheet, cursor.col, cursor.row + 1)
+    if row is None:
+        return None
+    return XlmCursor(cursor.sheet, row, cursor.col)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.column_blocks"><code class="name flex">
+<span>def <span class="ident">column_blocks</span></span>(<span>self, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The block structure of the column of the cursor: every marker row mapped to the block
+<code>IF</code> it belongs to, paired over the live formula rows of the column, so that cells the
+program wrote at run time take part in the pairing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L601-L616" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def column_blocks(self, cursor: XlmCursor) -&gt; dict[int, XlmBlock]:
+    &#34;&#34;&#34;
+    The block structure of the column of the cursor: every marker row mapped to the block
+    `IF` it belongs to, paired over the live formula rows of the column, so that cells the
+    program wrote at run time take part in the pairing.
+    &#34;&#34;&#34;
+    sheet = cursor.sheet.lower()
+    markers: list[tuple[int, str]] = []
+    for row in self._index.formula_rows.get(sheet, {}).get(cursor.col, ()):
+        cell = self._index.find(sheet, row, cursor.col)
+        if cell is None or cell.formula is None:
+            continue
+        marker = marker_of(cell.formula)
+        if marker is not None:
+            markers.append((row, marker))
+    return pair_blocks(markers)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.argument_reference"><code class="name flex">
+<span>def <span class="ident">argument_reference</span></span>(<span>self, call, index, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The cell address one argument of a call names, as <code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.node_reference" href="#refinery.lib.scripts.xlm.engine.XlmEngine.node_reference">XlmEngine.node_reference()</a></code> reads it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L618-L629" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def argument_reference(
+    self,
+    call: XlFunctionCall,
+    index: int,
+    cursor: XlmCursor,
+) -&gt; XlmReference | None:
+    &#34;&#34;&#34;
+    The cell address one argument of a call names, as `XlmEngine.node_reference` reads it.
+    &#34;&#34;&#34;
+    if index &gt;= len(call.arguments):
+        return None
+    return self.node_reference(call.arguments[index], cursor)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.node_reference"><code class="name flex">
+<span>def <span class="ident">node_reference</span></span>(<span>self, node, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The cell address a node names, with the sheet of a local reference filled in from the
+cursor: a reference resolves against it, a defined name through the reference its entry
+holds, and a string literal parses as a formula. Any other expression evaluates to the
+reference its value carries, or to the address its text spells.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L631-L651" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def node_reference(self, node, cursor: XlmCursor) -&gt; XlmReference | None:
+    &#34;&#34;&#34;
+    The cell address a node names, with the sheet of a local reference filled in from the
+    cursor: a reference resolves against it, a defined name through the reference its entry
+    holds, and a string literal parses as a formula. Any other expression evaluates to the
+    reference its value carries, or to the address its text spells.
+    &#34;&#34;&#34;
+    if isinstance(node, (XlA1Reference, XlR1C1Reference)):
+        return self._local(resolve_reference(node, cursor), cursor)
+    if isinstance(node, XlDefinedName):
+        reference = self._name_reference(node, cursor)
+        if reference is not None:
+            return self._local(reference, cursor)
+    if isinstance(node, XlString):
+        return self._spelled_reference(node.value, cursor)
+    value = evaluate_expression(self, node, cursor)
+    if value.reference is not None:
+        return self._local(value.reference, cursor)
+    if value.partial or not isinstance(value.value, str):
+        return None
+    return self._spelled_reference(value.value, cursor)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.range_corners"><code class="name flex">
+<span>def <span class="ident">range_corners</span></span>(<span>self, node, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The corners a range argument names, or <code>None</code> when the argument is no range.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L653-L665" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def range_corners(self, node, cursor: XlmCursor) -&gt; tuple[XlmReference, XlmReference] | None:
+    &#34;&#34;&#34;
+    The corners a range argument names, or `None` when the argument is no range.
+    &#34;&#34;&#34;
+    if not isinstance(node, XlBinaryExpression) or node.operator is not XlBinaryOperator.RANGE:
+        return None
+    corners = []
+    for side in (node.left, node.right):
+        reference = self.node_reference(side, cursor)
+        if reference is None:
+            return None
+        corners.append(reference)
+    return corners[0], corners[1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.range_cells"><code class="name flex">
+<span>def <span class="ident">range_cells</span></span>(<span>self, corners)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The addresses of the cells a range spans that the workbook holds, in row-major order:
+the cells the index holds on the sheet of the range, the cells of that sheet where it
+is a worksheet, and the failed writes inside it, which read as the values the program
+left unfinished. The walk counts the cells the workbook holds, not the coordinates the
+rectangle spans.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L667-L699" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def range_cells(self, corners: tuple[XlmReference, XlmReference]) -&gt; Iterator[XlmReference]:
+    &#34;&#34;&#34;
+    The addresses of the cells a range spans that the workbook holds, in row-major order:
+    the cells the index holds on the sheet of the range, the cells of that sheet where it
+    is a worksheet, and the failed writes inside it, which read as the values the program
+    left unfinished. The walk counts the cells the workbook holds, not the coordinates the
+    rectangle spans.
+    &#34;&#34;&#34;
+    first, last = corners
+    sheet = first.sheet
+    if sheet is None:
+        return
+    key = sheet.lower()
+    row_min = min(first.row, last.row)
+    row_max = max(first.row, last.row)
+    col_min = min(first.col, last.col)
+    col_max = max(first.col, last.col)
+    held = self._index.cells.get(key, {})
+    worksheet = self.view.worksheet(sheet)
+    coordinates = set(held) | set(worksheet or ())
+    coordinates.update(
+        (reference.row, reference.col)
+        for reference in self.failed_writes
+        if (reference.sheet or &#39;&#39;).lower() == key
+    )
+    inside = (
+        coordinate
+        for coordinate in coordinates
+        if row_min &lt;= coordinate[0] &lt;= row_max
+        and col_min &lt;= coordinate[1] &lt;= col_max
+    )
+    for row, col in sorted(inside):
+        yield XlmReference(sheet, row, col)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.snapshot"><code class="name flex">
+<span>def <span class="ident">snapshot</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The state a false branch of a partial <code>IF</code> rolls back to: the position of the journal,
+and the state of the run the journal does not hold.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L701-L711" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def snapshot(self) -&gt; XlmSnapshot:
+    &#34;&#34;&#34;
+    The state a false branch of a partial `IF` rolls back to: the position of the journal,
+    and the state of the run the journal does not hold.
+    &#34;&#34;&#34;
+    return XlmSnapshot(
+        len(self._journal),
+        tuple(self.call_stack),
+        tuple(loop.copy() for loop in self.while_stack),
+        self.active_cell,
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.state_digest"><code class="name flex">
+<span>def <span class="ident">state_digest</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The digest of the whole state a run can observe: the cells its index holds, with the
+value each holds and the formula it spells, the entries of the name table, the
+registered aliases, the failed-write marks, the content of every open file, every
+region of memory, and the cell the program selected. A run that returns to the digest
+it anchored changes nothing the program can see.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L713-L744" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def state_digest(self) -&gt; bytes:
+    &#34;&#34;&#34;
+    The digest of the whole state a run can observe: the cells its index holds, with the
+    value each holds and the formula it spells, the entries of the name table, the
+    registered aliases, the failed-write marks, the content of every open file, every
+    region of memory, and the cell the program selected. A run that returns to the digest
+    it anchored changes nothing the program can see.
+    &#34;&#34;&#34;
+    parts: list[str] = []
+    for sheet in sorted(self._index.cells):
+        cells = self._index.cells[sheet]
+        for row, col in sorted(cells):
+            cell = cells[(row, col)]
+            held = self._index.held.get(id(cell))
+            value = held.text if held is not None else repr(cell.value)
+            formula = cell.formula
+            spelling = synthesize_formula(formula) if formula is not None else &#39;&#39;
+            parts.append(F&#39;{sheet}!{row}!{col}={value}|{spelling}&#39;)
+    for entry in self.view.names.entries():
+        formula = entry.formula
+        spelling = synthesize_formula(formula) if formula is not None else &#39;&#39;
+        parts.append(F&#39;name:{entry.name.lower()}@{entry.sheet}={spelling}&#39;)
+    for name in sorted(self.aliases):
+        parts.append(F&#39;alias:{name}={self.aliases[name]}&#39;)
+    for reference in sorted(self.failed_writes):
+        parts.append(F&#39;failed:{reference.a1()}&#39;)
+    for name, content in self.files.snapshot():
+        parts.append(F&#39;file:{name}={content}&#39;)
+    for base, data in self.memory.snapshot():
+        parts.append(F&#39;memory:{base}={len(data)}:{data.hex()}&#39;)
+    parts.append(F&#39;active:{self.active_cell}&#39;)
+    return hashlib.sha256(&#39;\n&#39;.join(parts).encode()).digest()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.rollback"><code class="name flex">
+<span>def <span class="ident">rollback</span></span>(<span>self, snapshot)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Return to a snapshot: every change the journal holds past its position is undone —
+cells, names, aliases, files, memory regions, and failed-write marks return to what they
+carried, and cells the writes created leave their sheet again — and the call stack, the
+open loops, and the selected cell are what they were.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L746-L757" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def rollback(self, snapshot: XlmSnapshot) -&gt; None:
+    &#34;&#34;&#34;
+    Return to a snapshot: every change the journal holds past its position is undone —
+    cells, names, aliases, files, memory regions, and failed-write marks return to what they
+    carried, and cells the writes created leave their sheet again — and the call stack, the
+    open loops, and the selected cell are what they were.
+    &#34;&#34;&#34;
+    while len(self._journal) &gt; snapshot.journal:
+        self._journal.pop().undo(self)
+    self.call_stack = list(snapshot.call_stack)
+    self.while_stack = [loop.copy() for loop in snapshot.loops]
+    self.active_cell = snapshot.active_cell</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.write_value"><code class="name flex">
+<span>def <span class="ident">write_value</span></span>(<span>self, cell, value)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Leave the value a step computed — or a macro call returned — in the cell it belongs to,
+undoable by a branch that rolls back: a later read of the cell answers that value
+instead of evaluating the formula of the cell again.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L759-L775" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write_value(self, cell: XlmCell, value: XlmValue) -&gt; None:
+    &#34;&#34;&#34;
+    Leave the value a step computed — or a macro call returned — in the cell it belongs to,
+    undoable by a branch that rolls back: a later read of the cell answers that value
+    instead of evaluating the formula of the cell again.
+    &#34;&#34;&#34;
+    self._journal.append(_Write(
+        self._index.sheet_of.get(id(cell), &#39;&#39;),
+        cell,
+        cell.value,
+        cell.formula,
+        self._index.held.get(id(cell)),
+        False,
+    ))
+    held = _held(value)
+    set_value(cell, &#39;value&#39;, held.value)
+    self._index.hold(cell, held)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.write_cell"><code class="name flex">
+<span>def <span class="ident">write_cell</span></span>(<span>self, reference, value, cursor, value_only=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Write a value into the macrosheet cell an address names, as the mutation commands do,
+undoable by a branch that rolls back; a cell that does not exist is created. A
+value-only write changes the value the cell holds and leaves its formula in place. Any
+other write enters the value the way a typed entry does: a text that starts with <code>=</code>
+installs a formula, which a later read of the cell evaluates, and anything else replaces
+the formula of the cell by a constant. An address off every macrosheet is not written.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L777-L826" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write_cell(
+    self,
+    reference: XlmReference,
+    value: XlmValue,
+    cursor: XlmCursor,
+    value_only: bool = False,
+) -&gt; None:
+    &#34;&#34;&#34;
+    Write a value into the macrosheet cell an address names, as the mutation commands do,
+    undoable by a branch that rolls back; a cell that does not exist is created. A
+    value-only write changes the value the cell holds and leaves its formula in place. Any
+    other write enters the value the way a typed entry does: a text that starts with `=`
+    installs a formula, which a later read of the cell evaluates, and anything else replaces
+    the formula of the cell by a constant. An address off every macrosheet is not written.
+    &#34;&#34;&#34;
+    sheet = reference.sheet or cursor.sheet
+    macrosheet = self.view.macrosheet(sheet)
+    if macrosheet is None:
+        return
+    key = macrosheet.name.lower()
+    cell = self._index.find(key, reference.row, reference.col)
+    created = cell is None
+    if cell is None:
+        cell = XlmCell(row=reference.row, col=reference.col)
+        self._index.insert(key, cell)
+        if macrosheet.body:
+            edit = BodyEdit(macrosheet)
+            edit.splice(macrosheet.body[-1], [macrosheet.body[-1], cell])
+            edit.apply()
+        else:
+            set_body(macrosheet, [cell])
+    self._journal.append(_Write(
+        key,
+        cell,
+        cell.value,
+        cell.formula,
+        self._index.held.get(id(cell)),
+        created,
+    ))
+    held: XlmValue | None = _held(value)
+    formula = cell.formula
+    if not value_only:
+        formula = None
+        if isinstance(value.value, str) and value.value.startswith(&#39;=&#39;):
+            formula = parse_formula(value.value)
+            held = None
+    self._index.update_formula_rows(key, cell, cell.formula is not None, formula is not None)
+    set_value(cell, &#39;value&#39;, value.value if held is None else held.value)
+    set_child(cell, &#39;formula&#39;, formula)
+    self._index.hold(cell, held)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.define_name"><code class="name flex">
+<span>def <span class="ident">define_name</span></span>(<span>self, entry)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Define the name an entry carries, as the name commands do, undoable by a branch that
+rolls back.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L828-L834" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def define_name(self, entry: XlmNameEntry) -&gt; None:
+    &#34;&#34;&#34;
+    Define the name an entry carries, as the name commands do, undoable by a branch that
+    rolls back.
+    &#34;&#34;&#34;
+    self._journal.append(_NameDefine(self.view.names.entries()))
+    self.view.names.define(entry)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.assign_name"><code class="name flex">
+<span>def <span class="ident">assign_name</span></span>(<span>self, name, formula, cursor)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Define a name as <code>SET.NAME</code> and the <code>FOR.CELL</code> loop do, undoable by a branch that rolls
+back: the definition replaces the entry a read on the sheet of the cursor resolves the
+name to, so that the sheet reads back what it assigned, and a name the sheet resolves to
+no entry is defined for the whole workbook. A name assigned no formula reads as one the
+workbook does not define.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L836-L846" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def assign_name(self, name: str, formula, cursor: XlmCursor) -&gt; None:
+    &#34;&#34;&#34;
+    Define a name as `SET.NAME` and the `FOR.CELL` loop do, undoable by a branch that rolls
+    back: the definition replaces the entry a read on the sheet of the cursor resolves the
+    name to, so that the sheet reads back what it assigned, and a name the sheet resolves to
+    no entry is defined for the whole workbook. A name assigned no formula reads as one the
+    workbook does not define.
+    &#34;&#34;&#34;
+    entry = self.view.names.resolve(name, self.view.sheet_index(cursor.sheet))
+    sheet = None if entry is None else entry.sheet
+    self.define_name(XlmNameEntry(name=name, sheet=sheet, formula=formula))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.register_alias"><code class="name flex">
+<span>def <span class="ident">register_alias</span></span>(<span>self, name, target)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Register the target a command name dispatches to, as <code>REGISTER</code> does, undoable by a
+branch that rolls back.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L848-L854" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def register_alias(self, name: str, target: str) -&gt; None:
+    &#34;&#34;&#34;
+    Register the target a command name dispatches to, as `REGISTER` does, undoable by a
+    branch that rolls back.
+    &#34;&#34;&#34;
+    self._journal.append(_AliasRegistration(name, self.aliases.get(name)))
+    self.aliases[name] = target</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.open_file"><code class="name flex">
+<span>def <span class="ident">open_file</span></span>(<span>self, name, access='1')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Open the name as a file, as <code>FOPEN</code> does, undoable by a branch that rolls back; a name
+that already answers a file changes nothing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L856-L864" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def open_file(self, name: str, access: str = &#39;1&#39;) -&gt; None:
+    &#34;&#34;&#34;
+    Open the name as a file, as `FOPEN` does, undoable by a branch that rolls back; a name
+    that already answers a file changes nothing.
+    &#34;&#34;&#34;
+    if self.files.opened(name):
+        return
+    self._journal.append(_FileOpen(name))
+    self.files.open(name, access)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.write_file"><code class="name flex">
+<span>def <span class="ident">write_file</span></span>(<span>self, name, text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Append to a file the program opened, as <code>FWRITE</code> does, undoable by a branch that rolls
+back, reporting whether the file took the write.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L866-L876" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write_file(self, name: str, text: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Append to a file the program opened, as `FWRITE` does, undoable by a branch that rolls
+    back, reporting whether the file took the write.
+    &#34;&#34;&#34;
+    length = self.files.size(name)
+    if length is None:
+        return False
+    self._journal.append(_FileWrite(name, length))
+    self.files.write(name, text)
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.allocate_memory"><code class="name flex">
+<span>def <span class="ident">allocate_memory</span></span>(<span>self, base, size)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Reserve a region of memory, as <code>Kernel32.VirtualAlloc</code> does, undoable by a branch that
+rolls back.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L878-L884" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def allocate_memory(self, base: int, size: int) -&gt; int:
+    &#34;&#34;&#34;
+    Reserve a region of memory, as `Kernel32.VirtualAlloc` does, undoable by a branch that
+    rolls back.
+    &#34;&#34;&#34;
+    self._journal.append(_RegionAlloc())
+    return self.memory.allocate(base, size)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.write_memory"><code class="name flex">
+<span>def <span class="ident">write_memory</span></span>(<span>self, base, data, size)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Write bytes into a region of memory, as the Kernel32 write commands do, undoable by a
+branch that rolls back, reporting whether a region took the whole write.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L886-L896" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write_memory(self, base: int, data: bytes, size: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Write bytes into a region of memory, as the Kernel32 write commands do, undoable by a
+    branch that rolls back, reporting whether a region took the whole write.
+    &#34;&#34;&#34;
+    before = self.memory.peek(base, size)
+    if before is None:
+        return False
+    self.memory.write(base, data, size)
+    self._journal.append(_MemoryWrite(base, before))
+    return True</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.mark_failed"><code class="name flex">
+<span>def <span class="ident">mark_failed</span></span>(<span>self, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Mark an address as the destination of a write that never finished, undoable by a
+branch that rolls back.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L898-L906" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def mark_failed(self, reference: XlmReference) -&gt; None:
+    &#34;&#34;&#34;
+    Mark an address as the destination of a write that never finished, undoable by a
+    branch that rolls back.
+    &#34;&#34;&#34;
+    if reference in self.failed_writes:
+        return
+    self._journal.append(_FailedMark(reference, True))
+    self.failed_writes.add(reference)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.unmark_failed"><code class="name flex">
+<span>def <span class="ident">unmark_failed</span></span>(<span>self, reference)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Drop the failed-write mark of an address, undoable by a branch that rolls back.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L908-L915" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unmark_failed(self, reference: XlmReference) -&gt; None:
+    &#34;&#34;&#34;
+    Drop the failed-write mark of an address, undoable by a branch that rolls back.
+    &#34;&#34;&#34;
+    if reference not in self.failed_writes:
+        return
+    self._journal.append(_FailedMark(reference, False))
+    self.failed_writes.discard(reference)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.xlm.engine.XlmEngine.check_deadline"><code class="name flex">
+<span>def <span class="ident">check_deadline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Raise the exhaustion of the run's deadline, for the walks a command takes inside one
+step, so that a walk over a rectangle the workbook barely fills still answers to the
+deadline of the run.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/xlm/engine.py#L1091-L1098" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def check_deadline(self) -&gt; None:
+    &#34;&#34;&#34;
+    Raise the exhaustion of the run&#39;s deadline, for the walks a command takes inside one
+    step, so that a walk over a rectangle the workbook barely fills still answers to the
+    deadline of the run.
+    &#34;&#34;&#34;
+    if self._expired():
+        raise _Exhausted(&#39;the run exceeded its timeout&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.xlm" href="index.html">refinery.lib.scripts.xlm</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.xlm.engine.callee_name" href="#refinery.lib.scripts.xlm.engine.callee_name">callee_name</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine" href="#refinery.lib.scripts.xlm.engine.XlmEngine">XlmEngine</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.run" href="#refinery.lib.scripts.xlm.engine.XlmEngine.run">run</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.trial" href="#refinery.lib.scripts.xlm.engine.XlmEngine.trial">trial</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.read_reference" href="#refinery.lib.scripts.xlm.engine.XlmEngine.read_reference">read_reference</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.resolve_name" href="#refinery.lib.scripts.xlm.engine.XlmEngine.resolve_name">resolve_name</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.call" href="#refinery.lib.scripts.xlm.engine.XlmEngine.call">call</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.dispatch" href="#refinery.lib.scripts.xlm.engine.XlmEngine.dispatch">dispatch</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.return_value" href="#refinery.lib.scripts.xlm.engine.XlmEngine.return_value">return_value</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.anchor" href="#refinery.lib.scripts.xlm.engine.XlmEngine.anchor">anchor</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.next_formula_cell" href="#refinery.lib.scripts.xlm.engine.XlmEngine.next_formula_cell">next_formula_cell</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.column_blocks" href="#refinery.lib.scripts.xlm.engine.XlmEngine.column_blocks">column_blocks</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.argument_reference" href="#refinery.lib.scripts.xlm.engine.XlmEngine.argument_reference">argument_reference</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.node_reference" href="#refinery.lib.scripts.xlm.engine.XlmEngine.node_reference">node_reference</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.range_corners" href="#refinery.lib.scripts.xlm.engine.XlmEngine.range_corners">range_corners</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.range_cells" href="#refinery.lib.scripts.xlm.engine.XlmEngine.range_cells">range_cells</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.snapshot" href="#refinery.lib.scripts.xlm.engine.XlmEngine.snapshot">snapshot</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.state_digest" href="#refinery.lib.scripts.xlm.engine.XlmEngine.state_digest">state_digest</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.rollback" href="#refinery.lib.scripts.xlm.engine.XlmEngine.rollback">rollback</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.write_value" href="#refinery.lib.scripts.xlm.engine.XlmEngine.write_value">write_value</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.write_cell" href="#refinery.lib.scripts.xlm.engine.XlmEngine.write_cell">write_cell</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.define_name" href="#refinery.lib.scripts.xlm.engine.XlmEngine.define_name">define_name</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.assign_name" href="#refinery.lib.scripts.xlm.engine.XlmEngine.assign_name">assign_name</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.register_alias" href="#refinery.lib.scripts.xlm.engine.XlmEngine.register_alias">register_alias</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.open_file" href="#refinery.lib.scripts.xlm.engine.XlmEngine.open_file">open_file</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.write_file" href="#refinery.lib.scripts.xlm.engine.XlmEngine.write_file">write_file</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.allocate_memory" href="#refinery.lib.scripts.xlm.engine.XlmEngine.allocate_memory">allocate_memory</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.write_memory" href="#refinery.lib.scripts.xlm.engine.XlmEngine.write_memory">write_memory</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.mark_failed" href="#refinery.lib.scripts.xlm.engine.XlmEngine.mark_failed">mark_failed</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.unmark_failed" href="#refinery.lib.scripts.xlm.engine.XlmEngine.unmark_failed">unmark_failed</a></code></li>
+<li><code><a title="refinery.lib.scripts.xlm.engine.XlmEngine.check_deadline" href="#refinery.lib.scripts.xlm.engine.XlmEngine.check_deadline">check_deadline</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

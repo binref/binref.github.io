@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.excel.ooxml documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.excel.ooxml</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/ooxml.py#L1-L426" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import datetime
+import posixpath
+
+from collections.abc import Iterator, Sequence
+from xml.etree.ElementTree import Element
+
+from defusedxml.ElementTree import fromstring, iterparse
+
+from refinery.lib.excel.common import (
+    XML_DEFECTS,
+    Cell,
+    CellKind,
+    DefinedName,
+    ExcelFormatError,
+    FormulaSource,
+    SheetKind,
+    date_cell,
+    datetime_to_serial,
+    decode_xstring,
+    is_builtin_date_format,
+    is_date_format_string,
+    local_name,
+    rc2ref,
+    ref2rc,
+)
+from refinery.lib.excel.formula.model import Expression, XlUnparsedFormula
+from refinery.lib.excel.formula.parse import parse_formula
+from refinery.lib.excel.workbook import ExcelFormat, ExcelSheet, ExcelWorkbook, _Package
+
+_REL_WORKSHEET = &#39;http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet&#39;
+_REL_CHARTSHEET = &#39;http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet&#39;
+_REL_MACROSHEET = &#39;http://schemas.microsoft.com/office/2006/relationships/xlMacrosheet&#39;
+_REL_INTL_MACROSHEET = &#39;http://schemas.microsoft.com/office/2006/relationships/xlIntlMacrosheet&#39;
+_REL_SHARED_STRINGS = (
+    &#39;http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings&#39;)
+_REL_STYLES = &#39;http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles&#39;
+_RELATIONSHIP_NS = &#39;http://schemas.openxmlformats.org/officeDocument/2006/relationships&#39;
+
+_SHEET_KINDS = {
+    _REL_WORKSHEET: SheetKind.WORKSHEET,
+    _REL_CHARTSHEET: SheetKind.CHART,
+    _REL_MACROSHEET: SheetKind.MACROSHEET,
+    _REL_INTL_MACROSHEET: SheetKind.MACROSHEET,
+}
+
+
+def _resolve_part(base: str, target: str) -&gt; str:
+    target = target.replace(&#39;\\&#39;, &#39;/&#39;)
+    if target.startswith(&#39;/&#39;):
+        return target.lstrip(&#39;/&#39;)
+    return posixpath.normpath(posixpath.join(base, target))
+
+
+def _collect_text(element: Element) -&gt; str:
+    parts: list[str] = []
+    for child in element:
+        local = local_name(child.tag)
+        if local == &#39;t&#39;:
+            parts.append(child.text or &#39;&#39;)
+        elif local == &#39;r&#39;:
+            for run in child:
+                if local_name(run.tag) == &#39;t&#39;:
+                    parts.append(run.text or &#39;&#39;)
+    return &#39;&#39;.join(parts)
+
+
+def _cast_number(text: str) -&gt; int | float:
+    if &#39;.&#39; in text or &#39;e&#39; in text or &#39;E&#39; in text:
+        number = float(text)
+    else:
+        number = int(text)
+    if isinstance(number, float) and number.is_integer():
+        return int(number)
+    return number
+
+
+class OoxmlSheet(ExcelSheet):
+    &#34;&#34;&#34;
+    A worksheet, macrosheet, or chart sheet of an `OoxmlWorkbook`. Calling `cells` streams the
+    cell elements of the sheet part; when the part is missing or malformed, the cells read up
+    to the defect are yielded first and an `ExcelFormatError` is raised afterwards.
+    &#34;&#34;&#34;
+
+    def __init__(self, name: str, kind: SheetKind, part: str | None, workbook: OoxmlWorkbook):
+        self.name = name
+        self.kind = kind
+        self._part = part
+        self._workbook = workbook
+
+    def cells(self) -&gt; Iterator[Cell]:
+        &#34;&#34;&#34;
+        Iterate over every cell of the sheet, in document order.
+        &#34;&#34;&#34;
+        if self._part is None:
+            raise ExcelFormatError(F&#39;sheet {self.name!r} is not attached to a cell part&#39;)
+        stream = self._workbook._package.open(self._part)
+        if stream is None:
+            raise ExcelFormatError(F&#39;part {self._part!r} of sheet {self.name!r} is missing&#39;)
+        context = iterparse(stream, events=(&#39;start&#39;, &#39;end&#39;))
+        root = None
+        row_number = 0
+        try:
+            first = next(context, None)
+            if first is None or first[0] != &#39;start&#39;:
+                raise ExcelFormatError(F&#39;part {self._part!r} of sheet {self.name!r} is empty&#39;)
+            root = first[1]
+            for event, element in context:
+                if event != &#39;end&#39; or local_name(element.tag) != &#39;row&#39;:
+                    continue
+                reference = element.get(&#39;r&#39;)
+                if (
+                    reference is not None
+                    and reference.isascii()
+                    and reference.isdigit()
+                    and int(reference) &gt; 0
+                ):
+                    row_number = int(reference)
+                else:
+                    row_number += 1
+                next_col = 1
+                for cell_element in element:
+                    if local_name(cell_element.tag) != &#39;c&#39;:
+                        continue
+                    row = row_number
+                    col = next_col
+                    cell_reference = cell_element.get(&#39;r&#39;)
+                    if cell_reference is not None:
+                        try:
+                            row, col = ref2rc(cell_reference)
+                        except ValueError:
+                            pass
+                    next_col = col + 1
+                    yield self._build_cell(cell_element, row, col)
+                element.clear()
+                root.clear()
+        except XML_DEFECTS as error:
+            raise ExcelFormatError(F&#39;sheet {self.name!r} is malformed&#39;) from error
+
+    def _build_cell(self, element: Element, row: int, col: int) -&gt; Cell:
+        formula: str | None = None
+        assignment = False
+        value_text: str | None = None
+        inline: str | None = None
+        for child in element:
+            local = local_name(child.tag)
+            if local == &#39;f&#39;:
+                formula = child.text or None
+                assignment = (child.get(&#39;bx&#39;) or &#39;&#39;).lower() in (&#39;1&#39;, &#39;true&#39;)
+            elif local == &#39;v&#39;:
+                value_text = child.text
+            elif local == &#39;is&#39;:
+                inline = decode_xstring(_collect_text(child))
+        workbook = self._workbook
+        kind_hint = element.get(&#39;t&#39;)
+        if kind_hint == &#39;s&#39; and value_text is not None:
+            try:
+                index = int(value_text)
+            except ValueError:
+                index = -1
+            strings = workbook._ensure_shared_strings()
+            if not 0 &lt;= index &lt; len(strings):
+                raise ExcelFormatError(
+                    F&#39;cell {rc2ref(row, col)} of sheet {self.name!r} references shared string&#39;
+                    F&#39; {value_text} outside the table of {len(strings)} entries&#39;)
+            return Cell(row, col, CellKind.TEXT, strings[index], formula, assignment)
+        if kind_hint == &#39;inlineStr&#39; and inline is not None:
+            return Cell(row, col, CellKind.TEXT, inline, formula, assignment)
+        if value_text is None:
+            if formula is not None:
+                return Cell(row, col, CellKind.FORMULA, None, formula, assignment)
+            return Cell(row, col, CellKind.BLANK, None, None)
+        if kind_hint == &#39;str&#39;:
+            return Cell(
+                row,
+                col,
+                CellKind.TEXT,
+                decode_xstring(value_text),
+                formula,
+                assignment,
+            )
+        if kind_hint == &#39;b&#39;:
+            return Cell(
+                row,
+                col,
+                CellKind.BOOLEAN,
+                value_text.strip().lower() in (&#39;1&#39;, &#39;true&#39;),
+                formula,
+                assignment,
+            )
+        if kind_hint == &#39;e&#39;:
+            return Cell(row, col, CellKind.ERROR, value_text, formula, assignment)
+        if kind_hint == &#39;d&#39;:
+            try:
+                value = datetime.datetime.fromisoformat(value_text)
+            except ValueError as error:
+                raise ExcelFormatError(
+                    F&#39;cell {rc2ref(row, col)} of sheet {self.name!r} has the malformed value&#39;
+                    F&#39; {value_text!r}&#39;) from error
+            serial = datetime_to_serial(value, workbook.date_mode_1904)
+            return date_cell(row, col, serial, workbook.date_mode_1904, formula, assignment)
+        try:
+            number = _cast_number(value_text)
+        except ValueError as error:
+            raise ExcelFormatError(
+                F&#39;cell {rc2ref(row, col)} of sheet {self.name!r} has the malformed value&#39;
+                F&#39; {value_text!r}&#39;) from error
+        if workbook._style_is_date(element.get(&#39;s&#39;)):
+            return date_cell(row, col, number, workbook.date_mode_1904, formula, assignment)
+        return Cell(row, col, CellKind.NUMBER, number, formula, assignment)
+
+
+class OoxmlWorkbook(ExcelWorkbook):
+    &#34;&#34;&#34;
+    A reader for workbooks in the Office Open XML format, which covers the XLSX and XLSM file
+    extensions. The parts of the container are located through the relationships of the
+    workbook part so that relocated or oddly cased part names do not break extraction.
+    &#34;&#34;&#34;
+
+    format = ExcelFormat.OOXML
+
+    def __init__(self, data: bytes | bytearray | memoryview):
+        self._package = _Package(data)
+        workbook_part = self._workbook_part()
+        self._base = posixpath.dirname(workbook_part)
+        self._rels = self._read_rels(workbook_part)
+        self.date_mode_1904 = False
+        self._sheets: list[OoxmlSheet] = []
+        self._names: list[DefinedName] = []
+        self._shared_strings: list[str] = []
+        self._shared_strings_loaded = False
+        self._formats: dict[int, str] = {}
+        self._style_formats: list[int] | None = None
+        root = self._parse_part(workbook_part, &#39;workbook part&#39;)
+        for element in root.iter():
+            local = local_name(element.tag)
+            if local == &#39;workbookPr&#39;:
+                mode = element.get(&#39;date1904&#39;) or &#39;&#39;
+                self.date_mode_1904 = mode.lower() in (&#39;true&#39;, &#39;1&#39;)
+            elif local == &#39;sheet&#39;:
+                name = element.get(&#39;name&#39;) or &#39;&#39;
+                rid = element.get(F&#39;{{{_RELATIONSHIP_NS}}}id&#39;)
+                target, rel_type = self._rels.get(rid or &#39;&#39;, (None, None))
+                part = None if target is None else _resolve_part(self._base, target)
+                kind = _SHEET_KINDS.get(rel_type or &#39;&#39;, SheetKind.OTHER)
+                self._sheets.append(OoxmlSheet(name, kind, part, self))
+            elif local == &#39;definedName&#39;:
+                self._names.append(self._defined_name(element))
+
+    def sheets(self) -&gt; list[OoxmlSheet]:
+        &#34;&#34;&#34;
+        All sheets of the workbook in document order.
+        &#34;&#34;&#34;
+        return self._sheets
+
+    def defined_names(self) -&gt; Sequence[DefinedName]:
+        &#34;&#34;&#34;
+        All defined names of the workbook, in the order their `definedName` elements appear.
+        &#34;&#34;&#34;
+        return self._names
+
+    def formula(self, source: FormulaSource) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Decode the formula text of a cell or a defined name of this workbook through the text
+        parser. Text the parser cannot read in full yields the carrier that prints it verbatim,
+        and `None` yields `None`; a byte string is not an OOXML source.
+        &#34;&#34;&#34;
+        if source is None:
+            return None
+        if isinstance(source, str):
+            return parse_formula(source)
+        return XlUnparsedFormula(text=bytes(source).hex())
+
+    @staticmethod
+    def _defined_name(element: Element) -&gt; DefinedName:
+        &#34;&#34;&#34;
+        Parse one `definedName` element. A built-in name carries the `_xlnm.` prefix, which the
+        BIFF readers spell away as the lower-case name its single-byte code selects, so the
+        prefix is stripped and the name lower-cased to match. An element without text names a
+        broken reference; the empty formula it yields decodes to the empty carrier, as the empty
+        token stream of the other readers does.
+        &#34;&#34;&#34;
+        name = element.get(&#39;name&#39;) or &#39;&#39;
+        if name.startswith(&#39;_xlnm.&#39;):
+            name = name[len(&#39;_xlnm.&#39;):].lower()
+        sheet = element.get(&#39;localSheetId&#39;)
+        try:
+            scope = None if sheet is None else int(sheet)
+        except ValueError:
+            scope = None
+        return DefinedName(
+            name=name,
+            formula=element.text or &#39;&#39;,
+            sheet=scope,
+        )
+
+    def _workbook_part(self) -&gt; str:
+        part = &#39;xl/workbook.xml&#39;
+        stream = self._package.open(&#39;[Content_Types].xml&#39;)
+        if stream is not None:
+            try:
+                root = fromstring(stream.read())
+            except XML_DEFECTS:
+                return part
+            for element in root.iter():
+                if local_name(element.tag) != &#39;Override&#39;:
+                    continue
+                if &#39;sheet.main+xml&#39; not in (element.get(&#39;ContentType&#39;) or &#39;&#39;):
+                    continue
+                override = element.get(&#39;PartName&#39;)
+                if override:
+                    part = override.replace(&#39;\\&#39;, &#39;/&#39;).lstrip(&#39;/&#39;)
+                    break
+        return part
+
+    def _read_rels(self, workbook_part: str) -&gt; dict[str, tuple[str, str]]:
+        base = posixpath.dirname(workbook_part)
+        name = posixpath.basename(workbook_part)
+        rels = posixpath.join(base, &#39;_rels&#39;, F&#39;{name}.rels&#39;)
+        stream = self._package.open(rels)
+        if stream is None:
+            return {}
+        try:
+            root = fromstring(stream.read())
+        except XML_DEFECTS:
+            return {}
+        result: dict[str, tuple[str, str]] = {}
+        for element in root.iter():
+            if local_name(element.tag) != &#39;Relationship&#39;:
+                continue
+            rid = element.get(&#39;Id&#39;)
+            if rid:
+                result[rid] = (element.get(&#39;Target&#39;) or &#39;&#39;, element.get(&#39;Type&#39;) or &#39;&#39;)
+        return result
+
+    def _parse_part(self, part: str, what: str) -&gt; Element:
+        stream = self._package.open(part)
+        if stream is None:
+            raise ExcelFormatError(F&#39;{what} {part!r} is missing from the archive&#39;)
+        try:
+            return fromstring(stream.read())
+        except XML_DEFECTS as error:
+            raise ExcelFormatError(F&#39;{what} {part!r} is malformed&#39;) from error
+
+    def _part_for(self, rel_type: str) -&gt; str | None:
+        for target, rtype in self._rels.values():
+            if rtype == rel_type:
+                return _resolve_part(self._base, target)
+        return None
+
+    def _ensure_shared_strings(self) -&gt; list[str]:
+        if not self._shared_strings_loaded:
+            self._load_shared_strings()
+            self._shared_strings_loaded = True
+        return self._shared_strings
+
+    def _load_shared_strings(self) -&gt; None:
+        part = self._part_for(_REL_SHARED_STRINGS)
+        if part is None:
+            return
+        stream = self._package.open(part)
+        if stream is None:
+            raise ExcelFormatError(F&#39;shared string part {part!r} is missing from the archive&#39;)
+        context = iterparse(stream, events=(&#39;start&#39;, &#39;end&#39;))
+        root = None
+        strings: list[str] = []
+        try:
+            first = next(context, None)
+            if first is None or first[0] != &#39;start&#39;:
+                raise ExcelFormatError(F&#39;shared string part {part!r} is empty&#39;)
+            root = first[1]
+            for event, element in context:
+                if event != &#39;end&#39; or local_name(element.tag) != &#39;si&#39;:
+                    continue
+                strings.append(decode_xstring(_collect_text(element)))
+                element.clear()
+                root.clear()
+        except XML_DEFECTS as error:
+            raise ExcelFormatError(F&#39;shared string part {part!r} is malformed&#39;) from error
+        self._shared_strings = strings
+
+    def _load_styles(self) -&gt; None:
+        part = self._part_for(_REL_STYLES)
+        self._style_formats = []
+        if part is None:
+            return
+        stream = self._package.open(part)
+        if stream is None:
+            return
+        try:
+            root = fromstring(stream.read())
+        except XML_DEFECTS:
+            return
+        for element in root.iter():
+            local = local_name(element.tag)
+            if local == &#39;numFmt&#39;:
+                try:
+                    self._formats[int(element.get(&#39;numFmtId&#39;) or 0)] = (
+                        element.get(&#39;formatCode&#39;) or &#39;&#39;)
+                except ValueError:
+                    pass
+            elif local == &#39;cellXfs&#39;:
+                for xf in element:
+                    try:
+                        self._style_formats.append(int(xf.get(&#39;numFmtId&#39;) or 0))
+                    except ValueError:
+                        self._style_formats.append(0)
+
+    def _style_is_date(self, style: str | None) -&gt; bool:
+        if self._style_formats is None:
+            self._load_styles()
+        assert self._style_formats is not None
+        if style is None:
+            return False
+        try:
+            index = int(style)
+        except ValueError:
+            return False
+        if not 0 &lt;= index &lt; len(self._style_formats):
+            return False
+        fmt_id = self._style_formats[index]
+        code = self._formats.get(fmt_id)
+        if code is None:
+            return is_builtin_date_format(fmt_id)
+        return is_date_format_string(code)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.excel.ooxml.OoxmlSheet"><code class="flex name class">
+<span>class <span class="ident">OoxmlSheet</span></span>
+<span>(</span><span>name, kind, part, workbook)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A worksheet, macrosheet, or chart sheet of an <code><a title="refinery.lib.excel.ooxml.OoxmlWorkbook" href="#refinery.lib.excel.ooxml.OoxmlWorkbook">OoxmlWorkbook</a></code>. Calling <code>cells</code> streams the
+cell elements of the sheet part; when the part is missing or malformed, the cells read up
+to the defect are yielded first and an <code>ExcelFormatError</code> is raised afterwards.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/ooxml.py#L79-L211" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class OoxmlSheet(ExcelSheet):
+    &#34;&#34;&#34;
+    A worksheet, macrosheet, or chart sheet of an `OoxmlWorkbook`. Calling `cells` streams the
+    cell elements of the sheet part; when the part is missing or malformed, the cells read up
+    to the defect are yielded first and an `ExcelFormatError` is raised afterwards.
+    &#34;&#34;&#34;
+
+    def __init__(self, name: str, kind: SheetKind, part: str | None, workbook: OoxmlWorkbook):
+        self.name = name
+        self.kind = kind
+        self._part = part
+        self._workbook = workbook
+
+    def cells(self) -&gt; Iterator[Cell]:
+        &#34;&#34;&#34;
+        Iterate over every cell of the sheet, in document order.
+        &#34;&#34;&#34;
+        if self._part is None:
+            raise ExcelFormatError(F&#39;sheet {self.name!r} is not attached to a cell part&#39;)
+        stream = self._workbook._package.open(self._part)
+        if stream is None:
+            raise ExcelFormatError(F&#39;part {self._part!r} of sheet {self.name!r} is missing&#39;)
+        context = iterparse(stream, events=(&#39;start&#39;, &#39;end&#39;))
+        root = None
+        row_number = 0
+        try:
+            first = next(context, None)
+            if first is None or first[0] != &#39;start&#39;:
+                raise ExcelFormatError(F&#39;part {self._part!r} of sheet {self.name!r} is empty&#39;)
+            root = first[1]
+            for event, element in context:
+                if event != &#39;end&#39; or local_name(element.tag) != &#39;row&#39;:
+                    continue
+                reference = element.get(&#39;r&#39;)
+                if (
+                    reference is not None
+                    and reference.isascii()
+                    and reference.isdigit()
+                    and int(reference) &gt; 0
+                ):
+                    row_number = int(reference)
+                else:
+                    row_number += 1
+                next_col = 1
+                for cell_element in element:
+                    if local_name(cell_element.tag) != &#39;c&#39;:
+                        continue
+                    row = row_number
+                    col = next_col
+                    cell_reference = cell_element.get(&#39;r&#39;)
+                    if cell_reference is not None:
+                        try:
+                            row, col = ref2rc(cell_reference)
+                        except ValueError:
+                            pass
+                    next_col = col + 1
+                    yield self._build_cell(cell_element, row, col)
+                element.clear()
+                root.clear()
+        except XML_DEFECTS as error:
+            raise ExcelFormatError(F&#39;sheet {self.name!r} is malformed&#39;) from error
+
+    def _build_cell(self, element: Element, row: int, col: int) -&gt; Cell:
+        formula: str | None = None
+        assignment = False
+        value_text: str | None = None
+        inline: str | None = None
+        for child in element:
+            local = local_name(child.tag)
+            if local == &#39;f&#39;:
+                formula = child.text or None
+                assignment = (child.get(&#39;bx&#39;) or &#39;&#39;).lower() in (&#39;1&#39;, &#39;true&#39;)
+            elif local == &#39;v&#39;:
+                value_text = child.text
+            elif local == &#39;is&#39;:
+                inline = decode_xstring(_collect_text(child))
+        workbook = self._workbook
+        kind_hint = element.get(&#39;t&#39;)
+        if kind_hint == &#39;s&#39; and value_text is not None:
+            try:
+                index = int(value_text)
+            except ValueError:
+                index = -1
+            strings = workbook._ensure_shared_strings()
+            if not 0 &lt;= index &lt; len(strings):
+                raise ExcelFormatError(
+                    F&#39;cell {rc2ref(row, col)} of sheet {self.name!r} references shared string&#39;
+                    F&#39; {value_text} outside the table of {len(strings)} entries&#39;)
+            return Cell(row, col, CellKind.TEXT, strings[index], formula, assignment)
+        if kind_hint == &#39;inlineStr&#39; and inline is not None:
+            return Cell(row, col, CellKind.TEXT, inline, formula, assignment)
+        if value_text is None:
+            if formula is not None:
+                return Cell(row, col, CellKind.FORMULA, None, formula, assignment)
+            return Cell(row, col, CellKind.BLANK, None, None)
+        if kind_hint == &#39;str&#39;:
+            return Cell(
+                row,
+                col,
+                CellKind.TEXT,
+                decode_xstring(value_text),
+                formula,
+                assignment,
+            )
+        if kind_hint == &#39;b&#39;:
+            return Cell(
+                row,
+                col,
+                CellKind.BOOLEAN,
+                value_text.strip().lower() in (&#39;1&#39;, &#39;true&#39;),
+                formula,
+                assignment,
+            )
+        if kind_hint == &#39;e&#39;:
+            return Cell(row, col, CellKind.ERROR, value_text, formula, assignment)
+        if kind_hint == &#39;d&#39;:
+            try:
+                value = datetime.datetime.fromisoformat(value_text)
+            except ValueError as error:
+                raise ExcelFormatError(
+                    F&#39;cell {rc2ref(row, col)} of sheet {self.name!r} has the malformed value&#39;
+                    F&#39; {value_text!r}&#39;) from error
+            serial = datetime_to_serial(value, workbook.date_mode_1904)
+            return date_cell(row, col, serial, workbook.date_mode_1904, formula, assignment)
+        try:
+            number = _cast_number(value_text)
+        except ValueError as error:
+            raise ExcelFormatError(
+                F&#39;cell {rc2ref(row, col)} of sheet {self.name!r} has the malformed value&#39;
+                F&#39; {value_text!r}&#39;) from error
+        if workbook._style_is_date(element.get(&#39;s&#39;)):
+            return date_cell(row, col, number, workbook.date_mode_1904, formula, assignment)
+        return Cell(row, col, CellKind.NUMBER, number, formula, assignment)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.excel.workbook.ExcelSheet" href="workbook.html#refinery.lib.excel.workbook.ExcelSheet">ExcelSheet</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.excel.workbook.ExcelSheet" href="workbook.html#refinery.lib.excel.workbook.ExcelSheet">ExcelSheet</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.excel.workbook.ExcelSheet.cells" href="workbook.html#refinery.lib.excel.workbook.ExcelSheet.cells">cells</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelSheet.kind" href="workbook.html#refinery.lib.excel.workbook.ExcelSheet.kind">kind</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelSheet.name" href="workbook.html#refinery.lib.excel.workbook.ExcelSheet.name">name</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.excel.ooxml.OoxmlWorkbook"><code class="flex name class">
+<span>class <span class="ident">OoxmlWorkbook</span></span>
+<span>(</span><span>data)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>A reader for workbooks in the Office Open XML format, which covers the XLSX and XLSM file
+extensions. The parts of the container are located through the relationships of the
+workbook part so that relocated or oddly cased part names do not break extraction.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/ooxml.py#L214-L426" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class OoxmlWorkbook(ExcelWorkbook):
+    &#34;&#34;&#34;
+    A reader for workbooks in the Office Open XML format, which covers the XLSX and XLSM file
+    extensions. The parts of the container are located through the relationships of the
+    workbook part so that relocated or oddly cased part names do not break extraction.
+    &#34;&#34;&#34;
+
+    format = ExcelFormat.OOXML
+
+    def __init__(self, data: bytes | bytearray | memoryview):
+        self._package = _Package(data)
+        workbook_part = self._workbook_part()
+        self._base = posixpath.dirname(workbook_part)
+        self._rels = self._read_rels(workbook_part)
+        self.date_mode_1904 = False
+        self._sheets: list[OoxmlSheet] = []
+        self._names: list[DefinedName] = []
+        self._shared_strings: list[str] = []
+        self._shared_strings_loaded = False
+        self._formats: dict[int, str] = {}
+        self._style_formats: list[int] | None = None
+        root = self._parse_part(workbook_part, &#39;workbook part&#39;)
+        for element in root.iter():
+            local = local_name(element.tag)
+            if local == &#39;workbookPr&#39;:
+                mode = element.get(&#39;date1904&#39;) or &#39;&#39;
+                self.date_mode_1904 = mode.lower() in (&#39;true&#39;, &#39;1&#39;)
+            elif local == &#39;sheet&#39;:
+                name = element.get(&#39;name&#39;) or &#39;&#39;
+                rid = element.get(F&#39;{{{_RELATIONSHIP_NS}}}id&#39;)
+                target, rel_type = self._rels.get(rid or &#39;&#39;, (None, None))
+                part = None if target is None else _resolve_part(self._base, target)
+                kind = _SHEET_KINDS.get(rel_type or &#39;&#39;, SheetKind.OTHER)
+                self._sheets.append(OoxmlSheet(name, kind, part, self))
+            elif local == &#39;definedName&#39;:
+                self._names.append(self._defined_name(element))
+
+    def sheets(self) -&gt; list[OoxmlSheet]:
+        &#34;&#34;&#34;
+        All sheets of the workbook in document order.
+        &#34;&#34;&#34;
+        return self._sheets
+
+    def defined_names(self) -&gt; Sequence[DefinedName]:
+        &#34;&#34;&#34;
+        All defined names of the workbook, in the order their `definedName` elements appear.
+        &#34;&#34;&#34;
+        return self._names
+
+    def formula(self, source: FormulaSource) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        Decode the formula text of a cell or a defined name of this workbook through the text
+        parser. Text the parser cannot read in full yields the carrier that prints it verbatim,
+        and `None` yields `None`; a byte string is not an OOXML source.
+        &#34;&#34;&#34;
+        if source is None:
+            return None
+        if isinstance(source, str):
+            return parse_formula(source)
+        return XlUnparsedFormula(text=bytes(source).hex())
+
+    @staticmethod
+    def _defined_name(element: Element) -&gt; DefinedName:
+        &#34;&#34;&#34;
+        Parse one `definedName` element. A built-in name carries the `_xlnm.` prefix, which the
+        BIFF readers spell away as the lower-case name its single-byte code selects, so the
+        prefix is stripped and the name lower-cased to match. An element without text names a
+        broken reference; the empty formula it yields decodes to the empty carrier, as the empty
+        token stream of the other readers does.
+        &#34;&#34;&#34;
+        name = element.get(&#39;name&#39;) or &#39;&#39;
+        if name.startswith(&#39;_xlnm.&#39;):
+            name = name[len(&#39;_xlnm.&#39;):].lower()
+        sheet = element.get(&#39;localSheetId&#39;)
+        try:
+            scope = None if sheet is None else int(sheet)
+        except ValueError:
+            scope = None
+        return DefinedName(
+            name=name,
+            formula=element.text or &#39;&#39;,
+            sheet=scope,
+        )
+
+    def _workbook_part(self) -&gt; str:
+        part = &#39;xl/workbook.xml&#39;
+        stream = self._package.open(&#39;[Content_Types].xml&#39;)
+        if stream is not None:
+            try:
+                root = fromstring(stream.read())
+            except XML_DEFECTS:
+                return part
+            for element in root.iter():
+                if local_name(element.tag) != &#39;Override&#39;:
+                    continue
+                if &#39;sheet.main+xml&#39; not in (element.get(&#39;ContentType&#39;) or &#39;&#39;):
+                    continue
+                override = element.get(&#39;PartName&#39;)
+                if override:
+                    part = override.replace(&#39;\\&#39;, &#39;/&#39;).lstrip(&#39;/&#39;)
+                    break
+        return part
+
+    def _read_rels(self, workbook_part: str) -&gt; dict[str, tuple[str, str]]:
+        base = posixpath.dirname(workbook_part)
+        name = posixpath.basename(workbook_part)
+        rels = posixpath.join(base, &#39;_rels&#39;, F&#39;{name}.rels&#39;)
+        stream = self._package.open(rels)
+        if stream is None:
+            return {}
+        try:
+            root = fromstring(stream.read())
+        except XML_DEFECTS:
+            return {}
+        result: dict[str, tuple[str, str]] = {}
+        for element in root.iter():
+            if local_name(element.tag) != &#39;Relationship&#39;:
+                continue
+            rid = element.get(&#39;Id&#39;)
+            if rid:
+                result[rid] = (element.get(&#39;Target&#39;) or &#39;&#39;, element.get(&#39;Type&#39;) or &#39;&#39;)
+        return result
+
+    def _parse_part(self, part: str, what: str) -&gt; Element:
+        stream = self._package.open(part)
+        if stream is None:
+            raise ExcelFormatError(F&#39;{what} {part!r} is missing from the archive&#39;)
+        try:
+            return fromstring(stream.read())
+        except XML_DEFECTS as error:
+            raise ExcelFormatError(F&#39;{what} {part!r} is malformed&#39;) from error
+
+    def _part_for(self, rel_type: str) -&gt; str | None:
+        for target, rtype in self._rels.values():
+            if rtype == rel_type:
+                return _resolve_part(self._base, target)
+        return None
+
+    def _ensure_shared_strings(self) -&gt; list[str]:
+        if not self._shared_strings_loaded:
+            self._load_shared_strings()
+            self._shared_strings_loaded = True
+        return self._shared_strings
+
+    def _load_shared_strings(self) -&gt; None:
+        part = self._part_for(_REL_SHARED_STRINGS)
+        if part is None:
+            return
+        stream = self._package.open(part)
+        if stream is None:
+            raise ExcelFormatError(F&#39;shared string part {part!r} is missing from the archive&#39;)
+        context = iterparse(stream, events=(&#39;start&#39;, &#39;end&#39;))
+        root = None
+        strings: list[str] = []
+        try:
+            first = next(context, None)
+            if first is None or first[0] != &#39;start&#39;:
+                raise ExcelFormatError(F&#39;shared string part {part!r} is empty&#39;)
+            root = first[1]
+            for event, element in context:
+                if event != &#39;end&#39; or local_name(element.tag) != &#39;si&#39;:
+                    continue
+                strings.append(decode_xstring(_collect_text(element)))
+                element.clear()
+                root.clear()
+        except XML_DEFECTS as error:
+            raise ExcelFormatError(F&#39;shared string part {part!r} is malformed&#39;) from error
+        self._shared_strings = strings
+
+    def _load_styles(self) -&gt; None:
+        part = self._part_for(_REL_STYLES)
+        self._style_formats = []
+        if part is None:
+            return
+        stream = self._package.open(part)
+        if stream is None:
+            return
+        try:
+            root = fromstring(stream.read())
+        except XML_DEFECTS:
+            return
+        for element in root.iter():
+            local = local_name(element.tag)
+            if local == &#39;numFmt&#39;:
+                try:
+                    self._formats[int(element.get(&#39;numFmtId&#39;) or 0)] = (
+                        element.get(&#39;formatCode&#39;) or &#39;&#39;)
+                except ValueError:
+                    pass
+            elif local == &#39;cellXfs&#39;:
+                for xf in element:
+                    try:
+                        self._style_formats.append(int(xf.get(&#39;numFmtId&#39;) or 0))
+                    except ValueError:
+                        self._style_formats.append(0)
+
+    def _style_is_date(self, style: str | None) -&gt; bool:
+        if self._style_formats is None:
+            self._load_styles()
+        assert self._style_formats is not None
+        if style is None:
+            return False
+        try:
+            index = int(style)
+        except ValueError:
+            return False
+        if not 0 &lt;= index &lt; len(self._style_formats):
+            return False
+        fmt_id = self._style_formats[index]
+        code = self._formats.get(fmt_id)
+        if code is None:
+            return is_builtin_date_format(fmt_id)
+        return is_date_format_string(code)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.excel.workbook.ExcelWorkbook" href="workbook.html#refinery.lib.excel.workbook.ExcelWorkbook">ExcelWorkbook</a></li>
+<li>abc.ABC</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.excel.ooxml.OoxmlWorkbook.defined_names"><code class="name flex">
+<span>def <span class="ident">defined_names</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>All defined names of the workbook, in the order their <code>definedName</code> elements appear.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/ooxml.py#L257-L261" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def defined_names(self) -&gt; Sequence[DefinedName]:
+    &#34;&#34;&#34;
+    All defined names of the workbook, in the order their `definedName` elements appear.
+    &#34;&#34;&#34;
+    return self._names</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.ooxml.OoxmlWorkbook.formula"><code class="name flex">
+<span>def <span class="ident">formula</span></span>(<span>self, source)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode the formula text of a cell or a defined name of this workbook through the text
+parser. Text the parser cannot read in full yields the carrier that prints it verbatim,
+and <code>None</code> yields <code>None</code>; a byte string is not an OOXML source.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/ooxml.py#L263-L273" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def formula(self, source: FormulaSource) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    Decode the formula text of a cell or a defined name of this workbook through the text
+    parser. Text the parser cannot read in full yields the carrier that prints it verbatim,
+    and `None` yields `None`; a byte string is not an OOXML source.
+    &#34;&#34;&#34;
+    if source is None:
+        return None
+    if isinstance(source, str):
+        return parse_formula(source)
+    return XlUnparsedFormula(text=bytes(source).hex())</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.excel.workbook.ExcelWorkbook" href="workbook.html#refinery.lib.excel.workbook.ExcelWorkbook">ExcelWorkbook</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.date_mode_1904" href="workbook.html#refinery.lib.excel.workbook.ExcelWorkbook.date_mode_1904">date_mode_1904</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.format" href="workbook.html#refinery.lib.excel.workbook.ExcelWorkbook.format">format</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.sheet_index" href="workbook.html#refinery.lib.excel.workbook.ExcelWorkbook.sheet_index">sheet_index</a></code></li>
+<li><code><a title="refinery.lib.excel.workbook.ExcelWorkbook.sheets" href="workbook.html#refinery.lib.excel.workbook.ExcelWorkbook.sheets">sheets</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.excel" href="index.html">refinery.lib.excel</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.excel.ooxml.OoxmlSheet" href="#refinery.lib.excel.ooxml.OoxmlSheet">OoxmlSheet</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.excel.ooxml.OoxmlWorkbook" href="#refinery.lib.excel.ooxml.OoxmlWorkbook">OoxmlWorkbook</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.excel.ooxml.OoxmlWorkbook.defined_names" href="#refinery.lib.excel.ooxml.OoxmlWorkbook.defined_names">defined_names</a></code></li>
+<li><code><a title="refinery.lib.excel.ooxml.OoxmlWorkbook.formula" href="#refinery.lib.excel.ooxml.OoxmlWorkbook.formula">formula</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

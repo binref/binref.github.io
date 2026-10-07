@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.paramcopy documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.paramcopy</code></h1>
+</header>
+<section id="section-intro">
+<p>Fold a parameter into the local its function copies it to before anything else runs.</p>
+<p>A function whose body opens by copying a parameter into a local of its own and never reads the
+parameter again,</p>
+<pre><code>function (a_1) { var a; a = a_1; ... a ... }
+</code></pre>
+<p>has the local hold the argument from the first statement on, which is what a parameter of that name
+holds. Giving the parameter the local's name and dropping the copy leaves the same function:</p>
+<pre><code>function (a) { ... a ... }
+</code></pre>
+<p>Recovering a function the obfuscator flattened into a state machine leaves this shape behind: the
+machine stores the arguments into a scope object, and flattening that object turns each store into
+a copy from the parameter the recovery gives the function.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/js/deobfuscation/paramcopy.py#L1-L259" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Fold a parameter into the local its function copies it to before anything else runs.
+
+A function whose body opens by copying a parameter into a local of its own and never reads the
+parameter again,
+
+    function (a_1) { var a; a = a_1; ... a ... }
+
+has the local hold the argument from the first statement on, which is what a parameter of that name
+holds. Giving the parameter the local&#39;s name and dropping the copy leaves the same function:
+
+    function (a) { ... a ... }
+
+Recovering a function the obfuscator flattened into a state machine leaves this shape behind: the
+machine stores the arguments into a scope object, and flattening that object turns each store into
+a copy from the parameter the recovery gives the function.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import NamedTuple
+
+from refinery.lib.scripts import Node, _remove_from_parent, _replace_in_parent
+from refinery.lib.scripts.js.analysis.cache import model_cache
+from refinery.lib.scripts.js.analysis.model import (
+    FUNCTION_NODES,
+    Binding,
+    BindingKind,
+    Scope,
+    SemanticModel,
+    references_own_arguments,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import ScriptLevelTransformer, remove_declarator
+from refinery.lib.scripts.js.model import (
+    JsAssignmentExpression,
+    JsBlockStatement,
+    JsExpressionStatement,
+    JsFunctionDeclaration,
+    JsFunctionNode,
+    JsIdentifier,
+    JsRestElement,
+    JsScript,
+    JsSequenceExpression,
+    JsSwitchCase,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+)
+from refinery.lib.scripts.js.strict import directive_prologue, strict_mode_at
+
+
+class _Copy(NamedTuple):
+    assignment: JsAssignmentExpression
+    param: JsIdentifier
+    local: Binding
+
+
+def _parameters(function: JsFunctionNode) -&gt; dict[int, JsIdentifier]:
+    &#34;&#34;&#34;
+    The plain and rest parameters of *function*, by the id of the identifier each one declares.
+    &#34;&#34;&#34;
+    params: dict[int, JsIdentifier] = {}
+    for param in function.params:
+        if isinstance(param, JsRestElement):
+            param = param.argument
+        if isinstance(param, JsIdentifier):
+            params[id(param)] = param
+    return params
+
+
+def _entry_copies(function: JsFunctionNode, model: SemanticModel) -&gt; list[JsAssignmentExpression]:
+    &#34;&#34;&#34;
+    The assignments that run first in *function*, before any other statement of its body, and copy
+    one of its parameters into a `var` of its body (`_copies_a_parameter`): those in the statements
+    that open the body, where the only statements before them are directives, `var` declarations
+    without an initializer and function declarations, none of which runs anything at its position.
+    A statement joining several such assignments with commas contributes each of them. The run ends
+    at the first assignment of any other kind, so no assignment before a copy reads a local or can
+    throw.
+    &#34;&#34;&#34;
+    body = function.body
+    if not isinstance(body, JsBlockStatement):
+        return []
+    params = _parameters(function)
+    body_scope = model.function_scope(function)
+    statements = body.body[len(directive_prologue(body)):]
+    copies: list[JsAssignmentExpression] = []
+    for statement in statements:
+        if isinstance(statement, JsFunctionDeclaration):
+            continue
+        if isinstance(statement, JsVariableDeclaration):
+            if all(
+                isinstance(declarator, JsVariableDeclarator) and declarator.init is None
+                for declarator in statement.declarations
+            ):
+                continue
+            break
+        if not isinstance(statement, JsExpressionStatement):
+            break
+        expression = statement.expression
+        parts = [expression]
+        if isinstance(expression, JsSequenceExpression):
+            parts = expression.expressions
+        for part in parts:
+            if not _copies_a_parameter(part, params, body_scope, model):
+                return copies
+            assert isinstance(part, JsAssignmentExpression)
+            copies.append(part)
+    return copies
+
+
+def _copies_a_parameter(
+    part: Node | None,
+    params: dict[int, JsIdentifier],
+    body_scope: Scope | None,
+    model: SemanticModel,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *part* is `x = p` for one of the parameters *params* and a `var` `x` of the function
+    whose body scope is *body_scope*.
+    &#34;&#34;&#34;
+    if not isinstance(part, JsAssignmentExpression) or part.operator != &#39;=&#39;:
+        return False
+    left = part.left
+    right = part.right
+    if not isinstance(left, JsIdentifier) or not isinstance(right, JsIdentifier):
+        return False
+    source = model.resolve(right)
+    local = model.resolve(left)
+    return (
+        source is not None
+        and source.kind is BindingKind.PARAM
+        and any(id(declaration) in params for declaration in source.declarations)
+        and local is not None
+        and local.kind is BindingKind.VAR
+        and local.scope is body_scope
+    )
+
+
+def _is_sole_access(binding: Binding | None, reference: Node, model: SemanticModel) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *reference* is the one access to *binding* the program can make: the binding records it
+    and nothing else, and no name the model cannot attribute can reach it.
+    &#34;&#34;&#34;
+    return (
+        binding is not None
+        and [*binding.reads, *binding.writes] == [reference]
+        and not binding.dynamic_refs
+        and not binding.indefinite_writes
+        and not binding.exported
+        and not model.reflection_can_reach(binding)
+    )
+
+
+def _names_in_the_parameter_list(function: JsFunctionNode) -&gt; set[str]:
+    &#34;&#34;&#34;
+    Every name spelled in the parameter list of *function*: the parameters it binds, and the names
+    its default values read, which are resolved in a scope of their own that does not see the body.
+    A parameter renamed to one of them would clash with a binding of the list or capture the read.
+    &#34;&#34;&#34;
+    return {
+        node.name
+        for param in function.params
+        for node in param.walk()
+        if isinstance(node, JsIdentifier)
+    }
+
+
+def _declared_in_a_statement(declaration: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *declaration* is the name of a declarator without an initializer whose `var` statement
+    stands directly in a statement list, from which `remove_declarator` takes it without a gap.
+    &#34;&#34;&#34;
+    declarator = declaration.parent
+    if not isinstance(declarator, JsVariableDeclarator) or declarator.id is not declaration:
+        return False
+    statement = declarator.parent
+    return (
+        declarator.init is None
+        and isinstance(statement, JsVariableDeclaration)
+        and isinstance(statement.parent, (JsBlockStatement, JsScript, JsSwitchCase))
+    )
+
+
+def _coalescible(function: JsFunctionNode, model: SemanticModel) -&gt; list[_Copy]:
+    &#34;&#34;&#34;
+    The entry copies of *function* whose parameter can take the local&#39;s place. The parameter is a
+    plain or rest one of *function*&#39;s own, declared by nothing else, and read by the copy and by
+    nothing else. The local holds the copied value and no other (`SemanticModel.singular_value`),
+    is declared only by declarators `remove_declarator` can take out, and its name is spelled
+    nowhere in the parameter list (`_names_in_the_parameter_list`). A sloppy body that reads its own
+    `arguments` sees the parameters through it, and moving an argument from one name to another
+    would change what a write through either one reaches.
+    &#34;&#34;&#34;
+    if not strict_mode_at(function) and references_own_arguments(function):
+        return []
+    params = _parameters(function)
+    spelled = _names_in_the_parameter_list(function)
+    copies: list[_Copy] = []
+    for assignment in _entry_copies(function, model):
+        left = assignment.left
+        right = assignment.right
+        assert isinstance(left, JsIdentifier) and isinstance(right, JsIdentifier)
+        source = model.resolve(right)
+        if (
+            source is None
+            or len(source.declarations) != 1
+            or id(source.declarations[0]) not in params
+            or not _is_sole_access(source, right, model)
+        ):
+            continue
+        local = model.resolve(left)
+        if (
+            local is None
+            or local.name in spelled
+            or not local.reads
+            or model.singular_value(local) is not right
+            or local.dynamic_refs
+            or local.exported
+            or model.reflection_can_reach(local)
+            or not all(map(_declared_in_a_statement, local.declarations))
+        ):
+            continue
+        spelled.add(local.name)
+        copies.append(_Copy(assignment, params[id(source.declarations[0])], local))
+    return copies
+
+
+def _drop(assignment: JsAssignmentExpression) -&gt; None:
+    &#34;&#34;&#34;
+    Remove an entry copy from the statement that holds it, and the statement with its last copy.
+    &#34;&#34;&#34;
+    parent = assignment.parent
+    if isinstance(parent, JsSequenceExpression):
+        _remove_from_parent(assignment)
+        if len(parent.expressions) == 1:
+            _replace_in_parent(parent, parent.expressions[0])
+        return
+    assert isinstance(parent, JsExpressionStatement)
+    _remove_from_parent(parent)
+
+
+class JsParameterCopyCoalescing(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Give a parameter the name of the local its function copies it to on entry, and drop the copy.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        model = model_cache(self, node).model
+        decided: list[_Copy] = []
+        for function in node.walk():
+            if isinstance(function, FUNCTION_NODES):
+                decided.extend(_coalescible(function, model))
+        for copy in decided:
+            for declaration in copy.local.declarations:
+                declarator = declaration.parent
+                assert isinstance(declarator, JsVariableDeclarator)
+                remove_declarator(declarator)
+            _replace_in_parent(copy.param, JsIdentifier(name=copy.local.name))
+            _drop(copy.assignment)
+            self.mark_changed()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.paramcopy.JsParameterCopyCoalescing"><code class="flex name class">
+<span>class <span class="ident">JsParameterCopyCoalescing</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Give a parameter the name of the local its function copies it to on entry, and drop the copy.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/scripts/js/deobfuscation/paramcopy.py#L241-L259" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsParameterCopyCoalescing(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Give a parameter the name of the local its function copies it to on entry, and drop the copy.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        model = model_cache(self, node).model
+        decided: list[_Copy] = []
+        for function in node.walk():
+            if isinstance(function, FUNCTION_NODES):
+                decided.extend(_coalescible(function, model))
+        for copy in decided:
+            for declaration in copy.local.declarations:
+                declarator = declaration.parent
+                assert isinstance(declarator, JsVariableDeclarator)
+                remove_declarator(declarator)
+            _replace_in_parent(copy.param, JsIdentifier(name=copy.local.name))
+            _drop(copy.assignment)
+            self.mark_changed()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.paramcopy.JsParameterCopyCoalescing" href="#refinery.lib.scripts.js.deobfuscation.paramcopy.JsParameterCopyCoalescing">JsParameterCopyCoalescing</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

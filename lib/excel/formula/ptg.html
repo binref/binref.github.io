@@ -1,0 +1,2195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.excel.formula.ptg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.excel.formula.ptg</code></h1>
+</header>
+<section id="section-intro">
+<p>The shared substrate for the RPN formula streams that BIFF and XLSB cells store: the <code><a title="refinery.lib.excel.formula.ptg.Ptg" href="#refinery.lib.excel.formula.ptg.Ptg">Ptg</a></code>
+token table with the value-class bits masked away, the built-in function-id table that the call
+tokens index, and one stack machine that folds a token stream into the AST model. The machine
+owns every policy that does not depend on byte layout — operator folding, call assembly, the
+<code>ptgAttr</code> rules — while each container family supplies its own operand readers through a
+subclass.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1-L1340" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The shared substrate for the RPN formula streams that BIFF and XLSB cells store: the `Ptg`
+token table with the value-class bits masked away, the built-in function-id table that the call
+tokens index, and one stack machine that folds a token stream into the AST model. The machine
+owns every policy that does not depend on byte layout — operator folding, call assembly, the
+`ptgAttr` rules — while each container family supplies its own operand readers through a
+subclass.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import enum
+import struct
+
+from typing import Protocol
+
+from refinery.lib.excel.common import ERROR_TEXT
+from refinery.lib.excel.formula.model import (
+    Expression,
+    XlA1Reference,
+    XlBinaryExpression,
+    XlBinaryOperator,
+    XlBoolean,
+    XlDefinedName,
+    XlError,
+    XlFunctionCall,
+    XlMissingArgument,
+    XlNumber,
+    XlParenExpression,
+    XlR1C1Reference,
+    XlString,
+    XlUnaryExpression,
+    XlUnaryOperator,
+)
+
+
+class Ptg(enum.IntEnum):
+    &#34;&#34;&#34;
+    The base ptg values after the value-class bits are masked off. The raw token byte of an
+    operand ptg carries two class bits above the base: adding `0x40` selects the value class
+    and adding `0x60` the array class, which never changes what the token means for the model.
+    The names follow the Microsoft documentation, so the union operator is `UNION` even though
+    its ptg is historically spelled `tList`.
+    &#34;&#34;&#34;
+
+    EXP = 0x01
+    TBL = 0x02
+    ADD = 0x03
+    SUB = 0x04
+    MUL = 0x05
+    DIV = 0x06
+    POW = 0x07
+    CONCAT = 0x08
+    LT = 0x09
+    LE = 0x0A
+    EQ = 0x0B
+    GE = 0x0C
+    GT = 0x0D
+    NE = 0x0E
+    ISECT = 0x0F
+    UNION = 0x10
+    RANGE = 0x11
+    UPLUS = 0x12
+    UMINUS = 0x13
+    PERCENT = 0x14
+    PAREN = 0x15
+    MISSARG = 0x16
+    STR = 0x17
+    EXTENDED = 0x18
+    ATTR = 0x19
+    SHEET = 0x1A
+    ENDSHEET = 0x1B
+    ERR = 0x1C
+    BOOL = 0x1D
+    INT = 0x1E
+    NUM = 0x1F
+    ARRAY = 0x20
+    FUNC = 0x21
+    FUNCVAR = 0x22
+    NAME = 0x23
+    REF = 0x24
+    AREA = 0x25
+    MEMAREA = 0x26
+    MEMERR = 0x27
+    MEMNOMEM = 0x28
+    MEMFUNC = 0x29
+    REFERR = 0x2A
+    AREAERR = 0x2B
+    REFN = 0x2C
+    AREAN = 0x2D
+    MEMAREAN = 0x2E
+    MEMNOMEMN = 0x2F
+    FUNCCE = 0x38
+    NAMEX = 0x39
+    REF3D = 0x3A
+    AREA3D = 0x3B
+    REFERR3D = 0x3C
+    AREAERR3D = 0x3D
+
+
+def base_ptg(token: int) -&gt; Ptg:
+    &#34;&#34;&#34;
+    Strip the value-class bits off a raw token byte. Control ptgs live below `0x20` and carry
+    no class bits; an operand ptg keeps its reference-class spelling, `0x40` adds the value
+    class and `0x60` the array class. A byte that names no ptg raises `RpnError`.
+    &#34;&#34;&#34;
+    try:
+        if token &lt; 0x20:
+            return Ptg(token)
+        return Ptg((token | 0x20) &amp; 0x3F)
+    except ValueError:
+        raise RpnError(F&#39;the byte {token:#x} names no token&#39;) from None
+
+
+BUILTIN_FUNCTIONS: dict[int, tuple[str, int, int]] = {
+    # id: (name, minimum arguments, maximum arguments); -1 marks an unknown arity
+    0x000: (&#39;COUNT&#39;, 0, 30),
+    0x001: (&#39;IF&#39;, 1, 3),
+    0x002: (&#39;ISNA&#39;, 1, 1),
+    0x003: (&#39;ISERROR&#39;, 1, 1),
+    0x004: (&#39;SUM&#39;, 0, 30),
+    0x005: (&#39;AVERAGE&#39;, 1, 30),
+    0x006: (&#39;MIN&#39;, 1, 30),
+    0x007: (&#39;MAX&#39;, 1, 30),
+    0x008: (&#39;ROW&#39;, 0, 1),
+    0x009: (&#39;COLUMN&#39;, 0, 1),
+    0x00A: (&#39;NA&#39;, 0, 0),
+    0x00B: (&#39;NPV&#39;, 2, 30),
+    0x00C: (&#39;STDEV&#39;, 1, 30),
+    0x00D: (&#39;DOLLAR&#39;, 1, 2),
+    0x00E: (&#39;FIXED&#39;, 2, 3),
+    0x00F: (&#39;SIN&#39;, 1, 1),
+    0x010: (&#39;COS&#39;, 1, 1),
+    0x011: (&#39;TAN&#39;, 1, 1),
+    0x012: (&#39;ATAN&#39;, 1, 1),
+    0x013: (&#39;PI&#39;, 0, 0),
+    0x014: (&#39;SQRT&#39;, 1, 1),
+    0x015: (&#39;EXP&#39;, 1, 1),
+    0x016: (&#39;LN&#39;, 1, 1),
+    0x017: (&#39;LOG10&#39;, 1, 1),
+    0x018: (&#39;ABS&#39;, 1, 1),
+    0x019: (&#39;INT&#39;, 1, 1),
+    0x01A: (&#39;SIGN&#39;, 1, 1),
+    0x01B: (&#39;ROUND&#39;, 2, 2),
+    0x01C: (&#39;LOOKUP&#39;, 2, 3),
+    0x01D: (&#39;INDEX&#39;, 2, 4),
+    0x01E: (&#39;REPT&#39;, 2, 2),
+    0x01F: (&#39;MID&#39;, 3, 3),
+    0x020: (&#39;LEN&#39;, 1, 1),
+    0x021: (&#39;VALUE&#39;, 1, 1),
+    0x022: (&#39;TRUE&#39;, 0, 0),
+    0x023: (&#39;FALSE&#39;, 0, 0),
+    0x024: (&#39;AND&#39;, 1, 30),
+    0x025: (&#39;OR&#39;, 1, 30),
+    0x026: (&#39;NOT&#39;, 1, 1),
+    0x027: (&#39;MOD&#39;, 2, 2),
+    0x028: (&#39;DCOUNT&#39;, 3, 3),
+    0x029: (&#39;DSUM&#39;, 3, 3),
+    0x02A: (&#39;DAVERAGE&#39;, 3, 3),
+    0x02B: (&#39;DMIN&#39;, 3, 3),
+    0x02C: (&#39;DMAX&#39;, 3, 3),
+    0x02D: (&#39;DSTDEV&#39;, 3, 3),
+    0x02E: (&#39;VAR&#39;, 1, 30),
+    0x02F: (&#39;DVAR&#39;, 3, 3),
+    0x030: (&#39;TEXT&#39;, 2, 2),
+    0x031: (&#39;LINEST&#39;, 1, 4),
+    0x032: (&#39;TREND&#39;, 1, 4),
+    0x033: (&#39;LOGEST&#39;, 1, 4),
+    0x034: (&#39;GROWTH&#39;, 1, 4),
+    0x035: (&#39;GOTO&#39;, 1, 1),
+    0x036: (&#39;HALT&#39;, 0, 1),
+    0x037: (&#39;RETURN&#39;, 0, 1),
+    0x038: (&#39;PV&#39;, 3, 5),
+    0x039: (&#39;FV&#39;, 3, 5),
+    0x03A: (&#39;NPER&#39;, 3, 5),
+    0x03B: (&#39;PMT&#39;, 3, 5),
+    0x03C: (&#39;RATE&#39;, 3, 6),
+    0x03D: (&#39;MIRR&#39;, 3, 3),
+    0x03E: (&#39;IRR&#39;, 1, 2),
+    0x03F: (&#39;RAND&#39;, 0, 0),
+    0x040: (&#39;MATCH&#39;, 2, 3),
+    0x041: (&#39;DATE&#39;, 3, 3),
+    0x042: (&#39;TIME&#39;, 3, 3),
+    0x043: (&#39;DAY&#39;, 1, 1),
+    0x044: (&#39;MONTH&#39;, 1, 1),
+    0x045: (&#39;YEAR&#39;, 1, 1),
+    0x046: (&#39;WEEKDAY&#39;, 1, 2),
+    0x047: (&#39;HOUR&#39;, 1, 1),
+    0x048: (&#39;MINUTE&#39;, 1, 1),
+    0x049: (&#39;SECOND&#39;, 1, 1),
+    0x04A: (&#39;NOW&#39;, 0, 0),
+    0x04B: (&#39;AREAS&#39;, 1, 1),
+    0x04C: (&#39;ROWS&#39;, 1, 1),
+    0x04D: (&#39;COLUMNS&#39;, 1, 1),
+    0x04E: (&#39;OFFSET&#39;, 3, 5),
+    0x04F: (&#39;ABSREF&#39;, 2, 2),
+    0x050: (&#39;RELREF&#39;, 2, 2),
+    0x051: (&#39;ARGUMENT&#39;, 0, 3),
+    0x052: (&#39;SEARCH&#39;, 2, 3),
+    0x053: (&#39;TRANSPOSE&#39;, 1, 1),
+    0x054: (&#39;ERROR&#39;, 0, 2),
+    0x055: (&#39;STEP&#39;, 0, 0),
+    0x056: (&#39;TYPE&#39;, 1, 1),
+    0x057: (&#39;ECHO&#39;, -1, -1),
+    0x058: (&#39;SET.NAME&#39;, 1, 2),
+    0x059: (&#39;CALLER&#39;, 0, 0),
+    0x05A: (&#39;DEREF&#39;, 1, 1),
+    0x05B: (&#39;WINDOWS&#39;, 0, 2),
+    0x05C: (&#39;SERIESSUM&#39;, 4, 4),
+    0x05D: (&#39;DOCUMENTS&#39;, 0, 2),
+    0x05E: (&#39;ACTIVE.CELL&#39;, 0, 0),
+    0x05F: (&#39;SELECTION&#39;, 0, 0),
+    0x060: (&#39;RESULT&#39;, 0, 1),
+    0x061: (&#39;ATAN2&#39;, 2, 2),
+    0x062: (&#39;ASIN&#39;, 1, 1),
+    0x063: (&#39;ACOS&#39;, 1, 1),
+    0x064: (&#39;CHOOSE&#39;, 2, 30),
+    0x065: (&#39;HLOOKUP&#39;, 3, 4),
+    0x066: (&#39;VLOOKUP&#39;, 3, 4),
+    0x067: (&#39;LINKS&#39;, 0, 2),
+    0x068: (&#39;INPUT&#39;, 1, 7),
+    0x069: (&#39;ISREF&#39;, 1, 1),
+    0x06A: (&#39;GET.FORMULA&#39;, 1, 1),
+    0x06B: (&#39;GET.NAME&#39;, 1, 2),
+    0x06C: (&#39;SET.VALUE&#39;, 2, 2),
+    0x06D: (&#39;LOG&#39;, 1, 2),
+    0x06E: (&#39;EXEC&#39;, 1, 4),
+    0x06F: (&#39;CHAR&#39;, 1, 1),
+    0x070: (&#39;LOWER&#39;, 1, 1),
+    0x071: (&#39;UPPER&#39;, 1, 1),
+    0x072: (&#39;PROPER&#39;, 1, 1),
+    0x073: (&#39;LEFT&#39;, 1, 2),
+    0x074: (&#39;RIGHT&#39;, 1, 2),
+    0x075: (&#39;EXACT&#39;, 2, 2),
+    0x076: (&#39;TRIM&#39;, 1, 1),
+    0x077: (&#39;REPLACE&#39;, 4, 4),
+    0x078: (&#39;SUBSTITUTE&#39;, 3, 4),
+    0x079: (&#39;CODE&#39;, 1, 1),
+    0x07A: (&#39;NAMES&#39;, -1, -1),
+    0x07B: (&#39;DIRECTORY&#39;, 0, 1),
+    0x07C: (&#39;FIND&#39;, 2, 3),
+    0x07D: (&#39;CELL&#39;, 1, 2),
+    0x07E: (&#39;ISERR&#39;, 1, 1),
+    0x07F: (&#39;ISTEXT&#39;, 1, 1),
+    0x080: (&#39;ISNUMBER&#39;, 1, 1),
+    0x081: (&#39;ISBLANK&#39;, 1, 1),
+    0x082: (&#39;T&#39;, 1, 1),
+    0x083: (&#39;N&#39;, 1, 1),
+    0x084: (&#39;FOPEN&#39;, 1, 2),
+    0x085: (&#39;FCLOSE&#39;, 1, 1),
+    0x086: (&#39;FSIZE&#39;, 1, 1),
+    0x087: (&#39;FREADLN&#39;, 1, 1),
+    0x088: (&#39;FREAD&#39;, 1, 1),
+    0x089: (&#39;FWRITELN&#39;, 2, 2),
+    0x08A: (&#39;FWRITE&#39;, 2, 2),
+    0x08B: (&#39;FPOS&#39;, 1, 2),
+    0x08C: (&#39;DATEVALUE&#39;, 1, 1),
+    0x08D: (&#39;TIMEVALUE&#39;, 1, 1),
+    0x08E: (&#39;SLN&#39;, 3, 3),
+    0x08F: (&#39;SYD&#39;, 4, 4),
+    0x090: (&#39;DDB&#39;, 4, 5),
+    0x091: (&#39;GET.DEF&#39;, 1, 3),
+    0x092: (&#39;REFTEXT&#39;, 1, 2),
+    0x093: (&#39;TEXTREF&#39;, 1, 2),
+    0x094: (&#39;INDIRECT&#39;, 1, 2),
+    0x095: (&#39;REGISTER&#39;, 0, 29),
+    0x096: (&#39;CALL&#39;, 1, 30),
+    0x097: (&#39;ADD.BAR&#39;, 1, 30),
+    0x098: (&#39;ADD.MENU&#39;, 1, 4),
+    0x099: (&#39;ADD.COMMAND&#39;, 3, 5),
+    0x09A: (&#39;ENABLE.COMMAND&#39;, 4, 5),
+    0x09B: (&#39;CHECK.COMMAND&#39;, 4, 5),
+    0x09C: (&#39;RENAME.COMMAND&#39;, 4, 5),
+    0x09D: (&#39;SHOW.BAR&#39;, 1, 1),
+    0x09E: (&#39;DELETE.MENU&#39;, 2, 3),
+    0x09F: (&#39;DELETE.COMMAND&#39;, 3, 4),
+    0x0A0: (&#39;GET.CHART.ITEM&#39;, 1, 3),
+    0x0A1: (&#39;DIALOG.BOX&#39;, 1, 1),
+    0x0A2: (&#39;CLEAN&#39;, 1, 1),
+    0x0A3: (&#39;MDETERM&#39;, 1, 1),
+    0x0A4: (&#39;MINVERSE&#39;, 1, 1),
+    0x0A5: (&#39;MMULT&#39;, 2, 2),
+    0x0A6: (&#39;FILES&#39;, 0, 2),
+    0x0A7: (&#39;IPMT&#39;, 4, 6),
+    0x0A8: (&#39;PPMT&#39;, 4, 6),
+    0x0A9: (&#39;COUNTA&#39;, 0, 30),
+    0x0AA: (&#39;CANCEL.KEY&#39;, 0, 2),
+    0x0AB: (&#39;FOR&#39;, 3, 4),
+    0x0AC: (&#39;WHILE&#39;, 1, 1),
+    0x0AD: (&#39;BREAK&#39;, 0, 0),
+    0x0AE: (&#39;NEXT&#39;, 0, 0),
+    0x0AF: (&#39;INITIATE&#39;, 2, 2),
+    0x0B0: (&#39;REQUEST&#39;, 2, 2),
+    0x0B1: (&#39;POKE&#39;, 3, 3),
+    0x0B2: (&#39;EXECUTE&#39;, 2, 2),
+    0x0B3: (&#39;TERMINATE&#39;, 1, 1),
+    0x0B4: (&#39;RESTART&#39;, 1, 1),
+    0x0B5: (&#39;HELP&#39;, 1, 1),
+    0x0B6: (&#39;GET.BAR&#39;, 0, 4),
+    0x0B7: (&#39;PRODUCT&#39;, 0, 30),
+    0x0B8: (&#39;FACT&#39;, 1, 1),
+    0x0B9: (&#39;GET.CELL&#39;, 1, 2),
+    0x0BA: (&#39;GET.WORKSPACE&#39;, 1, 1),
+    0x0BB: (&#39;GET.WINDOW&#39;, 1, 2),
+    0x0BC: (&#39;GET.DOCUMENT&#39;, 1, 2),
+    0x0BD: (&#39;DPRODUCT&#39;, 3, 3),
+    0x0BE: (&#39;ISNONTEXT&#39;, 1, 1),
+    0x0BF: (&#39;GET.NOTE&#39;, 0, 3),
+    0x0C0: (&#39;NOTE&#39;, 0, 4),
+    0x0C1: (&#39;STDEVP&#39;, 1, 30),
+    0x0C2: (&#39;VARP&#39;, 1, 30),
+    0x0C3: (&#39;DSTDEVP&#39;, 3, 3),
+    0x0C4: (&#39;DVARP&#39;, 3, 3),
+    0x0C5: (&#39;TRUNC&#39;, 1, 2),
+    0x0C6: (&#39;ISLOGICAL&#39;, 1, 1),
+    0x0C7: (&#39;DCOUNTA&#39;, 3, 3),
+    0x0C8: (&#39;DELETE.BAR&#39;, 1, 1),
+    0x0C9: (&#39;UNREGISTER&#39;, 1, 1),
+    0x0CC: (&#39;USDOLLAR&#39;, 1, 2),
+    0x0CD: (&#39;FINDB&#39;, 2, 3),
+    0x0CE: (&#39;SEARCHB&#39;, 2, 3),
+    0x0CF: (&#39;REPLACEB&#39;, 4, 4),
+    0x0D0: (&#39;LEFTB&#39;, 1, 2),
+    0x0D1: (&#39;RIGHTB&#39;, 1, 2),
+    0x0D2: (&#39;MIDB&#39;, 3, 3),
+    0x0D3: (&#39;LENB&#39;, 1, 1),
+    0x0D4: (&#39;ROUNDUP&#39;, 2, 2),
+    0x0D5: (&#39;ROUNDDOWN&#39;, 2, 2),
+    0x0D6: (&#39;ASC&#39;, 1, 1),
+    0x0D7: (&#39;DBCS&#39;, 1, 1),
+    0x0D8: (&#39;RANK&#39;, 2, 3),
+    0x0DB: (&#39;ADDRESS&#39;, 2, 5),
+    0x0DC: (&#39;DAYS360&#39;, 2, 3),
+    0x0DD: (&#39;TODAY&#39;, 0, 0),
+    0x0DE: (&#39;VDB&#39;, 5, 7),
+    0x0DF: (&#39;ELSE&#39;, 0, 0),
+    0x0E0: (&#39;ELSE.IF&#39;, 1, 1),
+    0x0E1: (&#39;END.IF&#39;, 0, 0),
+    0x0E2: (&#39;FOR.CELL&#39;, 1, 3),
+    0x0E3: (&#39;MEDIAN&#39;, 1, 30),
+    0x0E4: (&#39;SUMPRODUCT&#39;, 1, 30),
+    0x0E5: (&#39;SINH&#39;, 1, 1),
+    0x0E6: (&#39;COSH&#39;, 1, 1),
+    0x0E7: (&#39;TANH&#39;, 1, 1),
+    0x0E8: (&#39;ASINH&#39;, 1, 1),
+    0x0E9: (&#39;ACOSH&#39;, 1, 1),
+    0x0EA: (&#39;ATANH&#39;, 1, 1),
+    0x0EB: (&#39;DGET&#39;, 3, 3),
+    0x0EC: (&#39;CREATE.OBJECT&#39;, 2, 11),
+    0x0ED: (&#39;VOLATILE&#39;, 1, 1),
+    0x0EE: (&#39;LAST.ERROR&#39;, 0, 0),
+    0x0EF: (&#39;CUSTOM.UNDO&#39;, 0, 2),
+    0x0F0: (&#39;CUSTOM.REPEAT&#39;, 0, 3),
+    0x0F1: (&#39;FORMULA.CONVERT&#39;, 2, 5),
+    0x0F2: (&#39;GET.LINK.INFO&#39;, 2, 4),
+    0x0F3: (&#39;TEXT.BOX&#39;, 1, 4),
+    0x0F4: (&#39;INFO&#39;, 1, 1),
+    0x0F5: (&#39;GROUP&#39;, 0, 0),
+    0x0F6: (&#39;GET.OBJECT&#39;, 1, 5),
+    0x0F7: (&#39;DB&#39;, 4, 5),
+    0x0F8: (&#39;PAUSE&#39;, 0, 1),
+    0x0FB: (&#39;RESUME&#39;, 1, 1),
+    0x0FC: (&#39;FREQUENCY&#39;, 2, 2),
+    0x0FD: (&#39;ADD.TOOLBAR&#39;, 0, 2),
+    0x0FE: (&#39;DELETE.TOOLBAR&#39;, 1, 1),
+    0x0FF: (&#39;UserDefinedFunction&#39;, 1, 30),
+    0x100: (&#39;RESET.TOOLBAR&#39;, 1, 1),
+    0x101: (&#39;EVALUATE&#39;, 1, 1),
+    0x102: (&#39;GET.TOOLBAR&#39;, 2, 2),
+    0x103: (&#39;GET.TOOL&#39;, 1, 3),
+    0x104: (&#39;SPELLING.CHECK&#39;, 1, 3),
+    0x105: (&#39;ERROR.TYPE&#39;, 1, 1),
+    0x106: (&#39;APP.TITLE&#39;, 1, 1),
+    0x107: (&#39;WINDOW.TITLE&#39;, 1, 1),
+    0x108: (&#39;SAVE.TOOLBAR&#39;, 0, 2),
+    0x109: (&#39;ENABLE.TOOL&#39;, 3, 3),
+    0x10A: (&#39;PRESS.TOOL&#39;, 3, 3),
+    0x10B: (&#39;REGISTER.ID&#39;, 3, 3),
+    0x10C: (&#39;GET.WORKBOOK&#39;, 1, 2),
+    0x10D: (&#39;AVEDEV&#39;, 1, 30),
+    0x10E: (&#39;BETADIST&#39;, 3, 5),
+    0x10F: (&#39;GAMMALN&#39;, 1, 1),
+    0x110: (&#39;BETAINV&#39;, 3, 5),
+    0x111: (&#39;BINOMDIST&#39;, 4, 4),
+    0x112: (&#39;CHIDIST&#39;, 2, 2),
+    0x113: (&#39;CHIINV&#39;, 2, 2),
+    0x114: (&#39;COMBIN&#39;, 2, 2),
+    0x115: (&#39;CONFIDENCE&#39;, 3, 3),
+    0x116: (&#39;CRITBINOM&#39;, 3, 3),
+    0x117: (&#39;EVEN&#39;, 1, 1),
+    0x118: (&#39;EXPONDIST&#39;, 3, 3),
+    0x119: (&#39;FDIST&#39;, 3, 3),
+    0x11A: (&#39;FINV&#39;, 3, 3),
+    0x11B: (&#39;FISHER&#39;, 1, 1),
+    0x11C: (&#39;FISHERINV&#39;, 1, 1),
+    0x11D: (&#39;FLOOR&#39;, 2, 2),
+    0x11E: (&#39;GAMMADIST&#39;, 4, 4),
+    0x11F: (&#39;GAMMAINV&#39;, 3, 3),
+    0x120: (&#39;CEILING&#39;, 2, 2),
+    0x121: (&#39;HYPGEOMDIST&#39;, 4, 4),
+    0x122: (&#39;LOGNORMDIST&#39;, 3, 3),
+    0x123: (&#39;LOGINV&#39;, 3, 3),
+    0x124: (&#39;NEGBINOMDIST&#39;, 3, 3),
+    0x125: (&#39;NORMDIST&#39;, 4, 4),
+    0x126: (&#39;NORMSDIST&#39;, 1, 1),
+    0x127: (&#39;NORMINV&#39;, 3, 3),
+    0x128: (&#39;NORMSINV&#39;, 1, 1),
+    0x129: (&#39;STANDARDIZE&#39;, 3, 3),
+    0x12A: (&#39;ODD&#39;, 1, 1),
+    0x12B: (&#39;PERMUT&#39;, 2, 2),
+    0x12C: (&#39;POISSON&#39;, 3, 3),
+    0x12D: (&#39;TDIST&#39;, 3, 3),
+    0x12E: (&#39;WEIBULL&#39;, 4, 4),
+    0x12F: (&#39;SUMXMY2&#39;, 2, 2),
+    0x130: (&#39;SUMX2MY2&#39;, 2, 2),
+    0x131: (&#39;SUMX2PY2&#39;, 2, 2),
+    0x132: (&#39;CHITEST&#39;, 2, 2),
+    0x133: (&#39;CORREL&#39;, 2, 2),
+    0x134: (&#39;COVAR&#39;, 2, 2),
+    0x135: (&#39;FORECAST&#39;, 3, 3),
+    0x136: (&#39;FTEST&#39;, 2, 2),
+    0x137: (&#39;INTERCEPT&#39;, 2, 2),
+    0x138: (&#39;PEARSON&#39;, 2, 2),
+    0x139: (&#39;RSQ&#39;, 2, 2),
+    0x13A: (&#39;STEYX&#39;, 2, 2),
+    0x13B: (&#39;SLOPE&#39;, 2, 2),
+    0x13C: (&#39;TTEST&#39;, 4, 4),
+    0x13D: (&#39;PROB&#39;, 3, 4),
+    0x13E: (&#39;DEVSQ&#39;, 1, 30),
+    0x13F: (&#39;GEOMEAN&#39;, 1, 30),
+    0x140: (&#39;HARMEAN&#39;, 1, 30),
+    0x141: (&#39;SUMSQ&#39;, 0, 30),
+    0x142: (&#39;KURT&#39;, 1, 30),
+    0x143: (&#39;SKEW&#39;, 1, 30),
+    0x144: (&#39;ZTEST&#39;, 2, 3),
+    0x145: (&#39;LARGE&#39;, 2, 2),
+    0x146: (&#39;SMALL&#39;, 2, 2),
+    0x147: (&#39;QUARTILE&#39;, 2, 2),
+    0x148: (&#39;PERCENTILE&#39;, 2, 2),
+    0x149: (&#39;PERCENTRANK&#39;, 2, 3),
+    0x14A: (&#39;MODE&#39;, 1, 30),
+    0x14B: (&#39;TRIMMEAN&#39;, 2, 2),
+    0x14C: (&#39;TINV&#39;, 2, 2),
+    0x14E: (&#39;MOVIE.COMMAND&#39;, -1, -1),
+    0x14F: (&#39;GET.MOVIE&#39;, -1, -1),
+    0x150: (&#39;CONCATENATE&#39;, 0, 30),
+    0x151: (&#39;POWER&#39;, 2, 2),
+    0x152: (&#39;PIVOT.ADD.DATA&#39;, -1, -1),
+    0x153: (&#39;GET.PIVOT.TABLE&#39;, -1, -1),
+    0x154: (&#39;GET.PIVOT.FIELD&#39;, -1, -1),
+    0x155: (&#39;GET.PIVOT.ITEM&#39;, -1, -1),
+    0x156: (&#39;RADIANS&#39;, 1, 1),
+    0x157: (&#39;DEGREES&#39;, 1, 1),
+    0x158: (&#39;SUBTOTAL&#39;, 2, 30),
+    0x159: (&#39;SUMIF&#39;, 2, 3),
+    0x15A: (&#39;COUNTIF&#39;, 2, 2),
+    0x15B: (&#39;COUNTBLANK&#39;, 1, 1),
+    0x15C: (&#39;SCENARIO.GET&#39;, -1, -1),
+    0x15D: (&#39;OPTIONS.LISTS.GET&#39;, 1, 1),
+    0x15E: (&#39;ISPMT&#39;, 4, 4),
+    0x15F: (&#39;DATEDIF&#39;, 3, 3),
+    0x160: (&#39;DATESTRING&#39;, 1, 1),
+    0x161: (&#39;NUMBERSTRING&#39;, 2, 2),
+    0x162: (&#39;ROMAN&#39;, 1, 2),
+    0x163: (&#39;OPEN.DIALOG&#39;, -1, -1),
+    0x164: (&#39;SAVE.DIALOG&#39;, -1, -1),
+    0x165: (&#39;VIEW.GET&#39;, -1, -1),
+    0x166: (&#39;GETPIVOTDATA&#39;, 2, 2),
+    0x167: (&#39;HYPERLINK&#39;, 1, 2),
+    0x168: (&#39;PHONETIC&#39;, 1, 1),
+    0x169: (&#39;AVERAGEA&#39;, 1, 30),
+    0x16A: (&#39;MAXA&#39;, 1, 30),
+    0x16B: (&#39;MINA&#39;, 1, 30),
+    0x16C: (&#39;STDEVPA&#39;, 1, 30),
+    0x16D: (&#39;VARPA&#39;, 1, 30),
+    0x16E: (&#39;STDEVA&#39;, 1, 30),
+    0x16F: (&#39;VARA&#39;, 1, 30),
+    0x170: (&#39;BAHTTEXT&#39;, 1, 1),
+    0x171: (&#39;THAIDAYOFWEEK&#39;, 1, 1),
+    0x172: (&#39;THAIDIGIT&#39;, 1, 1),
+    0x173: (&#39;THAIMONTHOFYEAR&#39;, 1, 1),
+    0x174: (&#39;THAINUMSOUND&#39;, 1, 1),
+    0x175: (&#39;THAINUMSTRING&#39;, 1, 1),
+    0x176: (&#39;THAISTRINGLENGTH&#39;, 1, 1),
+    0x177: (&#39;ISTHAIDIGIT&#39;, 1, 1),
+    0x178: (&#39;ROUNDBAHTDOWN&#39;, 1, 1),
+    0x179: (&#39;ROUNDBAHTUP&#39;, 1, 1),
+    0x17A: (&#39;THAIYEAR&#39;, 1, 1),
+    0x17B: (&#39;RTD&#39;, 2, 5),
+    0x17C: (&#39;CUBEVALUE&#39;, -1, -1),
+    0x17D: (&#39;CUBEMEMBER&#39;, -1, -1),
+    0x17E: (&#39;CUBEMEMBERPROPERTY&#39;, 3, 3),
+    0x17F: (&#39;CUBERANKEDMEMBER&#39;, -1, -1),
+    0x180: (&#39;HEX2BIN&#39;, -1, -1),
+    0x181: (&#39;HEX2DEC&#39;, 1, 1),
+    0x182: (&#39;HEX2OCT&#39;, -1, -1),
+    0x183: (&#39;DEC2BIN&#39;, -1, -1),
+    0x184: (&#39;DEC2HEX&#39;, -1, -1),
+    0x185: (&#39;DEC2OCT&#39;, -1, -1),
+    0x186: (&#39;OCT2BIN&#39;, -1, -1),
+    0x187: (&#39;OCT2HEX&#39;, -1, -1),
+    0x188: (&#39;OCT2DEC&#39;, 1, 1),
+    0x189: (&#39;BIN2DEC&#39;, 1, 1),
+    0x18A: (&#39;BIN2OCT&#39;, -1, -1),
+    0x18B: (&#39;BIN2HEX&#39;, -1, -1),
+    0x18C: (&#39;IMSUB&#39;, 2, 2),
+    0x18D: (&#39;IMDIV&#39;, 2, 2),
+    0x18E: (&#39;IMPOWER&#39;, 2, 2),
+    0x18F: (&#39;IMABS&#39;, 1, 1),
+    0x190: (&#39;IMSQRT&#39;, 1, 1),
+    0x191: (&#39;IMLN&#39;, 1, 1),
+    0x192: (&#39;IMLOG2&#39;, 1, 1),
+    0x193: (&#39;IMLOG10&#39;, 1, 1),
+    0x194: (&#39;IMSIN&#39;, 1, 1),
+    0x195: (&#39;IMCOS&#39;, 1, 1),
+    0x196: (&#39;IMEXP&#39;, 1, 1),
+    0x197: (&#39;IMARGUMENT&#39;, 1, 1),
+    0x198: (&#39;IMCONJUGATE&#39;, 1, 1),
+    0x199: (&#39;IMAGINARY&#39;, 1, 1),
+    0x19A: (&#39;IMREAL&#39;, 1, 1),
+    0x19B: (&#39;COMPLEX&#39;, -1, -1),
+    0x19C: (&#39;IMSUM&#39;, -1, -1),
+    0x19D: (&#39;IMPRODUCT&#39;, -1, -1),
+    0x19E: (&#39;SERIESSUM&#39;, 4, 4),
+    0x19F: (&#39;FACTDOUBLE&#39;, 1, 1),
+    0x1A0: (&#39;SQRTPI&#39;, 1, 1),
+    0x1A1: (&#39;QUOTIENT&#39;, 2, 2),
+    0x1A2: (&#39;DELTA&#39;, -1, -1),
+    0x1A3: (&#39;GESTEP&#39;, -1, -1),
+    0x1A4: (&#39;ISEVEN&#39;, 1, 1),
+    0x1A5: (&#39;ISODD&#39;, 1, 1),
+    0x1A6: (&#39;MROUND&#39;, 2, 2),
+    0x1A7: (&#39;ERF&#39;, -1, -1),
+    0x1A8: (&#39;ERFC&#39;, 1, 1),
+    0x1A9: (&#39;BESSELJ&#39;, 2, 2),
+    0x1AA: (&#39;BESSELK&#39;, 2, 2),
+    0x1AB: (&#39;BESSELY&#39;, 2, 2),
+    0x1AC: (&#39;BESSELI&#39;, 2, 2),
+    0x1AD: (&#39;XIRR&#39;, -1, -1),
+    0x1AE: (&#39;XNPV&#39;, 3, 3),
+    0x1AF: (&#39;PRICEMAT&#39;, -1, -1),
+    0x1B0: (&#39;YIELDMAT&#39;, -1, -1),
+    0x1B1: (&#39;INTRATE&#39;, -1, -1),
+    0x1B2: (&#39;RECEIVED&#39;, -1, -1),
+    0x1B3: (&#39;DISC&#39;, -1, -1),
+    0x1B4: (&#39;PRICEDISC&#39;, -1, -1),
+    0x1B5: (&#39;YIELDDISC&#39;, -1, -1),
+    0x1B6: (&#39;TBILLEQ&#39;, 3, 3),
+    0x1B7: (&#39;TBILLPRICE&#39;, 3, 3),
+    0x1B8: (&#39;TBILLYIELD&#39;, 3, 3),
+    0x1B9: (&#39;PRICE&#39;, -1, -1),
+    0x1BA: (&#39;YIELD&#39;, -1, -1),
+    0x1BB: (&#39;DOLLARDE&#39;, 2, 2),
+    0x1BC: (&#39;DOLLARFR&#39;, 2, 2),
+    0x1BD: (&#39;NOMINAL&#39;, 2, 2),
+    0x1BE: (&#39;EFFECT&#39;, 2, 2),
+    0x1BF: (&#39;CUMPRINC&#39;, 6, 6),
+    0x1C0: (&#39;CUMIPMT&#39;, 6, 6),
+    0x1C1: (&#39;EDATE&#39;, 2, 2),
+    0x1C2: (&#39;EOMONTH&#39;, 2, 2),
+    0x1C3: (&#39;YEARFRAC&#39;, -1, -1),
+    0x1C4: (&#39;COUPDAYBS&#39;, -1, -1),
+    0x1C5: (&#39;COUPDAYS&#39;, -1, -1),
+    0x1C6: (&#39;COUPDAYSNC&#39;, -1, -1),
+    0x1C7: (&#39;COUPNCD&#39;, -1, -1),
+    0x1C8: (&#39;COUPNUM&#39;, -1, -1),
+    0x1C9: (&#39;COUPPCD&#39;, -1, -1),
+    0x1CA: (&#39;DURATION&#39;, -1, -1),
+    0x1CB: (&#39;MDURATION&#39;, -1, -1),
+    0x1CC: (&#39;ODDLPRICE&#39;, -1, -1),
+    0x1CD: (&#39;ODDLYIELD&#39;, -1, -1),
+    0x1CE: (&#39;ODDFPRICE&#39;, -1, -1),
+    0x1CF: (&#39;ODDFYIELD&#39;, -1, -1),
+    0x1D0: (&#39;RANDBETWEEN&#39;, 2, 2),
+    0x1D1: (&#39;WEEKNUM&#39;, -1, -1),
+    0x1D2: (&#39;AMORDEGRC&#39;, -1, -1),
+    0x1D3: (&#39;AMORLINC&#39;, -1, -1),
+    0x1D5: (&#39;ACCRINT&#39;, -1, -1),
+    0x1D6: (&#39;ACCRINTM&#39;, -1, -1),
+    0x1D7: (&#39;WORKDAY&#39;, -1, -1),
+    0x1D8: (&#39;NETWORKDAYS&#39;, -1, -1),
+    0x1D9: (&#39;GCD&#39;, -1, -1),
+    0x1DA: (&#39;MULTINOMIAL&#39;, -1, -1),
+    0x1DB: (&#39;LCM&#39;, -1, -1),
+    0x1DC: (&#39;FVSCHEDULE&#39;, 2, 2),
+    0x1DD: (&#39;CUBEKPIMEMBER&#39;, -1, -1),
+    0x1DE: (&#39;CUBESET&#39;, -1, -1),
+    0x1DF: (&#39;CUBESETCOUNT&#39;, 1, 1),
+    0x1E0: (&#39;IFERROR&#39;, 2, 2),
+    0x1E1: (&#39;COUNTIFS&#39;, -1, -1),
+    0x1E2: (&#39;SUMIFS&#39;, -1, -1),
+    0x1E3: (&#39;AVERAGEIF&#39;, -1, -1),
+    0x8000: (&#39;BEEP&#39;, 0, 1),
+    0x8001: (&#39;OPEN&#39;, 0, 17),
+    0x8002: (&#39;OPEN.LINKS&#39;, 0, 15),
+    0x8003: (&#39;CLOSE.ALL&#39;, 0, 0),
+    0x8004: (&#39;SAVE&#39;, 0, 0),
+    0x8005: (&#39;SAVE.AS&#39;, 0, 7),
+    0x8006: (&#39;FILE.DELETE&#39;, 0, 1),
+    0x8007: (&#39;PAGE.SETUP&#39;, 0, 30),
+    0x8008: (&#39;PRINT&#39;, 0, 17),
+    0x8009: (&#39;PRINTER.SETUP&#39;, 0, 1),
+    0x800A: (&#39;QUIT&#39;, 0, 0),
+    0x800B: (&#39;NEW.WINDOW&#39;, 0, 0),
+    0x800C: (&#39;ARRANGE.ALL&#39;, 0, 4),
+    0x800D: (&#39;WINDOW.SIZE&#39;, 0, 3),
+    0x800E: (&#39;WINDOW.MOVE&#39;, 0, 3),
+    0x800F: (&#39;FULL&#39;, 0, 1),
+    0x8010: (&#39;CLOSE&#39;, 0, 2),
+    0x8011: (&#39;RUN&#39;, 0, 2),
+    0x8016: (&#39;SET.PRINT.AREA&#39;, 0, 1),
+    0x8017: (&#39;SET.PRINT.TITLES&#39;, 0, 2),
+    0x8018: (&#39;SET.PAGE.BREAK&#39;, 0, 0),
+    0x8019: (&#39;REMOVE.PAGE.BREAK&#39;, 0, 2),
+    0x801A: (&#39;FONT&#39;, 0, 2),
+    0x801B: (&#39;DISPLAY&#39;, 0, 9),
+    0x801C: (&#39;PROTECT.DOCUMENT&#39;, 0, 7),
+    0x801D: (&#39;PRECISION&#39;, 0, 1),
+    0x801E: (&#39;A1.R1C1&#39;, 0, 1),
+    0x801F: (&#39;CALCULATE.NOW&#39;, 0, 0),
+    0x8020: (&#39;CALCULATION&#39;, 0, 11),
+    0x8022: (&#39;DATA.FIND&#39;, 0, 1),
+    0x8023: (&#39;EXTRACT&#39;, 0, 1),
+    0x8024: (&#39;DATA.DELETE&#39;, 0, 0),
+    0x8025: (&#39;SET.DATABASE&#39;, 0, 0),
+    0x8026: (&#39;SET.CRITERIA&#39;, 0, 0),
+    0x8027: (&#39;SORT&#39;, 0, 17),
+    0x8028: (&#39;DATA.SERIES&#39;, 0, 6),
+    0x8029: (&#39;TABLE&#39;, 0, 2),
+    0x802A: (&#39;FORMAT.NUMBER&#39;, 0, 1),
+    0x802B: (&#39;ALIGNMENT&#39;, 0, 10),
+    0x802C: (&#39;STYLE&#39;, 0, 2),
+    0x802D: (&#39;BORDER&#39;, 0, 27),
+    0x802E: (&#39;CELL.PROTECTION&#39;, 0, 2),
+    0x802F: (&#39;COLUMN.WIDTH&#39;, 0, 5),
+    0x8030: (&#39;UNDO&#39;, 0, 0),
+    0x8031: (&#39;CUT&#39;, 0, 2),
+    0x8032: (&#39;COPY&#39;, 0, 2),
+    0x8033: (&#39;PASTE&#39;, 0, 1),
+    0x8034: (&#39;CLEAR&#39;, 0, 1),
+    0x8035: (&#39;PASTE.SPECIAL&#39;, 0, 7),
+    0x8036: (&#39;EDIT.DELETE&#39;, 0, 1),
+    0x8037: (&#39;INSERT&#39;, 0, 2),
+    0x8038: (&#39;FILL.RIGHT&#39;, 0, 0),
+    0x8039: (&#39;FILL.DOWN&#39;, 0, 0),
+    0x803D: (&#39;DEFINE.NAME&#39;, 0, 7),
+    0x803E: (&#39;CREATE.NAMES&#39;, 0, 4),
+    0x803F: (&#39;FORMULA.GOTO&#39;, 0, 2),
+    0x8040: (&#39;FORMULA.FIND&#39;, 0, 12),
+    0x8041: (&#39;SELECT.LAST.CELL&#39;, 0, 0),
+    0x8042: (&#39;SHOW.ACTIVE.CELL&#39;, 0, 0),
+    0x8043: (&#39;GALLERY.AREA&#39;, 0, 2),
+    0x8044: (&#39;GALLERY.BAR&#39;, 0, 2),
+    0x8045: (&#39;GALLERY.COLUMN&#39;, 0, 2),
+    0x8046: (&#39;GALLERY.LINE&#39;, 0, 2),
+    0x8047: (&#39;GALLERY.PIE&#39;, 0, 2),
+    0x8048: (&#39;GALLERY.SCATTER&#39;, 0, 2),
+    0x8049: (&#39;COMBINATION&#39;, 0, 1),
+    0x804A: (&#39;PREFERRED&#39;, 0, 0),
+    0x804B: (&#39;ADD.OVERLAY&#39;, 0, 0),
+    0x804C: (&#39;GRIDLINES&#39;, 0, 7),
+    0x804D: (&#39;SET.PREFERRED&#39;, 0, 1),
+    0x804E: (&#39;AXES&#39;, 0, 6),
+    0x804F: (&#39;LEGEND&#39;, 0, 1),
+    0x8050: (&#39;ATTACH.TEXT&#39;, 0, 3),
+    0x8051: (&#39;ADD.ARROW&#39;, 0, 0),
+    0x8052: (&#39;SELECT.CHART&#39;, 0, 0),
+    0x8053: (&#39;SELECT.PLOT.AREA&#39;, 0, 0),
+    0x8054: (&#39;PATTERNS&#39;, 0, 13),
+    0x8055: (&#39;MAIN.CHART&#39;, 0, 10),
+    0x8056: (&#39;OVERLAY&#39;, 0, 12),
+    0x8057: (&#39;SCALE&#39;, 0, 10),
+    0x8058: (&#39;FORMAT.LEGEND&#39;, 0, 1),
+    0x8059: (&#39;FORMAT.TEXT&#39;, 0, 11),
+    0x805A: (&#39;EDIT.REPEAT&#39;, 0, 0),
+    0x805B: (&#39;PARSE&#39;, 0, 2),
+    0x805C: (&#39;JUSTIFY&#39;, 0, 0),
+    0x805D: (&#39;HIDE&#39;, 0, 0),
+    0x805E: (&#39;UNHIDE&#39;, 0, 1),
+    0x805F: (&#39;WORKSPACE&#39;, 0, 16),
+    0x8060: (&#39;FORMULA&#39;, 0, 2),
+    0x8061: (&#39;FORMULA.FILL&#39;, 0, 2),
+    0x8062: (&#39;FORMULA.ARRAY&#39;, 0, 2),
+    0x8063: (&#39;DATA.FIND.NEXT&#39;, 0, 0),
+    0x8064: (&#39;DATA.FIND.PREV&#39;, 0, 0),
+    0x8065: (&#39;FORMULA.FIND.NEXT&#39;, 0, 0),
+    0x8066: (&#39;FORMULA.FIND.PREV&#39;, 0, 0),
+    0x8067: (&#39;ACTIVATE&#39;, 0, 2),
+    0x8068: (&#39;ACTIVATE.NEXT&#39;, 0, 1),
+    0x8069: (&#39;ACTIVATE.PREV&#39;, 0, 1),
+    0x806A: (&#39;UNLOCKED.NEXT&#39;, 0, 0),
+    0x806B: (&#39;UNLOCKED.PREV&#39;, 0, 0),
+    0x806C: (&#39;COPY.PICTURE&#39;, 0, 3),
+    0x806D: (&#39;SELECT&#39;, 0, 2),
+    0x806E: (&#39;DELETE.NAME&#39;, 0, 1),
+    0x806F: (&#39;DELETE.FORMAT&#39;, 0, 1),
+    0x8070: (&#39;VLINE&#39;, 0, 1),
+    0x8071: (&#39;HLINE&#39;, 0, 1),
+    0x8072: (&#39;VPAGE&#39;, 0, 1),
+    0x8073: (&#39;HPAGE&#39;, 0, 1),
+    0x8074: (&#39;VSCROLL&#39;, 0, 2),
+    0x8075: (&#39;HSCROLL&#39;, 0, 2),
+    0x8076: (&#39;ALERT&#39;, 0, 3),
+    0x8077: (&#39;NEW&#39;, 0, 3),
+    0x8078: (&#39;CANCEL.COPY&#39;, 0, 1),
+    0x8079: (&#39;SHOW.CLIPBOARD&#39;, 0, 0),
+    0x807A: (&#39;MESSAGE&#39;, 0, 2),
+    0x807C: (&#39;PASTE.LINK&#39;, 0, 0),
+    0x807D: (&#39;APP.ACTIVATE&#39;, 0, 2),
+    0x807E: (&#39;DELETE.ARROW&#39;, 0, 0),
+    0x807F: (&#39;ROW.HEIGHT&#39;, 0, 4),
+    0x8080: (&#39;FORMAT.MOVE&#39;, 0, 3),
+    0x8081: (&#39;FORMAT.SIZE&#39;, 0, 3),
+    0x8082: (&#39;FORMULA.REPLACE&#39;, 0, 11),
+    0x8083: (&#39;SEND.KEYS&#39;, 0, 2),
+    0x8084: (&#39;SELECT.SPECIAL&#39;, 0, 3),
+    0x8085: (&#39;APPLY.NAMES&#39;, 0, 7),
+    0x8086: (&#39;REPLACE.FONT&#39;, 0, 10),
+    0x8087: (&#39;FREEZE.PANES&#39;, 0, 3),
+    0x8088: (&#39;SHOW.INFO&#39;, 0, 1),
+    0x8089: (&#39;SPLIT&#39;, 0, 2),
+    0x808A: (&#39;ON.WINDOW&#39;, 0, 2),
+    0x808B: (&#39;ON.DATA&#39;, 0, 2),
+    0x808C: (&#39;DISABLE.INPUT&#39;, 0, 1),
+    0x808E: (&#39;OUTLINE&#39;, 0, 4),
+    0x808F: (&#39;LIST.NAMES&#39;, 0, 0),
+    0x8090: (&#39;FILE.CLOSE&#39;, 0, 2),
+    0x8091: (&#39;SAVE.WORKBOOK&#39;, 0, 6),
+    0x8092: (&#39;DATA.FORM&#39;, 0, 0),
+    0x8093: (&#39;COPY.CHART&#39;, 0, 1),
+    0x8094: (&#39;ON.TIME&#39;, 0, 4),
+    0x8095: (&#39;WAIT&#39;, 0, 1),
+    0x8096: (&#39;FORMAT.FONT&#39;, 0, 15),
+    0x8097: (&#39;FILL.UP&#39;, 0, 0),
+    0x8098: (&#39;FILL.LEFT&#39;, 0, 0),
+    0x8099: (&#39;DELETE.OVERLAY&#39;, 0, 0),
+    0x809B: (&#39;SHORT.MENUS&#39;, 0, 1),
+    0x809F: (&#39;SET.UPDATE.STATUS&#39;, 0, 3),
+    0x80A1: (&#39;COLOR.PALETTE&#39;, 0, 1),
+    0x80A2: (&#39;DELETE.STYLE&#39;, 0, 1),
+    0x80A3: (&#39;WINDOW.RESTORE&#39;, 0, 1),
+    0x80A4: (&#39;WINDOW.MAXIMIZE&#39;, 0, 1),
+    0x80A6: (&#39;CHANGE.LINK&#39;, 0, 3),
+    0x80A7: (&#39;CALCULATE.DOCUMENT&#39;, 0, 0),
+    0x80A8: (&#39;ON.KEY&#39;, 0, 2),
+    0x80A9: (&#39;APP.RESTORE&#39;, 0, 0),
+    0x80AA: (&#39;APP.MOVE&#39;, 0, 2),
+    0x80AB: (&#39;APP.SIZE&#39;, 0, 2),
+    0x80AC: (&#39;APP.MINIMIZE&#39;, 0, 0),
+    0x80AD: (&#39;APP.MAXIMIZE&#39;, 0, 0),
+    0x80AE: (&#39;BRING.TO.FRONT&#39;, 0, 0),
+    0x80AF: (&#39;SEND.TO.BACK&#39;, 0, 0),
+    0x80B9: (&#39;MAIN.CHART.TYPE&#39;, 0, 1),
+    0x80BA: (&#39;OVERLAY.CHART.TYPE&#39;, 0, 1),
+    0x80BB: (&#39;SELECT.END&#39;, 0, 1),
+    0x80BC: (&#39;OPEN.MAIL&#39;, 0, 2),
+    0x80BD: (&#39;SEND.MAIL&#39;, 0, 3),
+    0x80BE: (&#39;STANDARD.FONT&#39;, 0, 9),
+    0x80BF: (&#39;CONSOLIDATE&#39;, 0, 5),
+    0x80C0: (&#39;SORT.SPECIAL&#39;, 0, 14),
+    0x80C1: (&#39;GALLERY.3D.AREA&#39;, 0, 1),
+    0x80C2: (&#39;GALLERY.3D.COLUMN&#39;, 0, 1),
+    0x80C3: (&#39;GALLERY.3D.LINE&#39;, 0, 1),
+    0x80C4: (&#39;GALLERY.3D.PIE&#39;, 0, 1),
+    0x80C5: (&#39;VIEW.3D&#39;, 0, 6),
+    0x80C6: (&#39;GOAL.SEEK&#39;, 0, 3),
+    0x80C7: (&#39;WORKGROUP&#39;, 0, 1),
+    0x80C8: (&#39;FILL.GROUP&#39;, 0, 1),
+    0x80C9: (&#39;UPDATE.LINK&#39;, 0, 2),
+    0x80CA: (&#39;PROMOTE&#39;, 0, 1),
+    0x80CB: (&#39;DEMOTE&#39;, 0, 1),
+    0x80CC: (&#39;SHOW.DETAIL&#39;, 0, 4),
+    0x80CE: (&#39;UNGROUP&#39;, 0, 0),
+    0x80CF: (&#39;OBJECT.PROPERTIES&#39;, 0, 2),
+    0x80D0: (&#39;SAVE.NEW.OBJECT&#39;, 0, 1),
+    0x80D1: (&#39;SHARE&#39;, 0, 0),
+    0x80D2: (&#39;SHARE.NAME&#39;, 0, 1),
+    0x80D3: (&#39;DUPLICATE&#39;, 0, 0),
+    0x80D4: (&#39;APPLY.STYLE&#39;, 0, 1),
+    0x80D5: (&#39;ASSIGN.TO.OBJECT&#39;, 0, 1),
+    0x80D6: (&#39;OBJECT.PROTECTION&#39;, 0, 2),
+    0x80D7: (&#39;HIDE.OBJECT&#39;, 0, 2),
+    0x80D8: (&#39;SET.EXTRACT&#39;, 0, 0),
+    0x80D9: (&#39;CREATE.PUBLISHER&#39;, 0, 4),
+    0x80DA: (&#39;SUBSCRIBE.TO&#39;, 0, 2),
+    0x80DB: (&#39;ATTRIBUTES&#39;, 0, 2),
+    0x80DC: (&#39;SHOW.TOOLBAR&#39;, 0, 10),
+    0x80DE: (&#39;PRINT.PREVIEW&#39;, 0, 1),
+    0x80DF: (&#39;EDIT.COLOR&#39;, 0, 4),
+    0x80E0: (&#39;SHOW.LEVELS&#39;, 0, 2),
+    0x80E1: (&#39;FORMAT.MAIN&#39;, 0, 14),
+    0x80E2: (&#39;FORMAT.OVERLAY&#39;, 0, 14),
+    0x80E3: (&#39;ON.RECALC&#39;, 0, 2),
+    0x80E4: (&#39;EDIT.SERIES&#39;, 0, 7),
+    0x80E5: (&#39;DEFINE.STYLE&#39;, 0, 14),
+    0x80F0: (&#39;LINE.PRINT&#39;, 0, 11),
+    0x80F3: (&#39;ENTER.DATA&#39;, 0, 1),
+    0x80F9: (&#39;GALLERY.RADAR&#39;, 0, 2),
+    0x80FA: (&#39;MERGE.STYLES&#39;, 0, 1),
+    0x80FB: (&#39;EDITION.OPTIONS&#39;, 0, 7),
+    0x80FC: (&#39;PASTE.PICTURE&#39;, 0, 0),
+    0x80FD: (&#39;PASTE.PICTURE.LINK&#39;, 0, 0),
+    0x80FE: (&#39;SPELLING&#39;, 0, 6),
+    0x8100: (&#39;ZOOM&#39;, 0, 1),
+    0x8103: (&#39;INSERT.OBJECT&#39;, 0, 13),
+    0x8104: (&#39;WINDOW.MINIMIZE&#39;, 0, 1),
+    0x8109: (&#39;SOUND.NOTE&#39;, 0, 3),
+    0x810A: (&#39;SOUND.PLAY&#39;, 0, 3),
+    0x810B: (&#39;FORMAT.SHAPE&#39;, 0, 5),
+    0x810C: (&#39;EXTEND.POLYGON&#39;, 0, 1),
+    0x810D: (&#39;FORMAT.AUTO&#39;, 0, 7),
+    0x8110: (&#39;GALLERY.3D.BAR&#39;, 0, 1),
+    0x8111: (&#39;GALLERY.3D.SURFACE&#39;, 0, 1),
+    0x8112: (&#39;FILL.AUTO&#39;, 0, 2),
+    0x8114: (&#39;CUSTOMIZE.TOOLBAR&#39;, 0, 1),
+    0x8115: (&#39;ADD.TOOL&#39;, 0, 3),
+    0x8116: (&#39;EDIT.OBJECT&#39;, 0, 1),
+    0x8117: (&#39;ON.DOUBLECLICK&#39;, 0, 2),
+    0x8118: (&#39;ON.ENTRY&#39;, 0, 2),
+    0x8119: (&#39;WORKBOOK.ADD&#39;, 0, 3),
+    0x811A: (&#39;WORKBOOK.MOVE&#39;, 0, 3),
+    0x811B: (&#39;WORKBOOK.COPY&#39;, 0, 3),
+    0x811C: (&#39;WORKBOOK.OPTIONS&#39;, 0, 3),
+    0x811D: (&#39;SAVE.WORKSPACE&#39;, 0, 1),
+    0x8120: (&#39;CHART.WIZARD&#39;, 0, 14),
+    0x8121: (&#39;DELETE.TOOL&#39;, 0, 2),
+    0x8122: (&#39;MOVE.TOOL&#39;, 0, 6),
+    0x8123: (&#39;WORKBOOK.SELECT&#39;, 0, 3),
+    0x8124: (&#39;WORKBOOK.ACTIVATE&#39;, 0, 2),
+    0x8125: (&#39;ASSIGN.TO.TOOL&#39;, 0, 3),
+    0x8127: (&#39;COPY.TOOL&#39;, 0, 2),
+    0x8128: (&#39;RESET.TOOL&#39;, 0, 2),
+    0x8129: (&#39;CONSTRAIN.NUMERIC&#39;, 0, 1),
+    0x812A: (&#39;PASTE.TOOL&#39;, 0, 2),
+    0x812E: (&#39;WORKBOOK.NEW&#39;, 0, 3),
+    0x8131: (&#39;SCENARIO.CELLS&#39;, 0, 1),
+    0x8132: (&#39;SCENARIO.DELETE&#39;, 0, 1),
+    0x8133: (&#39;SCENARIO.ADD&#39;, 0, 6),
+    0x8134: (&#39;SCENARIO.EDIT&#39;, 0, 7),
+    0x8135: (&#39;SCENARIO.SHOW&#39;, 0, 1),
+    0x8136: (&#39;SCENARIO.SHOW.NEXT&#39;, 0, 0),
+    0x8137: (&#39;SCENARIO.SUMMARY&#39;, 0, 2),
+    0x8138: (&#39;PIVOT.TABLE.WIZARD&#39;, 0, 16),
+    0x8139: (&#39;PIVOT.FIELD.PROPERTIES&#39;, 0, 7),
+    0x813A: (&#39;PIVOT.FIELD&#39;, 0, 4),
+    0x813B: (&#39;PIVOT.ITEM&#39;, 0, 4),
+    0x813C: (&#39;PIVOT.ADD.FIELDS&#39;, 0, 5),
+    0x813E: (&#39;OPTIONS.CALCULATION&#39;, 0, 10),
+    0x813F: (&#39;OPTIONS.EDIT&#39;, 0, 11),
+    0x8140: (&#39;OPTIONS.VIEW&#39;, 0, 18),
+    0x8141: (&#39;ADDIN.MANAGER&#39;, 0, 3),
+    0x8142: (&#39;MENU.EDITOR&#39;, 0, 0),
+    0x8143: (&#39;ATTACH.TOOLBARS&#39;, 0, 0),
+    0x8144: (&#39;VBAActivate&#39;, 0, 2),
+    0x8145: (&#39;OPTIONS.CHART&#39;, 0, 3),
+    0x8148: (&#39;VBA.INSERT.FILE&#39;, 0, 1),
+    0x814A: (&#39;VBA.PROCEDURE.DEFINITION&#39;, 0, 0),
+    0x8150: (&#39;ROUTING.SLIP&#39;, 0, 6),
+    0x8152: (&#39;ROUTE.DOCUMENT&#39;, 0, 0),
+    0x8153: (&#39;MAIL.LOGON&#39;, 0, 3),
+    0x8156: (&#39;INSERT.PICTURE&#39;, 0, 2),
+    0x8157: (&#39;EDIT.TOOL&#39;, 0, 2),
+    0x8158: (&#39;GALLERY.DOUGHNUT&#39;, 0, 2),
+    0x815E: (&#39;CHART.TREND&#39;, 0, 8),
+    0x8160: (&#39;PIVOT.ITEM.PROPERTIES&#39;, 0, 7),
+    0x8162: (&#39;WORKBOOK.INSERT&#39;, 0, 1),
+    0x8163: (&#39;OPTIONS.TRANSITION&#39;, 0, 5),
+    0x8164: (&#39;OPTIONS.GENERAL&#39;, 0, 14),
+    0x8172: (&#39;FILTER.ADVANCED&#39;, 0, 5),
+    0x8175: (&#39;MAIL.ADD.MAILER&#39;, 0, 0),
+    0x8176: (&#39;MAIL.DELETE.MAILER&#39;, 0, 0),
+    0x8177: (&#39;MAIL.REPLY&#39;, 0, 0),
+    0x8178: (&#39;MAIL.REPLY.ALL&#39;, 0, 0),
+    0x8179: (&#39;MAIL.FORWARD&#39;, 0, 0),
+    0x817A: (&#39;MAIL.NEXT.LETTER&#39;, 0, 0),
+    0x817B: (&#39;DATA.LABEL&#39;, 0, 10),
+    0x817C: (&#39;INSERT.TITLE&#39;, 0, 5),
+    0x817D: (&#39;FONT.PROPERTIES&#39;, 0, 14),
+    0x817E: (&#39;MACRO.OPTIONS&#39;, 0, 10),
+    0x817F: (&#39;WORKBOOK.HIDE&#39;, 0, 2),
+    0x8180: (&#39;WORKBOOK.UNHIDE&#39;, 0, 1),
+    0x8181: (&#39;WORKBOOK.DELETE&#39;, 0, 1),
+    0x8182: (&#39;WORKBOOK.NAME&#39;, 0, 2),
+    0x8184: (&#39;GALLERY.CUSTOM&#39;, 0, 1),
+    0x8186: (&#39;ADD.CHART.AUTOFORMAT&#39;, 0, 2),
+    0x8187: (&#39;DELETE.CHART.AUTOFORMAT&#39;, 0, 1),
+    0x8188: (&#39;CHART.ADD.DATA&#39;, 0, 6),
+    0x8189: (&#39;AUTO.OUTLINE&#39;, 0, 0),
+    0x818A: (&#39;TAB.ORDER&#39;, 0, 0),
+    0x818B: (&#39;SHOW.DIALOG&#39;, 0, 1),
+    0x818C: (&#39;SELECT.ALL&#39;, 0, 0),
+    0x818D: (&#39;UNGROUP.SHEETS&#39;, 0, 0),
+    0x818E: (&#39;SUBTOTAL.CREATE&#39;, 0, 6),
+    0x818F: (&#39;SUBTOTAL.REMOVE&#39;, 0, 0),
+    0x8190: (&#39;RENAME.OBJECT&#39;, 0, 1),
+    0x819C: (&#39;WORKBOOK.SCROLL&#39;, 0, 2),
+    0x819D: (&#39;WORKBOOK.NEXT&#39;, 0, 0),
+    0x819E: (&#39;WORKBOOK.PREV&#39;, 0, 0),
+    0x819F: (&#39;WORKBOOK.TAB.SPLIT&#39;, 0, 1),
+    0x81A0: (&#39;FULL.SCREEN&#39;, 0, 1),
+    0x81A1: (&#39;WORKBOOK.PROTECT&#39;, 0, 3),
+    0x81A4: (&#39;SCROLLBAR.PROPERTIES&#39;, 0, 7),
+    0x81A5: (&#39;PIVOT.SHOW.PAGES&#39;, 0, 2),
+    0x81A6: (&#39;TEXT.TO.COLUMNS&#39;, 0, 14),
+    0x81A7: (&#39;FORMAT.CHARTTYPE&#39;, 0, 4),
+    0x81A8: (&#39;LINK.FORMAT&#39;, 0, 0),
+    0x81A9: (&#39;TRACER.DISPLAY&#39;, 0, 2),
+    0x81AE: (&#39;TRACER.NAVIGATE&#39;, 0, 3),
+    0x81AF: (&#39;TRACER.CLEAR&#39;, 0, 0),
+    0x81B0: (&#39;TRACER.ERROR&#39;, 0, 0),
+    0x81B1: (&#39;PIVOT.FIELD.GROUP&#39;, 0, 4),
+    0x81B2: (&#39;PIVOT.FIELD.UNGROUP&#39;, 0, 0),
+    0x81B3: (&#39;CHECKBOX.PROPERTIES&#39;, 0, 5),
+    0x81B4: (&#39;LABEL.PROPERTIES&#39;, 0, 3),
+    0x81B5: (&#39;LISTBOX.PROPERTIES&#39;, 0, 5),
+    0x81B6: (&#39;EDITBOX.PROPERTIES&#39;, 0, 4),
+    0x81B7: (&#39;PIVOT.REFRESH&#39;, 0, 1),
+    0x81B8: (&#39;LINK.COMBO&#39;, 0, 1),
+    0x81B9: (&#39;OPEN.TEXT&#39;, 0, 17),
+    0x81BA: (&#39;HIDE.DIALOG&#39;, 0, 1),
+    0x81BB: (&#39;SET.DIALOG.FOCUS&#39;, 0, 1),
+    0x81BC: (&#39;ENABLE.OBJECT&#39;, 0, 2),
+    0x81BD: (&#39;PUSHBUTTON.PROPERTIES&#39;, 0, 6),
+    0x81BE: (&#39;SET.DIALOG.DEFAULT&#39;, 0, 1),
+    0x81BF: (&#39;FILTER&#39;, 0, 6),
+    0x81C0: (&#39;FILTER.SHOW.ALL&#39;, 0, 0),
+    0x81C1: (&#39;CLEAR.OUTLINE&#39;, 0, 0),
+    0x81C2: (&#39;FUNCTION.WIZARD&#39;, 0, 1),
+    0x81C3: (&#39;ADD.LIST.ITEM&#39;, 0, 2),
+    0x81C4: (&#39;SET.LIST.ITEM&#39;, 0, 2),
+    0x81C5: (&#39;REMOVE.LIST.ITEM&#39;, 0, 2),
+    0x81C6: (&#39;SELECT.LIST.ITEM&#39;, 0, 2),
+    0x81C7: (&#39;SET.CONTROL.VALUE&#39;, 0, 1),
+    0x81C8: (&#39;SAVE.COPY.AS&#39;, 0, 1),
+    0x81CA: (&#39;OPTIONS.LISTS.ADD&#39;, 0, 2),
+    0x81CB: (&#39;OPTIONS.LISTS.DELETE&#39;, 0, 1),
+    0x81CC: (&#39;SERIES.AXES&#39;, 0, 1),
+    0x81CD: (&#39;SERIES.X&#39;, 0, 1),
+    0x81CE: (&#39;SERIES.Y&#39;, 0, 2),
+    0x81CF: (&#39;ERRORBAR.X&#39;, 0, 4),
+    0x81D0: (&#39;ERRORBAR.Y&#39;, 0, 4),
+    0x81D1: (&#39;FORMAT.CHART&#39;, 0, 18),
+    0x81D2: (&#39;SERIES.ORDER&#39;, 0, 3),
+    0x81D3: (&#39;MAIL.LOGOFF&#39;, 0, 0),
+    0x81D4: (&#39;CLEAR.ROUTING.SLIP&#39;, 0, 1),
+    0x81D5: (&#39;APP.ACTIVATE.MICROSOFT&#39;, 0, 1),
+    0x81D6: (&#39;MAIL.EDIT.MAILER&#39;, 0, 6),
+    0x81D7: (&#39;ON.SHEET&#39;, 0, 3),
+    0x81D8: (&#39;STANDARD.WIDTH&#39;, 0, 1),
+    0x81D9: (&#39;SCENARIO.MERGE&#39;, 0, 1),
+    0x81DA: (&#39;SUMMARY.INFO&#39;, 0, 5),
+    0x81DB: (&#39;FIND.FILE&#39;, 0, 0),
+    0x81DC: (&#39;ACTIVE.CELL.FONT&#39;, 0, 14),
+    0x81DD: (&#39;ENABLE.TIPWIZARD&#39;, 0, 1),
+    0x81DE: (&#39;VBA.MAKE.ADDIN&#39;, 0, 1),
+    0x81E0: (&#39;INSERTDATATABLE&#39;, 0, 1),
+    0x81E1: (&#39;WORKGROUP.OPTIONS&#39;, 0, 0),
+    0x81E2: (&#39;MAIL.SEND.MAILER&#39;, 0, 2),
+    0x81E5: (&#39;AUTOCORRECT&#39;, 0, 2),
+    0x81E9: (&#39;POST.DOCUMENT&#39;, 0, 1),
+    0x81EB: (&#39;PICKLIST&#39;, 0, 0),
+    0x81ED: (&#39;VIEW.SHOW&#39;, 0, 1),
+    0x81EE: (&#39;VIEW.DEFINE&#39;, 0, 3),
+    0x81EF: (&#39;VIEW.DELETE&#39;, 0, 1),
+    0x81FD: (&#39;SHEET.BACKGROUND&#39;, 0, 2),
+    0x81FE: (&#39;INSERT.MAP.OBJECT&#39;, 0, 0),
+    0x81FF: (&#39;OPTIONS.MENONO&#39;, 0, 5),
+    0x8205: (&#39;MSOCHECKS&#39;, 0, 0),
+    0x8206: (&#39;NORMAL&#39;, 0, 0),
+    0x8207: (&#39;LAYOUT&#39;, 0, 0),
+    0x8208: (&#39;RM.PRINT.AREA&#39;, 0, 1),
+    0x8209: (&#39;CLEAR.PRINT.AREA&#39;, 0, 0),
+    0x820A: (&#39;ADD.PRINT.AREA&#39;, 0, 0),
+    0x820B: (&#39;MOVE.BRK&#39;, 0, 4),
+    0x8221: (&#39;HIDECURR.NOTE&#39;, 0, 2),
+    0x8222: (&#39;HIDEALL.NOTES&#39;, 0, 1),
+    0x8223: (&#39;DELETE.NOTE&#39;, 0, 1),
+    0x8224: (&#39;TRAVERSE.NOTES&#39;, 0, 2),
+    0x8225: (&#39;ACTIVATE.NOTES&#39;, 0, 2),
+    0x826C: (&#39;PROTECT.REVISIONS&#39;, 0, 0),
+    0x826D: (&#39;UNPROTECT.REVISIONS&#39;, 0, 0),
+    0x8287: (&#39;OPTIONS.ME&#39;, 0, 9),
+    0x828D: (&#39;WEB.PUBLISH&#39;, 0, 9),
+    0x829B: (&#39;NEWWEBQUERY&#39;, 0, 1),
+    0x82A1: (&#39;PIVOT.TABLE.CHART&#39;, 0, 16),
+    0x82F1: (&#39;OPTIONS.SAVE&#39;, 0, 4),
+    0x82F3: (&#39;OPTIONS.SPELL&#39;, 0, 12),
+    0x8328: (&#39;HIDEALL.INKANNOTS&#39;, 0, 1),
+}
+
+# the ptgAttr grbit bits, from the Microsoft documentation.
+ATTR_VOLATILE = 0x01
+ATTR_IF = 0x02
+ATTR_CHOOSE = 0x04
+ATTR_SKIP = 0x08
+ATTR_SUM = 0x10
+ATTR_ASSIGN = 0x20
+ATTR_SPACE = 0x40
+
+_BINARY_OPERATORS = {
+    Ptg.ADD: XlBinaryOperator.ADD,
+    Ptg.SUB: XlBinaryOperator.SUB,
+    Ptg.MUL: XlBinaryOperator.MUL,
+    Ptg.DIV: XlBinaryOperator.DIV,
+    Ptg.POW: XlBinaryOperator.POW,
+    Ptg.CONCAT: XlBinaryOperator.CONCAT,
+    Ptg.LT: XlBinaryOperator.LT,
+    Ptg.LE: XlBinaryOperator.LE,
+    Ptg.EQ: XlBinaryOperator.EQ,
+    Ptg.GE: XlBinaryOperator.GE,
+    Ptg.GT: XlBinaryOperator.GT,
+    Ptg.NE: XlBinaryOperator.NE,
+    Ptg.ISECT: XlBinaryOperator.ISECT,
+    Ptg.UNION: XlBinaryOperator.UNION,
+    Ptg.RANGE: XlBinaryOperator.RANGE,
+}
+
+_UNARY_OPERATORS = {
+    Ptg.UPLUS: XlUnaryOperator.POS,
+    Ptg.UMINUS: XlUnaryOperator.NEG,
+    Ptg.PERCENT: XlUnaryOperator.PERCENT,
+}
+
+_MEMORY_TOKENS = frozenset((
+    Ptg.MEMAREA,
+    Ptg.MEMERR,
+    Ptg.MEMNOMEM,
+    Ptg.MEMAREAN,
+    Ptg.MEMNOMEMN,
+))
+
+
+class RpnError(Exception):
+    &#34;&#34;&#34;
+    Raised when a formula token stream cannot be decoded in full. The workbook layer catches
+    it and hands the caller the unparsed carrier instead, so a hostile stream never breaks a
+    caller.
+    &#34;&#34;&#34;
+
+
+class RpnContext(Protocol):
+    &#34;&#34;&#34;
+    What the stack machine needs to know about the workbook a formula stream belongs to: the
+    names its `ptgName` tokens index and the sheets its 3-D tokens resolve through.
+    &#34;&#34;&#34;
+
+    def defined_name(self, index: int) -&gt; XlDefinedName:
+        &#34;&#34;&#34;
+        The defined name the given name index refers to.
+        &#34;&#34;&#34;
+        ...
+
+    def extern_sheets(self, ixti: int) -&gt; tuple[str, ...]:
+        &#34;&#34;&#34;
+        The sheet names the given extern-sheet index spans, from one entry for a plain
+        qualification to two for a 3-D span.
+        &#34;&#34;&#34;
+        ...
+
+
+class RpnDecoder:
+    &#34;&#34;&#34;
+    The stack machine a BIFF or XLSB subclass drives over its formula bytes. Every token is
+    folded into the model as it is read; a stream is only valid if it consumes exactly and
+    leaves exactly one expression on the stack.
+    &#34;&#34;&#34;
+
+    def __init__(self, view: memoryview, context: RpnContext | None = None):
+        self._view = view
+        self._pos = 0
+        self._context = context
+        self._stack: list[Expression] = []
+
+    def decode(self) -&gt; Expression:
+        while self._pos &lt; len(self._view):
+            self._step()
+        if len(self._stack) != 1:
+            raise RpnError(F&#39;the token stream left {len(self._stack)} operands on the stack&#39;)
+        return self._stack[0]
+
+    def _take(self, count: int) -&gt; list[Expression]:
+        if len(self._stack) &lt; count:
+            raise RpnError(F&#39;a token asked for {count} operands but {len(self._stack)} remain&#39;)
+        if not count:
+            return []
+        operands = self._stack[-count:]
+        del self._stack[-count:]
+        return operands
+
+    def _step(self):
+        token = base_ptg(self._read_u8())
+        if token in _BINARY_OPERATORS:
+            left, right = self._take(2)
+            self._stack.append(XlBinaryExpression(
+                left=left,
+                operator=_BINARY_OPERATORS[token],
+                right=right,
+            ))
+            return
+        if token in _UNARY_OPERATORS:
+            operand, = self._take(1)
+            self._stack.append(XlUnaryExpression(
+                operator=_UNARY_OPERATORS[token],
+                operand=operand,
+            ))
+            return
+        if token == Ptg.PAREN:
+            operand, = self._take(1)
+            self._stack.append(XlParenExpression(operand=operand))
+            return
+        if token == Ptg.MISSARG:
+            self._stack.append(XlMissingArgument())
+            return
+        if token == Ptg.ATTR:
+            self._attr()
+            return
+        if token == Ptg.ERR:
+            code = self._read_u8()
+            text = ERROR_TEXT.get(code)
+            if text is None:
+                raise RpnError(F&#39;unknown error code {code:#x}&#39;)
+            self._stack.append(XlError(value=text))
+            return
+        if token == Ptg.BOOL:
+            self._stack.append(XlBoolean(value=self._read_u8() != 0))
+            return
+        if token == Ptg.INT:
+            self._stack.append(XlNumber(value=self._read_u16()))
+            return
+        if token == Ptg.NUM:
+            number = self._read_double()
+            # a double that holds an integer is an integer literal: the synthesizer prints it
+            # without the decimal point, as Excel writes it
+            if number.is_integer():
+                number = int(number)
+            self._stack.append(XlNumber(value=number))
+            return
+        if token == Ptg.STR:
+            self._stack.append(self._read_string())
+            return
+        if token == Ptg.FUNC:
+            index = self._read_function_id()
+            self._stack.append(self._call_fixed_arity(index))
+            return
+        if token == Ptg.FUNCVAR:
+            index, argc, user_defined = self._read_function_variable()
+            self._stack.append(self._call_variable_arity(index, argc, user_defined))
+            return
+        if token == Ptg.NAME:
+            self._stack.append(self._read_defined_name())
+            return
+        if token == Ptg.REF:
+            self._stack.append(self._read_reference(relative=False))
+            return
+        if token == Ptg.AREA:
+            self._stack.append(self._read_area(relative=False))
+            return
+        if token == Ptg.REFN:
+            self._stack.append(self._read_reference(relative=True))
+            return
+        if token == Ptg.AREAN:
+            self._stack.append(self._read_area(relative=True))
+            return
+        if (
+            token == Ptg.REFERR
+            or token == Ptg.REFERR3D
+        ):
+            self._skip_reference_error(token)
+            self._stack.append(XlError(value=&#39;#REF!&#39;))
+            return
+        if (
+            token == Ptg.AREAERR
+            or token == Ptg.AREAERR3D
+        ):
+            self._skip_reference_error(token)
+            self._stack.append(XlError(value=&#39;#REF!&#39;))
+            return
+        if token == Ptg.REF3D:
+            self._stack.append(self._read_3d_reference())
+            return
+        if token == Ptg.AREA3D:
+            self._stack.append(self._read_3d_area())
+            return
+        if token == Ptg.ARRAY:
+            self._stack.append(self._read_array())
+            return
+        if token in _MEMORY_TOKENS:
+            self._skip_mem_token(token)
+            return
+        if token == Ptg.MEMFUNC:
+            self._skip_mem_func()
+            return
+        raise RpnError(F&#39;the token {token:#x} has no decoder&#39;)
+
+    def _attr(self):
+        &#34;&#34;&#34;
+        The `ptgAttr` rules: whitespace and assignment bookkeeping is dropped, the control-flow
+        subtypes are consumed with their jump tables, and the sum subtype is the `SUM` call,
+        because `=SUM(1)` is stored as `tInt(1), tAttrSum` with no call token anywhere.
+        &#34;&#34;&#34;
+        grbit = self._read_u8()
+        count = self._read_attr_data()
+        if grbit &amp; ATTR_CHOOSE:
+            for _ in range(count + 1):
+                self._read_attr_data()
+        if grbit &amp; ATTR_SUM:
+            operand, = self._take(1)
+            self._stack.append(XlFunctionCall(callee=&#39;SUM&#39;, arguments=[operand]))
+
+    def _call_fixed_arity(self, index: int) -&gt; XlFunctionCall:
+        entry = BUILTIN_FUNCTIONS.get(index)
+        if entry is None:
+            raise RpnError(F&#39;unknown fixed-arity function id {index:#x}&#39;)
+        name, lo, _hi = entry
+        if lo &lt; 0:
+            raise RpnError(F&#39;function id {index:#x} has no recorded arity&#39;)
+        return XlFunctionCall(callee=name, arguments=self._take(lo))
+
+    def _call_variable_arity(
+        self,
+        index: int,
+        argc: int,
+        user_defined: bool,
+    ) -&gt; XlFunctionCall:
+        if user_defined:
+            operands = self._take(argc)
+            if not operands:
+                raise RpnError(&#39;a user-defined call carries no name operand&#39;)
+            callee, *arguments = operands
+            if isinstance(callee, XlString):
+                return XlFunctionCall(callee=callee.value, arguments=arguments)
+            if not isinstance(callee, (XlA1Reference, XlR1C1Reference, XlDefinedName)):
+                raise RpnError(&#39;a user-defined call has an unspellable name operand&#39;)
+            return XlFunctionCall(callee=callee, arguments=arguments)
+        entry = BUILTIN_FUNCTIONS.get(index)
+        if entry is None:
+            raise RpnError(F&#39;unknown function id {index:#x}&#39;)
+        name, lo, hi = entry
+        if lo &gt;= 0 and not lo &lt;= argc &lt;= hi:
+            raise RpnError(F&#39;function {name} was called with {argc} of {lo}..{hi} arguments&#39;)
+        return XlFunctionCall(callee=name, arguments=self._take(argc))
+
+    def _read_u8(self) -&gt; int:
+        if self._pos &gt;= len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = self._view[self._pos]
+        self._pos += 1
+        return value
+
+    def _read_u16(self) -&gt; int:
+        if self._pos + 2 &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = struct.unpack_from(&#39;&lt;H&#39;, self._view, self._pos)[0]
+        self._pos += 2
+        return value
+
+    def _read_u32(self) -&gt; int:
+        if self._pos + 4 &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = struct.unpack_from(&#39;&lt;I&#39;, self._view, self._pos)[0]
+        self._pos += 4
+        return value
+
+    def _read_double(self) -&gt; float:
+        if self._pos + 8 &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = struct.unpack_from(&#39;&lt;d&#39;, self._view, self._pos)[0]
+        self._pos += 8
+        return value
+
+    def _read_bytes(self, count: int) -&gt; bytes:
+        if self._pos + count &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        raw = bytes(self._view[self._pos:self._pos + count])
+        self._pos += count
+        return raw
+
+    def _read_text(self, count: int, encoding: str) -&gt; str:
+        &#34;&#34;&#34;
+        Read `count` bytes as text in the given encoding; bytes that do not decode in it are a
+        defect of the stream like any other.
+        &#34;&#34;&#34;
+        try:
+            return self._read_bytes(count).decode(encoding)
+        except UnicodeDecodeError as error:
+            raise RpnError(F&#39;a string token does not decode as {encoding}&#39;) from error
+
+    # the operand readers a container family supplies; every default raises so that a subclass
+    # cannot silently skip a token it does not implement.
+
+    def _read_string(self) -&gt; XlString:
+        raise RpnError(&#39;this decoder does not read string tokens&#39;)
+
+    def _read_function_id(self) -&gt; int:
+        raise RpnError(&#39;this decoder does not read fixed-arity call tokens&#39;)
+
+    def _read_function_variable(self) -&gt; tuple[int, int, bool]:
+        raise RpnError(&#39;this decoder does not read variable-arity call tokens&#39;)
+
+    def _read_defined_name(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read name tokens&#39;)
+
+    def _read_reference(self, relative: bool) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read reference tokens&#39;)
+
+    def _read_area(self, relative: bool) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read area tokens&#39;)
+
+    def _read_3d_reference(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read 3-D reference tokens&#39;)
+
+    def _read_3d_area(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read 3-D area tokens&#39;)
+
+    def _read_array(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read array tokens&#39;)
+
+    def _read_attr_data(self) -&gt; int:
+        return self._read_u16()
+
+    def _qualify(self, expression: Expression, sheets: tuple[str, ...]) -&gt; Expression:
+        &#34;&#34;&#34;
+        Attach the sheet span of a 3-D token to every reference it contains.
+        &#34;&#34;&#34;
+        if isinstance(expression, XlBinaryExpression):
+            if expression.left is not None:
+                self._qualify(expression.left, sheets)
+            if expression.right is not None:
+                self._qualify(expression.right, sheets)
+        elif isinstance(expression, (XlA1Reference, XlR1C1Reference)):
+            expression.sheets = sheets
+        return expression
+
+    def _skip_mem_token(self, token: Ptg) -&gt; None:
+        raise RpnError(&#39;this decoder does not read memory tokens&#39;)
+
+    def _skip_mem_func(self) -&gt; None:
+        raise RpnError(&#39;this decoder does not read memory tokens&#39;)
+
+    def _skip_reference_error(self, token: Ptg) -&gt; None:
+        raise RpnError(&#39;this decoder does not read broken reference tokens&#39;)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.excel.formula.ptg.base_ptg"><code class="name flex">
+<span>def <span class="ident">base_ptg</span></span>(<span>token)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Strip the value-class bits off a raw token byte. Control ptgs live below <code>0x20</code> and carry
+no class bits; an operand ptg keeps its reference-class spelling, <code>0x40</code> adds the value
+class and <code>0x60</code> the array class. A byte that names no ptg raises <code><a title="refinery.lib.excel.formula.ptg.RpnError" href="#refinery.lib.excel.formula.ptg.RpnError">RpnError</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L100-L111" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def base_ptg(token: int) -&gt; Ptg:
+    &#34;&#34;&#34;
+    Strip the value-class bits off a raw token byte. Control ptgs live below `0x20` and carry
+    no class bits; an operand ptg keeps its reference-class spelling, `0x40` adds the value
+    class and `0x60` the array class. A byte that names no ptg raises `RpnError`.
+    &#34;&#34;&#34;
+    try:
+        if token &lt; 0x20:
+            return Ptg(token)
+        return Ptg((token | 0x20) &amp; 0x3F)
+    except ValueError:
+        raise RpnError(F&#39;the byte {token:#x} names no token&#39;) from None</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.excel.formula.ptg.Ptg"><code class="flex name class">
+<span>class <span class="ident">Ptg</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The base ptg values after the value-class bits are masked off. The raw token byte of an
+operand ptg carries two class bits above the base: adding <code>0x40</code> selects the value class
+and adding <code>0x60</code> the array class, which never changes what the token means for the model.
+The names follow the Microsoft documentation, so the union operator is <code>UNION</code> even though
+its ptg is historically spelled <code>tList</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L36-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ptg(enum.IntEnum):
+    &#34;&#34;&#34;
+    The base ptg values after the value-class bits are masked off. The raw token byte of an
+    operand ptg carries two class bits above the base: adding `0x40` selects the value class
+    and adding `0x60` the array class, which never changes what the token means for the model.
+    The names follow the Microsoft documentation, so the union operator is `UNION` even though
+    its ptg is historically spelled `tList`.
+    &#34;&#34;&#34;
+
+    EXP = 0x01
+    TBL = 0x02
+    ADD = 0x03
+    SUB = 0x04
+    MUL = 0x05
+    DIV = 0x06
+    POW = 0x07
+    CONCAT = 0x08
+    LT = 0x09
+    LE = 0x0A
+    EQ = 0x0B
+    GE = 0x0C
+    GT = 0x0D
+    NE = 0x0E
+    ISECT = 0x0F
+    UNION = 0x10
+    RANGE = 0x11
+    UPLUS = 0x12
+    UMINUS = 0x13
+    PERCENT = 0x14
+    PAREN = 0x15
+    MISSARG = 0x16
+    STR = 0x17
+    EXTENDED = 0x18
+    ATTR = 0x19
+    SHEET = 0x1A
+    ENDSHEET = 0x1B
+    ERR = 0x1C
+    BOOL = 0x1D
+    INT = 0x1E
+    NUM = 0x1F
+    ARRAY = 0x20
+    FUNC = 0x21
+    FUNCVAR = 0x22
+    NAME = 0x23
+    REF = 0x24
+    AREA = 0x25
+    MEMAREA = 0x26
+    MEMERR = 0x27
+    MEMNOMEM = 0x28
+    MEMFUNC = 0x29
+    REFERR = 0x2A
+    AREAERR = 0x2B
+    REFN = 0x2C
+    AREAN = 0x2D
+    MEMAREAN = 0x2E
+    MEMNOMEMN = 0x2F
+    FUNCCE = 0x38
+    NAMEX = 0x39
+    REF3D = 0x3A
+    AREA3D = 0x3B
+    REFERR3D = 0x3C
+    AREAERR3D = 0x3D</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.IntEnum</li>
+<li>builtins.int</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.EXP"><code class="name">var <span class="ident">EXP</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.TBL"><code class="name">var <span class="ident">TBL</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.ADD"><code class="name">var <span class="ident">ADD</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.SUB"><code class="name">var <span class="ident">SUB</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MUL"><code class="name">var <span class="ident">MUL</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.DIV"><code class="name">var <span class="ident">DIV</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.POW"><code class="name">var <span class="ident">POW</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.CONCAT"><code class="name">var <span class="ident">CONCAT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.LT"><code class="name">var <span class="ident">LT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.LE"><code class="name">var <span class="ident">LE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.EQ"><code class="name">var <span class="ident">EQ</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.GE"><code class="name">var <span class="ident">GE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.GT"><code class="name">var <span class="ident">GT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.NE"><code class="name">var <span class="ident">NE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.ISECT"><code class="name">var <span class="ident">ISECT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.UNION"><code class="name">var <span class="ident">UNION</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.RANGE"><code class="name">var <span class="ident">RANGE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.UPLUS"><code class="name">var <span class="ident">UPLUS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.UMINUS"><code class="name">var <span class="ident">UMINUS</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.PERCENT"><code class="name">var <span class="ident">PERCENT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.PAREN"><code class="name">var <span class="ident">PAREN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MISSARG"><code class="name">var <span class="ident">MISSARG</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.STR"><code class="name">var <span class="ident">STR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.EXTENDED"><code class="name">var <span class="ident">EXTENDED</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.ATTR"><code class="name">var <span class="ident">ATTR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.SHEET"><code class="name">var <span class="ident">SHEET</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.ENDSHEET"><code class="name">var <span class="ident">ENDSHEET</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.ERR"><code class="name">var <span class="ident">ERR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.BOOL"><code class="name">var <span class="ident">BOOL</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.INT"><code class="name">var <span class="ident">INT</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.NUM"><code class="name">var <span class="ident">NUM</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.ARRAY"><code class="name">var <span class="ident">ARRAY</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.FUNC"><code class="name">var <span class="ident">FUNC</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.FUNCVAR"><code class="name">var <span class="ident">FUNCVAR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.NAME"><code class="name">var <span class="ident">NAME</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.REF"><code class="name">var <span class="ident">REF</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.AREA"><code class="name">var <span class="ident">AREA</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MEMAREA"><code class="name">var <span class="ident">MEMAREA</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MEMERR"><code class="name">var <span class="ident">MEMERR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MEMNOMEM"><code class="name">var <span class="ident">MEMNOMEM</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MEMFUNC"><code class="name">var <span class="ident">MEMFUNC</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.REFERR"><code class="name">var <span class="ident">REFERR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.AREAERR"><code class="name">var <span class="ident">AREAERR</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.REFN"><code class="name">var <span class="ident">REFN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.AREAN"><code class="name">var <span class="ident">AREAN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MEMAREAN"><code class="name">var <span class="ident">MEMAREAN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.MEMNOMEMN"><code class="name">var <span class="ident">MEMNOMEMN</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.FUNCCE"><code class="name">var <span class="ident">FUNCCE</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.NAMEX"><code class="name">var <span class="ident">NAMEX</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.REF3D"><code class="name">var <span class="ident">REF3D</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.AREA3D"><code class="name">var <span class="ident">AREA3D</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.REFERR3D"><code class="name">var <span class="ident">REFERR3D</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.Ptg.AREAERR3D"><code class="name">var <span class="ident">AREAERR3D</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.RpnError"><code class="flex name class">
+<span>class <span class="ident">RpnError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Raised when a formula token stream cannot be decoded in full. The workbook layer catches
+it and hands the caller the unparsed carrier instead, so a hostile stream never breaks a
+caller.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1032-L1037" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RpnError(Exception):
+    &#34;&#34;&#34;
+    Raised when a formula token stream cannot be decoded in full. The workbook layer catches
+    it and hands the caller the unparsed carrier instead, so a hostile stream never breaks a
+    caller.
+    &#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.RpnContext"><code class="flex name class">
+<span>class <span class="ident">RpnContext</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What the stack machine needs to know about the workbook a formula stream belongs to: the
+names its <code>ptgName</code> tokens index and the sheets its 3-D tokens resolve through.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1040-L1057" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RpnContext(Protocol):
+    &#34;&#34;&#34;
+    What the stack machine needs to know about the workbook a formula stream belongs to: the
+    names its `ptgName` tokens index and the sheets its 3-D tokens resolve through.
+    &#34;&#34;&#34;
+
+    def defined_name(self, index: int) -&gt; XlDefinedName:
+        &#34;&#34;&#34;
+        The defined name the given name index refers to.
+        &#34;&#34;&#34;
+        ...
+
+    def extern_sheets(self, ixti: int) -&gt; tuple[str, ...]:
+        &#34;&#34;&#34;
+        The sheet names the given extern-sheet index spans, from one entry for a plain
+        qualification to two for a 3-D span.
+        &#34;&#34;&#34;
+        ...</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Protocol</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.excel.formula.biff.BiffRpnContext" href="biff.html#refinery.lib.excel.formula.biff.BiffRpnContext">BiffRpnContext</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.excel.formula.ptg.RpnContext.defined_name"><code class="name flex">
+<span>def <span class="ident">defined_name</span></span>(<span>self, index)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The defined name the given name index refers to.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1046-L1050" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def defined_name(self, index: int) -&gt; XlDefinedName:
+    &#34;&#34;&#34;
+    The defined name the given name index refers to.
+    &#34;&#34;&#34;
+    ...</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.RpnContext.extern_sheets"><code class="name flex">
+<span>def <span class="ident">extern_sheets</span></span>(<span>self, ixti)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The sheet names the given extern-sheet index spans, from one entry for a plain
+qualification to two for a 3-D span.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1052-L1057" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def extern_sheets(self, ixti: int) -&gt; tuple[str, ...]:
+    &#34;&#34;&#34;
+    The sheet names the given extern-sheet index spans, from one entry for a plain
+    qualification to two for a 3-D span.
+    &#34;&#34;&#34;
+    ...</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.excel.formula.ptg.RpnDecoder"><code class="flex name class">
+<span>class <span class="ident">RpnDecoder</span></span>
+<span>(</span><span>view, context=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The stack machine a BIFF or XLSB subclass drives over its formula bytes. Every token is
+folded into the model as it is read; a stream is only valid if it consumes exactly and
+leaves exactly one expression on the stack.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1060-L1340" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class RpnDecoder:
+    &#34;&#34;&#34;
+    The stack machine a BIFF or XLSB subclass drives over its formula bytes. Every token is
+    folded into the model as it is read; a stream is only valid if it consumes exactly and
+    leaves exactly one expression on the stack.
+    &#34;&#34;&#34;
+
+    def __init__(self, view: memoryview, context: RpnContext | None = None):
+        self._view = view
+        self._pos = 0
+        self._context = context
+        self._stack: list[Expression] = []
+
+    def decode(self) -&gt; Expression:
+        while self._pos &lt; len(self._view):
+            self._step()
+        if len(self._stack) != 1:
+            raise RpnError(F&#39;the token stream left {len(self._stack)} operands on the stack&#39;)
+        return self._stack[0]
+
+    def _take(self, count: int) -&gt; list[Expression]:
+        if len(self._stack) &lt; count:
+            raise RpnError(F&#39;a token asked for {count} operands but {len(self._stack)} remain&#39;)
+        if not count:
+            return []
+        operands = self._stack[-count:]
+        del self._stack[-count:]
+        return operands
+
+    def _step(self):
+        token = base_ptg(self._read_u8())
+        if token in _BINARY_OPERATORS:
+            left, right = self._take(2)
+            self._stack.append(XlBinaryExpression(
+                left=left,
+                operator=_BINARY_OPERATORS[token],
+                right=right,
+            ))
+            return
+        if token in _UNARY_OPERATORS:
+            operand, = self._take(1)
+            self._stack.append(XlUnaryExpression(
+                operator=_UNARY_OPERATORS[token],
+                operand=operand,
+            ))
+            return
+        if token == Ptg.PAREN:
+            operand, = self._take(1)
+            self._stack.append(XlParenExpression(operand=operand))
+            return
+        if token == Ptg.MISSARG:
+            self._stack.append(XlMissingArgument())
+            return
+        if token == Ptg.ATTR:
+            self._attr()
+            return
+        if token == Ptg.ERR:
+            code = self._read_u8()
+            text = ERROR_TEXT.get(code)
+            if text is None:
+                raise RpnError(F&#39;unknown error code {code:#x}&#39;)
+            self._stack.append(XlError(value=text))
+            return
+        if token == Ptg.BOOL:
+            self._stack.append(XlBoolean(value=self._read_u8() != 0))
+            return
+        if token == Ptg.INT:
+            self._stack.append(XlNumber(value=self._read_u16()))
+            return
+        if token == Ptg.NUM:
+            number = self._read_double()
+            # a double that holds an integer is an integer literal: the synthesizer prints it
+            # without the decimal point, as Excel writes it
+            if number.is_integer():
+                number = int(number)
+            self._stack.append(XlNumber(value=number))
+            return
+        if token == Ptg.STR:
+            self._stack.append(self._read_string())
+            return
+        if token == Ptg.FUNC:
+            index = self._read_function_id()
+            self._stack.append(self._call_fixed_arity(index))
+            return
+        if token == Ptg.FUNCVAR:
+            index, argc, user_defined = self._read_function_variable()
+            self._stack.append(self._call_variable_arity(index, argc, user_defined))
+            return
+        if token == Ptg.NAME:
+            self._stack.append(self._read_defined_name())
+            return
+        if token == Ptg.REF:
+            self._stack.append(self._read_reference(relative=False))
+            return
+        if token == Ptg.AREA:
+            self._stack.append(self._read_area(relative=False))
+            return
+        if token == Ptg.REFN:
+            self._stack.append(self._read_reference(relative=True))
+            return
+        if token == Ptg.AREAN:
+            self._stack.append(self._read_area(relative=True))
+            return
+        if (
+            token == Ptg.REFERR
+            or token == Ptg.REFERR3D
+        ):
+            self._skip_reference_error(token)
+            self._stack.append(XlError(value=&#39;#REF!&#39;))
+            return
+        if (
+            token == Ptg.AREAERR
+            or token == Ptg.AREAERR3D
+        ):
+            self._skip_reference_error(token)
+            self._stack.append(XlError(value=&#39;#REF!&#39;))
+            return
+        if token == Ptg.REF3D:
+            self._stack.append(self._read_3d_reference())
+            return
+        if token == Ptg.AREA3D:
+            self._stack.append(self._read_3d_area())
+            return
+        if token == Ptg.ARRAY:
+            self._stack.append(self._read_array())
+            return
+        if token in _MEMORY_TOKENS:
+            self._skip_mem_token(token)
+            return
+        if token == Ptg.MEMFUNC:
+            self._skip_mem_func()
+            return
+        raise RpnError(F&#39;the token {token:#x} has no decoder&#39;)
+
+    def _attr(self):
+        &#34;&#34;&#34;
+        The `ptgAttr` rules: whitespace and assignment bookkeeping is dropped, the control-flow
+        subtypes are consumed with their jump tables, and the sum subtype is the `SUM` call,
+        because `=SUM(1)` is stored as `tInt(1), tAttrSum` with no call token anywhere.
+        &#34;&#34;&#34;
+        grbit = self._read_u8()
+        count = self._read_attr_data()
+        if grbit &amp; ATTR_CHOOSE:
+            for _ in range(count + 1):
+                self._read_attr_data()
+        if grbit &amp; ATTR_SUM:
+            operand, = self._take(1)
+            self._stack.append(XlFunctionCall(callee=&#39;SUM&#39;, arguments=[operand]))
+
+    def _call_fixed_arity(self, index: int) -&gt; XlFunctionCall:
+        entry = BUILTIN_FUNCTIONS.get(index)
+        if entry is None:
+            raise RpnError(F&#39;unknown fixed-arity function id {index:#x}&#39;)
+        name, lo, _hi = entry
+        if lo &lt; 0:
+            raise RpnError(F&#39;function id {index:#x} has no recorded arity&#39;)
+        return XlFunctionCall(callee=name, arguments=self._take(lo))
+
+    def _call_variable_arity(
+        self,
+        index: int,
+        argc: int,
+        user_defined: bool,
+    ) -&gt; XlFunctionCall:
+        if user_defined:
+            operands = self._take(argc)
+            if not operands:
+                raise RpnError(&#39;a user-defined call carries no name operand&#39;)
+            callee, *arguments = operands
+            if isinstance(callee, XlString):
+                return XlFunctionCall(callee=callee.value, arguments=arguments)
+            if not isinstance(callee, (XlA1Reference, XlR1C1Reference, XlDefinedName)):
+                raise RpnError(&#39;a user-defined call has an unspellable name operand&#39;)
+            return XlFunctionCall(callee=callee, arguments=arguments)
+        entry = BUILTIN_FUNCTIONS.get(index)
+        if entry is None:
+            raise RpnError(F&#39;unknown function id {index:#x}&#39;)
+        name, lo, hi = entry
+        if lo &gt;= 0 and not lo &lt;= argc &lt;= hi:
+            raise RpnError(F&#39;function {name} was called with {argc} of {lo}..{hi} arguments&#39;)
+        return XlFunctionCall(callee=name, arguments=self._take(argc))
+
+    def _read_u8(self) -&gt; int:
+        if self._pos &gt;= len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = self._view[self._pos]
+        self._pos += 1
+        return value
+
+    def _read_u16(self) -&gt; int:
+        if self._pos + 2 &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = struct.unpack_from(&#39;&lt;H&#39;, self._view, self._pos)[0]
+        self._pos += 2
+        return value
+
+    def _read_u32(self) -&gt; int:
+        if self._pos + 4 &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = struct.unpack_from(&#39;&lt;I&#39;, self._view, self._pos)[0]
+        self._pos += 4
+        return value
+
+    def _read_double(self) -&gt; float:
+        if self._pos + 8 &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        value = struct.unpack_from(&#39;&lt;d&#39;, self._view, self._pos)[0]
+        self._pos += 8
+        return value
+
+    def _read_bytes(self, count: int) -&gt; bytes:
+        if self._pos + count &gt; len(self._view):
+            raise RpnError(&#39;the token stream ends inside a token&#39;)
+        raw = bytes(self._view[self._pos:self._pos + count])
+        self._pos += count
+        return raw
+
+    def _read_text(self, count: int, encoding: str) -&gt; str:
+        &#34;&#34;&#34;
+        Read `count` bytes as text in the given encoding; bytes that do not decode in it are a
+        defect of the stream like any other.
+        &#34;&#34;&#34;
+        try:
+            return self._read_bytes(count).decode(encoding)
+        except UnicodeDecodeError as error:
+            raise RpnError(F&#39;a string token does not decode as {encoding}&#39;) from error
+
+    # the operand readers a container family supplies; every default raises so that a subclass
+    # cannot silently skip a token it does not implement.
+
+    def _read_string(self) -&gt; XlString:
+        raise RpnError(&#39;this decoder does not read string tokens&#39;)
+
+    def _read_function_id(self) -&gt; int:
+        raise RpnError(&#39;this decoder does not read fixed-arity call tokens&#39;)
+
+    def _read_function_variable(self) -&gt; tuple[int, int, bool]:
+        raise RpnError(&#39;this decoder does not read variable-arity call tokens&#39;)
+
+    def _read_defined_name(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read name tokens&#39;)
+
+    def _read_reference(self, relative: bool) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read reference tokens&#39;)
+
+    def _read_area(self, relative: bool) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read area tokens&#39;)
+
+    def _read_3d_reference(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read 3-D reference tokens&#39;)
+
+    def _read_3d_area(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read 3-D area tokens&#39;)
+
+    def _read_array(self) -&gt; Expression:
+        raise RpnError(&#39;this decoder does not read array tokens&#39;)
+
+    def _read_attr_data(self) -&gt; int:
+        return self._read_u16()
+
+    def _qualify(self, expression: Expression, sheets: tuple[str, ...]) -&gt; Expression:
+        &#34;&#34;&#34;
+        Attach the sheet span of a 3-D token to every reference it contains.
+        &#34;&#34;&#34;
+        if isinstance(expression, XlBinaryExpression):
+            if expression.left is not None:
+                self._qualify(expression.left, sheets)
+            if expression.right is not None:
+                self._qualify(expression.right, sheets)
+        elif isinstance(expression, (XlA1Reference, XlR1C1Reference)):
+            expression.sheets = sheets
+        return expression
+
+    def _skip_mem_token(self, token: Ptg) -&gt; None:
+        raise RpnError(&#39;this decoder does not read memory tokens&#39;)
+
+    def _skip_mem_func(self) -&gt; None:
+        raise RpnError(&#39;this decoder does not read memory tokens&#39;)
+
+    def _skip_reference_error(self, token: Ptg) -&gt; None:
+        raise RpnError(&#39;this decoder does not read broken reference tokens&#39;)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.excel.formula.biff.BiffRpnDecoder" href="biff.html#refinery.lib.excel.formula.biff.BiffRpnDecoder">BiffRpnDecoder</a></li>
+<li><a title="refinery.lib.excel.formula.xlsb.XlsbRpnDecoder" href="xlsb.html#refinery.lib.excel.formula.xlsb.XlsbRpnDecoder">XlsbRpnDecoder</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.excel.formula.ptg.RpnDecoder.decode"><code class="name flex">
+<span>def <span class="ident">decode</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/ptg.py#L1073-L1078" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode(self) -&gt; Expression:
+    while self._pos &lt; len(self._view):
+        self._step()
+    if len(self._stack) != 1:
+        raise RpnError(F&#39;the token stream left {len(self._stack)} operands on the stack&#39;)
+    return self._stack[0]</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.excel.formula" href="index.html">refinery.lib.excel.formula</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.excel.formula.ptg.base_ptg" href="#refinery.lib.excel.formula.ptg.base_ptg">base_ptg</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.excel.formula.ptg.Ptg" href="#refinery.lib.excel.formula.ptg.Ptg">Ptg</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.excel.formula.ptg.RpnError" href="#refinery.lib.excel.formula.ptg.RpnError">RpnError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.excel.formula.ptg.RpnContext" href="#refinery.lib.excel.formula.ptg.RpnContext">RpnContext</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.excel.formula.ptg.RpnContext.defined_name" href="#refinery.lib.excel.formula.ptg.RpnContext.defined_name">defined_name</a></code></li>
+<li><code><a title="refinery.lib.excel.formula.ptg.RpnContext.extern_sheets" href="#refinery.lib.excel.formula.ptg.RpnContext.extern_sheets">extern_sheets</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.excel.formula.ptg.RpnDecoder" href="#refinery.lib.excel.formula.ptg.RpnDecoder">RpnDecoder</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.excel.formula.ptg.RpnDecoder.decode" href="#refinery.lib.excel.formula.ptg.RpnDecoder.decode">decode</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

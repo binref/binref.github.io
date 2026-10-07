@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.excel.formula.parse documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.excel.formula.parse</code></h1>
+</header>
+<section id="section-intro">
+<p>The text parser for Excel formula sources: the <code>&lt;f&gt;</code> element text of an OOXML cell, the body of
+a defined name, or any other formula text with or without the leading <code>=</code>. The precedence chain
+follows the Microsoft-documented order, loosest to tightest: comparisons, concatenation,
+addition, multiplication, exponentiation, the postfix percent, the unary sign, and finally the
+reference operators, of which the union binds loosest, the intersection is tighter, and the
+range is tightest. The union operator is recognized only inside parentheses, so the separator
+of call arguments is never read as one. On any input the parser cannot read in full it returns
+<code>XlUnparsedFormula</code> rather than raising, so that hostile text never breaks a caller.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/parse.py#L1-L545" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The text parser for Excel formula sources: the `&lt;f&gt;` element text of an OOXML cell, the body of
+a defined name, or any other formula text with or without the leading `=`. The precedence chain
+follows the Microsoft-documented order, loosest to tightest: comparisons, concatenation,
+addition, multiplication, exponentiation, the postfix percent, the unary sign, and finally the
+reference operators, of which the union binds loosest, the intersection is tighter, and the
+range is tightest. The union operator is recognized only inside parentheses, so the separator
+of call arguments is never read as one. On any input the parser cannot read in full it returns
+`XlUnparsedFormula` rather than raising, so that hostile text never breaks a caller.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import re
+
+from typing import NamedTuple
+
+from refinery.lib.excel.common import ERROR_TEXT, ref2rc
+from refinery.lib.excel.formula.model import (
+    Expression,
+    XlA1Reference,
+    XlArrayConstant,
+    XlBinaryExpression,
+    XlBinaryOperator,
+    XlBoolean,
+    XlDefinedName,
+    XlError,
+    XlFunctionCall,
+    XlLiteral,
+    XlMissingArgument,
+    XlNumber,
+    XlParenExpression,
+    XlR1C1Reference,
+    XlString,
+    XlUnaryExpression,
+    XlUnaryOperator,
+    XlUnparsedFormula,
+)
+from refinery.lib.scripts import TREE_RECURSION_DEPTH
+from refinery.lib.tools import RecursionDepth
+
+
+class International(NamedTuple):
+    &#34;&#34;&#34;
+    The locale-dependent characters of formula text: the separator between the arguments of a
+    call and between the columns of an array constant, and the brackets around a relative R1C1
+    offset.
+    &#34;&#34;&#34;
+
+    list_separator: str = &#39;,&#39;
+    left_bracket: str = &#39;[&#39;
+    right_bracket: str = &#39;]&#39;
+
+
+class _ParseFailure(Exception):
+    pass
+
+
+_RE_STRING = re.compile(R&#39;&#34;(?:[^&#34;]|&#34;&#34;)*&#34;&#39;)
+_RE_NUMBER = re.compile(r&#39;(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?&#39;)
+_RE_NAME = re.compile(R&#39;[a-zA-Z_\\][a-zA-Z0-9_.\\?]*&#39;)
+_RE_BOOLEAN = re.compile(R&#39;TRUE|FALSE&#39;, re.IGNORECASE)
+_RE_A1 = re.compile(R&#39;(\$?)([A-Za-z]{1,3})(\$?)(\d+)&#39;)
+_RE_ERROR = re.compile(
+    &#39;|&#39;.join(re.escape(e) for e in sorted(ERROR_TEXT.values(), key=len, reverse=True)),
+    re.IGNORECASE,
+)
+_NAME_CONTINUATION = frozenset(
+    &#39;abcdefghijklmnopqrstuvwxyz&#39;
+    &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;
+    &#39;0123456789_.\\?&#39;
+)
+_NAME_START = frozenset(&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_.\\?&#39;)
+_COMPARISONS = (&#39;&lt;=&#39;, &#39;&gt;=&#39;, &#39;&lt;&gt;&#39;, &#39;&lt;&#39;, &#39;&gt;&#39;, &#39;=&#39;)
+_SPACES = &#39; \t\r\n&#39;
+
+_OPERATORS = {
+    &#39;=&#39;: XlBinaryOperator.EQ,
+    &#39;&lt;&gt;&#39;: XlBinaryOperator.NE,
+    &#39;&lt;&#39;: XlBinaryOperator.LT,
+    &#39;&lt;=&#39;: XlBinaryOperator.LE,
+    &#39;&gt;&#39;: XlBinaryOperator.GT,
+    &#39;&gt;=&#39;: XlBinaryOperator.GE,
+    &#39;&amp;&#39;: XlBinaryOperator.CONCAT,
+    &#39;+&#39;: XlBinaryOperator.ADD,
+    &#39;-&#39;: XlBinaryOperator.SUB,
+    &#39;*&#39;: XlBinaryOperator.MUL,
+    &#39;/&#39;: XlBinaryOperator.DIV,
+    &#39;^&#39;: XlBinaryOperator.POW,
+    &#39;:&#39;: XlBinaryOperator.RANGE,
+}
+
+_RE_COLUMN = re.compile(R&#39;[A-Za-z]{1,3}&#39;)
+
+
+def _spells_whole_span(left: Expression, right: Expression) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the operands of a range operator spell a whole-column reference such as `A:C` or a
+    whole-row reference such as `1:3`. The model has no node for either yet, and bare letters
+    would otherwise read as defined names and bare digits as numbers, so the range they form
+    would be a different program; such input is refused.
+    &#34;&#34;&#34;
+    if isinstance(left, XlNumber) and isinstance(right, XlNumber):
+        return True
+    if not isinstance(left, XlDefinedName) or not isinstance(right, XlDefinedName):
+        return False
+    return (
+        _RE_COLUMN.fullmatch(left.name) is not None
+        and _RE_COLUMN.fullmatch(right.name) is not None
+    )
+
+
+def parse_formula(
+    text: str,
+    international: International | None = None,
+) -&gt; Expression:
+    &#34;&#34;&#34;
+    Parse formula text into the AST model. The leading `=` of a stored formula is optional. Any
+    input that does not read as one whole formula becomes an `XlUnparsedFormula` carrying the
+    text, never an exception. The parse runs under `refinery.lib.scripts.TREE_RECURSION_DEPTH`,
+    so how deeply a formula may nest does not depend on the recursion limit of the caller.
+    &#34;&#34;&#34;
+    if not text or not text.strip():
+        return XlUnparsedFormula(text=text)
+    parser = _Parser(text.strip(), international or International())
+    try:
+        with RecursionDepth(TREE_RECURSION_DEPTH):
+            expression = parser.parse()
+    except (_ParseFailure, RecursionError, ValueError, IndexError):
+        return XlUnparsedFormula(text=text)
+    return expression
+
+
+class _Parser:
+    &#34;&#34;&#34;
+    A recursive-descent reader over formula text. Every token is consumed through a method that
+    also skips the whitespace behind it and records whether it skipped any, which is how the
+    intersection level tells an operand apart from spacing around an operator.
+    &#34;&#34;&#34;
+
+    def __init__(self, text: str, international: International):
+        self._src = text
+        self._pos = 0
+        self._sep = international.list_separator
+        self._lb = international.left_bracket
+        self._rb = international.right_bracket
+        self._spaced = False
+
+    def parse(self) -&gt; Expression:
+        if self._src.startswith(&#39;=&#39;):
+            self._pos = 1
+        expression = self._parse_comparison()
+        self._skip_spaces()
+        if self._pos != len(self._src):
+            raise _ParseFailure
+        return expression
+
+    def _at_end(self) -&gt; bool:
+        return self._pos &gt;= len(self._src)
+
+    def _peek(self) -&gt; str:
+        return self._src[self._pos] if self._pos &lt; len(self._src) else &#39;&#39;
+
+    def _skip_spaces(self) -&gt; None:
+        moved = False
+        while self._pos &lt; len(self._src) and self._src[self._pos] in _SPACES:
+            self._pos += 1
+            moved = True
+        self._spaced = moved
+
+    def _consume(self, char: str) -&gt; None:
+        if self._peek() != char:
+            raise _ParseFailure
+        self._pos += 1
+        self._skip_spaces()
+
+    def _match(self, pattern: re.Pattern[str]) -&gt; re.Match[str] | None:
+        match = pattern.match(self._src, self._pos)
+        if match is None:
+            return None
+        self._pos = match.end()
+        self._skip_spaces()
+        return match
+
+    def _begins_operand(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the input at the cursor starts another operand, which is what turns skipped
+        whitespace into an intersection operator rather than spacing. A sign never begins one:
+        `A1 -B1` is a subtraction however it is spaced.
+        &#34;&#34;&#34;
+        char = self._peek()
+        if not char:
+            return False
+        return (
+            char in &#39;&#34;{#$\&#39;(&#39;
+            or char.isdigit()
+            or char == &#39;.&#39;
+            or char in _NAME_START
+        )
+
+    def _binary(
+        self,
+        level,
+        operators: tuple[str, ...],
+    ) -&gt; Expression:
+        &#34;&#34;&#34;
+        Parse one left-associative binary level: operands of the next tighter level separated
+        by any of the given operator texts.
+        &#34;&#34;&#34;
+        left = level()
+        while not self._at_end():
+            for text in operators:
+                if self._src.startswith(text, self._pos):
+                    self._pos += len(text)
+                    self._skip_spaces()
+                    left = XlBinaryExpression(
+                        left=left,
+                        operator=_OPERATORS[text],
+                        right=level(),
+                    )
+                    break
+            else:
+                return left
+        return left
+
+    def _parse_comparison(self) -&gt; Expression:
+        return self._binary(self._parse_concat, _COMPARISONS)
+
+    def _parse_concat(self) -&gt; Expression:
+        return self._binary(self._parse_additive, (&#39;&amp;&#39;,))
+
+    def _parse_additive(self) -&gt; Expression:
+        return self._binary(self._parse_multiplicative, (&#39;+&#39;, &#39;-&#39;))
+
+    def _parse_multiplicative(self) -&gt; Expression:
+        return self._binary(self._parse_power, (&#39;*&#39;, &#39;/&#39;))
+
+    def _parse_power(self) -&gt; Expression:
+        return self._binary(self._parse_percent, (&#39;^&#39;,))
+
+    def _parse_percent(self) -&gt; Expression:
+        left = self._parse_unary()
+        while not self._at_end() and self._peek() == &#39;%&#39;:
+            self._pos += 1
+            self._skip_spaces()
+            left = XlUnaryExpression(operator=XlUnaryOperator.PERCENT, operand=left)
+        return left
+
+    def _parse_unary(self) -&gt; Expression:
+        if self._peek() in (&#39;-&#39;, &#39;+&#39;):
+            operator = XlUnaryOperator.NEG if self._peek() == &#39;-&#39; else XlUnaryOperator.POS
+            self._pos += 1
+            self._skip_spaces()
+            return XlUnaryExpression(operator=operator, operand=self._parse_unary())
+        return self._parse_isect()
+
+    def _parse_isect(self) -&gt; Expression:
+        left = self._parse_range()
+        while not self._at_end():
+            if not self._spaced or not self._begins_operand():
+                return left
+            left = XlBinaryExpression(
+                left=left,
+                operator=XlBinaryOperator.ISECT,
+                right=self._parse_range(),
+            )
+        return left
+
+    def _parse_range(self) -&gt; Expression:
+        left = self._parse_primary()
+        while not self._at_end() and self._peek() == &#39;:&#39;:
+            self._pos += 1
+            self._skip_spaces()
+            right = self._parse_primary()
+            if _spells_whole_span(left, right):
+                raise _ParseFailure
+            left = XlBinaryExpression(
+                left=left,
+                operator=XlBinaryOperator.RANGE,
+                right=right,
+            )
+        return left
+
+    def _parse_primary(self) -&gt; Expression:
+        char = self._peek()
+        if char == &#39;(&#39;:
+            self._pos += 1
+            self._skip_spaces()
+            inner = self._parse_union()
+            self._consume(&#39;)&#39;)
+            return XlParenExpression(operand=inner)
+        if char == &#39;&#34;&#39;:
+            return self._parse_string_literal()
+        if char == &#39;#&#39;:
+            return self._parse_error_literal()
+        if char == &#39;{&#39;:
+            return self._parse_array()
+        if char.isdigit() or char == &#39;.&#39;:
+            return self._parse_number()
+        return self._parse_reference_or_name()
+
+    def _parse_union(self) -&gt; Expression:
+        left = self._parse_comparison()
+        while not self._at_end() and self._peek() == self._sep:
+            self._pos += 1
+            self._skip_spaces()
+            left = XlBinaryExpression(
+                left=left,
+                operator=XlBinaryOperator.UNION,
+                right=self._parse_comparison(),
+            )
+        return left
+
+    def _parse_number(self) -&gt; XlNumber:
+        match = self._match(_RE_NUMBER)
+        if match is None:
+            raise _ParseFailure
+        raw = match.group()
+        if &#39;.&#39; in raw or &#39;e&#39; in raw or &#39;E&#39; in raw:
+            value: int | float = float(raw)
+            if value.is_integer():
+                value = int(value)
+        else:
+            value = int(raw)
+        return XlNumber(value=value, raw=raw)
+
+    def _parse_string_literal(self) -&gt; XlString:
+        match = self._match(_RE_STRING)
+        if match is None:
+            raise _ParseFailure
+        return XlString(value=match.group()[1:-1].replace(&#39;&#34;&#34;&#39;, &#39;&#34;&#39;))
+
+    def _parse_error_literal(self) -&gt; XlError:
+        match = self._match(_RE_ERROR)
+        if match is None:
+            raise _ParseFailure
+        return XlError(value=match.group().upper())
+
+    def _parse_array(self) -&gt; XlArrayConstant:
+        self._consume(&#39;{&#39;)
+        rows: list[tuple[XlLiteral, ...]] = []
+        row: list[XlLiteral] = [self._parse_array_item()]
+        while not self._at_end():
+            char = self._peek()
+            if char == &#39;}&#39;:
+                break
+            if char == &#39;;&#39;:
+                self._pos += 1
+                self._skip_spaces()
+                rows.append(tuple(row))
+                row = [self._parse_array_item()]
+                continue
+            if char == self._sep:
+                self._pos += 1
+                self._skip_spaces()
+                row.append(self._parse_array_item())
+                continue
+            raise _ParseFailure
+        self._consume(&#39;}&#39;)
+        rows.append(tuple(row))
+        return XlArrayConstant(rows=rows)
+
+    def _parse_array_item(self) -&gt; XlLiteral:
+        char = self._peek()
+        if char == &#39;&#34;&#39;:
+            return self._parse_string_literal()
+        if char == &#39;#&#39;:
+            return self._parse_error_literal()
+        if char in (&#39;-&#39;, &#39;+&#39;):
+            negative = char == &#39;-&#39;
+            self._pos += 1
+            self._skip_spaces()
+            number = self._parse_number()
+            return XlNumber(
+                value=-number.value if negative else number.value,
+                raw=F&#39;-{number.raw}&#39; if negative else number.raw,
+            )
+        match = _RE_BOOLEAN.match(self._src, self._pos)
+        if match is not None and (
+            match.end() &gt;= len(self._src)
+            or self._src[match.end()] not in _NAME_CONTINUATION
+        ):
+            self._pos = match.end()
+            self._skip_spaces()
+            return XlBoolean(value=match.group().upper() == &#39;TRUE&#39;)
+        return self._parse_number()
+
+    def _parse_sheet_prefix(self) -&gt; tuple[str, ...] | None:
+        &#34;&#34;&#34;
+        Consume a sheet qualification such as `Sheet1!`, `&#39;My Sheet&#39;!`, or the 3-D span
+        `Sheet1:Sheet2!`, and return the sheet names it names, or `None` when the input carries
+        no qualification at all. A name-like token that no `!` follows is not a prefix: the
+        cursor rewinds and the caller reads it as a reference or name instead.
+        &#34;&#34;&#34;
+        start = self._pos
+        first = self._parse_sheet_name()
+        if first is None:
+            if self._peek() != &#39;!&#39;:
+                return None
+            self._pos += 1
+            self._skip_spaces()
+            return ()
+        if self._peek() == &#39;:&#39;:
+            self._pos += 1
+            self._skip_spaces()
+            second = self._parse_sheet_name()
+            if second is None:
+                self._pos = start
+                return None
+            sheets = (first, second)
+        else:
+            sheets = (first,)
+        if self._peek() != &#39;!&#39;:
+            self._pos = start
+            return None
+        self._pos += 1
+        self._skip_spaces()
+        return sheets
+
+    def _parse_sheet_name(self) -&gt; str | None:
+        if self._peek() == &#34;&#39;&#34;:
+            end = self._src.find(&#34;&#39;&#34;, self._pos + 1)
+            while end &gt;= 0 and end + 1 &lt; len(self._src) and self._src[end + 1] == &#34;&#39;&#34;:
+                end = self._src.find(&#34;&#39;&#34;, end + 2)
+            if end &lt; 0:
+                raise _ParseFailure
+            name = self._src[self._pos + 1:end].replace(&#34;&#39;&#39;&#34;, &#34;&#39;&#34;)
+            self._pos = end + 1
+            return name
+        match = _RE_NAME.match(self._src, self._pos)
+        if match is None:
+            return None
+        self._pos = match.end()
+        return match.group()
+
+    def _parse_reference_or_name(self) -&gt; Expression:
+        sheets = self._parse_sheet_prefix()
+        reference = self._try_parse_r1c1(sheets)
+        if reference is not None:
+            return self._maybe_call(reference)
+        reference = self._try_parse_a1(sheets)
+        if reference is not None:
+            return self._maybe_call(reference)
+        match = self._match(_RE_NAME)
+        if match is None:
+            raise _ParseFailure
+        name = match.group()
+        if sheets:
+            return self._maybe_call(XlDefinedName(name=name, sheet=sheets[0]))
+        boolean = _RE_BOOLEAN.fullmatch(name)
+        if boolean is not None:
+            return XlBoolean(value=name.upper() == &#39;TRUE&#39;)
+        return self._maybe_call(name)
+
+    def _try_parse_a1(self, sheets: tuple[str, ...] | None) -&gt; XlA1Reference | None:
+        match = _RE_A1.match(self._src, self._pos)
+        if match is None:
+            return None
+        end = match.end()
+        if end &lt; len(self._src) and self._src[end] in _NAME_CONTINUATION:
+            return None
+        self._pos = end
+        self._skip_spaces()
+        _, col = ref2rc(F&#39;{match.group(2)}1&#39;)
+        return XlA1Reference(
+            sheets=sheets,
+            row=int(match.group(4)),
+            col=col,
+            relative_row=match.group(3) != &#39;$&#39;,
+            relative_col=match.group(1) != &#39;$&#39;,
+        )
+
+    def _try_parse_r1c1(self, sheets: tuple[str, ...] | None) -&gt; XlR1C1Reference | None:
+        &#34;&#34;&#34;
+        Read an R1C1 reference such as `R1C2`, `RC`, or `R[1]C[-1]`. A bracketed axis number is
+        an offset from the containing cell; an unbracketed one is absolute, and a missing one is
+        a relative zero. The attempt gives up when the text continues like a name, so that
+        `R1C1X` stays a name and `R1C1()` stays the call of a macro cell.
+        &#34;&#34;&#34;
+        start = self._pos
+        if self._peek().upper() != &#39;R&#39;:
+            return None
+        self._pos += 1
+        row_relative, row = self._try_parse_r1c1_axis()
+        if self._peek().upper() != &#39;C&#39;:
+            self._pos = start
+            return None
+        self._pos += 1
+        col_relative, col = self._try_parse_r1c1_axis()
+        if self._pos &lt; len(self._src) and self._src[self._pos] in _NAME_CONTINUATION:
+            self._pos = start
+            return None
+        self._skip_spaces()
+        return XlR1C1Reference(
+            sheets=sheets,
+            row=row,
+            col=col,
+            relative_row=row_relative,
+            relative_col=col_relative,
+        )
+
+    def _try_parse_r1c1_axis(self) -&gt; tuple[bool, int]:
+        char = self._peek()
+        if char == self._lb:
+            end = self._src.find(self._rb, self._pos)
+            if end &lt; 0:
+                raise _ParseFailure
+            try:
+                offset = int(self._src[self._pos + 1:end])
+            except ValueError:
+                raise _ParseFailure
+            self._pos = end + 1
+            return True, offset
+        digits = 0
+        while self._pos + digits &lt; len(self._src) and self._src[self._pos + digits].isdigit():
+            digits += 1
+        if not digits:
+            return True, 0
+        value = int(self._src[self._pos:self._pos + digits])
+        self._pos += digits
+        return False, value
+
+    def _maybe_call(
+        self,
+        callee: XlA1Reference | XlR1C1Reference | XlDefinedName | str,
+    ) -&gt; Expression:
+        if self._at_end() or self._peek() != &#39;(&#39;:
+            return callee if isinstance(callee, Expression) else XlDefinedName(name=callee)
+        self._pos += 1
+        self._skip_spaces()
+        arguments: list[Expression] = []
+        if self._peek() == &#39;)&#39;:
+            self._pos += 1
+            self._skip_spaces()
+            return XlFunctionCall(callee=callee, arguments=arguments)
+        while True:
+            if self._peek() in (self._sep, &#39;)&#39;):
+                arguments.append(XlMissingArgument())
+            else:
+                arguments.append(self._parse_comparison())
+            if self._peek() == self._sep:
+                self._pos += 1
+                self._skip_spaces()
+                continue
+            self._consume(&#39;)&#39;)
+            return XlFunctionCall(callee=callee, arguments=arguments)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.excel.formula.parse.parse_formula"><code class="name flex">
+<span>def <span class="ident">parse_formula</span></span>(<span>text, international=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Parse formula text into the AST model. The leading <code>=</code> of a stored formula is optional. Any
+input that does not read as one whole formula becomes an <code>XlUnparsedFormula</code> carrying the
+text, never an exception. The parse runs under <code><a title="refinery.lib.scripts.TREE_RECURSION_DEPTH" href="../../scripts/index.html#refinery.lib.scripts.TREE_RECURSION_DEPTH">TREE_RECURSION_DEPTH</a></code>,
+so how deeply a formula may nest does not depend on the recursion limit of the caller.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/parse.py#L112-L130" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def parse_formula(
+    text: str,
+    international: International | None = None,
+) -&gt; Expression:
+    &#34;&#34;&#34;
+    Parse formula text into the AST model. The leading `=` of a stored formula is optional. Any
+    input that does not read as one whole formula becomes an `XlUnparsedFormula` carrying the
+    text, never an exception. The parse runs under `refinery.lib.scripts.TREE_RECURSION_DEPTH`,
+    so how deeply a formula may nest does not depend on the recursion limit of the caller.
+    &#34;&#34;&#34;
+    if not text or not text.strip():
+        return XlUnparsedFormula(text=text)
+    parser = _Parser(text.strip(), international or International())
+    try:
+        with RecursionDepth(TREE_RECURSION_DEPTH):
+            expression = parser.parse()
+    except (_ParseFailure, RecursionError, ValueError, IndexError):
+        return XlUnparsedFormula(text=text)
+    return expression</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.excel.formula.parse.International"><code class="flex name class">
+<span>class <span class="ident">International</span></span>
+<span>(</span><span>list_separator=',', left_bracket='[', right_bracket=']')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The locale-dependent characters of formula text: the separator between the arguments of a
+call and between the columns of an array constant, and the brackets around a relative R1C1
+offset.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/parse.py#L42-L51" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class International(NamedTuple):
+    &#34;&#34;&#34;
+    The locale-dependent characters of formula text: the separator between the arguments of a
+    call and between the columns of an array constant, and the brackets around a relative R1C1
+    offset.
+    &#34;&#34;&#34;
+
+    list_separator: str = &#39;,&#39;
+    left_bracket: str = &#39;[&#39;
+    right_bracket: str = &#39;]&#39;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.excel.formula.parse.International.list_separator"><code class="name">var <span class="ident">list_separator</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/parse.py#L42-L51" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class International(NamedTuple):
+    &#34;&#34;&#34;
+    The locale-dependent characters of formula text: the separator between the arguments of a
+    call and between the columns of an array constant, and the brackets around a relative R1C1
+    offset.
+    &#34;&#34;&#34;
+
+    list_separator: str = &#39;,&#39;
+    left_bracket: str = &#39;[&#39;
+    right_bracket: str = &#39;]&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.formula.parse.International.left_bracket"><code class="name">var <span class="ident">left_bracket</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/parse.py#L42-L51" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class International(NamedTuple):
+    &#34;&#34;&#34;
+    The locale-dependent characters of formula text: the separator between the arguments of a
+    call and between the columns of an array constant, and the brackets around a relative R1C1
+    offset.
+    &#34;&#34;&#34;
+
+    list_separator: str = &#39;,&#39;
+    left_bracket: str = &#39;[&#39;
+    right_bracket: str = &#39;]&#39;</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.excel.formula.parse.International.right_bracket"><code class="name">var <span class="ident">right_bracket</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/6c974ca1ea6ad61db46eee1f5612d8b0a1c643f4/refinery/lib/excel/formula/parse.py#L42-L51" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class International(NamedTuple):
+    &#34;&#34;&#34;
+    The locale-dependent characters of formula text: the separator between the arguments of a
+    call and between the columns of an array constant, and the brackets around a relative R1C1
+    offset.
+    &#34;&#34;&#34;
+
+    list_separator: str = &#39;,&#39;
+    left_bracket: str = &#39;[&#39;
+    right_bracket: str = &#39;]&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.excel.formula" href="index.html">refinery.lib.excel.formula</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.excel.formula.parse.parse_formula" href="#refinery.lib.excel.formula.parse.parse_formula">parse_formula</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.excel.formula.parse.International" href="#refinery.lib.excel.formula.parse.International">International</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
