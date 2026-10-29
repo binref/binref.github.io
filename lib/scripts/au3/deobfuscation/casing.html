@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.deobfuscation.casing documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.deobfuscation.casing</code></h1>
+</header>
+<section id="section-intro">
+<p>Builtin case normalization: printing every reference to a builtin function the official
+documentation spells it with.</p>
+<p>AutoIt resolves function names without regard to case, so an obfuscator may spell a builtin any
+way it likes and the call still resolves; the wide builtin table maps every lowercased name to
+the official spelling, and this pass prints that one, so case-scrambling obfuscation leaves no
+fingerprint in the output. Two shapes are rewritten: the direct callee of a call whose name the
+table holds, and the string-literal first argument of a <code>Call</code> that names a builtin — the docs
+say <code>Call</code> invokes builtins too, and no earlier pass resolves that name.</p>
+<p>A spelling is rewritten only where it differs from the official one in ASCII case. Python's
+<code>str.lower</code> also folds characters outside ASCII into ASCII letters — U+212A KELVIN SIGN becomes
+<code>k</code> — and whether the engine folds them too is unpinned; the source spelling is right under
+either answer, so the rewrite refuses such a name.</p>
+<p>The callee rewrite changes only the printed spelling, never what the call resolves to, so it
+carries no gate over what the tree holds, only the shadowing rule: a declared script function
+owning the name keeps the call site's spelling, because printing a builtin's name there would
+tell the reader the call is one. The <code>Call</code> argument is data the invoked function may read, so
+its rewrite carries the same refusals the dynamic-name flattener reads — a script function of
+the name <code>Call</code> shadows the builtin, an include may hide a <code>Func Call</code> no walk of the tree sees,
+and a parse error leaves text no walk reads — and the same shadowing rule for the named
+function. A registration builtin's string argument names a script function, never a builtin, and
+no rule here reads it: only a <code>Call</code> holds a name this pass rewrites.</p>
+<p>The pass runs in the final pipeline group, after every splice, fold, flatten, and alias rewrite
+has produced its final call shapes, so nothing it prints is later re-shaped. Its edits change no
+lowercased name and no declaration, so the scope snapshot the pass holds stays true mid-pass,
+and every spelling it writes is one a later round refuses, so the group runs it once.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/casing.py#L1-L110" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Builtin case normalization: printing every reference to a builtin function the official
+documentation spells it with.
+
+AutoIt resolves function names without regard to case, so an obfuscator may spell a builtin any
+way it likes and the call still resolves; the wide builtin table maps every lowercased name to
+the official spelling, and this pass prints that one, so case-scrambling obfuscation leaves no
+fingerprint in the output. Two shapes are rewritten: the direct callee of a call whose name the
+table holds, and the string-literal first argument of a `Call` that names a builtin — the docs
+say `Call` invokes builtins too, and no earlier pass resolves that name.
+
+A spelling is rewritten only where it differs from the official one in ASCII case. Python&#39;s
+`str.lower` also folds characters outside ASCII into ASCII letters — U+212A KELVIN SIGN becomes
+`k` — and whether the engine folds them too is unpinned; the source spelling is right under
+either answer, so the rewrite refuses such a name.
+
+The callee rewrite changes only the printed spelling, never what the call resolves to, so it
+carries no gate over what the tree holds, only the shadowing rule: a declared script function
+owning the name keeps the call site&#39;s spelling, because printing a builtin&#39;s name there would
+tell the reader the call is one. The `Call` argument is data the invoked function may read, so
+its rewrite carries the same refusals the dynamic-name flattener reads — a script function of
+the name `Call` shadows the builtin, an include may hide a `Func Call` no walk of the tree sees,
+and a parse error leaves text no walk reads — and the same shadowing rule for the named
+function. A registration builtin&#39;s string argument names a script function, never a builtin, and
+no rule here reads it: only a `Call` holds a name this pass rewrites.
+
+The pass runs in the final pipeline group, after every splice, fold, flatten, and alias rewrite
+has produced its final call shapes, so nothing it prints is later re-shaped. Its edits change no
+lowercased name and no declaration, so the scope snapshot the pass holds stays true mid-pass,
+and every spelling it writes is one a later round refuses, so the group runs it once.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Node, Transformer, set_value
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.cache import model_cache
+from refinery.lib.scripts.au3.analysis.scopes import Au3ScopeModel
+from refinery.lib.scripts.au3.functions import AUTOIT_FUNCTION_NAMES
+from refinery.lib.scripts.au3.lexer import ascii_lower, encode_au3_string
+from refinery.lib.scripts.au3.model import (
+    Au3Call,
+    Au3Identifier,
+    Au3Script,
+    Au3StringLiteral,
+)
+
+
+class Au3BuiltinCaseNormalization(Transformer):
+    &#34;&#34;&#34;
+    Prints every reference to a builtin function — a call&#39;s callee, or the name a `Call` holds —
+    in the official documentation spelling.
+    &#34;&#34;&#34;
+
+    self_converging = True
+
+    def __init__(self):
+        super().__init__()
+        self._scopes = Au3ScopeModel({})
+
+    def visit(self, node: Node) -&gt; Node | None:
+        if isinstance(node, Au3Script):
+            self._scopes = model_cache(self, node).scopes
+        self.generic_visit(node)
+        if not isinstance(node, Au3Call):
+            return None
+        callee = ast.direct_callee(node)
+        if callee is None:
+            return None
+        if callee.name not in self._scopes.functions:
+            self._normalize_callee(callee)
+            if callee.name == &#39;call&#39;:
+                self._normalize_call_name(node)
+        return None
+
+    def _normalize_callee(self, callee: Au3Identifier) -&gt; None:
+        official = _official_spelling(callee.raw)
+        if official is None:
+            return
+        set_value(callee, &#39;raw&#39;, official)
+        self.mark_changed()
+
+    def _normalize_call_name(self, call: Au3Call) -&gt; None:
+        if self._scopes.holds_an_include or self._scopes.holds_a_parse_error:
+            return
+        if not call.arguments:
+            return
+        literal = ast.unwrap_parens(call.arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            return
+        if literal.value.lower() in self._scopes.functions:
+            return
+        official = _official_spelling(literal.value)
+        if official is None:
+            return
+        set_value(literal, &#39;value&#39;, official)
+        set_value(literal, &#39;raw&#39;, encode_au3_string(official))
+        self.mark_changed()
+
+
+def _official_spelling(spelling: str) -&gt; str | None:
+    &#34;&#34;&#34;
+    The official spelling of the builtin *spelling* names where the two differ in ASCII case
+    alone, or `None` where they are equal or no builtin is named. The lookup folds through
+    `refinery.lib.scripts.au3.lexer.ascii_lower`, so a spelling that only a fold beyond ASCII case
+    maps onto a builtin keeps a character no table key holds and names none.
+    &#34;&#34;&#34;
+    official = AUTOIT_FUNCTION_NAMES.get(ascii_lower(spelling))
+    if official is None or official == spelling:
+        return None
+    return official</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.casing.Au3BuiltinCaseNormalization"><code class="flex name class">
+<span>class <span class="ident">Au3BuiltinCaseNormalization</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Prints every reference to a builtin function — a call's callee, or the name a <code>Call</code> holds —
+in the official documentation spelling.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/casing.py#L48-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Au3BuiltinCaseNormalization(Transformer):
+    &#34;&#34;&#34;
+    Prints every reference to a builtin function — a call&#39;s callee, or the name a `Call` holds —
+    in the official documentation spelling.
+    &#34;&#34;&#34;
+
+    self_converging = True
+
+    def __init__(self):
+        super().__init__()
+        self._scopes = Au3ScopeModel({})
+
+    def visit(self, node: Node) -&gt; Node | None:
+        if isinstance(node, Au3Script):
+            self._scopes = model_cache(self, node).scopes
+        self.generic_visit(node)
+        if not isinstance(node, Au3Call):
+            return None
+        callee = ast.direct_callee(node)
+        if callee is None:
+            return None
+        if callee.name not in self._scopes.functions:
+            self._normalize_callee(callee)
+            if callee.name == &#39;call&#39;:
+                self._normalize_call_name(node)
+        return None
+
+    def _normalize_callee(self, callee: Au3Identifier) -&gt; None:
+        official = _official_spelling(callee.raw)
+        if official is None:
+            return
+        set_value(callee, &#39;raw&#39;, official)
+        self.mark_changed()
+
+    def _normalize_call_name(self, call: Au3Call) -&gt; None:
+        if self._scopes.holds_an_include or self._scopes.holds_a_parse_error:
+            return
+        if not call.arguments:
+            return
+        literal = ast.unwrap_parens(call.arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            return
+        if literal.value.lower() in self._scopes.functions:
+            return
+        official = _official_spelling(literal.value)
+        if official is None:
+            return
+        set_value(literal, &#39;value&#39;, official)
+        set_value(literal, &#39;raw&#39;, encode_au3_string(official))
+        self.mark_changed()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.casing.Au3BuiltinCaseNormalization.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/casing.py#L60-L73" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit(self, node: Node) -&gt; Node | None:
+    if isinstance(node, Au3Script):
+        self._scopes = model_cache(self, node).scopes
+    self.generic_visit(node)
+    if not isinstance(node, Au3Call):
+        return None
+    callee = ast.direct_callee(node)
+    if callee is None:
+        return None
+    if callee.name not in self._scopes.functions:
+        self._normalize_callee(callee)
+        if callee.name == &#39;call&#39;:
+            self._normalize_call_name(node)
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.Transformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation" href="index.html">refinery.lib.scripts.au3.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.deobfuscation.casing.Au3BuiltinCaseNormalization" href="#refinery.lib.scripts.au3.deobfuscation.casing.Au3BuiltinCaseNormalization">Au3BuiltinCaseNormalization</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.casing.Au3BuiltinCaseNormalization.visit" href="#refinery.lib.scripts.au3.deobfuscation.casing.Au3BuiltinCaseNormalization.visit">visit</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

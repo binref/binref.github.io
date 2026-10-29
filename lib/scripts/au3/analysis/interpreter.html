@@ -1,0 +1,1468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.analysis.interpreter documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.analysis.interpreter</code></h1>
+</header>
+<section id="section-intro">
+<p>One script function of an AutoIt3 tree, run over the value domain. The Phase 3 transform calls
+it on a call whose every argument is a literal, and replaces the call with the spelled result —
+which is what resolves a script-defined decoder function, the shape the obfuscator hides its
+payload behind.</p>
+<p>The interpreter owns no semantics of its own: the operators and coercions are
+<code><a title="refinery.lib.scripts.au3.analysis.values" href="values.html">refinery.lib.scripts.au3.analysis.values</a></code>, the builtins its table, the functions the scope
+model, and the expression evaluation is the constant evaluator
+<code><a title="refinery.lib.scripts.au3.analysis.constants" href="constants.html">refinery.lib.scripts.au3.analysis.constants</a></code>, asked with a frame-backed lookup and a call hook
+that reaches the script functions the interpreter runs. What it owns is the run: the storage
+rules a function body follows (a read finds the local first and a global second, and a write
+stores a local of the run — the storage AutoIt writes wherever the gate below lets a function
+run), the control flow, and the budget that keeps a runaway loop from running forever. Every
+refusal and every budget overrun answers <code>None</code> from <code>call</code> — the call site stands unchanged. A
+loop or case signal that reaches a function boundary is one of those refusals: no construct
+consumed it, which is a shape AutoIt refuses to load.</p>
+<p>The gate is the may-write summary: only a function whose summary is the empty set runs, because
+only then does nothing it reaches change a global, and only then do the values the walk proved
+at the call site hold for the whole run. The globals the run may read are exactly what
+<code>Au3PropagationModel.entry_globals</code> hands over.</p>
+<p><code>probe</code> is the second entry point, and it replaces nothing: it runs one function body over an
+empty world to learn a value — the payload of an <code>Execute</code>, the name a computed <code>Call</code> spells —
+so it needs no summary and no entry globals. Its soundness is the one frame it runs: a read of
+a name the run never wrote refuses, and a read after a write sees the value the run itself
+stored either way, whatever storage an implicit write targets in the script. A nested call
+into a script function refuses there — a callee's implicit write lands in the callee's frame
+under the probe but in a global in the script, so the caller's later read of that name diverges.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/interpreter.py#L1-L741" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+One script function of an AutoIt3 tree, run over the value domain. The Phase 3 transform calls
+it on a call whose every argument is a literal, and replaces the call with the spelled result —
+which is what resolves a script-defined decoder function, the shape the obfuscator hides its
+payload behind.
+
+The interpreter owns no semantics of its own: the operators and coercions are
+`refinery.lib.scripts.au3.analysis.values`, the builtins its table, the functions the scope
+model, and the expression evaluation is the constant evaluator
+`refinery.lib.scripts.au3.analysis.constants`, asked with a frame-backed lookup and a call hook
+that reaches the script functions the interpreter runs. What it owns is the run: the storage
+rules a function body follows (a read finds the local first and a global second, and a write
+stores a local of the run — the storage AutoIt writes wherever the gate below lets a function
+run), the control flow, and the budget that keeps a runaway loop from running forever. Every
+refusal and every budget overrun answers `None` from `call` — the call site stands unchanged. A
+loop or case signal that reaches a function boundary is one of those refusals: no construct
+consumed it, which is a shape AutoIt refuses to load.
+
+The gate is the may-write summary: only a function whose summary is the empty set runs, because
+only then does nothing it reaches change a global, and only then do the values the walk proved
+at the call site hold for the whole run. The globals the run may read are exactly what
+`Au3PropagationModel.entry_globals` hands over.
+
+`probe` is the second entry point, and it replaces nothing: it runs one function body over an
+empty world to learn a value — the payload of an `Execute`, the name a computed `Call` spells —
+so it needs no summary and no entry globals. Its soundness is the one frame it runs: a read of
+a name the run never wrote refuses, and a read after a write sees the value the run itself
+stored either way, whatever storage an implicit write targets in the script. A nested call
+into a script function refuses there — a callee&#39;s implicit write lands in the callee&#39;s frame
+under the probe but in a global in the script, so the caller&#39;s later read of that name diverges.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from typing import cast
+
+from refinery.lib.scripts import Node, Statement
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.builtins import evaluate_builtin
+from refinery.lib.scripts.au3.analysis.constants import Policy, constant_value, within_limit
+from refinery.lib.scripts.au3.analysis.scopes import Au3ScopeModel
+from refinery.lib.scripts.au3.analysis.values import (
+    Au3Value,
+    Kind,
+    apply_binary,
+    compare,
+    literal_value,
+    of_array,
+    of_int,
+    of_number,
+    of_string,
+    to_number,
+    truthy,
+)
+from refinery.lib.scripts.au3.model import (
+    Au3ArrayAccess,
+    Au3ArrayLiteral,
+    Au3Assignment,
+    Au3CaseRange,
+    Au3ContinueCaseStatement,
+    Au3ContinueLoopStatement,
+    Au3DoUntilStatement,
+    Au3EnumDeclaration,
+    Au3ErrorNode,
+    Au3ExitLoopStatement,
+    Au3ExitStatement,
+    Au3ForInStatement,
+    Au3ForStatement,
+    Au3FunctionDeclaration,
+    Au3IfStatement,
+    Au3ReDimStatement,
+    Au3ReturnStatement,
+    Au3ScopeKind,
+    Au3SelectStatement,
+    Au3SwitchCase,
+    Au3SwitchStatement,
+    Au3Variable,
+    Au3VariableDeclaration,
+    Au3VariableDeclarator,
+    Au3WhileStatement,
+    Au3WithStatement,
+    Expression,
+)
+
+_MAX_INTERPRETER_ITERATIONS = 100_000
+_MAX_INTERPRETER_PAYLOAD_LEN = 1_000_000
+_MAX_INTERPRETER_ARRAY_LEN = 1_000_000
+_MAX_INTERPRETER_DEPTH = 64
+
+
+def _nested_array(value: Au3Value) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* is an array holding an array — the one array shape the run refuses wherever
+    it reaches one: an argument, a ternary branch, or a result the evaluator&#39;s literal path
+    hands in, exactly as the array literal the run builds itself is refused.
+    &#34;&#34;&#34;
+    return (
+        value.kind is Kind.ARRAY
+        and any(
+            element.kind is Kind.ARRAY
+            for element in cast(tuple[Au3Value, ...], value.payload)
+        )
+    )
+
+
+class _Refusal(Exception):
+    &#34;&#34;&#34;
+    The one way out of a run the interpreter cannot finish: an unpinned semantics, a shape the
+    domain does not model, or a budget overrun.
+    &#34;&#34;&#34;
+
+
+class _Return(Exception):
+    def __init__(self, value: Au3Value):
+        self.value = value
+
+
+class _ExitLoop(Exception):
+    def __init__(self, level: int):
+        self.level = level
+
+
+class _ContinueLoop(Exception):
+    def __init__(self, level: int):
+        self.level = level
+
+
+class _ContinueCase(Exception):
+    pass
+
+
+@dataclass
+class _Array:
+    &#34;&#34;&#34;
+    One array a run holds mutable, converted to the domain&#39;s value — a fresh copy — wherever a
+    read, an argument, or a result carries it out.
+    &#34;&#34;&#34;
+    elements: list[Au3Value]
+
+
+@dataclass
+class _Budget:
+    &#34;&#34;&#34;
+    What one top-level call may spend: loop iterations and calls together, and recursion depth.
+    &#34;&#34;&#34;
+    steps: int = 0
+    depth: int = 0
+
+    def spend(self) -&gt; None:
+        self.steps += 1
+        if self.steps &gt; _MAX_INTERPRETER_ITERATIONS:
+            raise _Refusal
+
+
+class _Frame:
+    &#34;&#34;&#34;
+    The storage one running function sees: its locals and the globals the call site proved, and
+    the evaluation policy over them, its hooks bound to this frame alone. A write to a name the
+    run never declared declares it — the local AutoIt itself creates — and a read of a name no
+    storage holds refuses.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        globals: Mapping[str, Au3Value],
+        budget: _Budget,
+        probing: bool = False,
+    ):
+        self.globals = globals
+        self.budget = budget
+        self.probing = probing
+        self.locals: dict[str, Au3Value | _Array] = {}
+        self.policy: Policy = Policy(frozenset())
+
+    def read(self, name: str) -&gt; Au3Value:
+        local = self.locals.get(name)
+        if local is not None:
+            if isinstance(local, Au3Value):
+                return local
+            return of_array(tuple(local.elements))
+        value = self.globals.get(name)
+        if value is None:
+            raise _Refusal
+        return value
+
+    def write(self, name: str, value: Au3Value) -&gt; None:
+        self.locals[name] = _stored(value)
+
+    def array(self, name: str) -&gt; _Array:
+        local = self.locals.get(name)
+        if not isinstance(local, _Array):
+            raise _Refusal
+        return local
+
+
+def _stored(value: Au3Value) -&gt; Au3Value | _Array:
+    if value.kind is Kind.ARRAY:
+        return _Array(list(cast(tuple[Au3Value, ...], value.payload)))
+    return value
+
+
+@dataclass(frozen=True)
+class Au3Probe:
+    &#34;&#34;&#34;
+    What one probe learned: the value its run answered — `None` where the run refused — and the
+    steps the run spent, which a caller that owns many probes bounds in total.
+    &#34;&#34;&#34;
+    value: Au3Value | None
+    steps: int
+
+
+class Au3Interpreter:
+    &#34;&#34;&#34;
+    Runs one script function of a tree over the value domain. Constructed once per tree version
+    from the scope model and the may-write summaries the propagation walk built.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        scope_model: Au3ScopeModel,
+        summaries: Mapping[str, frozenset[str] | None],
+    ):
+        self.functions = scope_model.functions
+        self.function_names = scope_model.function_names
+        self.summaries = summaries
+
+    def call(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Au3Value],
+        globals: Mapping[str, Au3Value],
+    ) -&gt; Au3Value | None:
+        try:
+            return self._call(function, list(arguments), globals, _Budget())
+        except _Refusal:
+            return None
+
+    def probe(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Au3Value],
+    ) -&gt; Au3Probe:
+        &#34;&#34;&#34;
+        One ungated run of *function*&#39;s body over an empty world: no summary gate, no globals,
+        and a nested script-function call refusing. The run computes a value — it replaces
+        nothing — so it needs no effect soundness: a read of a name the run never wrote refuses,
+        and a read after a write sees the value the run itself stored, whatever storage an
+        implicit write targets in the script.
+        &#34;&#34;&#34;
+        budget = _Budget()
+        try:
+            value = self._call(function, list(arguments), {}, budget, probing=True)
+        except _Refusal:
+            value = None
+        return Au3Probe(value, budget.steps)
+
+    def _call(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: list[Au3Value],
+        globals: Mapping[str, Au3Value],
+        budget: _Budget,
+        probing: bool = False,
+    ) -&gt; Au3Value:
+        name = function.name.name if function.name is not None else None
+        if name is None or (
+            not probing
+            and self.summaries.get(name) != frozenset()
+        ):
+            raise _Refusal
+        if len(arguments) &gt; len(function.params):
+            raise _Refusal
+        budget.spend()
+        budget.depth += 1
+        frame = _Frame(globals, budget, probing)
+        frame.policy = self._policy(frame)
+        try:
+            if budget.depth &gt; _MAX_INTERPRETER_DEPTH:
+                raise _Refusal
+            for index, parameter in enumerate(function.params):
+                variable = parameter.variable
+                if variable is None or parameter.by_ref:
+                    raise _Refusal
+                if index &lt; len(arguments):
+                    value = arguments[index]
+                else:
+                    if parameter.default is None:
+                        raise _Refusal
+                    value = literal_value(parameter.default, self.function_names)
+                    if value is None:
+                        raise _Refusal
+                frame.write(variable.name, value)
+            self._run_body(function.body, frame)
+            return of_int(0)
+        except _Return as returned:
+            return returned.value
+        except (_ExitLoop, _ContinueLoop, _ContinueCase):
+            raise _Refusal
+        finally:
+            budget.depth -= 1
+
+    def _run_body(self, body: Sequence[Statement], frame: _Frame) -&gt; None:
+        for statement in body:
+            self._run_statement(statement, frame)
+
+    def _run_statement(self, statement: Statement, frame: _Frame) -&gt; None:
+        if isinstance(statement, Au3VariableDeclaration):
+            self._run_declaration(statement, frame)
+            return
+        if isinstance(statement, Au3EnumDeclaration):
+            self._run_enum(statement, frame)
+            return
+        if isinstance(statement, Au3ReDimStatement):
+            self._run_redim(statement, frame)
+            return
+        if isinstance(statement, Au3IfStatement):
+            self._run_if(statement, frame)
+            return
+        if isinstance(statement, Au3WhileStatement):
+            self._run_while(statement, frame)
+            return
+        if isinstance(statement, Au3DoUntilStatement):
+            self._run_do_until(statement, frame)
+            return
+        if isinstance(statement, Au3ForStatement):
+            self._run_for(statement, frame)
+            return
+        if isinstance(statement, Au3ForInStatement):
+            self._run_for_in(statement, frame)
+            return
+        if isinstance(statement, Au3SwitchStatement):
+            self._run_switch(statement, frame)
+            return
+        if isinstance(statement, Au3SelectStatement):
+            self._run_select(statement, frame)
+            return
+        if isinstance(statement, Au3ReturnStatement):
+            raise _Return(
+                of_int(0) if statement.value is None else self._eval(statement.value, frame))
+        if isinstance(statement, Au3ExitLoopStatement):
+            raise _ExitLoop(self._loop_level(statement.level, frame))
+        if isinstance(statement, Au3ContinueLoopStatement):
+            raise _ContinueLoop(self._loop_level(statement.level, frame))
+        if isinstance(statement, Au3ContinueCaseStatement):
+            raise _ContinueCase
+        if isinstance(
+            statement,
+            (
+                Au3ExitStatement,
+                Au3WithStatement,
+                Au3ErrorNode,
+            ),
+        ):
+            raise _Refusal
+        for child in statement.children():
+            if isinstance(child, Expression):
+                self._eval(child, frame)
+
+    def _run_declaration(self, statement: Au3VariableDeclaration, frame: _Frame) -&gt; None:
+        if not _declares_into_local(statement.is_static, statement.scope, statement.is_const):
+            raise _Refusal
+        for declarator in statement.declarations:
+            self._run_declarator(declarator, frame)
+
+    def _run_declarator(self, declarator: Au3VariableDeclarator, frame: _Frame) -&gt; None:
+        variable = declarator.variable
+        if variable is None:
+            raise _Refusal
+        if not declarator.dimensions:
+            value = of_string(&#39;&#39;)
+            if declarator.initializer is not None:
+                value = self._eval(declarator.initializer, frame)
+            frame.write(variable.name, value)
+            return
+        if len(declarator.dimensions) != 1:
+            raise _Refusal
+        dimension = declarator.dimensions[0]
+        if dimension is None:
+            initializer = self._eval(declarator.initializer, frame)
+            if initializer.kind is not Kind.ARRAY:
+                raise _Refusal
+            frame.write(variable.name, initializer)
+            return
+        size = self._subscript(self._eval(dimension, frame))
+        if not 1 &lt;= size &lt;= _MAX_INTERPRETER_ARRAY_LEN:
+            raise _Refusal
+        elements = [of_string(&#39;&#39;) for _ in range(size)]
+        if declarator.initializer is not None:
+            initializer = self._eval(declarator.initializer, frame)
+            if initializer.kind is not Kind.ARRAY:
+                raise _Refusal
+            for index, element in enumerate(cast(tuple[Au3Value, ...], initializer.payload)):
+                if index &gt;= size:
+                    break
+                elements[index] = element
+        frame.write(variable.name, of_array(tuple(elements)))
+
+    def _run_enum(self, statement: Au3EnumDeclaration, frame: _Frame) -&gt; None:
+        if statement.scope is Au3ScopeKind.GLOBAL:
+            raise _Refusal
+        counter: Au3Value | None = of_int(0)
+        step = of_int(statement.step_value)
+        for declarator in statement.declarations:
+            variable = declarator.variable
+            if variable is None:
+                raise _Refusal
+            if declarator.initializer is not None:
+                value = self._eval(declarator.initializer, frame)
+                frame.write(variable.name, value)
+                counter = apply_binary(statement.step_operator, value, step)
+                continue
+            if counter is None:
+                raise _Refusal
+            frame.write(variable.name, counter)
+            counter = apply_binary(statement.step_operator, counter, step)
+
+    def _run_redim(self, statement: Au3ReDimStatement, frame: _Frame) -&gt; None:
+        for target in statement.targets:
+            variable = target.variable
+            if variable is None or len(target.dimensions) != 1:
+                raise _Refusal
+            array = frame.array(variable.name)
+            size = self._subscript(self._eval(target.dimensions[0], frame))
+            if not 1 &lt;= size &lt;= _MAX_INTERPRETER_ARRAY_LEN:
+                raise _Refusal
+            while len(array.elements) &lt; size:
+                array.elements.append(of_string(&#39;&#39;))
+            del array.elements[size:]
+
+    def _run_if(self, statement: Au3IfStatement, frame: _Frame) -&gt; None:
+        if self._decides(statement.test, frame):
+            self._run_body(statement.body, frame)
+            return
+        for elseif in statement.elseifs:
+            if self._decides(elseif.test, frame):
+                self._run_body(elseif.body, frame)
+                return
+        if statement.else_body is not None:
+            self._run_body(statement.else_body, frame)
+
+    def _run_while(self, statement: Au3WhileStatement, frame: _Frame) -&gt; None:
+        while self._decides(statement.test, frame):
+            frame.budget.spend()
+            if not self._run_loop_body(statement.body, frame):
+                return
+
+    def _run_do_until(self, statement: Au3DoUntilStatement, frame: _Frame) -&gt; None:
+        while True:
+            frame.budget.spend()
+            if not self._run_loop_body(statement.body, frame):
+                return
+            if self._decides(statement.test, frame):
+                return
+
+    def _run_for(self, statement: Au3ForStatement, frame: _Frame) -&gt; None:
+        variable = statement.variable
+        if variable is None:
+            raise _Refusal
+        start = self._number(statement.start, frame)
+        limit = self._number(statement.limit, frame)
+        step = (
+            of_int(1)
+            if statement.step is None
+            else of_number(self._number(statement.step, frame))
+        )
+        number = to_number(step)
+        if number is None or number == 0:
+            raise _Refusal
+        frame.write(variable.name, of_number(start))
+        while True:
+            relation = &#39;&lt;=&#39; if number &gt; 0 else &#39;&gt;=&#39;
+            within = compare(relation, frame.read(variable.name), of_number(limit))
+            if within is None or not truthy(within):
+                return
+            frame.budget.spend()
+            if not self._run_loop_body(statement.body, frame):
+                return
+            advanced = apply_binary(&#39;+&#39;, frame.read(variable.name), step)
+            if advanced is None:
+                raise _Refusal
+            frame.write(variable.name, advanced)
+
+    def _run_for_in(self, statement: Au3ForInStatement, frame: _Frame) -&gt; None:
+        variable = statement.variable
+        if variable is None:
+            raise _Refusal
+        iterable = self._eval(statement.iterable, frame)
+        if iterable.kind is not Kind.ARRAY:
+            raise _Refusal
+        for element in cast(tuple[Au3Value, ...], iterable.payload):
+            frame.budget.spend()
+            frame.write(variable.name, element)
+            if not self._run_loop_body(statement.body, frame):
+                return
+
+    def _run_switch(self, statement: Au3SwitchStatement, frame: _Frame) -&gt; None:
+        discriminant = self._eval(statement.discriminant, frame)
+        index = self._matching_case(statement.cases, discriminant, frame)
+        if index is None:
+            return
+        while index &lt; len(statement.cases):
+            try:
+                self._run_body(statement.cases[index].body, frame)
+                return
+            except _ContinueCase:
+                index += 1
+                if index &gt;= len(statement.cases):
+                    raise _Refusal
+
+    def _run_select(self, statement: Au3SelectStatement, frame: _Frame) -&gt; None:
+        for case in statement.cases:
+            if case.test is None or self._decides(case.test, frame):
+                self._run_body(case.body, frame)
+                return
+
+    def _matching_case(
+        self,
+        cases: Sequence[Au3SwitchCase],
+        discriminant: Au3Value,
+        frame: _Frame,
+    ) -&gt; int | None:
+        for index, case in enumerate(cases):
+            if case.values is None:
+                return index
+            for value in case.values:
+                if self._matches(discriminant, value, frame):
+                    return index
+        return None
+
+    def _matches(self, discriminant: Au3Value, value: Node, frame: _Frame) -&gt; bool:
+        if isinstance(value, Au3CaseRange):
+            low = self._eval(value.start, frame)
+            high = self._eval(value.end, frame)
+            within = compare(&#39;&lt;=&#39;, low, discriminant)
+            ending = compare(&#39;&lt;=&#39;, discriminant, high)
+            if within is None or ending is None:
+                raise _Refusal
+            return truthy(within) is True and truthy(ending) is True
+        equal = compare(&#39;=&#39;, discriminant, self._eval(cast(Expression, value), frame))
+        if equal is None:
+            raise _Refusal
+        return truthy(equal) is True
+
+    def _run_loop_body(self, body: Sequence[Statement], frame: _Frame) -&gt; bool:
+        &#34;&#34;&#34;
+        One iteration of a loop body: `False` when an `ExitLoop` ended the loop, `True` when the
+        loop continues — a `ContinueLoop` of this level among them. A signal of a deeper level
+        travels on, one level cheaper.
+        &#34;&#34;&#34;
+        try:
+            self._run_body(body, frame)
+        except _ExitLoop as signal:
+            if signal.level &gt; 1:
+                raise _ExitLoop(signal.level - 1)
+            return False
+        except _ContinueLoop as signal:
+            if signal.level &gt; 1:
+                raise _ContinueLoop(signal.level - 1)
+        return True
+
+    def _policy(self, frame: _Frame) -&gt; Policy:
+        &#34;&#34;&#34;
+        The evaluation over one frame: its lookup reads the frame, its call hook runs the script
+        functions the callee names, and its fallback answers the shapes only the run holds.
+        &#34;&#34;&#34;
+        return Policy(
+            self.function_names,
+            lookup=lambda name: self._frame_value(name, frame),
+            limit=_MAX_INTERPRETER_PAYLOAD_LEN,
+            call=lambda name, arguments: self._run_call(name, arguments, frame),
+            fallback=lambda expression: self._eval_special(expression, frame),
+        )
+
+    def _eval(self, node: Expression | None, frame: _Frame) -&gt; Au3Value:
+        value = self._eval_expression(node, frame)
+        if not within_limit(value, _MAX_INTERPRETER_PAYLOAD_LEN) or _nested_array(value):
+            raise _Refusal
+        return value
+
+    def _eval_expression(self, node: Expression | None, frame: _Frame) -&gt; Au3Value:
+        if node is None:
+            raise _Refusal
+        if isinstance(node, (Au3Assignment, Au3ArrayAccess, Au3ArrayLiteral)):
+            special = self._eval_special(node, frame)
+            if special is None:
+                raise _Refusal
+            return special
+        value = constant_value(node, frame.policy)
+        if value is None:
+            raise _Refusal
+        return value
+
+    def _eval_special(self, node: Expression, frame: _Frame) -&gt; Au3Value | None:
+        &#34;&#34;&#34;
+        The value of an expression only the run can hold — an assignment, an array access, an
+        array literal — asked where it stands inside an expression the constant evaluator walks,
+        or `None` where the run refuses it.
+        &#34;&#34;&#34;
+        try:
+            if isinstance(node, Au3Assignment):
+                return self._eval_assignment(node, frame)
+            if isinstance(node, Au3ArrayAccess):
+                return self._element(self._eval(node.array, frame), self._eval(node.index, frame))
+            if isinstance(node, Au3ArrayLiteral):
+                elements = [self._eval(element, frame) for element in node.elements]
+                if any(element.kind is Kind.ARRAY for element in elements):
+                    return None
+                return of_array(tuple(elements))
+        except _Refusal:
+            return None
+        return None
+
+    def _frame_value(self, name: str, frame: _Frame) -&gt; Au3Value | None:
+        &#34;&#34;&#34;
+        The value a variable read holds in *frame*, or `None` where the run stored none.
+        &#34;&#34;&#34;
+        try:
+            return frame.read(name)
+        except _Refusal:
+            return None
+
+    def _run_call(
+        self,
+        name: str,
+        arguments: tuple[Au3Value, ...],
+        frame: _Frame,
+    ) -&gt; Au3Value | None:
+        &#34;&#34;&#34;
+        The value of one call inside a run: a script function the interpreter runs — the
+        precedence a call site has over the builtin of the same name — then the builtin table.
+        Every argument answers the bounds first: the payload bound the run holds over every
+        value it evaluates, and the refusal of an array holding an array.
+        &#34;&#34;&#34;
+        if any(
+            not within_limit(argument, _MAX_INTERPRETER_PAYLOAD_LEN)
+            or _nested_array(argument)
+            for argument in arguments
+        ):
+            return None
+        function = self.functions.get(name)
+        if function is not None:
+            if frame.probing:
+                return None
+            try:
+                return self._call(function, list(arguments), frame.globals, frame.budget)
+            except _Refusal:
+                return None
+        return evaluate_builtin(name, tuple(arguments))
+
+    def _eval_assignment(self, node: Au3Assignment, frame: _Frame) -&gt; Au3Value:
+        variable = ast.store_target_variable(node.target)
+        if variable is None:
+            raise _Refusal
+        target = ast.unwrap_parens(node.target)
+        if isinstance(target, Au3ArrayAccess):
+            return self._eval_element_assignment(node, target, variable, frame)
+        if not isinstance(target, Au3Variable):
+            raise _Refusal
+        if node.operator == &#39;=&#39;:
+            value = self._eval(node.value, frame)
+        else:
+            current = frame.read(variable.name)
+            operand = self._eval(node.value, frame)
+            value = apply_binary(node.operator.rstrip(&#39;=&#39;), current, operand)
+            if value is None:
+                raise _Refusal
+        frame.write(variable.name, value)
+        return value
+
+    def _eval_element_assignment(
+        self,
+        node: Au3Assignment,
+        target: Au3ArrayAccess,
+        variable: Au3Variable,
+        frame: _Frame,
+    ) -&gt; Au3Value:
+        if not isinstance(ast.unwrap_parens(target.array), Au3Variable):
+            raise _Refusal
+        array = frame.array(variable.name)
+        subscript = self._subscript(self._eval(target.index, frame))
+        if not 0 &lt;= subscript &lt; len(array.elements):
+            raise _Refusal
+        if node.operator == &#39;=&#39;:
+            value = self._eval(node.value, frame)
+        else:
+            operand = self._eval(node.value, frame)
+            value = apply_binary(
+                node.operator.rstrip(&#39;=&#39;), array.elements[subscript], operand)
+            if value is None:
+                raise _Refusal
+        if value.kind is Kind.ARRAY:
+            raise _Refusal
+        array.elements[subscript] = value
+        return value
+
+    def _element(self, array: Au3Value, index: Au3Value) -&gt; Au3Value:
+        if array.kind is not Kind.ARRAY:
+            raise _Refusal
+        elements = cast(tuple[Au3Value, ...], array.payload)
+        subscript = self._subscript(index)
+        if not 0 &lt;= subscript &lt; len(elements):
+            raise _Refusal
+        return elements[subscript]
+
+    def _subscript(self, index: Au3Value) -&gt; int:
+        number = to_number(index)
+        if number is None:
+            raise _Refusal
+        return int(number)
+
+    def _number(self, node: Expression | None, frame: _Frame) -&gt; int | float:
+        number = to_number(self._eval(node, frame))
+        if number is None:
+            raise _Refusal
+        return number
+
+    def _decides(self, node: Expression | None, frame: _Frame) -&gt; bool:
+        verdict = truthy(self._eval(node, frame))
+        if verdict is None:
+            raise _Refusal
+        return verdict
+
+    def _loop_level(self, node: Expression | None, frame: _Frame) -&gt; int:
+        if node is None:
+            return 1
+        number = to_number(self._eval(node, frame))
+        if number is None or not isinstance(number, int):
+            raise _Refusal
+        return max(1, number)
+
+
+def _declares_into_local(is_static: bool, scope: Au3ScopeKind | None, is_const: bool) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a variable declaration of this shape creates a local of the running function:
+    `Local`, and a `Const` of function scope. `Static` keeps its value across calls, `Global`
+    writes the whole script, and a `Dim` forces nothing, so each refuses.
+    &#34;&#34;&#34;
+    if is_static or scope is Au3ScopeKind.GLOBAL:
+        return False
+    return scope is Au3ScopeKind.LOCAL or is_const</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.interpreter.Au3Probe"><code class="flex name class">
+<span>class <span class="ident">Au3Probe</span></span>
+<span>(</span><span>value, steps)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What one probe learned: the value its run answered — <code>None</code> where the run refused — and the
+steps the run spent, which a caller that owns many probes bounds in total.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/interpreter.py#L203-L210" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(frozen=True)
+class Au3Probe:
+    &#34;&#34;&#34;
+    What one probe learned: the value its run answered — `None` where the run refused — and the
+    steps the run spent, which a caller that owns many probes bounds in total.
+    &#34;&#34;&#34;
+    value: Au3Value | None
+    steps: int</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.interpreter.Au3Probe.value"><code class="name">var <span class="ident">value</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.interpreter.Au3Probe.steps"><code class="name">var <span class="ident">steps</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter"><code class="flex name class">
+<span>class <span class="ident">Au3Interpreter</span></span>
+<span>(</span><span>scope_model, summaries)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Runs one script function of a tree over the value domain. Constructed once per tree version
+from the scope model and the may-write summaries the propagation walk built.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/interpreter.py#L213-L730" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Au3Interpreter:
+    &#34;&#34;&#34;
+    Runs one script function of a tree over the value domain. Constructed once per tree version
+    from the scope model and the may-write summaries the propagation walk built.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        scope_model: Au3ScopeModel,
+        summaries: Mapping[str, frozenset[str] | None],
+    ):
+        self.functions = scope_model.functions
+        self.function_names = scope_model.function_names
+        self.summaries = summaries
+
+    def call(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Au3Value],
+        globals: Mapping[str, Au3Value],
+    ) -&gt; Au3Value | None:
+        try:
+            return self._call(function, list(arguments), globals, _Budget())
+        except _Refusal:
+            return None
+
+    def probe(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Au3Value],
+    ) -&gt; Au3Probe:
+        &#34;&#34;&#34;
+        One ungated run of *function*&#39;s body over an empty world: no summary gate, no globals,
+        and a nested script-function call refusing. The run computes a value — it replaces
+        nothing — so it needs no effect soundness: a read of a name the run never wrote refuses,
+        and a read after a write sees the value the run itself stored, whatever storage an
+        implicit write targets in the script.
+        &#34;&#34;&#34;
+        budget = _Budget()
+        try:
+            value = self._call(function, list(arguments), {}, budget, probing=True)
+        except _Refusal:
+            value = None
+        return Au3Probe(value, budget.steps)
+
+    def _call(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: list[Au3Value],
+        globals: Mapping[str, Au3Value],
+        budget: _Budget,
+        probing: bool = False,
+    ) -&gt; Au3Value:
+        name = function.name.name if function.name is not None else None
+        if name is None or (
+            not probing
+            and self.summaries.get(name) != frozenset()
+        ):
+            raise _Refusal
+        if len(arguments) &gt; len(function.params):
+            raise _Refusal
+        budget.spend()
+        budget.depth += 1
+        frame = _Frame(globals, budget, probing)
+        frame.policy = self._policy(frame)
+        try:
+            if budget.depth &gt; _MAX_INTERPRETER_DEPTH:
+                raise _Refusal
+            for index, parameter in enumerate(function.params):
+                variable = parameter.variable
+                if variable is None or parameter.by_ref:
+                    raise _Refusal
+                if index &lt; len(arguments):
+                    value = arguments[index]
+                else:
+                    if parameter.default is None:
+                        raise _Refusal
+                    value = literal_value(parameter.default, self.function_names)
+                    if value is None:
+                        raise _Refusal
+                frame.write(variable.name, value)
+            self._run_body(function.body, frame)
+            return of_int(0)
+        except _Return as returned:
+            return returned.value
+        except (_ExitLoop, _ContinueLoop, _ContinueCase):
+            raise _Refusal
+        finally:
+            budget.depth -= 1
+
+    def _run_body(self, body: Sequence[Statement], frame: _Frame) -&gt; None:
+        for statement in body:
+            self._run_statement(statement, frame)
+
+    def _run_statement(self, statement: Statement, frame: _Frame) -&gt; None:
+        if isinstance(statement, Au3VariableDeclaration):
+            self._run_declaration(statement, frame)
+            return
+        if isinstance(statement, Au3EnumDeclaration):
+            self._run_enum(statement, frame)
+            return
+        if isinstance(statement, Au3ReDimStatement):
+            self._run_redim(statement, frame)
+            return
+        if isinstance(statement, Au3IfStatement):
+            self._run_if(statement, frame)
+            return
+        if isinstance(statement, Au3WhileStatement):
+            self._run_while(statement, frame)
+            return
+        if isinstance(statement, Au3DoUntilStatement):
+            self._run_do_until(statement, frame)
+            return
+        if isinstance(statement, Au3ForStatement):
+            self._run_for(statement, frame)
+            return
+        if isinstance(statement, Au3ForInStatement):
+            self._run_for_in(statement, frame)
+            return
+        if isinstance(statement, Au3SwitchStatement):
+            self._run_switch(statement, frame)
+            return
+        if isinstance(statement, Au3SelectStatement):
+            self._run_select(statement, frame)
+            return
+        if isinstance(statement, Au3ReturnStatement):
+            raise _Return(
+                of_int(0) if statement.value is None else self._eval(statement.value, frame))
+        if isinstance(statement, Au3ExitLoopStatement):
+            raise _ExitLoop(self._loop_level(statement.level, frame))
+        if isinstance(statement, Au3ContinueLoopStatement):
+            raise _ContinueLoop(self._loop_level(statement.level, frame))
+        if isinstance(statement, Au3ContinueCaseStatement):
+            raise _ContinueCase
+        if isinstance(
+            statement,
+            (
+                Au3ExitStatement,
+                Au3WithStatement,
+                Au3ErrorNode,
+            ),
+        ):
+            raise _Refusal
+        for child in statement.children():
+            if isinstance(child, Expression):
+                self._eval(child, frame)
+
+    def _run_declaration(self, statement: Au3VariableDeclaration, frame: _Frame) -&gt; None:
+        if not _declares_into_local(statement.is_static, statement.scope, statement.is_const):
+            raise _Refusal
+        for declarator in statement.declarations:
+            self._run_declarator(declarator, frame)
+
+    def _run_declarator(self, declarator: Au3VariableDeclarator, frame: _Frame) -&gt; None:
+        variable = declarator.variable
+        if variable is None:
+            raise _Refusal
+        if not declarator.dimensions:
+            value = of_string(&#39;&#39;)
+            if declarator.initializer is not None:
+                value = self._eval(declarator.initializer, frame)
+            frame.write(variable.name, value)
+            return
+        if len(declarator.dimensions) != 1:
+            raise _Refusal
+        dimension = declarator.dimensions[0]
+        if dimension is None:
+            initializer = self._eval(declarator.initializer, frame)
+            if initializer.kind is not Kind.ARRAY:
+                raise _Refusal
+            frame.write(variable.name, initializer)
+            return
+        size = self._subscript(self._eval(dimension, frame))
+        if not 1 &lt;= size &lt;= _MAX_INTERPRETER_ARRAY_LEN:
+            raise _Refusal
+        elements = [of_string(&#39;&#39;) for _ in range(size)]
+        if declarator.initializer is not None:
+            initializer = self._eval(declarator.initializer, frame)
+            if initializer.kind is not Kind.ARRAY:
+                raise _Refusal
+            for index, element in enumerate(cast(tuple[Au3Value, ...], initializer.payload)):
+                if index &gt;= size:
+                    break
+                elements[index] = element
+        frame.write(variable.name, of_array(tuple(elements)))
+
+    def _run_enum(self, statement: Au3EnumDeclaration, frame: _Frame) -&gt; None:
+        if statement.scope is Au3ScopeKind.GLOBAL:
+            raise _Refusal
+        counter: Au3Value | None = of_int(0)
+        step = of_int(statement.step_value)
+        for declarator in statement.declarations:
+            variable = declarator.variable
+            if variable is None:
+                raise _Refusal
+            if declarator.initializer is not None:
+                value = self._eval(declarator.initializer, frame)
+                frame.write(variable.name, value)
+                counter = apply_binary(statement.step_operator, value, step)
+                continue
+            if counter is None:
+                raise _Refusal
+            frame.write(variable.name, counter)
+            counter = apply_binary(statement.step_operator, counter, step)
+
+    def _run_redim(self, statement: Au3ReDimStatement, frame: _Frame) -&gt; None:
+        for target in statement.targets:
+            variable = target.variable
+            if variable is None or len(target.dimensions) != 1:
+                raise _Refusal
+            array = frame.array(variable.name)
+            size = self._subscript(self._eval(target.dimensions[0], frame))
+            if not 1 &lt;= size &lt;= _MAX_INTERPRETER_ARRAY_LEN:
+                raise _Refusal
+            while len(array.elements) &lt; size:
+                array.elements.append(of_string(&#39;&#39;))
+            del array.elements[size:]
+
+    def _run_if(self, statement: Au3IfStatement, frame: _Frame) -&gt; None:
+        if self._decides(statement.test, frame):
+            self._run_body(statement.body, frame)
+            return
+        for elseif in statement.elseifs:
+            if self._decides(elseif.test, frame):
+                self._run_body(elseif.body, frame)
+                return
+        if statement.else_body is not None:
+            self._run_body(statement.else_body, frame)
+
+    def _run_while(self, statement: Au3WhileStatement, frame: _Frame) -&gt; None:
+        while self._decides(statement.test, frame):
+            frame.budget.spend()
+            if not self._run_loop_body(statement.body, frame):
+                return
+
+    def _run_do_until(self, statement: Au3DoUntilStatement, frame: _Frame) -&gt; None:
+        while True:
+            frame.budget.spend()
+            if not self._run_loop_body(statement.body, frame):
+                return
+            if self._decides(statement.test, frame):
+                return
+
+    def _run_for(self, statement: Au3ForStatement, frame: _Frame) -&gt; None:
+        variable = statement.variable
+        if variable is None:
+            raise _Refusal
+        start = self._number(statement.start, frame)
+        limit = self._number(statement.limit, frame)
+        step = (
+            of_int(1)
+            if statement.step is None
+            else of_number(self._number(statement.step, frame))
+        )
+        number = to_number(step)
+        if number is None or number == 0:
+            raise _Refusal
+        frame.write(variable.name, of_number(start))
+        while True:
+            relation = &#39;&lt;=&#39; if number &gt; 0 else &#39;&gt;=&#39;
+            within = compare(relation, frame.read(variable.name), of_number(limit))
+            if within is None or not truthy(within):
+                return
+            frame.budget.spend()
+            if not self._run_loop_body(statement.body, frame):
+                return
+            advanced = apply_binary(&#39;+&#39;, frame.read(variable.name), step)
+            if advanced is None:
+                raise _Refusal
+            frame.write(variable.name, advanced)
+
+    def _run_for_in(self, statement: Au3ForInStatement, frame: _Frame) -&gt; None:
+        variable = statement.variable
+        if variable is None:
+            raise _Refusal
+        iterable = self._eval(statement.iterable, frame)
+        if iterable.kind is not Kind.ARRAY:
+            raise _Refusal
+        for element in cast(tuple[Au3Value, ...], iterable.payload):
+            frame.budget.spend()
+            frame.write(variable.name, element)
+            if not self._run_loop_body(statement.body, frame):
+                return
+
+    def _run_switch(self, statement: Au3SwitchStatement, frame: _Frame) -&gt; None:
+        discriminant = self._eval(statement.discriminant, frame)
+        index = self._matching_case(statement.cases, discriminant, frame)
+        if index is None:
+            return
+        while index &lt; len(statement.cases):
+            try:
+                self._run_body(statement.cases[index].body, frame)
+                return
+            except _ContinueCase:
+                index += 1
+                if index &gt;= len(statement.cases):
+                    raise _Refusal
+
+    def _run_select(self, statement: Au3SelectStatement, frame: _Frame) -&gt; None:
+        for case in statement.cases:
+            if case.test is None or self._decides(case.test, frame):
+                self._run_body(case.body, frame)
+                return
+
+    def _matching_case(
+        self,
+        cases: Sequence[Au3SwitchCase],
+        discriminant: Au3Value,
+        frame: _Frame,
+    ) -&gt; int | None:
+        for index, case in enumerate(cases):
+            if case.values is None:
+                return index
+            for value in case.values:
+                if self._matches(discriminant, value, frame):
+                    return index
+        return None
+
+    def _matches(self, discriminant: Au3Value, value: Node, frame: _Frame) -&gt; bool:
+        if isinstance(value, Au3CaseRange):
+            low = self._eval(value.start, frame)
+            high = self._eval(value.end, frame)
+            within = compare(&#39;&lt;=&#39;, low, discriminant)
+            ending = compare(&#39;&lt;=&#39;, discriminant, high)
+            if within is None or ending is None:
+                raise _Refusal
+            return truthy(within) is True and truthy(ending) is True
+        equal = compare(&#39;=&#39;, discriminant, self._eval(cast(Expression, value), frame))
+        if equal is None:
+            raise _Refusal
+        return truthy(equal) is True
+
+    def _run_loop_body(self, body: Sequence[Statement], frame: _Frame) -&gt; bool:
+        &#34;&#34;&#34;
+        One iteration of a loop body: `False` when an `ExitLoop` ended the loop, `True` when the
+        loop continues — a `ContinueLoop` of this level among them. A signal of a deeper level
+        travels on, one level cheaper.
+        &#34;&#34;&#34;
+        try:
+            self._run_body(body, frame)
+        except _ExitLoop as signal:
+            if signal.level &gt; 1:
+                raise _ExitLoop(signal.level - 1)
+            return False
+        except _ContinueLoop as signal:
+            if signal.level &gt; 1:
+                raise _ContinueLoop(signal.level - 1)
+        return True
+
+    def _policy(self, frame: _Frame) -&gt; Policy:
+        &#34;&#34;&#34;
+        The evaluation over one frame: its lookup reads the frame, its call hook runs the script
+        functions the callee names, and its fallback answers the shapes only the run holds.
+        &#34;&#34;&#34;
+        return Policy(
+            self.function_names,
+            lookup=lambda name: self._frame_value(name, frame),
+            limit=_MAX_INTERPRETER_PAYLOAD_LEN,
+            call=lambda name, arguments: self._run_call(name, arguments, frame),
+            fallback=lambda expression: self._eval_special(expression, frame),
+        )
+
+    def _eval(self, node: Expression | None, frame: _Frame) -&gt; Au3Value:
+        value = self._eval_expression(node, frame)
+        if not within_limit(value, _MAX_INTERPRETER_PAYLOAD_LEN) or _nested_array(value):
+            raise _Refusal
+        return value
+
+    def _eval_expression(self, node: Expression | None, frame: _Frame) -&gt; Au3Value:
+        if node is None:
+            raise _Refusal
+        if isinstance(node, (Au3Assignment, Au3ArrayAccess, Au3ArrayLiteral)):
+            special = self._eval_special(node, frame)
+            if special is None:
+                raise _Refusal
+            return special
+        value = constant_value(node, frame.policy)
+        if value is None:
+            raise _Refusal
+        return value
+
+    def _eval_special(self, node: Expression, frame: _Frame) -&gt; Au3Value | None:
+        &#34;&#34;&#34;
+        The value of an expression only the run can hold — an assignment, an array access, an
+        array literal — asked where it stands inside an expression the constant evaluator walks,
+        or `None` where the run refuses it.
+        &#34;&#34;&#34;
+        try:
+            if isinstance(node, Au3Assignment):
+                return self._eval_assignment(node, frame)
+            if isinstance(node, Au3ArrayAccess):
+                return self._element(self._eval(node.array, frame), self._eval(node.index, frame))
+            if isinstance(node, Au3ArrayLiteral):
+                elements = [self._eval(element, frame) for element in node.elements]
+                if any(element.kind is Kind.ARRAY for element in elements):
+                    return None
+                return of_array(tuple(elements))
+        except _Refusal:
+            return None
+        return None
+
+    def _frame_value(self, name: str, frame: _Frame) -&gt; Au3Value | None:
+        &#34;&#34;&#34;
+        The value a variable read holds in *frame*, or `None` where the run stored none.
+        &#34;&#34;&#34;
+        try:
+            return frame.read(name)
+        except _Refusal:
+            return None
+
+    def _run_call(
+        self,
+        name: str,
+        arguments: tuple[Au3Value, ...],
+        frame: _Frame,
+    ) -&gt; Au3Value | None:
+        &#34;&#34;&#34;
+        The value of one call inside a run: a script function the interpreter runs — the
+        precedence a call site has over the builtin of the same name — then the builtin table.
+        Every argument answers the bounds first: the payload bound the run holds over every
+        value it evaluates, and the refusal of an array holding an array.
+        &#34;&#34;&#34;
+        if any(
+            not within_limit(argument, _MAX_INTERPRETER_PAYLOAD_LEN)
+            or _nested_array(argument)
+            for argument in arguments
+        ):
+            return None
+        function = self.functions.get(name)
+        if function is not None:
+            if frame.probing:
+                return None
+            try:
+                return self._call(function, list(arguments), frame.globals, frame.budget)
+            except _Refusal:
+                return None
+        return evaluate_builtin(name, tuple(arguments))
+
+    def _eval_assignment(self, node: Au3Assignment, frame: _Frame) -&gt; Au3Value:
+        variable = ast.store_target_variable(node.target)
+        if variable is None:
+            raise _Refusal
+        target = ast.unwrap_parens(node.target)
+        if isinstance(target, Au3ArrayAccess):
+            return self._eval_element_assignment(node, target, variable, frame)
+        if not isinstance(target, Au3Variable):
+            raise _Refusal
+        if node.operator == &#39;=&#39;:
+            value = self._eval(node.value, frame)
+        else:
+            current = frame.read(variable.name)
+            operand = self._eval(node.value, frame)
+            value = apply_binary(node.operator.rstrip(&#39;=&#39;), current, operand)
+            if value is None:
+                raise _Refusal
+        frame.write(variable.name, value)
+        return value
+
+    def _eval_element_assignment(
+        self,
+        node: Au3Assignment,
+        target: Au3ArrayAccess,
+        variable: Au3Variable,
+        frame: _Frame,
+    ) -&gt; Au3Value:
+        if not isinstance(ast.unwrap_parens(target.array), Au3Variable):
+            raise _Refusal
+        array = frame.array(variable.name)
+        subscript = self._subscript(self._eval(target.index, frame))
+        if not 0 &lt;= subscript &lt; len(array.elements):
+            raise _Refusal
+        if node.operator == &#39;=&#39;:
+            value = self._eval(node.value, frame)
+        else:
+            operand = self._eval(node.value, frame)
+            value = apply_binary(
+                node.operator.rstrip(&#39;=&#39;), array.elements[subscript], operand)
+            if value is None:
+                raise _Refusal
+        if value.kind is Kind.ARRAY:
+            raise _Refusal
+        array.elements[subscript] = value
+        return value
+
+    def _element(self, array: Au3Value, index: Au3Value) -&gt; Au3Value:
+        if array.kind is not Kind.ARRAY:
+            raise _Refusal
+        elements = cast(tuple[Au3Value, ...], array.payload)
+        subscript = self._subscript(index)
+        if not 0 &lt;= subscript &lt; len(elements):
+            raise _Refusal
+        return elements[subscript]
+
+    def _subscript(self, index: Au3Value) -&gt; int:
+        number = to_number(index)
+        if number is None:
+            raise _Refusal
+        return int(number)
+
+    def _number(self, node: Expression | None, frame: _Frame) -&gt; int | float:
+        number = to_number(self._eval(node, frame))
+        if number is None:
+            raise _Refusal
+        return number
+
+    def _decides(self, node: Expression | None, frame: _Frame) -&gt; bool:
+        verdict = truthy(self._eval(node, frame))
+        if verdict is None:
+            raise _Refusal
+        return verdict
+
+    def _loop_level(self, node: Expression | None, frame: _Frame) -&gt; int:
+        if node is None:
+            return 1
+        number = to_number(self._eval(node, frame))
+        if number is None or not isinstance(number, int):
+            raise _Refusal
+        return max(1, number)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.call"><code class="name flex">
+<span>def <span class="ident">call</span></span>(<span>self, function, arguments, globals)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/interpreter.py#L228-L237" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call(
+    self,
+    function: Au3FunctionDeclaration,
+    arguments: Sequence[Au3Value],
+    globals: Mapping[str, Au3Value],
+) -&gt; Au3Value | None:
+    try:
+        return self._call(function, list(arguments), globals, _Budget())
+    except _Refusal:
+        return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.probe"><code class="name flex">
+<span>def <span class="ident">probe</span></span>(<span>self, function, arguments)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>One ungated run of <em>function</em>'s body over an empty world: no summary gate, no globals,
+and a nested script-function call refusing. The run computes a value — it replaces
+nothing — so it needs no effect soundness: a read of a name the run never wrote refuses,
+and a read after a write sees the value the run itself stored, whatever storage an
+implicit write targets in the script.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/interpreter.py#L239-L256" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def probe(
+    self,
+    function: Au3FunctionDeclaration,
+    arguments: Sequence[Au3Value],
+) -&gt; Au3Probe:
+    &#34;&#34;&#34;
+    One ungated run of *function*&#39;s body over an empty world: no summary gate, no globals,
+    and a nested script-function call refusing. The run computes a value — it replaces
+    nothing — so it needs no effect soundness: a read of a name the run never wrote refuses,
+    and a read after a write sees the value the run itself stored, whatever storage an
+    implicit write targets in the script.
+    &#34;&#34;&#34;
+    budget = _Budget()
+    try:
+        value = self._call(function, list(arguments), {}, budget, probing=True)
+    except _Refusal:
+        value = None
+    return Au3Probe(value, budget.steps)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.analysis" href="index.html">refinery.lib.scripts.au3.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.interpreter.Au3Probe" href="#refinery.lib.scripts.au3.analysis.interpreter.Au3Probe">Au3Probe</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter" href="#refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter">Au3Interpreter</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.call" href="#refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.call">call</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.probe" href="#refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.probe">probe</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

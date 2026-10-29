@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.analysis.aliases documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.analysis.aliases</code></h1>
+</header>
+<section id="section-intro">
+<p>The alias map: which variables provably name one function, per scope. The indirection obfuscation
+assigns a builtin or a function name to a variable and calls through it — <code>Local $e = Execute</code>,
+<code>$b = Execute("BinaryToString")</code> — and the rewrite in
+<code><a title="refinery.lib.scripts.au3.deobfuscation" href="../deobfuscation/index.html">refinery.lib.scripts.au3.deobfuscation</a></code> replaces such call callees with the named function.</p>
+<p>A variable qualifies only when the whole scope agrees: it is the target of exactly one write,
+and every other occurrence of it is the callee of a call. A reassignment, an argument position,
+an index, a read — any of those forfeits the rewrite for that variable, because what the
+variable holds past that point is no longer pinned. The gate is per scope, so two functions
+holding same-named aliases never collide.</p>
+<p>A write that leaves no occurrence in the tree forfeits the same way. <code>Assign</code> names a variable at
+run time and <code>Execute</code> runs one expression of code, so a call to either costs the alias the name
+it may rebind — an <code>Assign</code> with a constant first argument costs that name alone, one of any
+other shape costs every alias whose write may target a global, and an <code>Execute</code> over a string
+literal that parses to code holding a call costs the same. A call to a script function costs the
+alias what that function's may-write summary says, which <code>Assign</code> and <code>Execute</code> feed; a name the
+script and the builtin table do not know, or a summary of "may write any", costs every alias
+whose write may target a global — but never a provably local one, which no other function can
+reach. Two shapes cost nothing: a call through a variable, and an <code>Execute</code> over anything but a
+string literal — the payload of either is a value this module cannot read, and forfeiting on
+either would freeze the chain of rewrites that resolve the indirection at its links, where the
+decoder's payload still sits behind an alias call.</p>
+<p>Two initializer shapes qualify: the bare builtin identifier <code>Execute</code>, and a call to the builtin
+<code>Execute</code> whose single argument is a string literal naming a script function or a table builtin.
+What <code>Execute</code> evaluates to as a value is never assumed — the rewrite is structural. A script
+function named <code>Execute</code> shadows the builtin, so a script declaring one has no aliases at all,
+and neither has a script with an include or a parse error, either of which may hide such a
+declaration from every walk of the tree. The rewrite prints the spelling the argument holds,
+which resolves exactly as a direct call of that spelling does; the official spelling of a
+builtin is the case normalization's to print.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/aliases.py#L1-L275" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The alias map: which variables provably name one function, per scope. The indirection obfuscation
+assigns a builtin or a function name to a variable and calls through it — `Local $e = Execute`,
+`$b = Execute(&#34;BinaryToString&#34;)` — and the rewrite in
+`refinery.lib.scripts.au3.deobfuscation` replaces such call callees with the named function.
+
+A variable qualifies only when the whole scope agrees: it is the target of exactly one write,
+and every other occurrence of it is the callee of a call. A reassignment, an argument position,
+an index, a read — any of those forfeits the rewrite for that variable, because what the
+variable holds past that point is no longer pinned. The gate is per scope, so two functions
+holding same-named aliases never collide.
+
+A write that leaves no occurrence in the tree forfeits the same way. `Assign` names a variable at
+run time and `Execute` runs one expression of code, so a call to either costs the alias the name
+it may rebind — an `Assign` with a constant first argument costs that name alone, one of any
+other shape costs every alias whose write may target a global, and an `Execute` over a string
+literal that parses to code holding a call costs the same. A call to a script function costs the
+alias what that function&#39;s may-write summary says, which `Assign` and `Execute` feed; a name the
+script and the builtin table do not know, or a summary of &#34;may write any&#34;, costs every alias
+whose write may target a global — but never a provably local one, which no other function can
+reach. Two shapes cost nothing: a call through a variable, and an `Execute` over anything but a
+string literal — the payload of either is a value this module cannot read, and forfeiting on
+either would freeze the chain of rewrites that resolve the indirection at its links, where the
+decoder&#39;s payload still sits behind an alias call.
+
+Two initializer shapes qualify: the bare builtin identifier `Execute`, and a call to the builtin
+`Execute` whose single argument is a string literal naming a script function or a table builtin.
+What `Execute` evaluates to as a value is never assumed — the rewrite is structural. A script
+function named `Execute` shadows the builtin, so a script declaring one has no aliases at all,
+and neither has a script with an include or a parse error, either of which may hide such a
+declaration from every walk of the tree. The rewrite prints the spelling the argument holds,
+which resolves exactly as a direct call of that spelling does; the official spelling of a
+builtin is the case normalization&#39;s to print.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.builtins import call_is_bounded
+from refinery.lib.scripts.au3.analysis.existence import assign_kills, execute_kills
+from refinery.lib.scripts.au3.analysis.scopes import Au3ScopeModel, Binding
+from refinery.lib.scripts.au3.functions import AUTOIT_FUNCTION_NAMES
+from refinery.lib.scripts.au3.model import (
+    Au3Assignment,
+    Au3Call,
+    Au3FunctionDeclaration,
+    Au3Identifier,
+    Au3Script,
+    Au3StringLiteral,
+    Au3Variable,
+    Au3VariableDeclarator,
+    Expression,
+)
+
+
+@dataclass(frozen=True)
+class Au3Alias:
+    &#34;&#34;&#34;
+    The function one variable provably names: its lowercase name, and the spelling the
+    synthesizer prints for it.
+    &#34;&#34;&#34;
+    name: str
+    raw: str
+
+
+@dataclass(frozen=True)
+class Au3AliasModel:
+    &#34;&#34;&#34;
+    Per scope, the alias-qualified variables and the functions they name. Built once per tree
+    version by `build_alias_model`.
+    &#34;&#34;&#34;
+    scopes: dict[Au3FunctionDeclaration | None, dict[str, Au3Alias]]
+
+    def alias(self, scope: Au3FunctionDeclaration | None, name: str) -&gt; Au3Alias | None:
+        &#34;&#34;&#34;
+        The function variable *name* provably stands for inside *scope* — a function declaration
+        node, or `None` at script level — or `None` when the variable is not an alias there.
+        &#34;&#34;&#34;
+        return self.scopes.get(scope, {}).get(name)
+
+
+@dataclass
+class _VariableUses:
+    writes: int = 0
+    initializer: Expression | None = None
+    every_read_is_a_call: bool = True
+    binding: Binding = Binding.NONE
+
+
+@dataclass
+class _RebindThreats:
+    &#34;&#34;&#34;
+    What a rebinding write may cost an alias: the names no scope may keep, the names no
+    global-backed alias may keep, whether any global-backed alias survives at all, and the
+    scopes where not even a provably local one does.
+    &#34;&#34;&#34;
+    names: set[str] = field(default_factory=set)
+    global_names: set[str] = field(default_factory=set)
+    no_global_aliases: bool = False
+    forfeited_scopes: set[Au3FunctionDeclaration | None] = field(default_factory=set)
+
+
+def _written_initializer(node: Au3Variable) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    The expression one write stores, when the write carries one: a declarator&#39;s initializer or an
+    assignment&#39;s value. Bindings without an expression answer `None` and never shape an alias.
+    &#34;&#34;&#34;
+    parent = node.parent
+    if isinstance(parent, Au3VariableDeclarator):
+        return parent.initializer
+    if isinstance(parent, Au3Assignment):
+        return parent.value
+    return None
+
+
+def _is_callee(node: Au3Variable) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the variable occurrence stands in the callee position of a call, through any number
+    of parentheses.
+    &#34;&#34;&#34;
+    return ast.in_callee_position(node)
+
+
+def _aliased_function(initializer: Expression | None, functions: frozenset[str]) -&gt; Au3Alias | None:
+    expression = ast.unwrap_parens(initializer)
+    if isinstance(expression, Au3Identifier):
+        if expression.name == &#39;execute&#39;:
+            return Au3Alias(&#39;execute&#39;, expression.raw)
+        return None
+    if not isinstance(expression, Au3Call):
+        return None
+    callee = ast.direct_callee(expression)
+    if callee is None or callee.name != &#39;execute&#39; or len(expression.arguments) != 1:
+        return None
+    argument = ast.unwrap_parens(expression.arguments[0])
+    if not isinstance(argument, Au3StringLiteral):
+        return None
+    name = argument.value.lower()
+    if name not in functions and name not in AUTOIT_FUNCTION_NAMES:
+        return None
+    return Au3Alias(name, argument.value)
+
+
+def _pinned_execute(call: Au3Call) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an `Execute` call takes one string literal — the only argument shape whose executed
+    code `execute_kills` can read. Anything else the call takes is a blind spot this module
+    documents, not a threat it forfeits on.
+    &#34;&#34;&#34;
+    if len(call.arguments) != 1:
+        return False
+    return isinstance(ast.unwrap_parens(call.arguments[0]), Au3StringLiteral)
+
+
+def _scan_rebinds(
+    root: Au3Script,
+    scope_model: Au3ScopeModel,
+    summaries: dict[str, frozenset[str] | None],
+) -&gt; _RebindThreats:
+    &#34;&#34;&#34;
+    Every way a call may rebind an alias without a write occurrence in the tree, collected over
+    all of *root*&#39;s scopes: an `Assign` or a code-running `Execute` standing lexically inside a
+    scope threatens that scope&#39;s locals, and everything the calls of the whole script may write
+    threatens the globals — a `Call` and a registration builtin included, because the script
+    function one of them runs may rebind any global (`call_is_bounded`).
+    &#34;&#34;&#34;
+    threats = _RebindThreats()
+    for scope, body in ast.scope_bodies(root):
+        for node in ast.scope_nodes(body):
+            if not isinstance(node, Au3Call):
+                continue
+            callee = ast.direct_callee(node)
+            if callee is None:
+                continue
+            if callee.name in scope_model.functions:
+                summary = summaries.get(callee.name)
+                if summary is None:
+                    threats.no_global_aliases = True
+                else:
+                    threats.global_names |= summary
+                continue
+            if callee.name == &#39;execute&#39;:
+                if _pinned_execute(node) and execute_kills(node) is None:
+                    threats.no_global_aliases = True
+                    threats.forfeited_scopes.add(scope)
+                continue
+            if callee.name == &#39;assign&#39;:
+                names = assign_kills(node)
+                if names is None:
+                    threats.no_global_aliases = True
+                    threats.forfeited_scopes.add(scope)
+                else:
+                    threats.names |= names
+                continue
+            if not call_is_bounded(callee.name):
+                threats.no_global_aliases = True
+    return threats
+
+
+def _threatened(
+    threats: _RebindThreats,
+    scope: Au3FunctionDeclaration | None,
+    name: str,
+    binding: Binding,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a rebinding write may have reached the variable *name* stands for in *scope*: a
+    provably local binding only inside its own scope, every other binding everywhere a global
+    write can.
+    &#34;&#34;&#34;
+    if name in threats.names or scope in threats.forfeited_scopes:
+        return True
+    if binding is Binding.LOCAL:
+        return False
+    return threats.no_global_aliases or name in threats.global_names
+
+
+def _record_use(
+    node: Au3Variable,
+    scope: Au3FunctionDeclaration | None,
+    scope_model: Au3ScopeModel,
+    uses: dict[Au3FunctionDeclaration | None, dict[str, _VariableUses]],
+) -&gt; None:
+    use = uses.setdefault(scope, {}).setdefault(node.name, _VariableUses())
+    if ast.is_write_occurrence(node):
+        use.writes += 1
+        use.initializer = _written_initializer(node)
+        statement = ast.owning_statement(node)
+        if statement is not None:
+            use.binding = scope_model.binding(scope, statement, node.name)
+    elif not _is_callee(node):
+        use.every_read_is_a_call = False
+
+
+def build_alias_model(
+    root: Au3Script,
+    scope_model: Au3ScopeModel,
+    summaries: dict[str, frozenset[str] | None],
+) -&gt; Au3AliasModel:
+    &#34;&#34;&#34;
+    Collect the alias-qualified variables of *root*, validating names against the script&#39;s
+    function names and cutting every name a rebinding write may cost.
+    &#34;&#34;&#34;
+    if (
+        &#39;execute&#39; in scope_model.functions
+        or scope_model.holds_an_include
+        or scope_model.holds_a_parse_error
+    ):
+        return Au3AliasModel({})
+    threats = _scan_rebinds(root, scope_model, summaries)
+    uses: dict[Au3FunctionDeclaration | None, dict[str, _VariableUses]] = {}
+    for scope, body in ast.scope_bodies(root):
+        if scope is not None:
+            for parameter in scope.params:
+                if parameter.variable is not None:
+                    _record_use(parameter.variable, scope, scope_model, uses)
+        for node in ast.scope_nodes(body):
+            if isinstance(node, Au3Variable):
+                _record_use(node, scope, scope_model, uses)
+    functions = scope_model.function_names
+    scopes: dict[Au3FunctionDeclaration | None, dict[str, Au3Alias]] = {}
+    for scope, variables in uses.items():
+        aliases = {}
+        for name, use in variables.items():
+            if use.writes != 1 or not use.every_read_is_a_call:
+                continue
+            if _threatened(threats, scope, name, use.binding):
+                continue
+            aliased = _aliased_function(use.initializer, functions)
+            if aliased is not None:
+                aliases[name] = aliased
+        if aliases:
+            scopes[scope] = aliases
+    return Au3AliasModel(scopes)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.build_alias_model"><code class="name flex">
+<span>def <span class="ident">build_alias_model</span></span>(<span>root, scope_model, summaries)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Collect the alias-qualified variables of <em>root</em>, validating names against the script's
+function names and cutting every name a rebinding write may cost.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/aliases.py#L236-L275" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_alias_model(
+    root: Au3Script,
+    scope_model: Au3ScopeModel,
+    summaries: dict[str, frozenset[str] | None],
+) -&gt; Au3AliasModel:
+    &#34;&#34;&#34;
+    Collect the alias-qualified variables of *root*, validating names against the script&#39;s
+    function names and cutting every name a rebinding write may cost.
+    &#34;&#34;&#34;
+    if (
+        &#39;execute&#39; in scope_model.functions
+        or scope_model.holds_an_include
+        or scope_model.holds_a_parse_error
+    ):
+        return Au3AliasModel({})
+    threats = _scan_rebinds(root, scope_model, summaries)
+    uses: dict[Au3FunctionDeclaration | None, dict[str, _VariableUses]] = {}
+    for scope, body in ast.scope_bodies(root):
+        if scope is not None:
+            for parameter in scope.params:
+                if parameter.variable is not None:
+                    _record_use(parameter.variable, scope, scope_model, uses)
+        for node in ast.scope_nodes(body):
+            if isinstance(node, Au3Variable):
+                _record_use(node, scope, scope_model, uses)
+    functions = scope_model.function_names
+    scopes: dict[Au3FunctionDeclaration | None, dict[str, Au3Alias]] = {}
+    for scope, variables in uses.items():
+        aliases = {}
+        for name, use in variables.items():
+            if use.writes != 1 or not use.every_read_is_a_call:
+                continue
+            if _threatened(threats, scope, name, use.binding):
+                continue
+            aliased = _aliased_function(use.initializer, functions)
+            if aliased is not None:
+                aliases[name] = aliased
+        if aliases:
+            scopes[scope] = aliases
+    return Au3AliasModel(scopes)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.Au3Alias"><code class="flex name class">
+<span>class <span class="ident">Au3Alias</span></span>
+<span>(</span><span>name, raw)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The function one variable provably names: its lowercase name, and the spelling the
+synthesizer prints for it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/aliases.py#L57-L64" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(frozen=True)
+class Au3Alias:
+    &#34;&#34;&#34;
+    The function one variable provably names: its lowercase name, and the spelling the
+    synthesizer prints for it.
+    &#34;&#34;&#34;
+    name: str
+    raw: str</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.Au3Alias.name"><code class="name">var <span class="ident">name</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.Au3Alias.raw"><code class="name">var <span class="ident">raw</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel"><code class="flex name class">
+<span>class <span class="ident">Au3AliasModel</span></span>
+<span>(</span><span>scopes)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Per scope, the alias-qualified variables and the functions they name. Built once per tree
+version by <code><a title="refinery.lib.scripts.au3.analysis.aliases.build_alias_model" href="#refinery.lib.scripts.au3.analysis.aliases.build_alias_model">build_alias_model()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/aliases.py#L67-L80" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(frozen=True)
+class Au3AliasModel:
+    &#34;&#34;&#34;
+    Per scope, the alias-qualified variables and the functions they name. Built once per tree
+    version by `build_alias_model`.
+    &#34;&#34;&#34;
+    scopes: dict[Au3FunctionDeclaration | None, dict[str, Au3Alias]]
+
+    def alias(self, scope: Au3FunctionDeclaration | None, name: str) -&gt; Au3Alias | None:
+        &#34;&#34;&#34;
+        The function variable *name* provably stands for inside *scope* — a function declaration
+        node, or `None` at script level — or `None` when the variable is not an alias there.
+        &#34;&#34;&#34;
+        return self.scopes.get(scope, {}).get(name)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel.scopes"><code class="name">var <span class="ident">scopes</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel.alias"><code class="name flex">
+<span>def <span class="ident">alias</span></span>(<span>self, scope, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The function variable <em>name</em> provably stands for inside <em>scope</em> — a function declaration
+node, or <code>None</code> at script level — or <code>None</code> when the variable is not an alias there.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/aliases.py#L75-L80" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def alias(self, scope: Au3FunctionDeclaration | None, name: str) -&gt; Au3Alias | None:
+    &#34;&#34;&#34;
+    The function variable *name* provably stands for inside *scope* — a function declaration
+    node, or `None` at script level — or `None` when the variable is not an alias there.
+    &#34;&#34;&#34;
+    return self.scopes.get(scope, {}).get(name)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.analysis" href="index.html">refinery.lib.scripts.au3.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.aliases.build_alias_model" href="#refinery.lib.scripts.au3.analysis.aliases.build_alias_model">build_alias_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.aliases.Au3Alias" href="#refinery.lib.scripts.au3.analysis.aliases.Au3Alias">Au3Alias</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel" href="#refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel">Au3AliasModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel.alias" href="#refinery.lib.scripts.au3.analysis.aliases.Au3AliasModel.alias">alias</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

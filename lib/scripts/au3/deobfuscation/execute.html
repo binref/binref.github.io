@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.deobfuscation.execute documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.deobfuscation.execute</code></h1>
+</header>
+<section id="section-intro">
+<p><code>Execute</code> flattening: splicing the one expression a string-literal argument provably names into
+the place of the call.</p>
+<p>The interpreter evaluates exactly one expression there — an assignment inside the argument
+parses as a <em>comparison</em> and writes nothing, declarations and statement sequences are parse errors
+that answer <code>""</code> — so the literal is read with the parser's expression entry, where <code>=</code> climbs as
+a comparison. A literal that parses to a bare identifier never splices, in any position: what the
+name evaluates to is unpinned, and the alias map in
+<code><a title="refinery.lib.scripts.au3.analysis.aliases" href="../analysis/aliases.html">refinery.lib.scripts.au3.analysis.aliases</a></code> owns the declaration instead. A literal that parses
+to any other expression splices in expression position — including a top-level <code>=</code> comparison,
+which assignment duality reads back exactly as <code>Execute</code> did — and in statement position every
+shape splices except that comparison: the synthesized line would re-parse as an assignment.</p>
+<p>Every call inside the spliced expression must be a direct call to a script function or a table
+builtin: a call an unseen <code>#include</code> resolves, or one through a variable, leaves the <code>Execute</code>
+alone, because an unknown function is one of <code>Execute</code>'s pinned failure modes and the spliced
+form would make that error fatal where the original answered <code>""</code>. A literal that fails to parse
+never ran at runtime, so it is left standing for the same reason, and so is one that parses to
+an expression holding an array literal: an array literal is legal AutoIt only where a declaration
+initializes, which no splice position is.</p>
+<p>The splice also refuses wherever a read of <code>@error</code> or <code>@extended</code> may see the state the
+<code>Execute</code> stood over: a successful <code>Call</code>, <code>Assign</code>, and <code>Eval</code> all clear both flags (probe9
+A17, probe9f A21/A22), and whether a successful <code>Execute</code> clears them is unpinned, so a tree
+that may read either — by macro, through a computed callee, through another <code>Execute</code>'s
+payload, or through an include — keeps every wrapper standing rather than guess. The model
+cache owns that question; the decode pass over script functions refuses on the same answer.</p>
+<p>The accepted behavior change — a runtime error the original <code>Execute</code> would have swallowed
+becoming fatal where it happens — is bounded by these gates and owned by the Phase 2 plan.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/execute.py#L1-L146" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+`Execute` flattening: splicing the one expression a string-literal argument provably names into
+the place of the call.
+
+The interpreter evaluates exactly one expression there — an assignment inside the argument
+parses as a *comparison* and writes nothing, declarations and statement sequences are parse errors
+that answer `&#34;&#34;` — so the literal is read with the parser&#39;s expression entry, where `=` climbs as
+a comparison. A literal that parses to a bare identifier never splices, in any position: what the
+name evaluates to is unpinned, and the alias map in
+`refinery.lib.scripts.au3.analysis.aliases` owns the declaration instead. A literal that parses
+to any other expression splices in expression position — including a top-level `=` comparison,
+which assignment duality reads back exactly as `Execute` did — and in statement position every
+shape splices except that comparison: the synthesized line would re-parse as an assignment.
+
+Every call inside the spliced expression must be a direct call to a script function or a table
+builtin: a call an unseen `#include` resolves, or one through a variable, leaves the `Execute`
+alone, because an unknown function is one of `Execute`&#39;s pinned failure modes and the spliced
+form would make that error fatal where the original answered `&#34;&#34;`. A literal that fails to parse
+never ran at runtime, so it is left standing for the same reason, and so is one that parses to
+an expression holding an array literal: an array literal is legal AutoIt only where a declaration
+initializes, which no splice position is.
+
+The splice also refuses wherever a read of `@error` or `@extended` may see the state the
+`Execute` stood over: a successful `Call`, `Assign`, and `Eval` all clear both flags (probe9
+A17, probe9f A21/A22), and whether a successful `Execute` clears them is unpinned, so a tree
+that may read either — by macro, through a computed callee, through another `Execute`&#39;s
+payload, or through an include — keeps every wrapper standing rather than guess. The model
+cache owns that question; the decode pass over script functions refuses on the same answer.
+
+The accepted behavior change — a runtime error the original `Execute` would have swallowed
+becoming fatal where it happens — is bounded by these gates and owned by the Phase 2 plan.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts import Node, Transformer, _replace_in_parent, set_child
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.cache import model_cache
+from refinery.lib.scripts.au3.functions import AUTOIT_FUNCTION_NAMES
+from refinery.lib.scripts.au3.model import (
+    Au3BinaryExpression,
+    Au3Call,
+    Au3ExpressionStatement,
+    Au3Identifier,
+    Au3Script,
+    Au3StringLiteral,
+    Expression,
+)
+from refinery.lib.scripts.au3.parser import Au3Parser
+
+
+class Au3ExecuteFlattening(Transformer):
+    &#34;&#34;&#34;
+    Replaces an `Execute` call whose single argument is a string literal with the expression
+    that literal parses to, in every position the pinned semantics of `Execute` cover.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self._functions: frozenset[str] = frozenset()
+        self._error_state_is_observable = False
+
+    def visit(self, node: Node) -&gt; Node | None:
+        if isinstance(node, Au3Script):
+            cache = model_cache(self, node)
+            self._functions = cache.scopes.function_names
+            self._error_state_is_observable = cache.may_read_error_state
+        self.generic_visit(node)
+        if not isinstance(node, Au3Call):
+            return None
+        expression = self._flattenable_expression(node)
+        if expression is None:
+            return None
+        return self._splice(node, expression)
+
+    def _flattenable_expression(self, call: Au3Call) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        The expression the call&#39;s literal argument names, or `None` where the call is not a
+        flattenable `Execute`: a shadowed name, a non-literal or missing argument, a parse
+        failure, a bare identifier, an array literal inside the parsed expression, a call
+        inside it this pass cannot resolve, or a tree whose error state a read may observe.
+        &#34;&#34;&#34;
+        callee = ast.direct_callee(call)
+        if callee is None or callee.name != &#39;execute&#39;:
+            return None
+        if &#39;execute&#39; in self._functions:
+            return None
+        if self._error_state_is_observable:
+            return None
+        if len(call.arguments) != 1:
+            return None
+        literal = ast.unwrap_parens(call.arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            return None
+        expression = Au3Parser(literal.value).parse_expression()
+        if expression is None:
+            return None
+        if isinstance(expression, Au3Identifier):
+            return None
+        if ast.contains_an_array_literal(expression):
+            return None
+        if not self._calls_resolve(expression):
+            return None
+        return expression
+
+    def _calls_resolve(self, expression: Expression) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether every call in *expression* is a direct call to a script function or a table
+        builtin.
+        &#34;&#34;&#34;
+        for node in expression.walk():
+            if not isinstance(node, Au3Call):
+                continue
+            callee = ast.direct_callee(node)
+            if callee is None:
+                return False
+            if callee.name not in self._functions and callee.name not in AUTOIT_FUNCTION_NAMES:
+                return False
+        return True
+
+    def _splice(self, call: Au3Call, expression: Expression) -&gt; Node | None:
+        &#34;&#34;&#34;
+        Put *expression* where *call* stands: directly in expression position, and in statement
+        position as an expression statement — unless it is a top-level `=` comparison, which the
+        parser would read back as an assignment.
+        &#34;&#34;&#34;
+        statement = ast.owning_statement(call)
+        if (
+            isinstance(statement, Au3ExpressionStatement)
+            and ast.unwrap_parens(statement.expression) is call
+        ):
+            if self._is_top_level_equality(expression):
+                return None
+            set_child(statement, &#39;expression&#39;, expression)
+            self.mark_changed()
+            return None
+        if not _replace_in_parent(call, expression):
+            return None
+        self.mark_changed()
+        return None
+
+    @staticmethod
+    def _is_top_level_equality(expression: Expression) -&gt; bool:
+        return (
+            isinstance(expression, Au3BinaryExpression)
+            and expression.operator == &#39;=&#39;
+        )</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.execute.Au3ExecuteFlattening"><code class="flex name class">
+<span>class <span class="ident">Au3ExecuteFlattening</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Replaces an <code>Execute</code> call whose single argument is a string literal with the expression
+that literal parses to, in every position the pinned semantics of <code>Execute</code> cover.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/execute.py#L51-L146" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Au3ExecuteFlattening(Transformer):
+    &#34;&#34;&#34;
+    Replaces an `Execute` call whose single argument is a string literal with the expression
+    that literal parses to, in every position the pinned semantics of `Execute` cover.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self._functions: frozenset[str] = frozenset()
+        self._error_state_is_observable = False
+
+    def visit(self, node: Node) -&gt; Node | None:
+        if isinstance(node, Au3Script):
+            cache = model_cache(self, node)
+            self._functions = cache.scopes.function_names
+            self._error_state_is_observable = cache.may_read_error_state
+        self.generic_visit(node)
+        if not isinstance(node, Au3Call):
+            return None
+        expression = self._flattenable_expression(node)
+        if expression is None:
+            return None
+        return self._splice(node, expression)
+
+    def _flattenable_expression(self, call: Au3Call) -&gt; Expression | None:
+        &#34;&#34;&#34;
+        The expression the call&#39;s literal argument names, or `None` where the call is not a
+        flattenable `Execute`: a shadowed name, a non-literal or missing argument, a parse
+        failure, a bare identifier, an array literal inside the parsed expression, a call
+        inside it this pass cannot resolve, or a tree whose error state a read may observe.
+        &#34;&#34;&#34;
+        callee = ast.direct_callee(call)
+        if callee is None or callee.name != &#39;execute&#39;:
+            return None
+        if &#39;execute&#39; in self._functions:
+            return None
+        if self._error_state_is_observable:
+            return None
+        if len(call.arguments) != 1:
+            return None
+        literal = ast.unwrap_parens(call.arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            return None
+        expression = Au3Parser(literal.value).parse_expression()
+        if expression is None:
+            return None
+        if isinstance(expression, Au3Identifier):
+            return None
+        if ast.contains_an_array_literal(expression):
+            return None
+        if not self._calls_resolve(expression):
+            return None
+        return expression
+
+    def _calls_resolve(self, expression: Expression) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether every call in *expression* is a direct call to a script function or a table
+        builtin.
+        &#34;&#34;&#34;
+        for node in expression.walk():
+            if not isinstance(node, Au3Call):
+                continue
+            callee = ast.direct_callee(node)
+            if callee is None:
+                return False
+            if callee.name not in self._functions and callee.name not in AUTOIT_FUNCTION_NAMES:
+                return False
+        return True
+
+    def _splice(self, call: Au3Call, expression: Expression) -&gt; Node | None:
+        &#34;&#34;&#34;
+        Put *expression* where *call* stands: directly in expression position, and in statement
+        position as an expression statement — unless it is a top-level `=` comparison, which the
+        parser would read back as an assignment.
+        &#34;&#34;&#34;
+        statement = ast.owning_statement(call)
+        if (
+            isinstance(statement, Au3ExpressionStatement)
+            and ast.unwrap_parens(statement.expression) is call
+        ):
+            if self._is_top_level_equality(expression):
+                return None
+            set_child(statement, &#39;expression&#39;, expression)
+            self.mark_changed()
+            return None
+        if not _replace_in_parent(call, expression):
+            return None
+        self.mark_changed()
+        return None
+
+    @staticmethod
+    def _is_top_level_equality(expression: Expression) -&gt; bool:
+        return (
+            isinstance(expression, Au3BinaryExpression)
+            and expression.operator == &#39;=&#39;
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.execute.Au3ExecuteFlattening.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/execute.py#L62-L73" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit(self, node: Node) -&gt; Node | None:
+    if isinstance(node, Au3Script):
+        cache = model_cache(self, node)
+        self._functions = cache.scopes.function_names
+        self._error_state_is_observable = cache.may_read_error_state
+    self.generic_visit(node)
+    if not isinstance(node, Au3Call):
+        return None
+    expression = self._flattenable_expression(node)
+    if expression is None:
+        return None
+    return self._splice(node, expression)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.Transformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation" href="index.html">refinery.lib.scripts.au3.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.deobfuscation.execute.Au3ExecuteFlattening" href="#refinery.lib.scripts.au3.deobfuscation.execute.Au3ExecuteFlattening">Au3ExecuteFlattening</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.execute.Au3ExecuteFlattening.visit" href="#refinery.lib.scripts.au3.deobfuscation.execute.Au3ExecuteFlattening.visit">visit</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

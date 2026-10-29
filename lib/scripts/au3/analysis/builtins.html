@@ -1,0 +1,1151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.analysis.builtins documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.analysis.builtins</code></h1>
+</header>
+<section id="section-intro">
+<p>The AutoIt3 builtin emulation table: the functions a call folds over when every argument is a
+known value. A rule is pinned by the probe outputs in <code>temp/au3_semantics_probe/</code> or by the
+official docs; a case neither pins is refused — the evaluator answers <code>None</code> and the fold leaves
+the call standing. The facts a rule rests on are named on the evaluator that applies it.</p>
+<p>The binary functions share one string→binary coercion: a <code>0x…</code>-shaped string hex-decodes
+(probe 100/104), any other ASCII-only string is its own bytes (probe3 43), and everything else
+refuses — a number's little-endian int64 bytes (probe3 44) and a non-ASCII string are unpinned.</p>
+<p><code>Execute</code> and <code>Assign</code> are known builtin names for the transforms' callee gates and the
+may-write summaries but have no evaluator: <code>Execute</code>'s argument is code rather than data, and
+<code>Assign</code> writes rather than returns. The four names no evaluator will ever answer — <code>Execute</code>,
+<code>Assign</code>, <code>Call</code>, and <code>Eval</code> — are flattened structurally over literal arguments by
+<code><a title="refinery.lib.scripts.au3.deobfuscation" href="../deobfuscation/index.html">refinery.lib.scripts.au3.deobfuscation</a></code> instead. <code>IsDeclared</code> and <code>IsFunc</code> read runtime
+declaration state; neither is emulated. The name-parameter table below the evaluators lists the
+builtins whose argument names a function or a variable — the positions a computed name can
+reach a callee or a storage through, which no evaluator owns.</p>
+<p>A second, wider table answers a different question: not what a call returns, but what it can
+do. <code><a title="refinery.lib.scripts.au3.functions.AUTOIT_FUNCTION_NAMES" href="../functions.html#refinery.lib.scripts.au3.functions.AUTOIT_FUNCTION_NAMES">AUTOIT_FUNCTION_NAMES</a></code> is every core builtin AutoIt
+ships in its official spelling; the module that holds it names its sources. None of the 405
+take a <code>ByRef</code> parameter — checked against the doc page of every one of them — and no builtin
+but <code>Assign</code> writes a named variable by itself. Every other write a call may reach comes through
+what it runs: <code>Call</code> dispatches the function its argument names, which may take <code>ByRef</code>
+parameters, and a registration builtin runs a registered script function on its own trigger,
+which may write any global — the two kinds the <code><a title="refinery.lib.scripts.au3.analysis.builtins.DISPATCHING_NAMES" href="#refinery.lib.scripts.au3.analysis.builtins.DISPATCHING_NAMES">DISPATCHING_NAMES</a></code> set holds with <code>Execute</code> and
+<code>Assign</code>, whose own payload readers answer the same question precisely. An option setter is the
+exception in what it changes without writing at all: an expanding one rewrites the meaning of
+every string literal evaluated after it. The table's membership answers which names are builtins
+— the alias tracker's name resolution and the <code>Execute</code>-splice gate in
+<code><a title="refinery.lib.scripts.au3.deobfuscation.execute" href="../deobfuscation/execute.html">refinery.lib.scripts.au3.deobfuscation.execute</a></code> — while <code><a title="refinery.lib.scripts.au3.analysis.builtins.call_is_bounded" href="#refinery.lib.scripts.au3.analysis.builtins.call_is_bounded">call_is_bounded()</a></code> answers what a call
+can do — the may-write summaries in <code><a title="refinery.lib.scripts.au3.analysis.propagation" href="propagation.html">refinery.lib.scripts.au3.analysis.propagation</a></code> and the
+alias tracker's rebind scan in <code><a title="refinery.lib.scripts.au3.analysis.aliases" href="aliases.html">refinery.lib.scripts.au3.analysis.aliases</a></code>.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/builtins.py#L1-L942" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The AutoIt3 builtin emulation table: the functions a call folds over when every argument is a
+known value. A rule is pinned by the probe outputs in `temp/au3_semantics_probe/` or by the
+official docs; a case neither pins is refused — the evaluator answers `None` and the fold leaves
+the call standing. The facts a rule rests on are named on the evaluator that applies it.
+
+The binary functions share one string→binary coercion: a `0x…`-shaped string hex-decodes
+(probe 100/104), any other ASCII-only string is its own bytes (probe3 43), and everything else
+refuses — a number&#39;s little-endian int64 bytes (probe3 44) and a non-ASCII string are unpinned.
+
+`Execute` and `Assign` are known builtin names for the transforms&#39; callee gates and the
+may-write summaries but have no evaluator: `Execute`&#39;s argument is code rather than data, and
+`Assign` writes rather than returns. The four names no evaluator will ever answer — `Execute`,
+`Assign`, `Call`, and `Eval` — are flattened structurally over literal arguments by
+`refinery.lib.scripts.au3.deobfuscation` instead. `IsDeclared` and `IsFunc` read runtime
+declaration state; neither is emulated. The name-parameter table below the evaluators lists the
+builtins whose argument names a function or a variable — the positions a computed name can
+reach a callee or a storage through, which no evaluator owns.
+
+A second, wider table answers a different question: not what a call returns, but what it can
+do. `refinery.lib.scripts.au3.functions.AUTOIT_FUNCTION_NAMES` is every core builtin AutoIt
+ships in its official spelling; the module that holds it names its sources. None of the 405
+take a `ByRef` parameter — checked against the doc page of every one of them — and no builtin
+but `Assign` writes a named variable by itself. Every other write a call may reach comes through
+what it runs: `Call` dispatches the function its argument names, which may take `ByRef`
+parameters, and a registration builtin runs a registered script function on its own trigger,
+which may write any global — the two kinds the `DISPATCHING_NAMES` set holds with `Execute` and
+`Assign`, whose own payload readers answer the same question precisely. An option setter is the
+exception in what it changes without writing at all: an expanding one rewrites the meaning of
+every string literal evaluated after it. The table&#39;s membership answers which names are builtins
+— the alias tracker&#39;s name resolution and the `Execute`-splice gate in
+`refinery.lib.scripts.au3.deobfuscation.execute` — while `call_is_bounded` answers what a call
+can do — the may-write summaries in `refinery.lib.scripts.au3.analysis.propagation` and the
+alias tracker&#39;s rebind scan in `refinery.lib.scripts.au3.analysis.aliases`.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import decimal
+import math
+import operator
+import re
+import struct
+
+from typing import Callable, cast
+
+from refinery.lib.scripts.au3.analysis.values import (
+    HEX_DIGITS,
+    Au3Value,
+    Kind,
+    as_array,
+    as_binary,
+    as_string,
+    of_array,
+    of_binary,
+    of_double_result,
+    of_int,
+    of_int_result,
+    of_number,
+    of_string,
+    to_number,
+    to_string,
+)
+from refinery.lib.scripts.au3.functions import AUTOIT_FUNCTION_NAMES
+
+_Evaluator = Callable[[tuple[Au3Value, ...]], Au3Value | None]
+
+_HEX_SHAPE = re.compile(r&#39;0x(?:[0-9a-fA-F]{2})+&#39;)
+
+_INT32_MIN = -0x80000000
+_INT32_MAX = 0x7FFFFFFF
+_UINT32 = 0x100000000
+_UINT64 = 0x10000000000000000
+
+#: The bound beyond which an int no longer converts to a double exactly: `Mod`&#39;s integer mode
+#: runs through one, so past it the remainder is not a value any probe pinned.
+_EXACT_INT = 9007199254740992
+
+
+def _number_argument(arguments: tuple[Au3Value, ...], index: int) -&gt; int | float | None:
+    if index &gt;= len(arguments):
+        return None
+    return to_number(arguments[index])
+
+
+def _int_argument(arguments: tuple[Au3Value, ...], index: int) -&gt; int | None:
+    number = _number_argument(arguments, index)
+    if number is None or not isinstance(number, int):
+        return None
+    return number
+
+
+def _whole_number(value: Au3Value) -&gt; int | None:
+    &#34;&#34;&#34;
+    The integer a value contributes to a bitwise builtin: a number without a fractional part, a
+    whole double included (probe7 51 — `BitAND(7.0, 3)` answers the Int32 3). A fractional value
+    is not a reading any probe pinned, so it refuses.
+    &#34;&#34;&#34;
+    number = to_number(value)
+    if number is None:
+        return None
+    if isinstance(number, float):
+        return int(number) if number == int(number) else None
+    return number
+
+
+def _optional_int_argument(
+    arguments: tuple[Au3Value, ...],
+    index: int,
+    default: int,
+) -&gt; int | None:
+    if index &gt;= len(arguments):
+        return default
+    return _int_argument(arguments, index)
+
+
+def _to_int32(value: int) -&gt; int:
+    &#34;&#34;&#34;
+    The 32-bit signed reading of *value*, the width every bitwise builtin works in: pinned by
+    `BitXOR(0xFFFFFFFF, 0)` = -1 and `BitAND(0xFFFFFFFFFFFFFFFF, 0xFF)` = 255.
+    &#34;&#34;&#34;
+    masked = value &amp; 0xFFFFFFFF
+    return masked - _UINT32 if masked &gt;= 0x80000000 else masked
+
+
+def _to_int64_signed(value: int) -&gt; int:
+    masked = value &amp; 0xFFFFFFFFFFFFFFFF
+    return masked - _UINT64 if masked &gt;= 0x8000000000000000 else masked
+
+
+def _string_bytes(text: str) -&gt; bytes | None:
+    &#34;&#34;&#34;
+    The bytes a string-kind argument becomes inside the binary builtins: a `0x…`-shaped string
+    hex-decodes, any other ASCII-only string is its own bytes, and a non-ASCII string refuses.
+    &#34;&#34;&#34;
+    if _HEX_SHAPE.fullmatch(text):
+        return bytes.fromhex(text[2:])
+    if not text.isascii():
+        return None
+    return text.encode(&#39;ascii&#39;)
+
+
+def _binary_argument(arguments: tuple[Au3Value, ...], index: int) -&gt; bytes | None:
+    if index &gt;= len(arguments):
+        return None
+    text = as_string(arguments[index])
+    if text is not None:
+        return _string_bytes(text)
+    return as_binary(arguments[index])
+
+
+def _evaluate_abs(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The absolute value as a double, over an integer argument no less than a string one
+    (probe7 45, 46, 55).
+    &#34;&#34;&#34;
+    if len(arguments) != 1:
+        return None
+    number = to_number(arguments[0])
+    if number is None:
+        return None
+    return of_double_result(float(abs(number)))
+
+
+def _evaluate_int(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    number = to_number(arguments[0])
+    if number is None:
+        return None
+    if isinstance(number, int):
+        return of_int_result(number)
+    return of_int_result(int(number))
+
+
+def _evaluate_floor(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    number = to_number(arguments[0])
+    if number is None:
+        return None
+    return of_int_result(math.floor(number))
+
+
+def _evaluate_ceiling(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    number = to_number(arguments[0])
+    if number is None:
+        return None
+    return of_int_result(math.ceil(number))
+
+
+def _evaluate_number(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    number = to_number(arguments[0])
+    if number is None:
+        return None
+    return of_number(number)
+
+
+def _evaluate_round(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    Half-up rounding. One argument rounds to an integer (probe7 43; probe8 21, 24, 25); two
+    arguments round to *digits* decimals and answer a double, an explicit zero included
+    (probe7 44; probe8 22, 23). Over an integer first argument the two-argument form is not a
+    reading any probe pinned, so it refuses.
+    &#34;&#34;&#34;
+    number = _number_argument(arguments, 0)
+    if number is None or len(arguments) &gt; 2:
+        return None
+    if len(arguments) == 1:
+        try:
+            quantized = decimal.Decimal(number).quantize(
+                decimal.Decimal(1), rounding=decimal.ROUND_HALF_UP)
+        except decimal.InvalidOperation:
+            return None
+        return of_int_result(int(quantized))
+    digits = _int_argument(arguments, 1)
+    if (
+        digits is None
+        or digits &lt; 0
+        or digits &gt; 15
+        or isinstance(number, int)
+    ):
+        return None
+    try:
+        quantized = decimal.Decimal(number).quantize(
+            decimal.Decimal(1).scaleb(-digits), rounding=decimal.ROUND_HALF_UP)
+    except decimal.InvalidOperation:
+        return None
+    return of_double_result(float(quantized))
+
+
+def _evaluate_sqrt(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    number = to_number(arguments[0])
+    if number is None or number &lt; 0:
+        return None
+    return of_double_result(math.sqrt(number))
+
+
+def _math_evaluator(function: Callable[[int | float], float]) -&gt; _Evaluator:
+    def evaluator(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+        if len(arguments) != 1:
+            return None
+        number = to_number(arguments[0])
+        if number is None:
+            return None
+        try:
+            result = function(number)
+        except (ValueError, OverflowError):
+            return None
+        return of_double_result(result)
+    return evaluator
+
+
+def _evaluate_mod(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The remainder with the sign of the dividend: an integer only when both arguments are values
+    of the integer kind, a double once any argument is a double, a string, or a boolean
+    (probe6 19; probe7 20-25).
+    &#34;&#34;&#34;
+    if len(arguments) != 2:
+        return None
+    one = to_number(arguments[0])
+    two = to_number(arguments[1])
+    if one is None or two is None or two == 0:
+        return None
+    if arguments[0].kind is not Kind.INT or arguments[1].kind is not Kind.INT:
+        return of_double_result(math.fmod(one, two))
+    if abs(one) &gt; _EXACT_INT or abs(two) &gt; _EXACT_INT:
+        return None
+    return of_int_result(int(math.fmod(one, two)))
+
+
+def _bitwise_result(
+        arguments: tuple[Au3Value, ...],
+        combine: Callable[[int, int], int]) -&gt; Au3Value | None:
+    numbers = []
+    for argument in arguments:
+        number = _whole_number(argument)
+        if number is None:
+            return None
+        numbers.append(_to_int32(number))
+    if len(numbers) &lt; 2:
+        return None
+    result = numbers[0]
+    for number in numbers[1:]:
+        result = combine(result, number)
+    return of_int_result(result)
+
+
+def _evaluate_bitand(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    return _bitwise_result(arguments, operator.and_)
+
+
+def _evaluate_bitor(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    return _bitwise_result(arguments, operator.or_)
+
+
+def _evaluate_bitxor(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    return _bitwise_result(arguments, operator.xor)
+
+
+def _evaluate_bitnot(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    number = _whole_number(arguments[0])
+    if number is None:
+        return None
+    return of_int_result(~_to_int32(number))
+
+
+def _evaluate_bitshift(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    A 32-bit signed shift: a positive count shifts right arithmetically (probe 73/74 —
+    `BitShift(1, 60)` is 0, `BitShift(-1, 1)` is -1), a negative count shifts left and refuses
+    when the result leaves int32.
+    &#34;&#34;&#34;
+    if len(arguments) != 2:
+        return None
+    one = _whole_number(arguments[0])
+    two = _number_argument(arguments, 1)
+    if one is None or two is None or not isinstance(two, int):
+        return None
+    value = _to_int32(one)
+    if two &gt;= 0:
+        return of_int_result(value &gt;&gt; two)
+    if value == 0:
+        return of_int(0)
+    if -two &gt;= 32:
+        return None
+    result = value &lt;&lt; -two
+    if result &gt; _INT32_MAX or result &lt; _INT32_MIN:
+        return None
+    return of_int_result(result)
+
+
+def _evaluate_bitrotate(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    A rotate of the low *width* bits, left for a positive count, with a sign-extended result
+    only at width 32: pinned by `BitRotate(1, 4)` = 16 (default width 16, default count 1).
+    &#34;&#34;&#34;
+    if not 1 &lt;= len(arguments) &lt;= 3:
+        return None
+    number = _int_argument(arguments, 0)
+    shift = _optional_int_argument(arguments, 1, 1)
+    width = _optional_int_argument(arguments, 2, 16)
+    if number is None or shift is None or width is None or width not in (8, 16, 32):
+        return None
+    mask = (1 &lt;&lt; width) - 1
+    value = number &amp; mask
+    count = shift % width
+    rotated = ((value &lt;&lt; count) | (value &gt;&gt; (width - count))) &amp; mask
+    if width == 32:
+        return of_int_result(_to_int32(rotated))
+    return of_int_result(rotated)
+
+
+def _chr_evaluator(limit: int) -&gt; _Evaluator:
+    &#34;&#34;&#34;
+    The character for *number*: above *limit* the empty string, at or below it the uint16 wrap
+    (probe2 50-54 — `Chr(-1)` and `ChrW(-1)` are both U+FFFF, `Chr(321)` and `ChrW(65601)` are
+    both empty). `Chr(0)` answers the NUL character, which the literal renderer then refuses.
+    &#34;&#34;&#34;
+    def evaluator(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+        if len(arguments) != 1:
+            return None
+        number = to_number(arguments[0])
+        if number is None or not isinstance(number, int):
+            return None
+        if number &gt; limit:
+            return of_string(&#39;&#39;)
+        return of_string(chr(number &amp; 0xFFFF))
+    return evaluator
+
+
+def _evaluate_asc(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None or not text:
+        return None
+    first = text[0]
+    if ord(first) &gt; 0x7F:
+        return None
+    return of_int(ord(first))
+
+
+def _evaluate_ascw(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The UTF-16 code unit of the first character: codepage-independent — `65` over `&#34;A&#34;`, `233`
+    over U+00E9 — with a character beyond the BMP answering its high surrogate and the empty
+    string zero (probe10).
+    &#34;&#34;&#34;
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None:
+        return None
+    if not text:
+        return of_int(0)
+    first = ord(text[0])
+    if first &gt; 0xFFFF:
+        return of_int(0xD800 + ((first - 0x10000) &gt;&gt; 10))
+    return of_int(first)
+
+
+def _evaluate_dec(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The hex reading of a string: unsigned by default, flag 1 reads the low 32 bits signed
+    (`Dec(&#34;FFFFFFFF&#34;, 1)` = -1), flag 2 the low 64 bits signed (`Dec(&#34;FFFFFFFF&#34;, 2)` =
+    4294967295). Anything but hex digits refuses, as does a value no flag can hold.
+    &#34;&#34;&#34;
+    if not 1 &lt;= len(arguments) &lt;= 2:
+        return None
+    text = as_string(arguments[0])
+    flag = _optional_int_argument(arguments, 1, 0)
+    if text is None or flag is None or flag not in (0, 1, 2) or not text:
+        return None
+    if any(character not in HEX_DIGITS for character in text):
+        return None
+    value = int(text, 16)
+    if value &gt; 0xFFFFFFFFFFFFFFFF:
+        return None
+    if flag == 1:
+        return of_int_result(_to_int32(value))
+    if flag == 2:
+        return of_int_result(_to_int64_signed(value))
+    return of_int_result(value)
+
+
+def _evaluate_hex(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The unsigned 64-bit hex of a number: eight digits by default when the value fits signed
+    int32 and sixteen otherwise, an explicit length zero-padding on the left or keeping the
+    rightmost digits (all seven pinned facts, probe 86-87 and probe3 20-24). A double is read
+    as its 64-bit IEEE bits, which follow the integer rule from there (probe7 60-64). A length
+    above sixteen is not a reading any probe pinned, so it refuses rather than spell an
+    unbounded string of zeroes.
+    &#34;&#34;&#34;
+    if not 1 &lt;= len(arguments) &lt;= 2:
+        return None
+    value = arguments[0]
+    if value.kind is Kind.DOUBLE:
+        bits = int.from_bytes(struct.pack(&#39;&gt;d&#39;, cast(float, value.payload)), &#39;big&#39;)
+        number = _to_int64_signed(bits)
+    else:
+        number = _int_argument(arguments, 0)
+    if number is None:
+        return None
+    unsigned = number &amp; 0xFFFFFFFFFFFFFFFF
+    if len(arguments) == 2:
+        length = _int_argument(arguments, 1)
+        if length is None or not 1 &lt;= length &lt;= 16:
+            return None
+    else:
+        length = 8 if _INT32_MIN &lt;= number &lt;= _INT32_MAX else 16
+    return of_string(F&#39;{unsigned:016X}&#39;[16 - length:])
+
+
+def _evaluate_string(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = to_string(arguments[0])
+    if text is None:
+        return None
+    return of_string(text)
+
+
+def _evaluate_stringlen(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None:
+        return None
+    return of_int(len(text))
+
+
+def _slice_evaluator(take: Callable[[str, int], str]) -&gt; _Evaluator:
+    &#34;&#34;&#34;
+    The substring builtin family: the text and a non-negative count, answering *take* of the two.
+    &#34;&#34;&#34;
+    def evaluator(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+        if len(arguments) != 2:
+            return None
+        text = as_string(arguments[0])
+        count = _int_argument(arguments, 1)
+        if text is None or count is None or count &lt; 0:
+            return None
+        return of_string(take(text, count))
+    return evaluator
+
+
+_evaluate_stringleft = _slice_evaluator(lambda text, count: text[:count])
+_evaluate_stringright = _slice_evaluator(lambda text, count: text[max(0, len(text) - count):])
+_evaluate_stringtrimleft = _slice_evaluator(lambda text, count: text[count:])
+_evaluate_stringtrimright = _slice_evaluator(lambda text, count: text[:max(0, len(text) - count)])
+
+
+def _evaluate_stringmid(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if not 2 &lt;= len(arguments) &lt;= 3:
+        return None
+    text = as_string(arguments[0])
+    start = _int_argument(arguments, 1)
+    if text is None or start is None or start &lt; 1:
+        return None
+    if len(arguments) == 3:
+        count = _int_argument(arguments, 2)
+        if count is None or count &lt; 0:
+            return None
+        return of_string(text[start - 1:start - 1 + count])
+    return of_string(text[start - 1:])
+
+
+def _evaluate_stringupper(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None or not text.isascii():
+        return None
+    return of_string(text.upper())
+
+
+def _evaluate_stringlower(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None or not text.isascii():
+        return None
+    return of_string(text.lower())
+
+
+def _evaluate_stringinstr(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The 1-based position of a needle, 0 when absent, case-insensitive by default and under
+    flag 1 case-sensitive (probe 91-92, probe2 30-32). The case-insensitive search is ASCII-only:
+    how AutoIt lowercases text beyond ASCII is not a fact any probe pinned.
+    &#34;&#34;&#34;
+    if not 2 &lt;= len(arguments) &lt;= 3:
+        return None
+    haystack = as_string(arguments[0])
+    needle = as_string(arguments[1])
+    flag = _optional_int_argument(arguments, 2, 0)
+    if haystack is None or needle is None or flag not in (0, 1) or not needle:
+        return None
+    if flag == 1:
+        position = haystack.find(needle)
+    elif haystack.isascii() and needle.isascii():
+        position = haystack.lower().find(needle.lower())
+    else:
+        return None
+    return of_int(position + 1)
+
+
+def _evaluate_stringreplace(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if not 3 &lt;= len(arguments) &lt;= 4:
+        return None
+    text = as_string(arguments[0])
+    search = as_string(arguments[1])
+    replacement = as_string(arguments[2])
+    flag = _optional_int_argument(arguments, 3, 0)
+    if (
+        text is None
+        or search is None
+        or replacement is None
+        or flag is None
+        or flag not in (0, 1)
+        or not search
+        or not text.isascii()
+        or not search.isascii()
+        or not replacement.isascii()
+    ):
+        return None
+    if flag == 1:
+        return of_string(text.replace(search, replacement))
+    pattern = re.escape(search)
+    return of_string(re.sub(
+        pattern,
+        replacement.replace(&#39;\\&#39;, &#39;\\\\&#39;),
+        text,
+        flags=re.IGNORECASE,
+    ))
+
+
+def _evaluate_stringreverse(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None:
+        return None
+    return of_string(text[::-1])
+
+
+def _evaluate_stringsplit(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The array `StringSplit` builds: the delimiter a character set under the default flag, an
+    empty delimiter one element per character (probe2 61), an empty input a single empty element
+    (probe 122, probe2 60), the element count in `[0]` unless flag 2 drops it (probe 120-121).
+    &#34;&#34;&#34;
+    if not 2 &lt;= len(arguments) &lt;= 3:
+        return None
+    text = as_string(arguments[0])
+    delimiter = as_string(arguments[1])
+    flag = _optional_int_argument(arguments, 2, 0)
+    if text is None or delimiter is None or flag is None or flag not in (0, 2):
+        return None
+    if not text:
+        parts = [&#39;&#39;]
+    elif not delimiter:
+        parts = list(text)
+    else:
+        parts = re.split(&#39;[&#39; + re.escape(delimiter) + &#39;]&#39;, text)
+    if flag == 2:
+        return of_array(tuple(of_string(part) for part in parts))
+    return of_array((
+        of_int(len(parts)),
+        *(of_string(part) for part in parts)
+    ))
+
+
+def _evaluate_binary(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    text = as_string(arguments[0])
+    if text is None:
+        return None
+    data = _string_bytes(text)
+    if data is None:
+        return None
+    return of_binary(data)
+
+
+def _evaluate_binarylen(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if len(arguments) != 1:
+        return None
+    data = as_binary(arguments[0])
+    if data is None:
+        return None
+    return of_int(len(data))
+
+
+def _evaluate_binarymid(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if not 2 &lt;= len(arguments) &lt;= 3:
+        return None
+    data = as_binary(arguments[0])
+    start = _int_argument(arguments, 1)
+    if data is None or start is None or start &lt; 1:
+        return None
+    if len(arguments) == 3:
+        count = _int_argument(arguments, 2)
+        if count is None or count &lt; 0:
+            return None
+        return of_binary(data[start - 1:start - 1 + count])
+    return of_binary(data[start - 1:])
+
+
+def _evaluate_binarytostring(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The string the argument&#39;s bytes spell: flag 1 (the default) ASCII, refusing any byte at or
+    above `0x80`; flag 2 UTF-16-LE, refusing an odd byte count (probe 100/104).
+    &#34;&#34;&#34;
+    if not 1 &lt;= len(arguments) &lt;= 2:
+        return None
+    data = _binary_argument(arguments, 0)
+    flag = _optional_int_argument(arguments, 1, 1)
+    if data is None or flag is None or flag not in (1, 2):
+        return None
+    if flag == 2:
+        if len(data) % 2:
+            return None
+        try:
+            return of_string(data.decode(&#39;utf-16-le&#39;))
+        except UnicodeDecodeError:
+            return None
+    if any(byte &gt;= 0x80 for byte in data):
+        return None
+    return of_string(data.decode(&#39;ascii&#39;))
+
+
+def _evaluate_stringtobinary(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if not 1 &lt;= len(arguments) &lt;= 2:
+        return None
+    text = as_string(arguments[0])
+    flag = _optional_int_argument(arguments, 1, 1)
+    if text is None or flag is None or flag not in (1, 2):
+        return None
+    if flag == 2:
+        try:
+            return of_binary(text.encode(&#39;utf-16-le&#39;))
+        except UnicodeEncodeError:
+            return None
+    data = _string_bytes(text)
+    if data is None:
+        return None
+    return of_binary(data)
+
+
+def _evaluate_ubound(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    if not 1 &lt;= len(arguments) &lt;= 2:
+        return None
+    elements = as_array(arguments[0])
+    dimension = _optional_int_argument(arguments, 1, 1)
+    if elements is None or dimension != 1:
+        return None
+    return of_int(len(elements))
+
+
+def _kind_evaluator(kinds: frozenset[Kind]) -&gt; _Evaluator:
+    &#34;&#34;&#34;
+    The kind-membership `Is…` functions: the integer 1 when the argument&#39;s kind is one of
+    *kinds*, the integer 0 otherwise (probe7 31-33; probe8 45).
+    &#34;&#34;&#34;
+    def evaluator(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+        if len(arguments) != 1:
+            return None
+        return of_int(1 if arguments[0].kind in kinds else 0)
+    return evaluator
+
+
+def _evaluate_isint(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The integer 1 for a number without a fractional part, a double holding a whole value
+    included (probe6 53), and 0 for a string (probe7 35; probe8 44). A boolean, a binary, and an
+    array are not readings any probe pinned, so they refuse.
+    &#34;&#34;&#34;
+    if len(arguments) != 1:
+        return None
+    value = arguments[0]
+    if value.kind is Kind.INT:
+        return of_int(1)
+    if value.kind is Kind.DOUBLE:
+        number = cast(float, value.payload)
+        return of_int(1 if number == int(number) else 0)
+    if value.kind is Kind.STRING:
+        return of_int(0)
+    return None
+
+
+def _evaluate_isfloat(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The integer 1 only for a double with a fractional part (probe6 54; probe7 34, 38), 0 for a
+    whole double, an integer, and a string (probe8 40-42). A boolean, a binary, and an array
+    refuse.
+    &#34;&#34;&#34;
+    if len(arguments) != 1:
+        return None
+    value = arguments[0]
+    if value.kind is Kind.DOUBLE:
+        number = cast(float, value.payload)
+        return of_int(0 if number == int(number) else 1)
+    if value.kind in (Kind.INT, Kind.STRING):
+        return of_int(0)
+    return None
+
+
+def _evaluate_isnumber(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The integer 1 for a number and 0 for a string (probe7 36; probe8 43). A boolean, a binary,
+    and an array refuse.
+    &#34;&#34;&#34;
+    if len(arguments) != 1:
+        return None
+    kind = arguments[0].kind
+    if kind in (Kind.INT, Kind.DOUBLE):
+        return of_int(1)
+    if kind is Kind.STRING:
+        return of_int(0)
+    return None
+
+
+def _evaluate_never(arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The answer for `IsKeyword`, `IsObj`, `IsHWnd`, and `IsPtr` over any value this domain can
+    hold: none of the four can appear in a folded constant, and the family answers 1/0.
+    &#34;&#34;&#34;
+    if len(arguments) != 1:
+        return None
+    return of_int(0)
+
+
+_EVALUATORS: dict[str, _Evaluator] = {
+    &#39;abs&#39;             : _evaluate_abs,
+    &#39;int&#39;             : _evaluate_int,
+    &#39;floor&#39;           : _evaluate_floor,
+    &#39;ceiling&#39;         : _evaluate_ceiling,
+    &#39;number&#39;          : _evaluate_number,
+    &#39;round&#39;           : _evaluate_round,
+    &#39;sqrt&#39;            : _evaluate_sqrt,
+    &#39;sin&#39;             : _math_evaluator(math.sin),
+    &#39;cos&#39;             : _math_evaluator(math.cos),
+    &#39;tan&#39;             : _math_evaluator(math.tan),
+    &#39;asin&#39;            : _math_evaluator(math.asin),
+    &#39;acos&#39;            : _math_evaluator(math.acos),
+    &#39;atan&#39;            : _math_evaluator(math.atan),
+    &#39;exp&#39;             : _math_evaluator(math.exp),
+    &#39;log&#39;             : _math_evaluator(math.log),
+    &#39;mod&#39;             : _evaluate_mod,
+    &#39;bitand&#39;          : _evaluate_bitand,
+    &#39;bitor&#39;           : _evaluate_bitor,
+    &#39;bitxor&#39;          : _evaluate_bitxor,
+    &#39;bitnot&#39;          : _evaluate_bitnot,
+    &#39;bitshift&#39;        : _evaluate_bitshift,
+    &#39;bitrotate&#39;       : _evaluate_bitrotate,
+    &#39;chr&#39;             : _chr_evaluator(255),
+    &#39;chrw&#39;            : _chr_evaluator(65535),
+    &#39;asc&#39;             : _evaluate_asc,
+    &#39;ascw&#39;            : _evaluate_ascw,
+    &#39;dec&#39;             : _evaluate_dec,
+    &#39;hex&#39;             : _evaluate_hex,
+    &#39;string&#39;          : _evaluate_string,
+    &#39;stringlen&#39;       : _evaluate_stringlen,
+    &#39;stringleft&#39;      : _evaluate_stringleft,
+    &#39;stringright&#39;     : _evaluate_stringright,
+    &#39;stringtrimleft&#39;  : _evaluate_stringtrimleft,
+    &#39;stringtrimright&#39; : _evaluate_stringtrimright,
+    &#39;stringmid&#39;       : _evaluate_stringmid,
+    &#39;stringupper&#39;     : _evaluate_stringupper,
+    &#39;stringlower&#39;     : _evaluate_stringlower,
+    &#39;stringinstr&#39;     : _evaluate_stringinstr,
+    &#39;stringreplace&#39;   : _evaluate_stringreplace,
+    &#39;stringreverse&#39;   : _evaluate_stringreverse,
+    &#39;stringsplit&#39;     : _evaluate_stringsplit,
+    &#39;binary&#39;          : _evaluate_binary,
+    &#39;binarylen&#39;       : _evaluate_binarylen,
+    &#39;binarymid&#39;       : _evaluate_binarymid,
+    &#39;binarytostring&#39;  : _evaluate_binarytostring,
+    &#39;stringtobinary&#39;  : _evaluate_stringtobinary,
+    &#39;ubound&#39;          : _evaluate_ubound,
+    &#39;isarray&#39;         : _kind_evaluator(frozenset({Kind.ARRAY})),
+    &#39;isbinary&#39;        : _kind_evaluator(frozenset({Kind.BINARY})),
+    &#39;isbool&#39;          : _kind_evaluator(frozenset({Kind.BOOL})),
+    &#39;isint&#39;           : _evaluate_isint,
+    &#39;isfloat&#39;         : _evaluate_isfloat,
+    &#39;isnumber&#39;        : _evaluate_isnumber,
+    &#39;isstring&#39;        : _kind_evaluator(frozenset({Kind.STRING})),
+    &#39;iskeyword&#39;       : _evaluate_never,
+    &#39;isobj&#39;           : _evaluate_never,
+    &#39;ishwnd&#39;          : _evaluate_never,
+    &#39;isptr&#39;           : _evaluate_never,
+}
+
+#: The builtins `evaluate_builtin` can answer: the emulated functions above, and nothing else.
+#: `Execute` and `Assign` never fold as a value — `Execute`&#39;s argument is code, and `Assign`&#39;s
+#: effect is a write the may-write summaries read — so the transforms resolve them structurally
+#: and they stand in no table here; a `Call` invocation may write any of its `ByRef` arguments,
+#: and `Eval`&#39;s value is a read of a name the tree spells as a string, which the name-parameter
+#: table below resolves instead. `refinery.lib.scripts.au3.functions.AUTOIT_FUNCTION_NAMES` is
+#: the question every other consumer actually asks.
+EMULATED_NAMES = frozenset(_EVALUATORS)
+
+#: The builtins that run script code the tree does not hold inline: `Call` dispatches to the
+#: function its argument names, and every registration builtin runs a registered script function
+#: on its own trigger — a press, a timer, a message, an event — at a moment no walk of the tree
+#: can place, so what that function writes is a write the registration may perform. `Execute`
+#: and `Assign` answer `False` for the same reason they stand outside `EMULATED_NAMES`: their
+#: payload readers own the precise answer, which a caller should prefer over this set.
+DISPATCHING_NAMES = frozenset({
+    &#39;call&#39;,
+    &#39;execute&#39;,
+    &#39;assign&#39;,
+    &#39;adlibregister&#39;,
+    &#39;onautoitexitregister&#39;,
+    &#39;dllcallbackregister&#39;,
+    &#39;hotkeyset&#39;,
+    &#39;guiregistermsg&#39;,
+    &#39;guictrlregisterlistviewsort&#39;,
+    &#39;guisetonevent&#39;,
+    &#39;guictrlsetonevent&#39;,
+    &#39;traysetonevent&#39;,
+    &#39;trayitemsetonevent&#39;,
+    &#39;objevent&#39;,
+})
+
+#: The builtins that set an interpreter option: an expanding one rewrites the meaning of every
+#: string literal evaluated after it, so a value a walk proved before the call may not hold
+#: after it — the same reason `refinery.lib.scripts.au3.analysis.existence` reads this set for
+#: its own census, which is why it lives here: `Opt` is the documented alias of
+#: `AutoItSetOption`.
+OPTION_SETTERS = frozenset({&#39;opt&#39;, &#39;autoitsetoption&#39;})
+
+
+def call_is_bounded(name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a call to *name* can neither write an arbitrary variable nor hold a bare-variable
+    argument by reference nor change what a stored literal means: true for every core builtin
+    but the dispatching ones and the option setters, confirmed by the absence of a `ByRef`
+    parameter in the official per-function docs. `Call` runs the function its argument names
+    and may write through its `ByRef` parameters, and a registration builtin runs a registered
+    script function on its own trigger, which may write any global. `Execute` and `Assign`
+    answer `False` here not because they are unbounded but because they have a more precise
+    answer elsewhere — `execute_kills` and `assign_kills` in
+    `refinery.lib.scripts.au3.analysis.existence` — which a caller should prefer over this
+    blunter fact whenever it has the call site in hand to ask them.
+    &#34;&#34;&#34;
+    return (
+        name in AUTOIT_FUNCTION_NAMES
+        and name not in DISPATCHING_NAMES
+        and name not in OPTION_SETTERS
+    )
+
+
+#: The builtins that consume the name of a script function or a variable through an argument,
+#: each mapped to every position that argument can take. The table errs on inclusion: a call to
+#: a name AutoIt does not define is fatal and cannot stand in a script that runs, so a spurious
+#: entry costs conservatism where a missing one is a hole — `DllCallbackRegister` lists both
+#: leading positions for exactly that reason. `Execute` is absent because
+#: `refinery.lib.scripts.au3.analysis.existence.execute_kills` answers what its payload can do.
+NAME_PARAMETERS: dict[str, frozenset[int]] = {
+    &#39;call&#39;                   : frozenset({0}),
+    &#39;assign&#39;                 : frozenset({0}),
+    &#39;eval&#39;                   : frozenset({0}),
+    &#39;isdeclared&#39;             : frozenset({0}),
+    &#39;isfunc&#39;                 : frozenset({0}),
+    &#39;adlibregister&#39;          : frozenset({0}),
+    &#39;adlibunregister&#39;        : frozenset({0}),
+    &#39;onautoitexitregister&#39;   : frozenset({0}),
+    &#39;onautoitexitunregister&#39; : frozenset({0}),
+    &#39;dllcallbackregister&#39;   : frozenset({0, 1}),
+    &#39;hotkeyset&#39;              : frozenset({1}),
+    &#39;guiregistermsg&#39;         : frozenset({1}),
+    &#39;guictrlregisterlistviewsort&#39;: frozenset({1}),
+    &#39;guisetonevent&#39;          : frozenset({1}),
+    &#39;guictrlsetonevent&#39;      : frozenset({1}),
+    &#39;traysetonevent&#39;         : frozenset({1}),
+    &#39;trayitemsetonevent&#39;     : frozenset({1}),
+    &#39;objevent&#39;               : frozenset({1}),
+}
+
+
+def evaluate_builtin(name: str, arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The value builtin *name* returns over *arguments*: `None` when the builtin is not emulated,
+    the arity is wrong, or an argument sits outside the builtin&#39;s pinned domain — every refusal
+    leaves the call standing.
+    &#34;&#34;&#34;
+    evaluator = _EVALUATORS.get(name)
+    if evaluator is None:
+        return None
+    return evaluator(arguments)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.builtins.EMULATED_NAMES"><code class="name">var <span class="ident">EMULATED_NAMES</span></code></dt>
+<dd>
+<section class="desc"><p>The builtins <code><a title="refinery.lib.scripts.au3.analysis.builtins.evaluate_builtin" href="#refinery.lib.scripts.au3.analysis.builtins.evaluate_builtin">evaluate_builtin()</a></code> can answer: the emulated functions above, and nothing else.
+<code>Execute</code> and <code>Assign</code> never fold as a value — <code>Execute</code>'s argument is code, and <code>Assign</code>'s
+effect is a write the may-write summaries read — so the transforms resolve them structurally
+and they stand in no table here; a <code>Call</code> invocation may write any of its <code>ByRef</code> arguments,
+and <code>Eval</code>'s value is a read of a name the tree spells as a string, which the name-parameter
+table below resolves instead. <code><a title="refinery.lib.scripts.au3.functions.AUTOIT_FUNCTION_NAMES" href="../functions.html#refinery.lib.scripts.au3.functions.AUTOIT_FUNCTION_NAMES">AUTOIT_FUNCTION_NAMES</a></code> is
+the question every other consumer actually asks.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.builtins.DISPATCHING_NAMES"><code class="name">var <span class="ident">DISPATCHING_NAMES</span></code></dt>
+<dd>
+<section class="desc"><p>The builtins that run script code the tree does not hold inline: <code>Call</code> dispatches to the
+function its argument names, and every registration builtin runs a registered script function
+on its own trigger — a press, a timer, a message, an event — at a moment no walk of the tree
+can place, so what that function writes is a write the registration may perform. <code>Execute</code>
+and <code>Assign</code> answer <code>False</code> for the same reason they stand outside <code><a title="refinery.lib.scripts.au3.analysis.builtins.EMULATED_NAMES" href="#refinery.lib.scripts.au3.analysis.builtins.EMULATED_NAMES">EMULATED_NAMES</a></code>: their
+payload readers own the precise answer, which a caller should prefer over this set.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.builtins.OPTION_SETTERS"><code class="name">var <span class="ident">OPTION_SETTERS</span></code></dt>
+<dd>
+<section class="desc"><p>The builtins that set an interpreter option: an expanding one rewrites the meaning of every
+string literal evaluated after it, so a value a walk proved before the call may not hold
+after it — the same reason <code><a title="refinery.lib.scripts.au3.analysis.existence" href="existence.html">refinery.lib.scripts.au3.analysis.existence</a></code> reads this set for
+its own census, which is why it lives here: <code>Opt</code> is the documented alias of
+<code>AutoItSetOption</code>.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.builtins.NAME_PARAMETERS"><code class="name">var <span class="ident">NAME_PARAMETERS</span></code></dt>
+<dd>
+<section class="desc"><p>The builtins that consume the name of a script function or a variable through an argument,
+each mapped to every position that argument can take. The table errs on inclusion: a call to
+a name AutoIt does not define is fatal and cannot stand in a script that runs, so a spurious
+entry costs conservatism where a missing one is a hole — <code>DllCallbackRegister</code> lists both
+leading positions for exactly that reason. <code>Execute</code> is absent because
+<code><a title="refinery.lib.scripts.au3.analysis.existence.execute_kills" href="existence.html#refinery.lib.scripts.au3.analysis.existence.execute_kills">execute_kills()</a></code> answers what its payload can do.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.builtins.call_is_bounded"><code class="name flex">
+<span>def <span class="ident">call_is_bounded</span></span>(<span>name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a call to <em>name</em> can neither write an arbitrary variable nor hold a bare-variable
+argument by reference nor change what a stored literal means: true for every core builtin
+but the dispatching ones and the option setters, confirmed by the absence of a <code>ByRef</code>
+parameter in the official per-function docs. <code>Call</code> runs the function its argument names
+and may write through its <code>ByRef</code> parameters, and a registration builtin runs a registered
+script function on its own trigger, which may write any global. <code>Execute</code> and <code>Assign</code>
+answer <code>False</code> here not because they are unbounded but because they have a more precise
+answer elsewhere — <code>execute_kills</code> and <code>assign_kills</code> in
+<code><a title="refinery.lib.scripts.au3.analysis.existence" href="existence.html">refinery.lib.scripts.au3.analysis.existence</a></code> — which a caller should prefer over this
+blunter fact whenever it has the call site in hand to ask them.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/builtins.py#L885-L902" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call_is_bounded(name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a call to *name* can neither write an arbitrary variable nor hold a bare-variable
+    argument by reference nor change what a stored literal means: true for every core builtin
+    but the dispatching ones and the option setters, confirmed by the absence of a `ByRef`
+    parameter in the official per-function docs. `Call` runs the function its argument names
+    and may write through its `ByRef` parameters, and a registration builtin runs a registered
+    script function on its own trigger, which may write any global. `Execute` and `Assign`
+    answer `False` here not because they are unbounded but because they have a more precise
+    answer elsewhere — `execute_kills` and `assign_kills` in
+    `refinery.lib.scripts.au3.analysis.existence` — which a caller should prefer over this
+    blunter fact whenever it has the call site in hand to ask them.
+    &#34;&#34;&#34;
+    return (
+        name in AUTOIT_FUNCTION_NAMES
+        and name not in DISPATCHING_NAMES
+        and name not in OPTION_SETTERS
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.builtins.evaluate_builtin"><code class="name flex">
+<span>def <span class="ident">evaluate_builtin</span></span>(<span>name, arguments)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The value builtin <em>name</em> returns over <em>arguments</em>: <code>None</code> when the builtin is not emulated,
+the arity is wrong, or an argument sits outside the builtin's pinned domain — every refusal
+leaves the call standing.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/builtins.py#L933-L942" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def evaluate_builtin(name: str, arguments: tuple[Au3Value, ...]) -&gt; Au3Value | None:
+    &#34;&#34;&#34;
+    The value builtin *name* returns over *arguments*: `None` when the builtin is not emulated,
+    the arity is wrong, or an argument sits outside the builtin&#39;s pinned domain — every refusal
+    leaves the call standing.
+    &#34;&#34;&#34;
+    evaluator = _EVALUATORS.get(name)
+    if evaluator is None:
+        return None
+    return evaluator(arguments)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.analysis" href="index.html">refinery.lib.scripts.au3.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.builtins.EMULATED_NAMES" href="#refinery.lib.scripts.au3.analysis.builtins.EMULATED_NAMES">EMULATED_NAMES</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.builtins.DISPATCHING_NAMES" href="#refinery.lib.scripts.au3.analysis.builtins.DISPATCHING_NAMES">DISPATCHING_NAMES</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.builtins.OPTION_SETTERS" href="#refinery.lib.scripts.au3.analysis.builtins.OPTION_SETTERS">OPTION_SETTERS</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.builtins.NAME_PARAMETERS" href="#refinery.lib.scripts.au3.analysis.builtins.NAME_PARAMETERS">NAME_PARAMETERS</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.builtins.call_is_bounded" href="#refinery.lib.scripts.au3.analysis.builtins.call_is_bounded">call_is_bounded</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.builtins.evaluate_builtin" href="#refinery.lib.scripts.au3.analysis.builtins.evaluate_builtin">evaluate_builtin</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

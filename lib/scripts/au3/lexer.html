@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.lexer documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.lexer</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L1-L346" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">from __future__ import annotations
+
+import string
+
+from dataclasses import dataclass
+from typing import Generator
+
+from refinery.lib.scripts.au3.token import KEYWORDS, Au3Token, Au3TokenKind
+
+_HEX = frozenset(&#39;0123456789abcdefABCDEF&#39;)
+
+_TWO_CHAR_OPS: dict[str, Au3TokenKind] = {
+    &#39;==&#39; : Au3TokenKind.EQ_STRICT,
+    &#39;&lt;&gt;&#39; : Au3TokenKind.NE,
+    &#39;&lt;=&#39; : Au3TokenKind.LE,
+    &#39;&gt;=&#39; : Au3TokenKind.GE,
+    &#39;+=&#39; : Au3TokenKind.PLUS_ASSIGN,
+    &#39;-=&#39; : Au3TokenKind.MINUS_ASSIGN,
+    &#39;*=&#39; : Au3TokenKind.MUL_ASSIGN,
+    &#39;/=&#39; : Au3TokenKind.DIV_ASSIGN,
+    &#39;&amp;=&#39; : Au3TokenKind.CONCAT_ASSIGN,
+}
+
+_ONE_CHAR_OPS: dict[str, Au3TokenKind] = {
+    &#39;=&#39;  : Au3TokenKind.ASSIGN_OR_EQ,
+    &#39;+&#39;  : Au3TokenKind.PLUS,
+    &#39;-&#39;  : Au3TokenKind.MINUS,
+    &#39;*&#39;  : Au3TokenKind.STAR,
+    &#39;/&#39;  : Au3TokenKind.SLASH,
+    &#39;^&#39;  : Au3TokenKind.CARET,
+    &#39;&amp;&#39;  : Au3TokenKind.AMP,
+    &#39;&lt;&#39;  : Au3TokenKind.LT,
+    &#39;&gt;&#39;  : Au3TokenKind.GT,
+    &#39;?&#39;  : Au3TokenKind.QUESTION,
+    &#39;:&#39;  : Au3TokenKind.COLON,
+    &#39;(&#39;  : Au3TokenKind.LPAREN,
+    &#39;)&#39;  : Au3TokenKind.RPAREN,
+    &#39;[&#39;  : Au3TokenKind.LBRACKET,
+    &#39;]&#39;  : Au3TokenKind.RBRACKET,
+    &#39;,&#39;  : Au3TokenKind.COMMA,
+    &#39;.&#39;  : Au3TokenKind.DOT,
+}
+
+#: Every character the lexer ends a line on, and with it a comment, a directive, or a string
+#: literal: `refinery.lib.scripts.au3.analysis.values` reads the set to refuse a value no
+#: literal can spell.
+LINE_BREAKS = frozenset(&#39;\r\n\u2028\u2029&#39;)
+
+_ASCII_LOWER = str.maketrans(string.ascii_uppercase, string.ascii_lowercase)
+
+_BLOCK_COMMENT_START = (&#39;#cs&#39;, &#39;#comments-start&#39;)
+_BLOCK_COMMENT_END = (&#39;#ce&#39;, &#39;#comments-end&#39;)
+
+
+def _is_ident_start(c: str) -&gt; bool:
+    return c.isalpha() or c == &#39;_&#39; or ord(c) &gt;= 0x80
+
+
+def _is_ident_part(c: str) -&gt; bool:
+    return c.isalnum() or c == &#39;_&#39; or ord(c) &gt;= 0x80
+
+
+def is_au3_identifier(text: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *text* is a shape the lexer reads as exactly one name: a first character a name
+    starts with and only characters a name continues with, so a caller that prints it back can
+    rely on the lexer reading the same name again.
+    &#34;&#34;&#34;
+    return bool(text) and _is_ident_start(text[0]) and all(
+        _is_ident_part(c) for c in text[1:]
+    )
+
+
+def ascii_lower(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    The lowercase spelling of *text* with ASCII letters only. Python&#39;s `str.lower` also folds
+    characters outside ASCII into ASCII letters — U+212A KELVIN SIGN becomes `k` — and whether
+    AutoIt folds them too is unpinned, so a caller that may only rewrite a name it knows the
+    engine matches compares through this instead.
+    &#34;&#34;&#34;
+    return text.translate(_ASCII_LOWER)
+
+
+def decode_au3_string(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode an AutoIt string literal, including its delimiting quotes. A doubled quote is the
+    only escape sequence; both quote styles delimit strings. An unterminated literal decodes
+    to its body.
+    &#34;&#34;&#34;
+    quote = text[0]
+    body = text[1:-1] if len(text) &gt; 1 and text[-1] == quote else text[1:]
+    return body.replace(quote * 2, quote)
+
+
+def encode_au3_string(value: str, quote: str = &#39;&#34;&#39;) -&gt; str:
+    &#34;&#34;&#34;
+    Encode a string as an AutoIt string literal with the given quote character.
+    &#34;&#34;&#34;
+    return quote + value.replace(quote, quote * 2) + quote
+
+
+@dataclass
+class Au3Lexer:
+    source: str
+    pos: int = 0
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _read_line_comment(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+            self.pos += 1
+        return Au3Token(Au3TokenKind.COMMENT, src[start:self.pos], start)
+
+    def _match_word(self, words: tuple[str, ...]) -&gt; int | None:
+        &#34;&#34;&#34;
+        Return the length of the first of `words` that starts at the cursor and is not the
+        prefix of a longer identifier, or `None`. Matching is case-insensitive.
+        &#34;&#34;&#34;
+        src = self.source
+        for word in words:
+            end = self.pos + len(word)
+            if src[self.pos:end].lower() == word:
+                after = src[end:end + 1]
+                if not after or not _is_ident_part(after):
+                    return len(word)
+        return None
+
+    def _read_block_comment(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        depth = 0
+        while self.pos &lt; length:
+            if (n := self._match_word(_BLOCK_COMMENT_END)) is not None:
+                self.pos += n
+                depth -= 1
+            elif (n := self._match_word(_BLOCK_COMMENT_START)) is not None:
+                self.pos += n
+                depth += 1
+            else:
+                self.pos += 1
+                continue
+            if depth == 0:
+                break
+        end = self.pos
+        if depth != 0 and end &gt; start and src[end - 1] in LINE_BREAKS:
+            # A comment the file never closes runs to its end, and the break that ends that last
+            # line is the one the synthesizer writes after every statement: leaving it out of the
+            # comment is what makes printing one read back as itself. A terminated comment already
+            # stops at its closing word, so only the unterminated one needs this.
+            if end - 1 &gt; start and src[end - 1] == &#39;\n&#39; and src[end - 2] == &#39;\r&#39;:
+                end -= 2
+            else:
+                end -= 1
+            self.pos = end
+        return Au3Token(Au3TokenKind.COMMENT, src[start:end], start)
+
+    def _read_directive(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+            self.pos += 1
+        return Au3Token(Au3TokenKind.DIRECTIVE, src[start:self.pos], start)
+
+    def _read_string(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        quote = src[self.pos]
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in LINE_BREAKS:
+                break
+            if c == quote:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] == quote:
+                    self.pos += 1
+                    continue
+                break
+            self.pos += 1
+        return Au3Token(Au3TokenKind.STRING, src[start:self.pos], start)
+
+    def _read_number(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        if src[self.pos] == &#39;0&#39; and src[self.pos + 1:self.pos + 2] in (&#39;x&#39;, &#39;X&#39;):
+            if src[self.pos + 2:self.pos + 3] and src[self.pos + 2] in _HEX:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in _HEX:
+                    self.pos += 1
+                return Au3Token(Au3TokenKind.INTEGER, src[start:self.pos], start)
+        is_float = False
+        while self.pos &lt; length and src[self.pos].isdigit():
+            self.pos += 1
+        if (
+            self.pos &lt; length
+            and src[self.pos] == &#39;.&#39;
+            and self.pos + 1 &lt; length
+            and src[self.pos + 1].isdigit()
+        ):
+            is_float = True
+            self.pos += 1
+            while self.pos &lt; length and src[self.pos].isdigit():
+                self.pos += 1
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            peek = self.pos + 1
+            if peek &lt; length and src[peek] in &#39;+-&#39;:
+                peek += 1
+            if peek &lt; length and src[peek].isdigit():
+                is_float = True
+                self.pos = peek
+                while self.pos &lt; length and src[self.pos].isdigit():
+                    self.pos += 1
+        kind = Au3TokenKind.FLOAT if is_float else Au3TokenKind.INTEGER
+        return Au3Token(kind, src[start:self.pos], start)
+
+    def _read_prefixed_name(self, kind: Au3TokenKind) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        return Au3Token(kind, src[start:self.pos], start)
+
+    def _read_identifier(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        word = src[start:self.pos]
+        kind = KEYWORDS.get(word.lower())
+        if kind is not None:
+            return Au3Token(kind, word, start)
+        return Au3Token(Au3TokenKind.IDENTIFIER, word, start)
+
+    def _consume_continuation(self):
+        &#34;&#34;&#34;
+        The cursor is on a line-continuation underscore: consume it, the rest of its line, and
+        the line break itself, so the logical line continues on the next physical one. Blank
+        lines after the break are consumed as well.
+        &#34;&#34;&#34;
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+            self.pos += 1
+        while self.pos &lt; length and src[self.pos] in LINE_BREAKS:
+            self.pos += 1
+            while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+                self.pos += 1
+            if self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+                return
+
+    def _is_blank_rest_of_line(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Check whether everything from just after the cursor&#39;s underscore to the end of the
+        line is whitespace or a comment.
+        &#34;&#34;&#34;
+        src = self.source
+        length = len(src)
+        pos = self.pos + 1
+        while pos &lt; length and src[pos] in &#39; \t&#39;:
+            pos += 1
+        if pos &lt; length and src[pos] == &#39;;&#39;:
+            while pos &lt; length and src[pos] not in LINE_BREAKS:
+                pos += 1
+        return pos &gt;= length or src[pos] in LINE_BREAKS
+
+    def _read_newline(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in LINE_BREAKS:
+                self.pos += 1
+            elif c in &#39; \t&#39;:
+                self.pos += 1
+            else:
+                break
+        return Au3Token(Au3TokenKind.NEWLINE, &#39;&#39;, start)
+
+    def tokenize(self) -&gt; Generator[Au3Token, None, None]:
+        src = self.source
+        length = len(src)
+        while True:
+            while self.pos &lt; length and src[self.pos] in &#39; \t\f\v&#39;:
+                self.pos += 1
+            if self._at_end():
+                yield Au3Token(Au3TokenKind.EOF, &#39;&#39;, self.pos)
+                return
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+            if c in LINE_BREAKS:
+                yield self._read_newline()
+                continue
+            if c == &#39;;&#39;:
+                yield self._read_line_comment()
+                continue
+            if c == &#39;#&#39;:
+                if self._match_word(_BLOCK_COMMENT_START) is not None:
+                    yield self._read_block_comment()
+                    continue
+                yield self._read_directive()
+                continue
+            if c in &#39;&#34;\&#39;&#39;:
+                yield self._read_string()
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+                yield self._read_prefixed_name(Au3TokenKind.VARIABLE)
+                continue
+            if c == &#39;@&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+                yield self._read_prefixed_name(Au3TokenKind.MACRO)
+                continue
+            if c.isdigit() or c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit():
+                yield self._read_number()
+                continue
+            if c == &#39;_&#39; and (self.pos + 1 &gt;= length or not _is_ident_part(src[self.pos + 1])):
+                if self._is_blank_rest_of_line():
+                    self._consume_continuation()
+                    continue
+                self.pos += 1
+                yield Au3Token(Au3TokenKind.ERROR, &#39;_&#39;, start)
+                continue
+            if _is_ident_start(c):
+                yield self._read_identifier()
+                continue
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                yield Au3Token(_TWO_CHAR_OPS[c2], c2, start)
+                continue
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                yield Au3Token(_ONE_CHAR_OPS[c], c, start)
+                continue
+            self.pos += 1
+            yield Au3Token(Au3TokenKind.ERROR, c, start)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.lexer.LINE_BREAKS"><code class="name">var <span class="ident">LINE_BREAKS</span></code></dt>
+<dd>
+<section class="desc"><p>Every character the lexer ends a line on, and with it a comment, a directive, or a string
+literal: <code><a title="refinery.lib.scripts.au3.analysis.values" href="analysis/values.html">refinery.lib.scripts.au3.analysis.values</a></code> reads the set to refuse a value no
+literal can spell.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.lexer.is_au3_identifier"><code class="name flex">
+<span>def <span class="ident">is_au3_identifier</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>text</em> is a shape the lexer reads as exactly one name: a first character a name
+starts with and only characters a name continues with, so a caller that prints it back can
+rely on the lexer reading the same name again.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L63-L71" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def is_au3_identifier(text: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *text* is a shape the lexer reads as exactly one name: a first character a name
+    starts with and only characters a name continues with, so a caller that prints it back can
+    rely on the lexer reading the same name again.
+    &#34;&#34;&#34;
+    return bool(text) and _is_ident_start(text[0]) and all(
+        _is_ident_part(c) for c in text[1:]
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.lexer.ascii_lower"><code class="name flex">
+<span>def <span class="ident">ascii_lower</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The lowercase spelling of <em>text</em> with ASCII letters only. Python's <code>str.lower</code> also folds
+characters outside ASCII into ASCII letters — U+212A KELVIN SIGN becomes <code>k</code> — and whether
+AutoIt folds them too is unpinned, so a caller that may only rewrite a name it knows the
+engine matches compares through this instead.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L74-L81" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def ascii_lower(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    The lowercase spelling of *text* with ASCII letters only. Python&#39;s `str.lower` also folds
+    characters outside ASCII into ASCII letters — U+212A KELVIN SIGN becomes `k` — and whether
+    AutoIt folds them too is unpinned, so a caller that may only rewrite a name it knows the
+    engine matches compares through this instead.
+    &#34;&#34;&#34;
+    return text.translate(_ASCII_LOWER)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.lexer.decode_au3_string"><code class="name flex">
+<span>def <span class="ident">decode_au3_string</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Decode an AutoIt string literal, including its delimiting quotes. A doubled quote is the
+only escape sequence; both quote styles delimit strings. An unterminated literal decodes
+to its body.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L84-L92" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def decode_au3_string(text: str) -&gt; str:
+    &#34;&#34;&#34;
+    Decode an AutoIt string literal, including its delimiting quotes. A doubled quote is the
+    only escape sequence; both quote styles delimit strings. An unterminated literal decodes
+    to its body.
+    &#34;&#34;&#34;
+    quote = text[0]
+    body = text[1:-1] if len(text) &gt; 1 and text[-1] == quote else text[1:]
+    return body.replace(quote * 2, quote)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.lexer.encode_au3_string"><code class="name flex">
+<span>def <span class="ident">encode_au3_string</span></span>(<span>value, quote='"')</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Encode a string as an AutoIt string literal with the given quote character.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L95-L99" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def encode_au3_string(value: str, quote: str = &#39;&#34;&#39;) -&gt; str:
+    &#34;&#34;&#34;
+    Encode a string as an AutoIt string literal with the given quote character.
+    &#34;&#34;&#34;
+    return quote + value.replace(quote, quote * 2) + quote</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.lexer.Au3Lexer"><code class="flex name class">
+<span>class <span class="ident">Au3Lexer</span></span>
+<span>(</span><span>source, pos=0)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Au3Lexer(source: 'str', pos: 'int' = 0)</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L102-L346" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass
+class Au3Lexer:
+    source: str
+    pos: int = 0
+
+    def _at_end(self) -&gt; bool:
+        return self.pos &gt;= len(self.source)
+
+    def _read_line_comment(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+            self.pos += 1
+        return Au3Token(Au3TokenKind.COMMENT, src[start:self.pos], start)
+
+    def _match_word(self, words: tuple[str, ...]) -&gt; int | None:
+        &#34;&#34;&#34;
+        Return the length of the first of `words` that starts at the cursor and is not the
+        prefix of a longer identifier, or `None`. Matching is case-insensitive.
+        &#34;&#34;&#34;
+        src = self.source
+        for word in words:
+            end = self.pos + len(word)
+            if src[self.pos:end].lower() == word:
+                after = src[end:end + 1]
+                if not after or not _is_ident_part(after):
+                    return len(word)
+        return None
+
+    def _read_block_comment(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        depth = 0
+        while self.pos &lt; length:
+            if (n := self._match_word(_BLOCK_COMMENT_END)) is not None:
+                self.pos += n
+                depth -= 1
+            elif (n := self._match_word(_BLOCK_COMMENT_START)) is not None:
+                self.pos += n
+                depth += 1
+            else:
+                self.pos += 1
+                continue
+            if depth == 0:
+                break
+        end = self.pos
+        if depth != 0 and end &gt; start and src[end - 1] in LINE_BREAKS:
+            # A comment the file never closes runs to its end, and the break that ends that last
+            # line is the one the synthesizer writes after every statement: leaving it out of the
+            # comment is what makes printing one read back as itself. A terminated comment already
+            # stops at its closing word, so only the unterminated one needs this.
+            if end - 1 &gt; start and src[end - 1] == &#39;\n&#39; and src[end - 2] == &#39;\r&#39;:
+                end -= 2
+            else:
+                end -= 1
+            self.pos = end
+        return Au3Token(Au3TokenKind.COMMENT, src[start:end], start)
+
+    def _read_directive(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+            self.pos += 1
+        return Au3Token(Au3TokenKind.DIRECTIVE, src[start:self.pos], start)
+
+    def _read_string(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        quote = src[self.pos]
+        self.pos += 1
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in LINE_BREAKS:
+                break
+            if c == quote:
+                self.pos += 1
+                if self.pos &lt; length and src[self.pos] == quote:
+                    self.pos += 1
+                    continue
+                break
+            self.pos += 1
+        return Au3Token(Au3TokenKind.STRING, src[start:self.pos], start)
+
+    def _read_number(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        if src[self.pos] == &#39;0&#39; and src[self.pos + 1:self.pos + 2] in (&#39;x&#39;, &#39;X&#39;):
+            if src[self.pos + 2:self.pos + 3] and src[self.pos + 2] in _HEX:
+                self.pos += 2
+                while self.pos &lt; length and src[self.pos] in _HEX:
+                    self.pos += 1
+                return Au3Token(Au3TokenKind.INTEGER, src[start:self.pos], start)
+        is_float = False
+        while self.pos &lt; length and src[self.pos].isdigit():
+            self.pos += 1
+        if (
+            self.pos &lt; length
+            and src[self.pos] == &#39;.&#39;
+            and self.pos + 1 &lt; length
+            and src[self.pos + 1].isdigit()
+        ):
+            is_float = True
+            self.pos += 1
+            while self.pos &lt; length and src[self.pos].isdigit():
+                self.pos += 1
+        if self.pos &lt; length and src[self.pos] in &#39;eE&#39;:
+            peek = self.pos + 1
+            if peek &lt; length and src[peek] in &#39;+-&#39;:
+                peek += 1
+            if peek &lt; length and src[peek].isdigit():
+                is_float = True
+                self.pos = peek
+                while self.pos &lt; length and src[self.pos].isdigit():
+                    self.pos += 1
+        kind = Au3TokenKind.FLOAT if is_float else Au3TokenKind.INTEGER
+        return Au3Token(kind, src[start:self.pos], start)
+
+    def _read_prefixed_name(self, kind: Au3TokenKind) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        self.pos += 1
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        return Au3Token(kind, src[start:self.pos], start)
+
+    def _read_identifier(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length and _is_ident_part(src[self.pos]):
+            self.pos += 1
+        word = src[start:self.pos]
+        kind = KEYWORDS.get(word.lower())
+        if kind is not None:
+            return Au3Token(kind, word, start)
+        return Au3Token(Au3TokenKind.IDENTIFIER, word, start)
+
+    def _consume_continuation(self):
+        &#34;&#34;&#34;
+        The cursor is on a line-continuation underscore: consume it, the rest of its line, and
+        the line break itself, so the logical line continues on the next physical one. Blank
+        lines after the break are consumed as well.
+        &#34;&#34;&#34;
+        src = self.source
+        length = len(src)
+        while self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+            self.pos += 1
+        while self.pos &lt; length and src[self.pos] in LINE_BREAKS:
+            self.pos += 1
+            while self.pos &lt; length and src[self.pos] in &#39; \t&#39;:
+                self.pos += 1
+            if self.pos &lt; length and src[self.pos] not in LINE_BREAKS:
+                return
+
+    def _is_blank_rest_of_line(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Check whether everything from just after the cursor&#39;s underscore to the end of the
+        line is whitespace or a comment.
+        &#34;&#34;&#34;
+        src = self.source
+        length = len(src)
+        pos = self.pos + 1
+        while pos &lt; length and src[pos] in &#39; \t&#39;:
+            pos += 1
+        if pos &lt; length and src[pos] == &#39;;&#39;:
+            while pos &lt; length and src[pos] not in LINE_BREAKS:
+                pos += 1
+        return pos &gt;= length or src[pos] in LINE_BREAKS
+
+    def _read_newline(self) -&gt; Au3Token:
+        src = self.source
+        length = len(src)
+        start = self.pos
+        while self.pos &lt; length:
+            c = src[self.pos]
+            if c in LINE_BREAKS:
+                self.pos += 1
+            elif c in &#39; \t&#39;:
+                self.pos += 1
+            else:
+                break
+        return Au3Token(Au3TokenKind.NEWLINE, &#39;&#39;, start)
+
+    def tokenize(self) -&gt; Generator[Au3Token, None, None]:
+        src = self.source
+        length = len(src)
+        while True:
+            while self.pos &lt; length and src[self.pos] in &#39; \t\f\v&#39;:
+                self.pos += 1
+            if self._at_end():
+                yield Au3Token(Au3TokenKind.EOF, &#39;&#39;, self.pos)
+                return
+            start = self.pos
+            c = src[self.pos]
+            c2 = src[self.pos:self.pos + 2]
+            if c in LINE_BREAKS:
+                yield self._read_newline()
+                continue
+            if c == &#39;;&#39;:
+                yield self._read_line_comment()
+                continue
+            if c == &#39;#&#39;:
+                if self._match_word(_BLOCK_COMMENT_START) is not None:
+                    yield self._read_block_comment()
+                    continue
+                yield self._read_directive()
+                continue
+            if c in &#39;&#34;\&#39;&#39;:
+                yield self._read_string()
+                continue
+            if c == &#39;$&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+                yield self._read_prefixed_name(Au3TokenKind.VARIABLE)
+                continue
+            if c == &#39;@&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+                yield self._read_prefixed_name(Au3TokenKind.MACRO)
+                continue
+            if c.isdigit() or c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit():
+                yield self._read_number()
+                continue
+            if c == &#39;_&#39; and (self.pos + 1 &gt;= length or not _is_ident_part(src[self.pos + 1])):
+                if self._is_blank_rest_of_line():
+                    self._consume_continuation()
+                    continue
+                self.pos += 1
+                yield Au3Token(Au3TokenKind.ERROR, &#39;_&#39;, start)
+                continue
+            if _is_ident_start(c):
+                yield self._read_identifier()
+                continue
+            if c2 in _TWO_CHAR_OPS:
+                self.pos += 2
+                yield Au3Token(_TWO_CHAR_OPS[c2], c2, start)
+                continue
+            if c in _ONE_CHAR_OPS:
+                self.pos += 1
+                yield Au3Token(_ONE_CHAR_OPS[c], c, start)
+                continue
+            self.pos += 1
+            yield Au3Token(Au3TokenKind.ERROR, c, start)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.lexer.Au3Lexer.source"><code class="name">var <span class="ident">source</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.lexer.Au3Lexer.pos"><code class="name">var <span class="ident">pos</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.lexer.Au3Lexer.tokenize"><code class="name flex">
+<span>def <span class="ident">tokenize</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/lexer.py#L291-L346" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def tokenize(self) -&gt; Generator[Au3Token, None, None]:
+    src = self.source
+    length = len(src)
+    while True:
+        while self.pos &lt; length and src[self.pos] in &#39; \t\f\v&#39;:
+            self.pos += 1
+        if self._at_end():
+            yield Au3Token(Au3TokenKind.EOF, &#39;&#39;, self.pos)
+            return
+        start = self.pos
+        c = src[self.pos]
+        c2 = src[self.pos:self.pos + 2]
+        if c in LINE_BREAKS:
+            yield self._read_newline()
+            continue
+        if c == &#39;;&#39;:
+            yield self._read_line_comment()
+            continue
+        if c == &#39;#&#39;:
+            if self._match_word(_BLOCK_COMMENT_START) is not None:
+                yield self._read_block_comment()
+                continue
+            yield self._read_directive()
+            continue
+        if c in &#39;&#34;\&#39;&#39;:
+            yield self._read_string()
+            continue
+        if c == &#39;$&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+            yield self._read_prefixed_name(Au3TokenKind.VARIABLE)
+            continue
+        if c == &#39;@&#39; and self.pos + 1 &lt; length and _is_ident_start(src[self.pos + 1]):
+            yield self._read_prefixed_name(Au3TokenKind.MACRO)
+            continue
+        if c.isdigit() or c == &#39;.&#39; and self.pos + 1 &lt; length and src[self.pos + 1].isdigit():
+            yield self._read_number()
+            continue
+        if c == &#39;_&#39; and (self.pos + 1 &gt;= length or not _is_ident_part(src[self.pos + 1])):
+            if self._is_blank_rest_of_line():
+                self._consume_continuation()
+                continue
+            self.pos += 1
+            yield Au3Token(Au3TokenKind.ERROR, &#39;_&#39;, start)
+            continue
+        if _is_ident_start(c):
+            yield self._read_identifier()
+            continue
+        if c2 in _TWO_CHAR_OPS:
+            self.pos += 2
+            yield Au3Token(_TWO_CHAR_OPS[c2], c2, start)
+            continue
+        if c in _ONE_CHAR_OPS:
+            self.pos += 1
+            yield Au3Token(_ONE_CHAR_OPS[c], c, start)
+            continue
+        self.pos += 1
+        yield Au3Token(Au3TokenKind.ERROR, c, start)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3" href="index.html">refinery.lib.scripts.au3</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.lexer.LINE_BREAKS" href="#refinery.lib.scripts.au3.lexer.LINE_BREAKS">LINE_BREAKS</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.lexer.is_au3_identifier" href="#refinery.lib.scripts.au3.lexer.is_au3_identifier">is_au3_identifier</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.lexer.ascii_lower" href="#refinery.lib.scripts.au3.lexer.ascii_lower">ascii_lower</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.lexer.decode_au3_string" href="#refinery.lib.scripts.au3.lexer.decode_au3_string">decode_au3_string</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.lexer.encode_au3_string" href="#refinery.lib.scripts.au3.lexer.encode_au3_string">encode_au3_string</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.lexer.Au3Lexer" href="#refinery.lib.scripts.au3.lexer.Au3Lexer">Au3Lexer</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.lexer.Au3Lexer.tokenize" href="#refinery.lib.scripts.au3.lexer.Au3Lexer.tokenize">tokenize</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

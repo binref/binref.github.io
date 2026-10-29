@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.analysis.cache documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.analysis.cache</code></h1>
+</header>
+<section id="section-intro">
+<p>A per-run cache of the AutoIt3 analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across every transform in a run, rebuilding the models
+only after that script's tree changes — whether a transform announces the change through
+<code><a title="refinery.lib.scripts.Transformer.changed" href="../../index.html#refinery.lib.scripts.Transformer.changed">Transformer.changed</a></code> or an in-pass mutation advances the script's
+<code><a title="refinery.lib.scripts.tree_version" href="../../index.html#refinery.lib.scripts.tree_version">tree_version()</a></code> counter. The version tracking, invalidation, and
+transformer-reuse mechanism live in <code><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></code>; this module
+declares the model slots, their build wiring, and the facts composed over several of them.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L1-L255" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+A per-run cache of the AutoIt3 analysis models. The deobfuscation pipeline builds one cache over
+the script being transformed and shares it across every transform in a run, rebuilding the models
+only after that script&#39;s tree changes — whether a transform announces the change through
+`refinery.lib.scripts.Transformer.changed` or an in-pass mutation advances the script&#39;s
+`refinery.lib.scripts.tree_version` counter. The version tracking, invalidation, and
+transformer-reuse mechanism live in `refinery.lib.scripts.modelcache.ModelCacheBase`; this module
+declares the model slots, their build wiring, and the facts composed over several of them.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from collections.abc import Mapping
+
+from refinery.lib.scripts import Node, Transformer
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.aliases import Au3AliasModel, build_alias_model
+from refinery.lib.scripts.au3.analysis.existence import (
+    Au3ExistenceModel,
+    Au3ProbeMemo,
+    build_existence_model,
+    call_target,
+    parse_payload,
+)
+from refinery.lib.scripts.au3.analysis.usage import (
+    Au3UsageModel,
+    ERROR_MACROS,
+    build_usage_model,
+    callee_census,
+)
+from refinery.lib.scripts.au3.analysis.propagation import (
+    Au3PropagationModel,
+    build_propagation_model,
+)
+from refinery.lib.scripts.au3.analysis.scopes import Au3ScopeModel, build_scope_model
+from refinery.lib.scripts.au3.analysis.values import Kind, literal_value, to_string
+from refinery.lib.scripts.au3.model import (
+    Au3Call,
+    Au3Directive,
+    Au3EnumDeclaration,
+    Au3FunctionDeclaration,
+    Au3Macro,
+    Au3MemberAccess,
+    Au3Script,
+    Au3StringLiteral,
+    Au3VariableDeclaration,
+    Expression,
+)
+from refinery.lib.scripts.modelcache import ModelCacheBase
+
+
+class Au3ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the analysis models for one root script — the scope model the
+    transforms ask which storage a write targets and which names are constant, the existence
+    census the summary refinement leans on, the alias map the indirection rewrite reads, the
+    propagation model the constant substitution reads, and the usage model the dead-code
+    elimination reads — each dropped, together, whenever this root&#39;s tree changes. The probes
+    the census makes are remembered for the whole run instead: their answers depend on what each
+    probe reads, not on the tree version. Beside the models, the cache owns the facts composed
+    over several of them — `entry_is_open`, whether the script runs from its own top-level
+    statements rather than from outside the tree, and `may_read_error_state`, whether the script
+    may read the interpreter&#39;s `@error` or `@extended` at run time.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_scopes&#39;,
+        &#39;_existence&#39;,
+        &#39;_aliases&#39;,
+        &#39;_propagation&#39;,
+        &#39;_usage&#39;,
+    )
+
+    root: Au3Script
+    _scopes: Au3ScopeModel | None
+    _existence: Au3ExistenceModel | None
+    _aliases: Au3AliasModel | None
+    _propagation: Au3PropagationModel | None
+    _usage: Au3UsageModel | None
+
+    def __init__(self, root: Node, options: object | None = None):
+        super().__init__(root, options)
+        self._probes = Au3ProbeMemo()
+
+    @property
+    def scopes(self) -&gt; Au3ScopeModel:
+        return self._lazy(&#39;_scopes&#39;, lambda: build_scope_model(self.root))
+
+    @property
+    def existence(self) -&gt; Au3ExistenceModel:
+        &#34;&#34;&#34;
+        The names a global may take when the root runs, and whether the tree may make every
+        implicit write fatal by setting `MustDeclareVars`.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_existence&#39;,
+            lambda: build_existence_model(self.root, self.scopes, self._probes),
+        )
+
+    @property
+    def aliases(self) -&gt; Au3AliasModel:
+        &#34;&#34;&#34;
+        The per-scope map of variables that provably name one function, cut by every name a
+        rebinding write — an `Assign`, a code-running `Execute`, or a script function call — may
+        cost, which the propagation summaries feed.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_aliases&#39;, lambda: build_alias_model(
+            self.root, self.scopes, self.propagation.summaries))
+
+    @property
+    def propagation(self) -&gt; Au3PropagationModel:
+        &#34;&#34;&#34;
+        The value at every variable read and the may-write summary of every script function, over
+        the scope model&#39;s binding answers.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_propagation&#39;,
+            lambda: build_propagation_model(self.root, self.scopes, self.existence),
+        )
+
+    @property
+    def usage(self) -&gt; Au3UsageModel:
+        &#34;&#34;&#34;
+        What the script does with its names — the call counts, purity, channels, spellings, and
+        storage bindings the dead-code elimination asks — over the scope model&#39;s bindings and the
+        propagation walk&#39;s may-write summaries.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_usage&#39;, lambda: build_usage_model(
+            self.root, self.scopes, self.propagation.summaries))
+
+    @property
+    def entry_is_open(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the root runs from its own top-level statements: it holds a statement that is
+        neither a declaration, a function definition nor a directive, and no include — read from
+        the scope model in both spellings the parser answers with, and from the unread text the
+        usage model holds — because an included file&#39;s contents are called from outside the tree.
+        &#34;&#34;&#34;
+        if self.scopes.holds_an_include:
+            return False
+        if self.usage.holds_unread_include():
+            return False
+        for statement in self.root.body:
+            if not isinstance(statement, (
+                Au3VariableDeclaration,
+                Au3EnumDeclaration,
+                Au3FunctionDeclaration,
+                Au3Directive,
+            )):
+                return True
+        return False
+
+    @property
+    def may_read_error_state(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the script may read the interpreter&#39;s `@error` or `@extended` at run time: a read
+        of either macro anywhere in the tree, a callee computed at run time — which may name
+        `Execute` over a payload no walk reads — an include, whose contents no fact of the tree
+        holds, or an `Execute` the tree spells, in text the parser could not read included, whose
+        payload is not provably free of such a read. Entering a user function clears both (probe9
+        A17/A17b), so a pass that replaces a call with its value drops a write a later read may
+        observe.
+        &#34;&#34;&#34;
+        census = callee_census(self.root, self.usage.functions, self.usage.unparsed)
+        if census.reads_error_macros or census.computed_callee:
+            return True
+        if self.scopes.holds_an_include or self.usage.holds_unread_include():
+            return True
+        if any(
+            &#39;execute&#39; in facts.identifiers
+            for facts in self.usage.unparsed.values()
+        ):
+            return True
+        return any(
+            isinstance(node, Au3Call)
+            and _call_may_read_error_state(node, self.usage.functions)
+            for node in self.root.walk()
+        )
+
+
+def _call_may_read_error_state(
+    call: Au3Call,
+    functions: Mapping[str, Au3FunctionDeclaration],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *call* may read `@error` or `@extended` through a payload it dispatches: a callee
+    computed at run time may name `Execute`, and an `Execute`, or a `Call` over the name, runs the
+    payload its argument spells — a `Call` whose name folds to a literal is read for the callee
+    `call_target` resolves the name to, and one whose name does not fold, or whose resolution
+    refuses, may dispatch anything. A call to a script function reads nothing this walk has to
+    find: its body stands in the tree, where the census reads it.
+    &#34;&#34;&#34;
+    callee = ast.direct_callee(call)
+    if callee is None:
+        return not isinstance(ast.unwrap_parens(call.callee), Au3MemberAccess)
+    if callee.name in functions:
+        return False
+    if callee.name == &#39;execute&#39;:
+        if len(call.arguments) != 1:
+            return True
+        return not _payload_free_of_error_state(call.arguments[0], functions)
+    if callee.name == &#39;call&#39;:
+        function_names = frozenset(functions)
+        name = literal_value(
+            call.arguments[0] if call.arguments else None,
+            function_names,
+        )
+        spelling = None if name is None or name.kind is not Kind.STRING else to_string(name)
+        if spelling is None:
+            return True
+        target = call_target(spelling, call.arguments[1:], function_names)
+        if target is None:
+            return True
+        if target != &#39;execute&#39;:
+            return False
+        return not _payload_free_of_error_state(
+            call.arguments[1] if len(call.arguments) &gt; 1 else None,
+            functions,
+        )
+    return False
+
+
+def _payload_free_of_error_state(
+    argument: Expression | None,
+    functions: Mapping[str, Au3FunctionDeclaration],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether an `Execute` payload provably reads neither `@error` nor `@extended`: a string
+    literal that parses to an expression free of both, where every dispatch the parse holds —
+    an `Execute`, or a `Call` over the name, inside the payload — hands its own literal to the
+    same question, so a payload that runs a payload may read through the one inside. Any other
+    shape may read either: an unparseable payload is still code AutoIt may run, this parser&#39;s
+    refusal is not AutoIt&#39;s. An empty payload answers `&#34;&#34;` at run time and reads nothing.
+    &#34;&#34;&#34;
+    literal = ast.unwrap_parens(argument) if argument is not None else None
+    if not isinstance(literal, Au3StringLiteral):
+        return False
+    expression = parse_payload(literal.value)
+    if expression is None:
+        return not literal.value.strip()
+    for node in expression.walk():
+        if isinstance(node, Au3Macro) and node.name in ERROR_MACROS:
+            return False
+        if isinstance(node, Au3Call) and _call_may_read_error_state(node, functions):
+            return False
+    return True
+
+
+def model_cache(transformer: Transformer, root: Node) -&gt; Au3ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `Au3ModelCache` for *root* when one is attached to *transformer* and
+    built over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse
+    within its single-pass lifetime. See
+    `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return Au3ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.cache.model_cache"><code class="name flex">
+<span>def <span class="ident">model_cache</span></span>(<span>transformer, root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The pipeline's shared <code><a title="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache" href="#refinery.lib.scripts.au3.analysis.cache.Au3ModelCache">Au3ModelCache</a></code> for <em>root</em> when one is attached to <em>transformer</em> and
+built over that same root, otherwise a fresh cache stashed back onto <em>transformer</em> for reuse
+within its single-pass lifetime. See
+<code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">ModelCacheBase.for_transformer()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L248-L255" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def model_cache(transformer: Transformer, root: Node) -&gt; Au3ModelCache:
+    &#34;&#34;&#34;
+    The pipeline&#39;s shared `Au3ModelCache` for *root* when one is attached to *transformer* and
+    built over that same root, otherwise a fresh cache stashed back onto *transformer* for reuse
+    within its single-pass lifetime. See
+    `refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer`.
+    &#34;&#34;&#34;
+    return Au3ModelCache.for_transformer(transformer, root)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache"><code class="flex name class">
+<span>class <span class="ident">Au3ModelCache</span></span>
+<span>(</span><span>root, options=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Lazily builds and memoizes the analysis models for one root script — the scope model the
+transforms ask which storage a write targets and which names are constant, the existence
+census the summary refinement leans on, the alias map the indirection rewrite reads, the
+propagation model the constant substitution reads, and the usage model the dead-code
+elimination reads — each dropped, together, whenever this root's tree changes. The probes
+the census makes are remembered for the whole run instead: their answers depend on what each
+probe reads, not on the tree version. Beside the models, the cache owns the facts composed
+over several of them — <code>entry_is_open</code>, whether the script runs from its own top-level
+statements rather than from outside the tree, and <code>may_read_error_state</code>, whether the script
+may read the interpreter's <code>@error</code> or <code>@extended</code> at run time.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L51-L177" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Au3ModelCache(ModelCacheBase):
+    &#34;&#34;&#34;
+    Lazily builds and memoizes the analysis models for one root script — the scope model the
+    transforms ask which storage a write targets and which names are constant, the existence
+    census the summary refinement leans on, the alias map the indirection rewrite reads, the
+    propagation model the constant substitution reads, and the usage model the dead-code
+    elimination reads — each dropped, together, whenever this root&#39;s tree changes. The probes
+    the census makes are remembered for the whole run instead: their answers depend on what each
+    probe reads, not on the tree version. Beside the models, the cache owns the facts composed
+    over several of them — `entry_is_open`, whether the script runs from its own top-level
+    statements rather than from outside the tree, and `may_read_error_state`, whether the script
+    may read the interpreter&#39;s `@error` or `@extended` at run time.
+    &#34;&#34;&#34;
+
+    _SLOTS = (
+        &#39;_scopes&#39;,
+        &#39;_existence&#39;,
+        &#39;_aliases&#39;,
+        &#39;_propagation&#39;,
+        &#39;_usage&#39;,
+    )
+
+    root: Au3Script
+    _scopes: Au3ScopeModel | None
+    _existence: Au3ExistenceModel | None
+    _aliases: Au3AliasModel | None
+    _propagation: Au3PropagationModel | None
+    _usage: Au3UsageModel | None
+
+    def __init__(self, root: Node, options: object | None = None):
+        super().__init__(root, options)
+        self._probes = Au3ProbeMemo()
+
+    @property
+    def scopes(self) -&gt; Au3ScopeModel:
+        return self._lazy(&#39;_scopes&#39;, lambda: build_scope_model(self.root))
+
+    @property
+    def existence(self) -&gt; Au3ExistenceModel:
+        &#34;&#34;&#34;
+        The names a global may take when the root runs, and whether the tree may make every
+        implicit write fatal by setting `MustDeclareVars`.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_existence&#39;,
+            lambda: build_existence_model(self.root, self.scopes, self._probes),
+        )
+
+    @property
+    def aliases(self) -&gt; Au3AliasModel:
+        &#34;&#34;&#34;
+        The per-scope map of variables that provably name one function, cut by every name a
+        rebinding write — an `Assign`, a code-running `Execute`, or a script function call — may
+        cost, which the propagation summaries feed.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_aliases&#39;, lambda: build_alias_model(
+            self.root, self.scopes, self.propagation.summaries))
+
+    @property
+    def propagation(self) -&gt; Au3PropagationModel:
+        &#34;&#34;&#34;
+        The value at every variable read and the may-write summary of every script function, over
+        the scope model&#39;s binding answers.
+        &#34;&#34;&#34;
+        return self._lazy(
+            &#39;_propagation&#39;,
+            lambda: build_propagation_model(self.root, self.scopes, self.existence),
+        )
+
+    @property
+    def usage(self) -&gt; Au3UsageModel:
+        &#34;&#34;&#34;
+        What the script does with its names — the call counts, purity, channels, spellings, and
+        storage bindings the dead-code elimination asks — over the scope model&#39;s bindings and the
+        propagation walk&#39;s may-write summaries.
+        &#34;&#34;&#34;
+        return self._lazy(&#39;_usage&#39;, lambda: build_usage_model(
+            self.root, self.scopes, self.propagation.summaries))
+
+    @property
+    def entry_is_open(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the root runs from its own top-level statements: it holds a statement that is
+        neither a declaration, a function definition nor a directive, and no include — read from
+        the scope model in both spellings the parser answers with, and from the unread text the
+        usage model holds — because an included file&#39;s contents are called from outside the tree.
+        &#34;&#34;&#34;
+        if self.scopes.holds_an_include:
+            return False
+        if self.usage.holds_unread_include():
+            return False
+        for statement in self.root.body:
+            if not isinstance(statement, (
+                Au3VariableDeclaration,
+                Au3EnumDeclaration,
+                Au3FunctionDeclaration,
+                Au3Directive,
+            )):
+                return True
+        return False
+
+    @property
+    def may_read_error_state(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the script may read the interpreter&#39;s `@error` or `@extended` at run time: a read
+        of either macro anywhere in the tree, a callee computed at run time — which may name
+        `Execute` over a payload no walk reads — an include, whose contents no fact of the tree
+        holds, or an `Execute` the tree spells, in text the parser could not read included, whose
+        payload is not provably free of such a read. Entering a user function clears both (probe9
+        A17/A17b), so a pass that replaces a call with its value drops a write a later read may
+        observe.
+        &#34;&#34;&#34;
+        census = callee_census(self.root, self.usage.functions, self.usage.unparsed)
+        if census.reads_error_macros or census.computed_callee:
+            return True
+        if self.scopes.holds_an_include or self.usage.holds_unread_include():
+            return True
+        if any(
+            &#39;execute&#39; in facts.identifiers
+            for facts in self.usage.unparsed.values()
+        ):
+            return True
+        return any(
+            isinstance(node, Au3Call)
+            and _call_may_read_error_state(node, self.usage.functions)
+            for node in self.root.walk()
+        )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.scopes"><code class="name">var <span class="ident">scopes</span></code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L84-L86" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def scopes(self) -&gt; Au3ScopeModel:
+    return self._lazy(&#39;_scopes&#39;, lambda: build_scope_model(self.root))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.existence"><code class="name">var <span class="ident">existence</span></code></dt>
+<dd>
+<section class="desc"><p>The names a global may take when the root runs, and whether the tree may make every
+implicit write fatal by setting <code>MustDeclareVars</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L88-L97" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def existence(self) -&gt; Au3ExistenceModel:
+    &#34;&#34;&#34;
+    The names a global may take when the root runs, and whether the tree may make every
+    implicit write fatal by setting `MustDeclareVars`.
+    &#34;&#34;&#34;
+    return self._lazy(
+        &#39;_existence&#39;,
+        lambda: build_existence_model(self.root, self.scopes, self._probes),
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.aliases"><code class="name">var <span class="ident">aliases</span></code></dt>
+<dd>
+<section class="desc"><p>The per-scope map of variables that provably name one function, cut by every name a
+rebinding write — an <code>Assign</code>, a code-running <code>Execute</code>, or a script function call — may
+cost, which the propagation summaries feed.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L99-L107" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def aliases(self) -&gt; Au3AliasModel:
+    &#34;&#34;&#34;
+    The per-scope map of variables that provably name one function, cut by every name a
+    rebinding write — an `Assign`, a code-running `Execute`, or a script function call — may
+    cost, which the propagation summaries feed.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_aliases&#39;, lambda: build_alias_model(
+        self.root, self.scopes, self.propagation.summaries))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.propagation"><code class="name">var <span class="ident">propagation</span></code></dt>
+<dd>
+<section class="desc"><p>The value at every variable read and the may-write summary of every script function, over
+the scope model's binding answers.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L109-L118" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def propagation(self) -&gt; Au3PropagationModel:
+    &#34;&#34;&#34;
+    The value at every variable read and the may-write summary of every script function, over
+    the scope model&#39;s binding answers.
+    &#34;&#34;&#34;
+    return self._lazy(
+        &#39;_propagation&#39;,
+        lambda: build_propagation_model(self.root, self.scopes, self.existence),
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.usage"><code class="name">var <span class="ident">usage</span></code></dt>
+<dd>
+<section class="desc"><p>What the script does with its names — the call counts, purity, channels, spellings, and
+storage bindings the dead-code elimination asks — over the scope model's bindings and the
+propagation walk's may-write summaries.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L120-L128" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def usage(self) -&gt; Au3UsageModel:
+    &#34;&#34;&#34;
+    What the script does with its names — the call counts, purity, channels, spellings, and
+    storage bindings the dead-code elimination asks — over the scope model&#39;s bindings and the
+    propagation walk&#39;s may-write summaries.
+    &#34;&#34;&#34;
+    return self._lazy(&#39;_usage&#39;, lambda: build_usage_model(
+        self.root, self.scopes, self.propagation.summaries))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.entry_is_open"><code class="name">var <span class="ident">entry_is_open</span></code></dt>
+<dd>
+<section class="desc"><p>Whether the root runs from its own top-level statements: it holds a statement that is
+neither a declaration, a function definition nor a directive, and no include — read from
+the scope model in both spellings the parser answers with, and from the unread text the
+usage model holds — because an included file's contents are called from outside the tree.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L130-L150" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def entry_is_open(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the root runs from its own top-level statements: it holds a statement that is
+    neither a declaration, a function definition nor a directive, and no include — read from
+    the scope model in both spellings the parser answers with, and from the unread text the
+    usage model holds — because an included file&#39;s contents are called from outside the tree.
+    &#34;&#34;&#34;
+    if self.scopes.holds_an_include:
+        return False
+    if self.usage.holds_unread_include():
+        return False
+    for statement in self.root.body:
+        if not isinstance(statement, (
+            Au3VariableDeclaration,
+            Au3EnumDeclaration,
+            Au3FunctionDeclaration,
+            Au3Directive,
+        )):
+            return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache.may_read_error_state"><code class="name">var <span class="ident">may_read_error_state</span></code></dt>
+<dd>
+<section class="desc"><p>Whether the script may read the interpreter's <code>@error</code> or <code>@extended</code> at run time: a read
+of either macro anywhere in the tree, a callee computed at run time — which may name
+<code>Execute</code> over a payload no walk reads — an include, whose contents no fact of the tree
+holds, or an <code>Execute</code> the tree spells, in text the parser could not read included, whose
+payload is not provably free of such a read. Entering a user function clears both (probe9
+A17/A17b), so a pass that replaces a call with its value drops a write a later read may
+observe.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/cache.py#L152-L177" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def may_read_error_state(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the script may read the interpreter&#39;s `@error` or `@extended` at run time: a read
+    of either macro anywhere in the tree, a callee computed at run time — which may name
+    `Execute` over a payload no walk reads — an include, whose contents no fact of the tree
+    holds, or an `Execute` the tree spells, in text the parser could not read included, whose
+    payload is not provably free of such a read. Entering a user function clears both (probe9
+    A17/A17b), so a pass that replaces a call with its value drops a write a later read may
+    observe.
+    &#34;&#34;&#34;
+    census = callee_census(self.root, self.usage.functions, self.usage.unparsed)
+    if census.reads_error_macros or census.computed_callee:
+        return True
+    if self.scopes.holds_an_include or self.usage.holds_unread_include():
+        return True
+    if any(
+        &#39;execute&#39; in facts.identifiers
+        for facts in self.usage.unparsed.values()
+    ):
+        return True
+    return any(
+        isinstance(node, Au3Call)
+        and _call_may_read_error_state(node, self.usage.functions)
+        for node in self.root.walk()
+    )</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.for_transformer">for_transformer</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.invalidate" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.invalidate">invalidate</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.options" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.options">options</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.pinned" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.pinned">pinned</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.renew" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.renew">renew</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.root" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.root">root</a></code></li>
+<li><code><a title="refinery.lib.scripts.modelcache.ModelCacheBase.warm" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase.warm">warm</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.analysis" href="index.html">refinery.lib.scripts.au3.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.cache.model_cache" href="#refinery.lib.scripts.au3.analysis.cache.model_cache">model_cache</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.cache.Au3ModelCache" href="#refinery.lib.scripts.au3.analysis.cache.Au3ModelCache">Au3ModelCache</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

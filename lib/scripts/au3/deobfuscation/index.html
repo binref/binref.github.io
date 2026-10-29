@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.deobfuscation documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.deobfuscation</code></h1>
+</header>
+<section id="section-intro">
+<p>AutoIt3 AST deobfuscation transforms.</p>
+<p>Five groups, in the order the obfuscated shapes need them. <code>normalize</code> rewrites what a call
+structurally is — an <code>Execute</code> call over a string literal becomes the expression that literal
+names, a call through an alias variable becomes the function that variable provably names, and
+a <code>Call</code>, <code>Assign</code>, or <code>Eval</code> over a string-literal name becomes the direct call, plain write,
+or plain read that name spells — <code><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code> replaces what is known — an expression whose operands
+pin its value becomes the literal of that value, a variable read the propagation walk proves a
+value for becomes that literal, and a dispatcher loop whose state a provable constant pins becomes
+the one case body it ever runs — <code>emulate</code> replaces what a script-defined function returns:
+the interpreter runs the call over the value domain and the call becomes the literal of its
+result — <code>cleanup</code> removes what no live code reaches: a function no call names, a declarator
+no occurrence binds, an effect-free statement, and a plain assignment whose target nothing reads
+— each only when no dynamic-name channel could observe the removal — and <code>canonicalize</code> reprints
+what survived: a call whose callee names a builtin, or whose <code>Call</code> argument does, takes the
+official spelling of that name, a change no resolution reads.</p>
+<p><code><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code> depends on <code>normalize</code> and re-triggers it: folding an <code>Execute</code> call's argument into the
+string literal it always was is what makes the next <code>normalize</code> pass see a flattenable call, and
+rewriting a callee through an alias is what makes the next <code><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code> pass see the builtin the alias
+named. <code>emulate</code> depends on <code><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code> — only literal arguments reach a decoded call — and every
+change it makes re-triggers the whole pipeline: a decoded <code>"BinaryToString"</code> is what the next
+<code>normalize</code> pass turns into an alias rewrite, and a decoded argument is what the next <code><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code>
+pass folds. <code>cleanup</code> depends on <code>emulate</code> and takes no selective invalidation set: a removal
+changes everything the other models know, the <code>emulate</code> stance. <code>canonicalize</code> depends on
+<code>cleanup</code> and takes the empty one: it rewrites only spellings, every model keys lowercased
+names, and no group depends on it, so its changes re-run nothing. The group's internal loop is
+what iterates a sweep to its fixpoint — a function whose only callers an earlier sweep removed
+keeps its call sites until the next sweep re-census.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/__init__.py#L1-L105" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+AutoIt3 AST deobfuscation transforms.
+
+Five groups, in the order the obfuscated shapes need them. `normalize` rewrites what a call
+structurally is — an `Execute` call over a string literal becomes the expression that literal
+names, a call through an alias variable becomes the function that variable provably names, and
+a `Call`, `Assign`, or `Eval` over a string-literal name becomes the direct call, plain write,
+or plain read that name spells — `fold` replaces what is known — an expression whose operands
+pin its value becomes the literal of that value, a variable read the propagation walk proves a
+value for becomes that literal, and a dispatcher loop whose state a provable constant pins becomes
+the one case body it ever runs — `emulate` replaces what a script-defined function returns:
+the interpreter runs the call over the value domain and the call becomes the literal of its
+result — `cleanup` removes what no live code reaches: a function no call names, a declarator
+no occurrence binds, an effect-free statement, and a plain assignment whose target nothing reads
+— each only when no dynamic-name channel could observe the removal — and `canonicalize` reprints
+what survived: a call whose callee names a builtin, or whose `Call` argument does, takes the
+official spelling of that name, a change no resolution reads.
+
+`fold` depends on `normalize` and re-triggers it: folding an `Execute` call&#39;s argument into the
+string literal it always was is what makes the next `normalize` pass see a flattenable call, and
+rewriting a callee through an alias is what makes the next `fold` pass see the builtin the alias
+named. `emulate` depends on `fold` — only literal arguments reach a decoded call — and every
+change it makes re-triggers the whole pipeline: a decoded `&#34;BinaryToString&#34;` is what the next
+`normalize` pass turns into an alias rewrite, and a decoded argument is what the next `fold`
+pass folds. `cleanup` depends on `emulate` and takes no selective invalidation set: a removal
+changes everything the other models know, the `emulate` stance. `canonicalize` depends on
+`cleanup` and takes the empty one: it rewrites only spellings, every model keys lowercased
+names, and no group depends on it, so its changes re-run nothing. The group&#39;s internal loop is
+what iterates a sweep to its fixpoint — a function whose only callers an earlier sweep removed
+keeps its call sites until the next sweep re-census.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from refinery.lib.scripts.au3.analysis import Au3ModelCache
+from refinery.lib.scripts.au3.deobfuscation.casing import Au3BuiltinCaseNormalization
+from refinery.lib.scripts.au3.deobfuscation.eliminate import Au3DeadCodeElimination
+from refinery.lib.scripts.au3.deobfuscation.evaluate import Au3FunctionEvaluation
+from refinery.lib.scripts.au3.deobfuscation.execute import Au3ExecuteFlattening
+from refinery.lib.scripts.au3.deobfuscation.fold import Au3ConstantFolding
+from refinery.lib.scripts.au3.deobfuscation.indirect import Au3IndirectCallRewrite
+from refinery.lib.scripts.au3.deobfuscation.names import Au3DynamicNameFlattening
+from refinery.lib.scripts.au3.deobfuscation.propagate import Au3ConstantPropagation
+from refinery.lib.scripts.au3.deobfuscation.unflatten import Au3ControlFlowDeflattening
+from refinery.lib.scripts.au3.deobfuscation.unused import Au3UnusedVariableRemoval
+from refinery.lib.scripts.au3.model import Au3Script
+from refinery.lib.scripts.pipeline import DeobfuscationPipeline, TransformerGroup
+
+_normalize = TransformerGroup(
+    &#39;normalize&#39;,
+    Au3ExecuteFlattening,
+    Au3IndirectCallRewrite,
+    Au3DynamicNameFlattening,
+)
+
+_fold = TransformerGroup(
+    &#39;fold&#39;,
+    Au3ConstantFolding,
+    Au3ConstantPropagation,
+    Au3ControlFlowDeflattening,
+)
+
+_emulate = TransformerGroup(
+    &#39;emulate&#39;,
+    Au3FunctionEvaluation,
+)
+
+_cleanup = TransformerGroup(
+    &#39;cleanup&#39;,
+    Au3DeadCodeElimination,
+    Au3UnusedVariableRemoval,
+)
+
+_canonicalize = TransformerGroup(
+    &#39;canonicalize&#39;,
+    Au3BuiltinCaseNormalization,
+)
+
+_GROUP_DEPENDENCIES = {
+    &#39;fold&#39;: {&#39;normalize&#39;},
+    &#39;emulate&#39;: {&#39;fold&#39;},
+    &#39;cleanup&#39;: {&#39;emulate&#39;},
+    &#39;canonicalize&#39;: {&#39;cleanup&#39;},
+}
+
+_GROUP_INVALIDATORS = {
+    &#39;fold&#39;: {&#39;normalize&#39;, &#39;emulate&#39;, &#39;cleanup&#39;, &#39;canonicalize&#39;},
+    &#39;canonicalize&#39;: set(),
+}
+
+_pipeline = DeobfuscationPipeline(
+    [_normalize, _fold, _emulate, _cleanup, _canonicalize],
+    dependencies=_GROUP_DEPENDENCIES,
+    invalidators=_GROUP_INVALIDATORS,
+)
+
+
+def deobfuscate(ast: Au3Script, max_steps: int = 5000) -&gt; int:
+    &#34;&#34;&#34;
+    Apply all available deobfuscators to the input. A non-zero `max_steps` bounds the total number
+    of change-producing transformer passes and raises
+    `refinery.lib.scripts.pipeline.DeobfuscationTimeout` once it is exceeded, so a set of
+    transforms that fails to converge fails loudly instead of hanging. Pass `0` to disable the
+    bound entirely.
+    &#34;&#34;&#34;
+    return _pipeline.run(ast, max_steps=max_steps, models=Au3ModelCache(ast))</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.casing" href="casing.html">refinery.lib.scripts.au3.deobfuscation.casing</a></code></dt>
+<dd>
+<section class="desc"><p>Builtin case normalization: printing every reference to a builtin function the official
+documentation spells it with …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.eliminate" href="eliminate.html">refinery.lib.scripts.au3.deobfuscation.eliminate</a></code></dt>
+<dd>
+<section class="desc"><p>The Phase 4 transform: what no live code reaches leaves the tree. A function no call names and
+no string spells, a declarator no occurrence binds or …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.evaluate" href="evaluate.html">refinery.lib.scripts.au3.deobfuscation.evaluate</a></code></dt>
+<dd>
+<section class="desc"><p>The Phase 3 transform: what a script-defined decoder function returns becomes the literal its
+call site stands for. The interpreter runs the call over …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.execute" href="execute.html">refinery.lib.scripts.au3.deobfuscation.execute</a></code></dt>
+<dd>
+<section class="desc"><p><code>Execute</code> flattening: splicing the one expression a string-literal argument provably names into
+the place of the call …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code></dt>
+<dd>
+<section class="desc"><p>Constant folding: replacing an expression whose value every ingredient pins with the literal that
+spells it …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.helpers" href="helpers.html">refinery.lib.scripts.au3.deobfuscation.helpers</a></code></dt>
+<dd>
+<section class="desc"><p>Shared utilities for AutoIt3 deobfuscation transforms.</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.indirect" href="indirect.html">refinery.lib.scripts.au3.deobfuscation.indirect</a></code></dt>
+<dd>
+<section class="desc"><p>Alias and indirection rewriting: replacing the callee of a call through an alias variable with the
+function that variable provably names …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.names" href="names.html">refinery.lib.scripts.au3.deobfuscation.names</a></code></dt>
+<dd>
+<section class="desc"><p>Dynamic-name flattening: replacing a <code>Call</code>, <code>Assign</code>, or <code>Eval</code> over a string-literal name with
+the direct call, plain write, or plain read that name …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.propagate" href="propagate.html">refinery.lib.scripts.au3.deobfuscation.propagate</a></code></dt>
+<dd>
+<section class="desc"><p>Constant propagation: replacing a variable read whose value the walk in
+<code><a title="refinery.lib.scripts.au3.analysis.propagation" href="../analysis/propagation.html">refinery.lib.scripts.au3.analysis.propagation</a></code> proves with the literal that …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.unflatten" href="unflatten.html">refinery.lib.scripts.au3.deobfuscation.unflatten</a></code></dt>
+<dd>
+<section class="desc"><p>Control-flow deflattening, degenerate form: a truthy-constant <code>While</code> whose body is one state
+assignment and one <code>Switch</code> over that state splices down …</p></section>
+</dd>
+<dt><code class="name"><a title="refinery.lib.scripts.au3.deobfuscation.unused" href="unused.html">refinery.lib.scripts.au3.deobfuscation.unused</a></code></dt>
+<dd>
+<section class="desc"><p>The write-only store sweep: a plain assignment whose target nothing reads leaves the tree. The
+read census of …</p></section>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.deobfuscate"><code class="name flex">
+<span>def <span class="ident">deobfuscate</span></span>(<span>ast, max_steps=5000)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Apply all available deobfuscators to the input. A non-zero <code>max_steps</code> bounds the total number
+of change-producing transformer passes and raises
+<code><a title="refinery.lib.scripts.pipeline.DeobfuscationTimeout" href="../../pipeline.html#refinery.lib.scripts.pipeline.DeobfuscationTimeout">DeobfuscationTimeout</a></code> once it is exceeded, so a set of
+transforms that fails to converge fails loudly instead of hanging. Pass <code>0</code> to disable the
+bound entirely.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/__init__.py#L97-L105" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def deobfuscate(ast: Au3Script, max_steps: int = 5000) -&gt; int:
+    &#34;&#34;&#34;
+    Apply all available deobfuscators to the input. A non-zero `max_steps` bounds the total number
+    of change-producing transformer passes and raises
+    `refinery.lib.scripts.pipeline.DeobfuscationTimeout` once it is exceeded, so a set of
+    transforms that fails to converge fails loudly instead of hanging. Pass `0` to disable the
+    bound entirely.
+    &#34;&#34;&#34;
+    return _pipeline.run(ast, max_steps=max_steps, models=Au3ModelCache(ast))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3" href="../index.html">refinery.lib.scripts.au3</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.casing" href="casing.html">refinery.lib.scripts.au3.deobfuscation.casing</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.eliminate" href="eliminate.html">refinery.lib.scripts.au3.deobfuscation.eliminate</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.evaluate" href="evaluate.html">refinery.lib.scripts.au3.deobfuscation.evaluate</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.execute" href="execute.html">refinery.lib.scripts.au3.deobfuscation.execute</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.fold" href="fold.html">refinery.lib.scripts.au3.deobfuscation.fold</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.helpers" href="helpers.html">refinery.lib.scripts.au3.deobfuscation.helpers</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.indirect" href="indirect.html">refinery.lib.scripts.au3.deobfuscation.indirect</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.names" href="names.html">refinery.lib.scripts.au3.deobfuscation.names</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.propagate" href="propagate.html">refinery.lib.scripts.au3.deobfuscation.propagate</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.unflatten" href="unflatten.html">refinery.lib.scripts.au3.deobfuscation.unflatten</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.unused" href="unused.html">refinery.lib.scripts.au3.deobfuscation.unused</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.deobfuscate" href="#refinery.lib.scripts.au3.deobfuscation.deobfuscate">deobfuscate</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

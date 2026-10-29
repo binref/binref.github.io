@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.analysis.existence documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.analysis.existence</code></h1>
+</header>
+<section id="section-intro">
+<p>The existence model: the names a global may take when the tree runs. The may-write summary
+refinement asks it — a bare write inside a function creates a local when no global of the name
+exists, so a summary may drop the write only when the census proves no channel can create that
+global — and the interpreter's frame relies on the same fact the other way: the summary the
+refinement emptied is what makes the frame's implicit local one AutoIt itself creates.</p>
+<p>The census walks every channel that can create a global: the command-line constants AutoIt
+defines before the first statement runs, a write at script level, a <code>Global</code> declaration
+anywhere in the tree, an <code>Assign</code> with a literal name, an <code>Execute</code> payload or a computed <code>Call</code>
+name resolved to the string it spells — a literal shape, or a call with literal arguments to a
+script function probed through <code><a title="refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.probe" href="interpreter.html#refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.probe">Au3Interpreter.probe()</a></code>
+— the variable names every call hands to a <code>ByRef</code> parameter, and the registrations whose
+registered function receives arguments, which must name a script function literally. Source text
+the parser could not read — an error node in the tree, or a payload this parser reads as
+nothing — is read through <code><a title="refinery.lib.scripts.au3.analysis.unparsed.read_unparsed" href="unparsed.html#refinery.lib.scripts.au3.analysis.unparsed.read_unparsed">read_unparsed()</a></code>, and every
+variable it spells may be a global. The parser's record list is not an input: its texts also
+live in the tree — an error node is its own record, and a repair record names a token of a line
+the parser went on to read — while the list itself outlives the edits that remove those lines,
+so a census over it would stay poisoned over a tree its own transforms had cleaned. A channel
+the census cannot read — an include it cannot see, a computed <code>Assign</code> name, an unresolvable
+payload or <code>Call</code> name, an indirect callee, a forwarding <code>Call</code> of <code>Call</code>, a registration whose
+name is not a literal script function, a registration or an option set through a <code>Call</code> whose
+sole argument may be a <code>CallArgArray</code> expansion, an option setting that may expand variables,
+macros, or
+environment strings inside string literals, unread text that may call a channel or declare a
+function, or a probe budget the tree exhausts — answers that any name may be a global, and that
+the tree may set <code>MustDeclareVars</code>, which the unread channel may do as well. Every other callee
+is covered by one closure claim: a name none of the channels above owns is an AutoIt builtin
+that creates no script variable or a call AutoIt refuses to run, which is the one
+documentation-sourced boundary of the census.</p>
+<p>An <code>Opt</code> that may set <code>MustDeclareVars</code> — tree-level or inside a payload the census examines —
+makes every implicit write fatal, so the model reports it and the summary refinement refuses to
+lean on the census while it holds. The census does not see the order in which the settings run,
+so a zero elsewhere clears nothing.</p>
+<p>This module also owns what a dynamic-name channel writes: <code><a title="refinery.lib.scripts.au3.analysis.existence.execute_kills" href="#refinery.lib.scripts.au3.analysis.existence.execute_kills">execute_kills()</a></code> and <code><a title="refinery.lib.scripts.au3.analysis.existence.assign_kills" href="#refinery.lib.scripts.au3.analysis.existence.assign_kills">assign_kills()</a></code>,
+the answers the constant-binding walk, the alias map, and the usage model read, over the one
+payload parse they share — and <code><a title="refinery.lib.scripts.au3.analysis.existence.call_target" href="#refinery.lib.scripts.au3.analysis.existence.call_target">call_target()</a></code>, the callee a computed <code>Call</code> invocation resolves
+to, which the usage model's read-side channel walk reads beside it.</p>
+<p>A census runs once per tree version, and a run holds one <code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo" href="#refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo">Au3ProbeMemo</a></code> across its versions, so
+a census asks the interpreter only for the probes no earlier census made.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L1-L529" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The existence model: the names a global may take when the tree runs. The may-write summary
+refinement asks it — a bare write inside a function creates a local when no global of the name
+exists, so a summary may drop the write only when the census proves no channel can create that
+global — and the interpreter&#39;s frame relies on the same fact the other way: the summary the
+refinement emptied is what makes the frame&#39;s implicit local one AutoIt itself creates.
+
+The census walks every channel that can create a global: the command-line constants AutoIt
+defines before the first statement runs, a write at script level, a `Global` declaration
+anywhere in the tree, an `Assign` with a literal name, an `Execute` payload or a computed `Call`
+name resolved to the string it spells — a literal shape, or a call with literal arguments to a
+script function probed through `refinery.lib.scripts.au3.analysis.interpreter.Au3Interpreter.probe`
+— the variable names every call hands to a `ByRef` parameter, and the registrations whose
+registered function receives arguments, which must name a script function literally. Source text
+the parser could not read — an error node in the tree, or a payload this parser reads as
+nothing — is read through `refinery.lib.scripts.au3.analysis.unparsed.read_unparsed`, and every
+variable it spells may be a global. The parser&#39;s record list is not an input: its texts also
+live in the tree — an error node is its own record, and a repair record names a token of a line
+the parser went on to read — while the list itself outlives the edits that remove those lines,
+so a census over it would stay poisoned over a tree its own transforms had cleaned. A channel
+the census cannot read — an include it cannot see, a computed `Assign` name, an unresolvable
+payload or `Call` name, an indirect callee, a forwarding `Call` of `Call`, a registration whose
+name is not a literal script function, a registration or an option set through a `Call` whose
+sole argument may be a `CallArgArray` expansion, an option setting that may expand variables,
+macros, or
+environment strings inside string literals, unread text that may call a channel or declare a
+function, or a probe budget the tree exhausts — answers that any name may be a global, and that
+the tree may set `MustDeclareVars`, which the unread channel may do as well. Every other callee
+is covered by one closure claim: a name none of the channels above owns is an AutoIt builtin
+that creates no script variable or a call AutoIt refuses to run, which is the one
+documentation-sourced boundary of the census.
+
+An `Opt` that may set `MustDeclareVars` — tree-level or inside a payload the census examines —
+makes every implicit write fatal, so the model reports it and the summary refinement refuses to
+lean on the census while it holds. The census does not see the order in which the settings run,
+so a zero elsewhere clears nothing.
+
+This module also owns what a dynamic-name channel writes: `execute_kills` and `assign_kills`,
+the answers the constant-binding walk, the alias map, and the usage model read, over the one
+payload parse they share — and `call_target`, the callee a computed `Call` invocation resolves
+to, which the usage model&#39;s read-side channel walk reads beside it.
+
+A census runs once per tree version, and a run holds one `Au3ProbeMemo` across its versions, so
+a census asks the interpreter only for the probes no earlier census made.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import functools
+
+from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import cast
+
+from refinery.lib.scripts import UnspellableNode
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.builtins import OPTION_SETTERS
+from refinery.lib.scripts.au3.analysis.interpreter import Au3Interpreter, Au3Probe
+from refinery.lib.scripts.au3.analysis.scopes import Au3ScopeModel, Binding
+from refinery.lib.scripts.au3.analysis.unparsed import read_unparsed, spelled_name
+from refinery.lib.scripts.au3.analysis.values import (
+    Au3Value,
+    Kind,
+    literal_value,
+    to_number,
+    truthy,
+)
+from refinery.lib.scripts.au3.model import (
+    Au3Call,
+    Au3EnumDeclaration,
+    Au3ErrorNode,
+    Au3FunctionDeclaration,
+    Au3Identifier,
+    Au3MemberAccess,
+    Au3ScopeKind,
+    Au3Script,
+    Au3StringLiteral,
+    Au3Variable,
+    Au3VariableDeclaration,
+    Expression,
+)
+from refinery.lib.scripts.au3.parser import Au3Parser
+from refinery.lib.scripts.au3.synth import Au3Synthesizer
+
+#: The globals every script holds before its first statement runs: the command-line constants
+#: exist whether or not parameters are passed, so a bare write of either inside a function
+#: reaches the constant — a fatal error — instead of creating a local.
+_PREDEFINED_GLOBALS = frozenset({&#39;cmdline&#39;, &#39;cmdlineraw&#39;})
+
+#: The registration builtins whose registered function receives arguments the registration
+#: passes through, each mapped to the argument positions that hold the registered name: a name
+#: registered there that is not a literal naming a script function may reach the builtin
+#: `Assign` with arguments, so the census answers that any name may be a global. The
+#: zero-argument registrations invoke an `Assign` shape with no arguments, which creates
+#: nothing. `DllCallbackRegister` names its function first; its other leading position is the
+#: return type, which names no function.
+_REGISTRATION_NAME_POSITIONS: dict[str, frozenset[int]] = {
+    &#39;guiregistermsg&#39;              : frozenset({1}),
+    &#39;guictrlregisterlistviewsort&#39; : frozenset({1}),
+    &#39;dllcallbackregister&#39;         : frozenset({0}),
+    &#39;objevent&#39;                    : frozenset({1}),
+}
+
+#: The options under which a string literal expands the variables, macros, or environment
+#: strings it spells when the tree runs: a literal the census reads as a name may then spell any
+#: other, so a tree that may set one answers that any name may be a global.
+_EXPANDING_OPTIONS = frozenset({&#39;expandvarstrings&#39;, &#39;expandenvstrings&#39;})
+
+#: Every builtin whose call the census reads as a channel: source text the parser could not
+#: read that names one may make a call the census can read only from a parsed tree.
+_CHANNEL_BUILTINS = frozenset({
+    &#39;assign&#39;,
+    &#39;call&#39;,
+    &#39;execute&#39;,
+    *_REGISTRATION_NAME_POSITIONS,
+    *OPTION_SETTERS,
+})
+
+#: The total steps every probe the census makes may spend together: a tree that exhausts them
+#: answers that any name may be a global. Roughly forty times what the a3x sample this model
+#: was built over spends across all of its probes.
+_MAX_CENSUS_PROBE_STEPS = 1_000_000
+
+
+@functools.lru_cache(maxsize=None)
+def parse_payload(text: str) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    The expression an `Execute` payload spells, or `None` where the payload parses to nothing:
+    AutoIt answers `&#34;&#34;` there (probe3), and `&#34;&#34;` writes nothing — only a call inside the parsed
+    expression can. Every reader walks the parse, so one payload text parses once.
+    &#34;&#34;&#34;
+    return Au3Parser(text).parse_expression()
+
+
+def execute_kills(call: Au3Call) -&gt; set[str] | None:
+    &#34;&#34;&#34;
+    The names an `Execute` call may write: a constant argument spells one expression, so only a
+    call inside it can write anything; a parse failure may still be a payload AutoIt runs — this
+    parser&#39;s refusal is not AutoIt&#39;s — so it answers any name except the empty payload AutoIt
+    answers `&#34;&#34;` for (probe3). Any other argument can execute arbitrary code.
+    &#34;&#34;&#34;
+    if len(call.arguments) != 1:
+        return None
+    literal = ast.unwrap_parens(call.arguments[0])
+    if not isinstance(literal, Au3StringLiteral):
+        return None
+    expression = parse_payload(literal.value)
+    if expression is None:
+        return set() if not literal.value.strip() else None
+    if ast.contains_a_call(expression):
+        return None
+    return set()
+
+
+def assign_kills(call: Au3Call) -&gt; set[str] | None:
+    &#34;&#34;&#34;
+    The names an `Assign` call may write: a constant first argument names one variable, anything
+    else may name any.
+    &#34;&#34;&#34;
+    if not call.arguments:
+        return set()
+    literal = ast.unwrap_parens(call.arguments[0])
+    if not isinstance(literal, Au3StringLiteral):
+        return None
+    return {spelled_name(literal.value)}
+
+
+def call_target(
+    name: str,
+    passed: Sequence[Expression],
+    function_names: frozenset[str],
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    The callee a computed `Call` invocation of *name* resolves to over *passed*, the arguments it
+    forwards: the name the string spells, or `None` where the resolution refuses — a forwarding
+    `Call` of `Call`, and a registration or option setter whose sole forwarded argument may be
+    the array a `CallArgArray` expansion unpacks. Both read a position past the first, an element
+    no walk sees.
+    &#34;&#34;&#34;
+    target = spelled_name(name)
+    if target == &#39;call&#39;:
+        return None
+    if (
+        len(passed) == 1
+        and (target in _REGISTRATION_NAME_POSITIONS or target in OPTION_SETTERS)
+        and _may_expand(passed[0], function_names)
+    ):
+        return None
+    return target
+
+
+def _may_expand(argument: Expression, function_names: frozenset[str]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *argument*, the sole one a computed `Call` passes on, may be the array a
+    `CallArgArray` expansion unpacks: only a literal scalar is not.
+    &#34;&#34;&#34;
+    value = literal_value(argument, function_names)
+    return value is None or value.kind is Kind.ARRAY
+
+
+@dataclass(frozen=True)
+class Au3ExistenceModel:
+    &#34;&#34;&#34;
+    What the census learned about one tree version: the names a global may take — `None` when
+    any name may — and whether the tree may set `MustDeclareVars`, which makes every implicit
+    write fatal; with both, which writes inside a function may target a global. Built once per
+    tree version by `build_existence_model`.
+    &#34;&#34;&#34;
+    possible_globals: frozenset[str] | None
+    implicit_writes_are_fatal: bool
+
+    def global_may_exist(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a global of *name* may exist when the tree runs.
+        &#34;&#34;&#34;
+        return self.possible_globals is None or name in self.possible_globals
+
+    def write_may_target_global(self, binding: Binding, name: str, creates_storage: bool) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a write of *name* inside a function, whose storage *binding* answers, may target
+        a global. A provable local never does and a provable global always does. A write that
+        proves nothing creates a local where no global of the name exists, so it may target one
+        only where the census answers that one may exist, or where the tree may make every
+        implicit write fatal. A write that creates no storage — a `ReDim`, which resizes an array
+        that exists or ends the script — is outside that refinement and may target a global
+        wherever no local provably holds the name.
+        &#34;&#34;&#34;
+        if binding is Binding.LOCAL:
+            return False
+        if binding is Binding.GLOBAL or not creates_storage:
+            return True
+        return self.implicit_writes_are_fatal or self.global_may_exist(name)
+
+    def write_is_fatal(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a store of *name* is a fatal error the tree runs into: one of the command-line
+        constants every script starts with is read-only, so its store can never leave.
+        &#34;&#34;&#34;
+        return name in _PREDEFINED_GLOBALS
+
+
+_ProbeKey = tuple[str, frozenset[str], str]
+
+
+class Au3ProbeMemo:
+    &#34;&#34;&#34;
+    The probes the censuses of one run made, so a census over a later tree version answers a
+    probe it asks again without running it. A probe reads the spelling of the function it runs,
+    the names of the script functions — a nested call into one refuses — and its arguments, so
+    its key holds all three, each argument by the exact spelling of its kind and payload; a
+    function no text spells is probed afresh. A census charges the steps a remembered probe spent
+    against its quota exactly as it would a fresh one, which keeps its answer a function of the
+    tree alone. Only the probes the latest two censuses asked are held, so a function that a fold
+    rewrites in every version costs no more memory than one census holds.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self._held: dict[_ProbeKey, Au3Probe] = {}
+        self._asked: dict[_ProbeKey, Au3Probe] = {}
+        self._spellings: dict[int, str | None] = {}
+
+    def renew(self) -&gt; None:
+        &#34;&#34;&#34;
+        Begin a census: the probes the previous census asked stay available, older ones drop.
+        &#34;&#34;&#34;
+        self._held = self._asked
+        self._asked = {}
+        self._spellings = {}
+
+    def probe(
+        self,
+        interpreter: Au3Interpreter,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Au3Value],
+    ) -&gt; Au3Probe:
+        spelling = self._spelling(function)
+        if spelling is None:
+            return interpreter.probe(function, arguments)
+        key = (spelling, interpreter.function_names, repr(tuple(arguments)))
+        probe = self._asked.get(key)
+        if probe is None:
+            probe = self._held.get(key)
+        if probe is None:
+            probe = interpreter.probe(function, arguments)
+        self._asked[key] = probe
+        return probe
+
+    def _spelling(self, function: Au3FunctionDeclaration) -&gt; str | None:
+        &#34;&#34;&#34;
+        The source text of *function*, synthesized once per census: the tree does not change
+        while a census runs.
+        &#34;&#34;&#34;
+        key = id(function)
+        if key not in self._spellings:
+            try:
+                self._spellings[key] = Au3Synthesizer().convert(function)
+            except (UnspellableNode, RecursionError):
+                self._spellings[key] = None
+        return self._spellings[key]
+
+
+class _Poison(Exception):
+    &#34;&#34;&#34;
+    The signal that unwinds the census: a channel whose global creation the tree may spell
+    without spelling its name, so the answer is that any name may be a global — and that the
+    tree may set `MustDeclareVars`: the walk ends there, so a setter in that channel or past it
+    goes unread.
+    &#34;&#34;&#34;
+
+
+class _Census:
+    &#34;&#34;&#34;
+    One walk over every global-creation channel of a tree, collecting the names a global may
+    take. A channel the walk cannot read raises `_Poison`, and the answer becomes that any name
+    may be a global and every implicit write may be fatal.
+    &#34;&#34;&#34;
+
+    def __init__(self, scope_model: Au3ScopeModel, memo: Au3ProbeMemo):
+        self.scope_model = scope_model
+        self.functions = scope_model.functions
+        self.function_names = scope_model.function_names
+        self.interpreter = Au3Interpreter(scope_model, {})
+        self.memo = memo
+        self.probe_steps = 0
+        self.names: set[str] = set(_PREDEFINED_GLOBALS)
+        self.implicit_writes_are_fatal = False
+
+    def collect(self, root: Au3Script) -&gt; Au3ExistenceModel:
+        try:
+            if self.scope_model.holds_an_include:
+                raise _Poison
+            for node in root.walk_in_order():
+                if isinstance(node, (Au3VariableDeclaration, Au3EnumDeclaration)):
+                    if node.scope is Au3ScopeKind.GLOBAL:
+                        for declarator in node.declarations:
+                            if declarator.variable is not None:
+                                self.names.add(declarator.variable.name)
+                    continue
+                if isinstance(node, Au3ErrorNode):
+                    self._examine_unparsed(node.text)
+                elif isinstance(node, Au3Call):
+                    self._examine_call(node)
+            for node in ast.scope_nodes(root.body):
+                if isinstance(node, Au3Variable) and ast.is_write_occurrence(node):
+                    self.names.add(node.name)
+        except (_Poison, RecursionError):
+            return Au3ExistenceModel(None, True)
+        return Au3ExistenceModel(frozenset(self.names), self.implicit_writes_are_fatal)
+
+    def _examine_call(self, call: Au3Call) -&gt; None:
+        callee = ast.unwrap_parens(call.callee)
+        if isinstance(callee, Au3MemberAccess):
+            return
+        if not isinstance(callee, Au3Identifier):
+            raise _Poison
+        self._examine_target(callee.name, call.arguments)
+
+    def _examine_target(self, name: str, arguments: Sequence[Expression]) -&gt; None:
+        &#34;&#34;&#34;
+        One call of *name* over *arguments*, as the tree spells it or as a computed `Call`
+        resolves it: a script function receives its `ByRef` arguments, and a channel builtin is
+        read over the arguments that reach it — after the name, where a `Call` spells one.
+        &#34;&#34;&#34;
+        if name in self.functions:
+            self._collect_byref(self.functions[name], arguments)
+        elif name == &#39;assign&#39;:
+            self._examine_assign(arguments)
+        elif name == &#39;execute&#39;:
+            self._examine_execute(arguments)
+        elif name == &#39;call&#39;:
+            self._examine_computed_call(arguments)
+        elif name in _REGISTRATION_NAME_POSITIONS:
+            for index in _REGISTRATION_NAME_POSITIONS[name]:
+                if index &lt; len(arguments):
+                    self._examine_registered_name(arguments[index])
+        elif name in OPTION_SETTERS:
+            self._examine_option(arguments)
+
+    def _collect_byref(
+        self,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Expression],
+    ) -&gt; None:
+        &#34;&#34;&#34;
+        The variable names *arguments* hand into the `ByRef` parameters of *function*. Whether an
+        undeclared name there is auto-created, fatal, or dead is unpinned, and spelling it is
+        sound under every answer: an extra spelled name only keeps more writes in the summaries.
+        &#34;&#34;&#34;
+        for variable in ast.byref_arguments(function, arguments):
+            self.names.add(variable.name)
+
+    def _examine_assign(self, arguments: Sequence[Expression]) -&gt; None:
+        if not arguments:
+            return
+        literal = ast.unwrap_parens(arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            raise _Poison
+        self.names.add(spelled_name(literal.value))
+
+    def _examine_execute(self, arguments: Sequence[Expression]) -&gt; None:
+        if not arguments:
+            return
+        payload = self._resolve_string(arguments[0])
+        if payload is None:
+            raise _Poison
+        self._examine_payload(payload)
+
+    def _examine_payload(self, payload: str) -&gt; None:
+        &#34;&#34;&#34;
+        One resolved `Execute` payload: only a call inside it can write (probe3), so every call
+        in the parsed expression is examined by the same rules the tree-level calls follow — a
+        nested payload resolving the same way, the structural recursion bounded by the
+        `RecursionError` the collect walk catches. A payload this parser reads as nothing may
+        still be one AutoIt runs, so its text is read token by token.
+        &#34;&#34;&#34;
+        expression = parse_payload(payload)
+        if expression is None:
+            self._examine_unparsed(payload)
+            return
+        for node in expression.walk_in_order():
+            if isinstance(node, Au3Call):
+                self._examine_call(node)
+
+    def _examine_computed_call(self, arguments: Sequence[Expression]) -&gt; None:
+        &#34;&#34;&#34;
+        A `Call` over a computed name: the name resolves to what it spells, and the target is
+        examined over the arguments that follow it. A resolution `call_target` refuses poisons,
+        and so does a name the census cannot read.
+        &#34;&#34;&#34;
+        if not arguments:
+            return
+        name = self._resolve_string(arguments[0])
+        if name is None:
+            raise _Poison
+        target = call_target(name, arguments[1:], self.function_names)
+        if target is None:
+            raise _Poison
+        self._examine_target(target, arguments[1:])
+
+    def _examine_registered_name(self, argument: Expression) -&gt; None:
+        literal = ast.unwrap_parens(argument)
+        if (
+            not isinstance(literal, Au3StringLiteral)
+            or spelled_name(literal.value) not in self.functions
+        ):
+            raise _Poison
+
+    def _examine_option(self, arguments: Sequence[Expression]) -&gt; None:
+        &#34;&#34;&#34;
+        One option setter: an option that may expand string literals is a channel the census
+        cannot read, `MustDeclareVars` makes every implicit write fatal, and an option name the
+        census cannot read may be either. A value may set an option unless it reads as zero both
+        as a number and as a condition — which reading AutoIt takes is unpinned, and the two
+        split on a non-empty string whose number is zero, such as `&#34;0&#34;`. The census does not see
+        the order in which the settings run, so one that may set an option holds for the whole
+        tree and no zero clears it. A setter of one argument only reads the option.
+        &#34;&#34;&#34;
+        if len(arguments) &lt; 2:
+            return
+        option = self._resolve_string(arguments[0])
+        name = None if option is None else spelled_name(option)
+        if name is not None and name not in _EXPANDING_OPTIONS and name != &#39;mustdeclarevars&#39;:
+            return
+        value = literal_value(arguments[1], self.function_names)
+        if value is not None and to_number(value) == 0 and truthy(value) is False:
+            return
+        if name != &#39;mustdeclarevars&#39;:
+            raise _Poison
+        self.implicit_writes_are_fatal = True
+
+    def _examine_unparsed(self, text: str) -&gt; None:
+        &#34;&#34;&#34;
+        Source text the parser could not read, which AutoIt may still run, read through
+        `read_unparsed`: every variable it spells may be a global, and text that names a channel
+        builtin, opens a call on a computed callee, or declares a function — whose `ByRef`
+        positions only a parsed declaration shows — is a channel the census cannot read.
+        &#34;&#34;&#34;
+        unparsed = read_unparsed(text)
+        if (
+            unparsed.computed_callee
+            or unparsed.declares_function
+            or unparsed.identifiers &amp; _CHANNEL_BUILTINS
+        ):
+            raise _Poison
+        self.names.update(unparsed.variables)
+
+    def _resolve_string(self, expression: Expression | None) -&gt; str | None:
+        &#34;&#34;&#34;
+        The string *expression* spells where the census reads a payload or a name: a literal
+        shape or the pieces one renders — `Chr(0)` standing alone spells the same string its `&amp;`
+        chain does — or a call with literal arguments to a script function, probed over the
+        value domain. Anything else the census cannot read.
+        &#34;&#34;&#34;
+        node = ast.unwrap_parens(expression)
+        value: Au3Value | None = None
+        if isinstance(node, Au3Call):
+            callee = ast.direct_callee(node)
+            if callee is not None and callee.name in self.functions:
+                arguments: list[Au3Value] = []
+                for argument in node.arguments:
+                    value = literal_value(argument, self.function_names)
+                    if value is None:
+                        return None
+                    arguments.append(value)
+                probe = self.memo.probe(self.interpreter, self.functions[callee.name], arguments)
+                self.probe_steps += probe.steps
+                if self.probe_steps &gt; _MAX_CENSUS_PROBE_STEPS:
+                    raise _Poison
+                value = probe.value
+        if value is None:
+            value = literal_value(cast(Expression | None, node), self.function_names)
+        if value is not None and value.kind is Kind.STRING:
+            return cast(str, value.payload)
+        return None
+
+
+def build_existence_model(
+    root: Au3Script,
+    scope_model: Au3ScopeModel,
+    memo: Au3ProbeMemo | None = None,
+) -&gt; Au3ExistenceModel:
+    &#34;&#34;&#34;
+    Walk every global-creation channel of *root* and collect the names a global may take, over
+    the functions and the include answer of *scope_model*. A *memo* the run holds across its tree
+    versions answers the probes an earlier census already made.
+    &#34;&#34;&#34;
+    if memo is None:
+        memo = Au3ProbeMemo()
+    memo.renew()
+    return _Census(scope_model, memo).collect(root)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.existence.parse_payload"><code class="name flex">
+<span>def <span class="ident">parse_payload</span></span>(<span>text)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The expression an <code>Execute</code> payload spells, or <code>None</code> where the payload parses to nothing:
+AutoIt answers <code>""</code> there (probe3), and <code>""</code> writes nothing — only a call inside the parsed
+expression can. Every reader walks the parse, so one payload text parses once.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L124-L131" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@functools.lru_cache(maxsize=None)
+def parse_payload(text: str) -&gt; Expression | None:
+    &#34;&#34;&#34;
+    The expression an `Execute` payload spells, or `None` where the payload parses to nothing:
+    AutoIt answers `&#34;&#34;` there (probe3), and `&#34;&#34;` writes nothing — only a call inside the parsed
+    expression can. Every reader walks the parse, so one payload text parses once.
+    &#34;&#34;&#34;
+    return Au3Parser(text).parse_expression()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.execute_kills"><code class="name flex">
+<span>def <span class="ident">execute_kills</span></span>(<span>call)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The names an <code>Execute</code> call may write: a constant argument spells one expression, so only a
+call inside it can write anything; a parse failure may still be a payload AutoIt runs — this
+parser's refusal is not AutoIt's — so it answers any name except the empty payload AutoIt
+answers <code>""</code> for (probe3). Any other argument can execute arbitrary code.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L134-L151" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def execute_kills(call: Au3Call) -&gt; set[str] | None:
+    &#34;&#34;&#34;
+    The names an `Execute` call may write: a constant argument spells one expression, so only a
+    call inside it can write anything; a parse failure may still be a payload AutoIt runs — this
+    parser&#39;s refusal is not AutoIt&#39;s — so it answers any name except the empty payload AutoIt
+    answers `&#34;&#34;` for (probe3). Any other argument can execute arbitrary code.
+    &#34;&#34;&#34;
+    if len(call.arguments) != 1:
+        return None
+    literal = ast.unwrap_parens(call.arguments[0])
+    if not isinstance(literal, Au3StringLiteral):
+        return None
+    expression = parse_payload(literal.value)
+    if expression is None:
+        return set() if not literal.value.strip() else None
+    if ast.contains_a_call(expression):
+        return None
+    return set()</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.assign_kills"><code class="name flex">
+<span>def <span class="ident">assign_kills</span></span>(<span>call)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The names an <code>Assign</code> call may write: a constant first argument names one variable, anything
+else may name any.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L154-L164" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def assign_kills(call: Au3Call) -&gt; set[str] | None:
+    &#34;&#34;&#34;
+    The names an `Assign` call may write: a constant first argument names one variable, anything
+    else may name any.
+    &#34;&#34;&#34;
+    if not call.arguments:
+        return set()
+    literal = ast.unwrap_parens(call.arguments[0])
+    if not isinstance(literal, Au3StringLiteral):
+        return None
+    return {spelled_name(literal.value)}</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.call_target"><code class="name flex">
+<span>def <span class="ident">call_target</span></span>(<span>name, passed, function_names)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The callee a computed <code>Call</code> invocation of <em>name</em> resolves to over <em>passed</em>, the arguments it
+forwards: the name the string spells, or <code>None</code> where the resolution refuses — a forwarding
+<code>Call</code> of <code>Call</code>, and a registration or option setter whose sole forwarded argument may be
+the array a <code>CallArgArray</code> expansion unpacks. Both read a position past the first, an element
+no walk sees.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L167-L188" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call_target(
+    name: str,
+    passed: Sequence[Expression],
+    function_names: frozenset[str],
+) -&gt; str | None:
+    &#34;&#34;&#34;
+    The callee a computed `Call` invocation of *name* resolves to over *passed*, the arguments it
+    forwards: the name the string spells, or `None` where the resolution refuses — a forwarding
+    `Call` of `Call`, and a registration or option setter whose sole forwarded argument may be
+    the array a `CallArgArray` expansion unpacks. Both read a position past the first, an element
+    no walk sees.
+    &#34;&#34;&#34;
+    target = spelled_name(name)
+    if target == &#39;call&#39;:
+        return None
+    if (
+        len(passed) == 1
+        and (target in _REGISTRATION_NAME_POSITIONS or target in OPTION_SETTERS)
+        and _may_expand(passed[0], function_names)
+    ):
+        return None
+    return target</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.build_existence_model"><code class="name flex">
+<span>def <span class="ident">build_existence_model</span></span>(<span>root, scope_model, memo=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Walk every global-creation channel of <em>root</em> and collect the names a global may take, over
+the functions and the include answer of <em>scope_model</em>. A <em>memo</em> the run holds across its tree
+versions answers the probes an earlier census already made.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L516-L529" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_existence_model(
+    root: Au3Script,
+    scope_model: Au3ScopeModel,
+    memo: Au3ProbeMemo | None = None,
+) -&gt; Au3ExistenceModel:
+    &#34;&#34;&#34;
+    Walk every global-creation channel of *root* and collect the names a global may take, over
+    the functions and the include answer of *scope_model*. A *memo* the run holds across its tree
+    versions answers the probes an earlier census already made.
+    &#34;&#34;&#34;
+    if memo is None:
+        memo = Au3ProbeMemo()
+    memo.renew()
+    return _Census(scope_model, memo).collect(root)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel"><code class="flex name class">
+<span>class <span class="ident">Au3ExistenceModel</span></span>
+<span>(</span><span>possible_globals, implicit_writes_are_fatal)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What the census learned about one tree version: the names a global may take — <code>None</code> when
+any name may — and whether the tree may set <code>MustDeclareVars</code>, which makes every implicit
+write fatal; with both, which writes inside a function may target a global. Built once per
+tree version by <code><a title="refinery.lib.scripts.au3.analysis.existence.build_existence_model" href="#refinery.lib.scripts.au3.analysis.existence.build_existence_model">build_existence_model()</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L200-L238" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(frozen=True)
+class Au3ExistenceModel:
+    &#34;&#34;&#34;
+    What the census learned about one tree version: the names a global may take — `None` when
+    any name may — and whether the tree may set `MustDeclareVars`, which makes every implicit
+    write fatal; with both, which writes inside a function may target a global. Built once per
+    tree version by `build_existence_model`.
+    &#34;&#34;&#34;
+    possible_globals: frozenset[str] | None
+    implicit_writes_are_fatal: bool
+
+    def global_may_exist(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a global of *name* may exist when the tree runs.
+        &#34;&#34;&#34;
+        return self.possible_globals is None or name in self.possible_globals
+
+    def write_may_target_global(self, binding: Binding, name: str, creates_storage: bool) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a write of *name* inside a function, whose storage *binding* answers, may target
+        a global. A provable local never does and a provable global always does. A write that
+        proves nothing creates a local where no global of the name exists, so it may target one
+        only where the census answers that one may exist, or where the tree may make every
+        implicit write fatal. A write that creates no storage — a `ReDim`, which resizes an array
+        that exists or ends the script — is outside that refinement and may target a global
+        wherever no local provably holds the name.
+        &#34;&#34;&#34;
+        if binding is Binding.LOCAL:
+            return False
+        if binding is Binding.GLOBAL or not creates_storage:
+            return True
+        return self.implicit_writes_are_fatal or self.global_may_exist(name)
+
+    def write_is_fatal(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether a store of *name* is a fatal error the tree runs into: one of the command-line
+        constants every script starts with is read-only, so its store can never leave.
+        &#34;&#34;&#34;
+        return name in _PREDEFINED_GLOBALS</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.possible_globals"><code class="name">var <span class="ident">possible_globals</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.implicit_writes_are_fatal"><code class="name">var <span class="ident">implicit_writes_are_fatal</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.global_may_exist"><code class="name flex">
+<span>def <span class="ident">global_may_exist</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a global of <em>name</em> may exist when the tree runs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L211-L215" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def global_may_exist(self, name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a global of *name* may exist when the tree runs.
+    &#34;&#34;&#34;
+    return self.possible_globals is None or name in self.possible_globals</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.write_may_target_global"><code class="name flex">
+<span>def <span class="ident">write_may_target_global</span></span>(<span>self, binding, name, creates_storage)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a write of <em>name</em> inside a function, whose storage <em>binding</em> answers, may target
+a global. A provable local never does and a provable global always does. A write that
+proves nothing creates a local where no global of the name exists, so it may target one
+only where the census answers that one may exist, or where the tree may make every
+implicit write fatal. A write that creates no storage — a <code>ReDim</code>, which resizes an array
+that exists or ends the script — is outside that refinement and may target a global
+wherever no local provably holds the name.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L217-L231" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write_may_target_global(self, binding: Binding, name: str, creates_storage: bool) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a write of *name* inside a function, whose storage *binding* answers, may target
+    a global. A provable local never does and a provable global always does. A write that
+    proves nothing creates a local where no global of the name exists, so it may target one
+    only where the census answers that one may exist, or where the tree may make every
+    implicit write fatal. A write that creates no storage — a `ReDim`, which resizes an array
+    that exists or ends the script — is outside that refinement and may target a global
+    wherever no local provably holds the name.
+    &#34;&#34;&#34;
+    if binding is Binding.LOCAL:
+        return False
+    if binding is Binding.GLOBAL or not creates_storage:
+        return True
+    return self.implicit_writes_are_fatal or self.global_may_exist(name)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.write_is_fatal"><code class="name flex">
+<span>def <span class="ident">write_is_fatal</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether a store of <em>name</em> is a fatal error the tree runs into: one of the command-line
+constants every script starts with is read-only, so its store can never leave.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L233-L238" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def write_is_fatal(self, name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a store of *name* is a fatal error the tree runs into: one of the command-line
+    constants every script starts with is read-only, so its store can never leave.
+    &#34;&#34;&#34;
+    return name in _PREDEFINED_GLOBALS</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo"><code class="flex name class">
+<span>class <span class="ident">Au3ProbeMemo</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>The probes the censuses of one run made, so a census over a later tree version answers a
+probe it asks again without running it. A probe reads the spelling of the function it runs,
+the names of the script functions — a nested call into one refuses — and its arguments, so
+its key holds all three, each argument by the exact spelling of its kind and payload; a
+function no text spells is probed afresh. A census charges the steps a remembered probe spent
+against its quota exactly as it would a fresh one, which keeps its answer a function of the
+tree alone. Only the probes the latest two censuses asked are held, so a function that a fold
+rewrites in every version costs no more memory than one census holds.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L244-L298" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Au3ProbeMemo:
+    &#34;&#34;&#34;
+    The probes the censuses of one run made, so a census over a later tree version answers a
+    probe it asks again without running it. A probe reads the spelling of the function it runs,
+    the names of the script functions — a nested call into one refuses — and its arguments, so
+    its key holds all three, each argument by the exact spelling of its kind and payload; a
+    function no text spells is probed afresh. A census charges the steps a remembered probe spent
+    against its quota exactly as it would a fresh one, which keeps its answer a function of the
+    tree alone. Only the probes the latest two censuses asked are held, so a function that a fold
+    rewrites in every version costs no more memory than one census holds.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self._held: dict[_ProbeKey, Au3Probe] = {}
+        self._asked: dict[_ProbeKey, Au3Probe] = {}
+        self._spellings: dict[int, str | None] = {}
+
+    def renew(self) -&gt; None:
+        &#34;&#34;&#34;
+        Begin a census: the probes the previous census asked stay available, older ones drop.
+        &#34;&#34;&#34;
+        self._held = self._asked
+        self._asked = {}
+        self._spellings = {}
+
+    def probe(
+        self,
+        interpreter: Au3Interpreter,
+        function: Au3FunctionDeclaration,
+        arguments: Sequence[Au3Value],
+    ) -&gt; Au3Probe:
+        spelling = self._spelling(function)
+        if spelling is None:
+            return interpreter.probe(function, arguments)
+        key = (spelling, interpreter.function_names, repr(tuple(arguments)))
+        probe = self._asked.get(key)
+        if probe is None:
+            probe = self._held.get(key)
+        if probe is None:
+            probe = interpreter.probe(function, arguments)
+        self._asked[key] = probe
+        return probe
+
+    def _spelling(self, function: Au3FunctionDeclaration) -&gt; str | None:
+        &#34;&#34;&#34;
+        The source text of *function*, synthesized once per census: the tree does not change
+        while a census runs.
+        &#34;&#34;&#34;
+        key = id(function)
+        if key not in self._spellings:
+            try:
+                self._spellings[key] = Au3Synthesizer().convert(function)
+            except (UnspellableNode, RecursionError):
+                self._spellings[key] = None
+        return self._spellings[key]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo.renew"><code class="name flex">
+<span>def <span class="ident">renew</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Begin a census: the probes the previous census asked stay available, older ones drop.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L261-L267" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def renew(self) -&gt; None:
+    &#34;&#34;&#34;
+    Begin a census: the probes the previous census asked stay available, older ones drop.
+    &#34;&#34;&#34;
+    self._held = self._asked
+    self._asked = {}
+    self._spellings = {}</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo.probe"><code class="name flex">
+<span>def <span class="ident">probe</span></span>(<span>self, interpreter, function, arguments)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/analysis/existence.py#L269-L285" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def probe(
+    self,
+    interpreter: Au3Interpreter,
+    function: Au3FunctionDeclaration,
+    arguments: Sequence[Au3Value],
+) -&gt; Au3Probe:
+    spelling = self._spelling(function)
+    if spelling is None:
+        return interpreter.probe(function, arguments)
+    key = (spelling, interpreter.function_names, repr(tuple(arguments)))
+    probe = self._asked.get(key)
+    if probe is None:
+        probe = self._held.get(key)
+    if probe is None:
+        probe = interpreter.probe(function, arguments)
+    self._asked[key] = probe
+    return probe</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.analysis" href="index.html">refinery.lib.scripts.au3.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.parse_payload" href="#refinery.lib.scripts.au3.analysis.existence.parse_payload">parse_payload</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.execute_kills" href="#refinery.lib.scripts.au3.analysis.existence.execute_kills">execute_kills</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.assign_kills" href="#refinery.lib.scripts.au3.analysis.existence.assign_kills">assign_kills</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.call_target" href="#refinery.lib.scripts.au3.analysis.existence.call_target">call_target</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.build_existence_model" href="#refinery.lib.scripts.au3.analysis.existence.build_existence_model">build_existence_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel" href="#refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel">Au3ExistenceModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.global_may_exist" href="#refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.global_may_exist">global_may_exist</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.write_may_target_global" href="#refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.write_may_target_global">write_may_target_global</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.write_is_fatal" href="#refinery.lib.scripts.au3.analysis.existence.Au3ExistenceModel.write_is_fatal">write_is_fatal</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo" href="#refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo">Au3ProbeMemo</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo.renew" href="#refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo.renew">renew</a></code></li>
+<li><code><a title="refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo.probe" href="#refinery.lib.scripts.au3.analysis.existence.Au3ProbeMemo.probe">probe</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

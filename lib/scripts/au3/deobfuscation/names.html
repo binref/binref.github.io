@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.au3.deobfuscation.names documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.au3.deobfuscation.names</code></h1>
+</header>
+<section id="section-intro">
+<p>Dynamic-name flattening: replacing a <code>Call</code>, <code>Assign</code>, or <code>Eval</code> over a string-literal name with
+the direct call, plain write, or plain read that name spells.</p>
+<p>The three builtins are the language's computed-name primitives, and every rule here flattens only
+where the pinned semantics prove the replacement indistinguishable. <code>Call("f", args…)</code> becomes
+<code>f(args…)</code> over a declared function whose arguments fill its parameters, defaulted ones included
+(probe9 A13), because the undeclared name and the wrong count are the failures <code>Call</code> answers
+with <code>@error</code> while the direct call terminates the script (probe9 A13b). A statement-position
+<code>Assign("x", v)</code> becomes <code>$x = v</code> — flag 0 is the plain write in every storage configuration
+probed (probe9 A1-A5, A18-A20, A23, A24) — never over a constant, which the plain write refuses
+fatally (probe9d A10), never under a <code>MustDeclareVars</code> the tree may set without a declaration
+backing the plain write — the option refusing the write to an undeclared name while its hold
+over <code>Assign</code> is unpinned — and never where <code>@error</code> is observable: a successful <code>Assign</code> clears a
+previous <code>@error</code>/<code>@extended</code> while the plain write leaves both (probe9f A21). <code>Eval("x")</code>
+becomes <code>$x</code> only behind a local that provably exists — every other read targets a global the
+tree cannot prove exists, and the plain read of a missing name is a fatal refusal where <code>Eval</code>
+answered <code>""</code> (probe9c A11) — and only behind a claim that strictly precedes the read:
+<code>Local $x = $x</code> is an interpreter refusal (probe9g A29). A successful <code>Eval</code> clears
+<code>@error</code>/<code>@extended</code> the same way (probe9f A22), so its rule carries the same observability gate,
+and one position refuses outright: a whole-argument slot an enclosing call passes by reference —
+the callee's write reaches the temporary <code>Eval</code> answers, not the named variable the flatten would
+put in its place, a variable <code>Call</code> mutates (probe9 A15). A statement whose whole expression is
+an <code>=</code> comparison still flattens: the synthesizer brackets the printed line, because a plain <code>=</code>
+comparison over a writable left operand re-parses as an assignment
+(<code><a title="refinery.lib.scripts.au3.precedence" href="../precedence.html">refinery.lib.scripts.au3.precedence</a></code>).</p>
+<p>Every rule shares four refusals: a script function of the builtin's name shadows it, an include
+may declare storage and constants no tree declaration covers — read from the scope model, in
+both spellings the parser answers with, the node and the directive an include line with trailing
+text becomes — a tree whose parse failed anywhere is refused outright, and a name that is not a
+shape the lexer reads back builds nothing this pass may write. The <code>MustDeclareVars</code> gate reads
+every spelling the option answers to — <code>Opt</code> is the documented alias of <code>AutoItSetOption</code>, and a
+computed callee may name either. The pass holds its model snapshot for the visit — its edits
+introduce no declaration, remove no declaration, and change no parameter list, so every fact the
+snapshot holds stays true mid-pass.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/names.py#L1-L311" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Dynamic-name flattening: replacing a `Call`, `Assign`, or `Eval` over a string-literal name with
+the direct call, plain write, or plain read that name spells.
+
+The three builtins are the language&#39;s computed-name primitives, and every rule here flattens only
+where the pinned semantics prove the replacement indistinguishable. `Call(&#34;f&#34;, args…)` becomes
+`f(args…)` over a declared function whose arguments fill its parameters, defaulted ones included
+(probe9 A13), because the undeclared name and the wrong count are the failures `Call` answers
+with `@error` while the direct call terminates the script (probe9 A13b). A statement-position
+`Assign(&#34;x&#34;, v)` becomes `$x = v` — flag 0 is the plain write in every storage configuration
+probed (probe9 A1-A5, A18-A20, A23, A24) — never over a constant, which the plain write refuses
+fatally (probe9d A10), never under a `MustDeclareVars` the tree may set without a declaration
+backing the plain write — the option refusing the write to an undeclared name while its hold
+over `Assign` is unpinned — and never where `@error` is observable: a successful `Assign` clears a
+previous `@error`/`@extended` while the plain write leaves both (probe9f A21). `Eval(&#34;x&#34;)`
+becomes `$x` only behind a local that provably exists — every other read targets a global the
+tree cannot prove exists, and the plain read of a missing name is a fatal refusal where `Eval`
+answered `&#34;&#34;` (probe9c A11) — and only behind a claim that strictly precedes the read:
+`Local $x = $x` is an interpreter refusal (probe9g A29). A successful `Eval` clears
+`@error`/`@extended` the same way (probe9f A22), so its rule carries the same observability gate,
+and one position refuses outright: a whole-argument slot an enclosing call passes by reference —
+the callee&#39;s write reaches the temporary `Eval` answers, not the named variable the flatten would
+put in its place, a variable `Call` mutates (probe9 A15). A statement whose whole expression is
+an `=` comparison still flattens: the synthesizer brackets the printed line, because a plain `=`
+comparison over a writable left operand re-parses as an assignment
+(`refinery.lib.scripts.au3.precedence`).
+
+Every rule shares four refusals: a script function of the builtin&#39;s name shadows it, an include
+may declare storage and constants no tree declaration covers — read from the scope model, in
+both spellings the parser answers with, the node and the directive an include line with trailing
+text becomes — a tree whose parse failed anywhere is refused outright, and a name that is not a
+shape the lexer reads back builds nothing this pass may write. The `MustDeclareVars` gate reads
+every spelling the option answers to — `Opt` is the documented alias of `AutoItSetOption`, and a
+computed callee may name either. The pass holds its model snapshot for the visit — its edits
+introduce no declaration, remove no declaration, and change no parameter list, so every fact the
+snapshot holds stays true mid-pass.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from refinery.lib.scripts import Node, Transformer, _replace_in_parent, set_child, set_child_list
+from refinery.lib.scripts.au3 import ast
+from refinery.lib.scripts.au3.analysis.builtins import OPTION_SETTERS
+from refinery.lib.scripts.au3.analysis.cache import Au3ModelCache, model_cache
+from refinery.lib.scripts.au3.analysis.scopes import Au3ScopeModel
+from refinery.lib.scripts.au3.analysis.usage import callee_census
+from refinery.lib.scripts.au3.lexer import is_au3_identifier
+from refinery.lib.scripts.au3.model import (
+    Au3Assignment,
+    Au3BooleanLiteral,
+    Au3Call,
+    Au3DefaultLiteral,
+    Au3ExpressionStatement,
+    Au3FloatLiteral,
+    Au3FunctionDeclaration,
+    Au3Identifier,
+    Au3IntLiteral,
+    Au3MemberAccess,
+    Au3NullLiteral,
+    Au3Script,
+    Au3StringLiteral,
+    Au3Variable,
+    Au3WithMember,
+    Expression,
+)
+
+#: The literal shapes a sole `Call` argument may hold: no literal can be the array a
+#: `CallArgArray` expansion reads (probe9 A14c), so a sole argument of any other shape keeps
+#: the call dynamic.
+_ARGUMENT_LITERALS = (
+    Au3BooleanLiteral,
+    Au3DefaultLiteral,
+    Au3FloatLiteral,
+    Au3IntLiteral,
+    Au3NullLiteral,
+    Au3StringLiteral,
+)
+
+#: The literal shapes a `ByRef` parameter position flattens: plain values, whose mutation both
+#: forms discard (probe9h A30). `Null` and `Default` are keyword arguments with passing rules no
+#: probe pinned, so they refuse.
+_BYREF_LITERALS = (
+    Au3BooleanLiteral,
+    Au3FloatLiteral,
+    Au3IntLiteral,
+    Au3StringLiteral,
+)
+
+
+@dataclass(frozen=True)
+class _TreeFacts:
+    &#34;&#34;&#34;
+    What the whole tree holds, read once per pass before any edit: a possible read of the error
+    state and a call to an option setter. The pass&#39;s edits rewrite and remove calls and add plain
+    reads, so neither can become true mid-pass.
+    &#34;&#34;&#34;
+    observes_error_state: bool
+    calls_autoit_set_option: bool
+
+
+def _tree_facts(cache: Au3ModelCache) -&gt; _TreeFacts:
+    &#34;&#34;&#34;
+    The facts the whole tree decides. The callee spellings are the census&#39;s to read — see
+    `callee_census` — over the usage model&#39;s functions and error-node facts, and they answer the
+    error-state and the option-setter questions. The spelling of the option the tree sets is
+    unpinned either way — only that the tree may set `MustDeclareVars` is a fact here.
+    &#34;&#34;&#34;
+    census = callee_census(cache.root, cache.usage.functions, cache.usage.unparsed)
+    return _TreeFacts(
+        census.observes_error_state(),
+        census.computed_callee or not OPTION_SETTERS.isdisjoint(census.callees),
+    )
+
+
+def _arguments_fill(arguments: list[Expression], function: Au3FunctionDeclaration) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *arguments* fill *function*&#39;s parameters: exactly as many, or fewer with every
+    missing one defaulted (probe9 A13 — `Call` fills a default the direct call fills too). One
+    argument too many refuses: `Call` answers that with `@error` (probe9 A13b) while the direct
+    call terminates the script.
+    &#34;&#34;&#34;
+    if len(arguments) &gt; len(function.params):
+        return False
+    return all(parameter.default is not None for parameter in function.params[len(arguments):])
+
+
+class Au3DynamicNameFlattening(Transformer):
+    &#34;&#34;&#34;
+    Replaces a `Call`, `Assign`, or `Eval` whose name argument is a string literal with the
+    direct call, plain write, or plain read that name spells, in every position the pinned
+    semantics of the three builtins cover.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self._scopes = Au3ScopeModel({})
+        self._facts = _TreeFacts(False, False)
+
+    def visit(self, node: Node) -&gt; Node | None:
+        if isinstance(node, Au3Script):
+            cache = model_cache(self, node)
+            self._scopes = cache.scopes
+            self._facts = _tree_facts(cache)
+        self.generic_visit(node)
+        if not isinstance(node, Au3Call):
+            return None
+        callee = ast.direct_callee(node)
+        if callee is None:
+            return None
+        if callee.name == &#39;call&#39;:
+            self._flatten_call(node)
+        elif callee.name == &#39;assign&#39;:
+            self._flatten_assign(node)
+        elif callee.name == &#39;eval&#39;:
+            self._flatten_eval(node)
+        return None
+
+    def _literal_name(self, call: Au3Call, builtin: str) -&gt; str | None:
+        &#34;&#34;&#34;
+        The spelling the call&#39;s first argument holds, or `None` where a shared gate refuses the
+        call: a script function of the builtin&#39;s name shadows it, the tree holds an include or a
+        parse error, the first argument is missing or not a string literal, or the spelling is no
+        shape the lexer reads back as one name.
+        &#34;&#34;&#34;
+        if builtin in self._scopes.functions:
+            return None
+        if self._scopes.holds_an_include:
+            return None
+        if self._scopes.holds_a_parse_error:
+            return None
+        if not call.arguments:
+            return None
+        literal = ast.unwrap_parens(call.arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            return None
+        if not is_au3_identifier(literal.value):
+            return None
+        return literal.value
+
+    def _flatten_call(self, call: Au3Call) -&gt; None:
+        spelling = self._literal_name(call, &#39;call&#39;)
+        if spelling is None or ast.in_callee_position(call):
+            return
+        name = spelling.lower()
+        target = self._scopes.functions.get(name)
+        if target is None:
+            return
+        arguments = call.arguments[1:]
+        if not _arguments_fill(arguments, target):
+            return
+        if any(ast.contains_an_array_literal(argument) for argument in arguments):
+            return
+        if len(arguments) == 1 and not isinstance(
+            ast.unwrap_parens(arguments[0]),
+            _ARGUMENT_LITERALS,
+        ):
+            return
+        for parameter, argument in zip(target.params, arguments):
+            if parameter.by_ref and not isinstance(
+                argument,
+                (Au3Variable, *_BYREF_LITERALS),
+            ):
+                return
+        set_child(call, &#39;callee&#39;, Au3Identifier(name=name, raw=spelling))
+        set_child_list(call, &#39;arguments&#39;, list(arguments))
+        self.mark_changed()
+
+    def _flatten_assign(self, call: Au3Call) -&gt; None:
+        spelling = self._literal_name(call, &#39;assign&#39;)
+        if spelling is None:
+            return
+        name = spelling.lower()
+        if name in self._scopes.constant_names:
+            return
+        if self._facts.observes_error_state:
+            return
+        arguments = call.arguments
+        if len(arguments) not in (2, 3):
+            return
+        if len(arguments) == 3:
+            flag = ast.unwrap_parens(arguments[2])
+            if not isinstance(flag, Au3IntLiteral) or flag.value != 0:
+                return
+        value = arguments[1]
+        if ast.contains_an_array_literal(value):
+            return
+        statement = ast.owning_statement(call)
+        if not (
+            isinstance(statement, Au3ExpressionStatement)
+            and ast.unwrap_parens(statement.expression) is call
+        ):
+            return
+        if self._facts.calls_autoit_set_option:
+            scope = ast.enclosing_function(call)
+            if not self._scopes.declaration_backs_write(scope, statement, name):
+                return
+        assignment = Au3Assignment()
+        set_child(assignment, &#39;target&#39;, Au3Variable(name=name, raw=F&#39;${spelling}&#39;))
+        set_child(assignment, &#39;value&#39;, value)
+        set_child(statement, &#39;expression&#39;, assignment)
+        self.mark_changed()
+
+    def _flatten_eval(self, call: Au3Call) -&gt; None:
+        spelling = self._literal_name(call, &#39;eval&#39;)
+        if spelling is None:
+            return
+        name = spelling.lower()
+        if self._facts.observes_error_state:
+            return
+        if len(call.arguments) != 1 or ast.in_callee_position(call):
+            return
+        if not self._scopes.local_precedes_read(ast.enclosing_function(call), call, name):
+            return
+        if self._in_byref_slot(call):
+            return
+        variable = Au3Variable(name=name, raw=F&#39;${spelling}&#39;)
+        statement = ast.owning_statement(call)
+        if (
+            isinstance(statement, Au3ExpressionStatement)
+            and ast.unwrap_parens(statement.expression) is call
+        ):
+            set_child(statement, &#39;expression&#39;, variable)
+        elif not _replace_in_parent(call, variable):
+            return
+        self.mark_changed()
+
+    def _in_byref_slot(self, call: Au3Call) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *call* stands as a whole argument in a slot an enclosing call passes by
+        reference. A function return value is an unnamed temporary the parameter may bind — the
+        Func documentation names it a legal `ByRef` argument — so the callee&#39;s write reaches the
+        temporary, while the flattened variable is the named variable `Call` into a `ByRef`
+        parameter mutates (probe9 A15). A parenthesized argument stays a parenthesized expression
+        after the flatten, so only the direct argument position refuses. The callee is read the
+        way `_tree_facts` reads one: an identifier naming a script function checks its
+        parameters — a `Call` invocation over a literal, offset by the name argument — any other
+        identifier names a builtin, whose parameters are never `ByRef`, and a callee computed at
+        run time could name a function whose parameter there is one, so it refuses; the include
+        gate rules out the unseen script function either spelling could name.
+        &#34;&#34;&#34;
+        parent = call.parent
+        if not isinstance(parent, Au3Call):
+            return False
+        index = next(
+            (position for position, argument in enumerate(parent.arguments) if argument is call),
+            None,
+        )
+        if index is None:
+            return False
+        callee = ast.unwrap_parens(parent.callee)
+        if not isinstance(callee, Au3Identifier):
+            return not isinstance(callee, (Au3MemberAccess, Au3WithMember))
+        offset = 0
+        if callee.name == &#39;call&#39; and callee.name not in self._scopes.functions:
+            if not parent.arguments:
+                return False
+            literal = ast.unwrap_parens(parent.arguments[0])
+            if not isinstance(literal, Au3StringLiteral):
+                return True
+            name = literal.value.lower()
+            offset = 1
+        else:
+            name = callee.name
+        target = self._scopes.functions.get(name)
+        if target is None:
+            return False
+        position = index - offset
+        if position &lt; 0 or position &gt;= len(target.params):
+            return False
+        return target.params[position].by_ref</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.names.Au3DynamicNameFlattening"><code class="flex name class">
+<span>class <span class="ident">Au3DynamicNameFlattening</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Replaces a <code>Call</code>, <code>Assign</code>, or <code>Eval</code> whose name argument is a string literal with the
+direct call, plain write, or plain read that name spells, in every position the pinned
+semantics of the three builtins cover.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/names.py#L128-L311" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Au3DynamicNameFlattening(Transformer):
+    &#34;&#34;&#34;
+    Replaces a `Call`, `Assign`, or `Eval` whose name argument is a string literal with the
+    direct call, plain write, or plain read that name spells, in every position the pinned
+    semantics of the three builtins cover.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        super().__init__()
+        self._scopes = Au3ScopeModel({})
+        self._facts = _TreeFacts(False, False)
+
+    def visit(self, node: Node) -&gt; Node | None:
+        if isinstance(node, Au3Script):
+            cache = model_cache(self, node)
+            self._scopes = cache.scopes
+            self._facts = _tree_facts(cache)
+        self.generic_visit(node)
+        if not isinstance(node, Au3Call):
+            return None
+        callee = ast.direct_callee(node)
+        if callee is None:
+            return None
+        if callee.name == &#39;call&#39;:
+            self._flatten_call(node)
+        elif callee.name == &#39;assign&#39;:
+            self._flatten_assign(node)
+        elif callee.name == &#39;eval&#39;:
+            self._flatten_eval(node)
+        return None
+
+    def _literal_name(self, call: Au3Call, builtin: str) -&gt; str | None:
+        &#34;&#34;&#34;
+        The spelling the call&#39;s first argument holds, or `None` where a shared gate refuses the
+        call: a script function of the builtin&#39;s name shadows it, the tree holds an include or a
+        parse error, the first argument is missing or not a string literal, or the spelling is no
+        shape the lexer reads back as one name.
+        &#34;&#34;&#34;
+        if builtin in self._scopes.functions:
+            return None
+        if self._scopes.holds_an_include:
+            return None
+        if self._scopes.holds_a_parse_error:
+            return None
+        if not call.arguments:
+            return None
+        literal = ast.unwrap_parens(call.arguments[0])
+        if not isinstance(literal, Au3StringLiteral):
+            return None
+        if not is_au3_identifier(literal.value):
+            return None
+        return literal.value
+
+    def _flatten_call(self, call: Au3Call) -&gt; None:
+        spelling = self._literal_name(call, &#39;call&#39;)
+        if spelling is None or ast.in_callee_position(call):
+            return
+        name = spelling.lower()
+        target = self._scopes.functions.get(name)
+        if target is None:
+            return
+        arguments = call.arguments[1:]
+        if not _arguments_fill(arguments, target):
+            return
+        if any(ast.contains_an_array_literal(argument) for argument in arguments):
+            return
+        if len(arguments) == 1 and not isinstance(
+            ast.unwrap_parens(arguments[0]),
+            _ARGUMENT_LITERALS,
+        ):
+            return
+        for parameter, argument in zip(target.params, arguments):
+            if parameter.by_ref and not isinstance(
+                argument,
+                (Au3Variable, *_BYREF_LITERALS),
+            ):
+                return
+        set_child(call, &#39;callee&#39;, Au3Identifier(name=name, raw=spelling))
+        set_child_list(call, &#39;arguments&#39;, list(arguments))
+        self.mark_changed()
+
+    def _flatten_assign(self, call: Au3Call) -&gt; None:
+        spelling = self._literal_name(call, &#39;assign&#39;)
+        if spelling is None:
+            return
+        name = spelling.lower()
+        if name in self._scopes.constant_names:
+            return
+        if self._facts.observes_error_state:
+            return
+        arguments = call.arguments
+        if len(arguments) not in (2, 3):
+            return
+        if len(arguments) == 3:
+            flag = ast.unwrap_parens(arguments[2])
+            if not isinstance(flag, Au3IntLiteral) or flag.value != 0:
+                return
+        value = arguments[1]
+        if ast.contains_an_array_literal(value):
+            return
+        statement = ast.owning_statement(call)
+        if not (
+            isinstance(statement, Au3ExpressionStatement)
+            and ast.unwrap_parens(statement.expression) is call
+        ):
+            return
+        if self._facts.calls_autoit_set_option:
+            scope = ast.enclosing_function(call)
+            if not self._scopes.declaration_backs_write(scope, statement, name):
+                return
+        assignment = Au3Assignment()
+        set_child(assignment, &#39;target&#39;, Au3Variable(name=name, raw=F&#39;${spelling}&#39;))
+        set_child(assignment, &#39;value&#39;, value)
+        set_child(statement, &#39;expression&#39;, assignment)
+        self.mark_changed()
+
+    def _flatten_eval(self, call: Au3Call) -&gt; None:
+        spelling = self._literal_name(call, &#39;eval&#39;)
+        if spelling is None:
+            return
+        name = spelling.lower()
+        if self._facts.observes_error_state:
+            return
+        if len(call.arguments) != 1 or ast.in_callee_position(call):
+            return
+        if not self._scopes.local_precedes_read(ast.enclosing_function(call), call, name):
+            return
+        if self._in_byref_slot(call):
+            return
+        variable = Au3Variable(name=name, raw=F&#39;${spelling}&#39;)
+        statement = ast.owning_statement(call)
+        if (
+            isinstance(statement, Au3ExpressionStatement)
+            and ast.unwrap_parens(statement.expression) is call
+        ):
+            set_child(statement, &#39;expression&#39;, variable)
+        elif not _replace_in_parent(call, variable):
+            return
+        self.mark_changed()
+
+    def _in_byref_slot(self, call: Au3Call) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether *call* stands as a whole argument in a slot an enclosing call passes by
+        reference. A function return value is an unnamed temporary the parameter may bind — the
+        Func documentation names it a legal `ByRef` argument — so the callee&#39;s write reaches the
+        temporary, while the flattened variable is the named variable `Call` into a `ByRef`
+        parameter mutates (probe9 A15). A parenthesized argument stays a parenthesized expression
+        after the flatten, so only the direct argument position refuses. The callee is read the
+        way `_tree_facts` reads one: an identifier naming a script function checks its
+        parameters — a `Call` invocation over a literal, offset by the name argument — any other
+        identifier names a builtin, whose parameters are never `ByRef`, and a callee computed at
+        run time could name a function whose parameter there is one, so it refuses; the include
+        gate rules out the unseen script function either spelling could name.
+        &#34;&#34;&#34;
+        parent = call.parent
+        if not isinstance(parent, Au3Call):
+            return False
+        index = next(
+            (position for position, argument in enumerate(parent.arguments) if argument is call),
+            None,
+        )
+        if index is None:
+            return False
+        callee = ast.unwrap_parens(parent.callee)
+        if not isinstance(callee, Au3Identifier):
+            return not isinstance(callee, (Au3MemberAccess, Au3WithMember))
+        offset = 0
+        if callee.name == &#39;call&#39; and callee.name not in self._scopes.functions:
+            if not parent.arguments:
+                return False
+            literal = ast.unwrap_parens(parent.arguments[0])
+            if not isinstance(literal, Au3StringLiteral):
+                return True
+            name = literal.value.lower()
+            offset = 1
+        else:
+            name = callee.name
+        target = self._scopes.functions.get(name)
+        if target is None:
+            return False
+        position = index - offset
+        if position &lt; 0 or position &gt;= len(target.params):
+            return False
+        return target.params[position].by_ref</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.au3.deobfuscation.names.Au3DynamicNameFlattening.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/64ee861de8e9959ea666085ed61b8b96766435ba/refinery/lib/scripts/au3/deobfuscation/names.py#L140-L157" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def visit(self, node: Node) -&gt; Node | None:
+    if isinstance(node, Au3Script):
+        cache = model_cache(self, node)
+        self._scopes = cache.scopes
+        self._facts = _tree_facts(cache)
+    self.generic_visit(node)
+    if not isinstance(node, Au3Call):
+        return None
+    callee = ast.direct_callee(node)
+    if callee is None:
+        return None
+    if callee.name == &#39;call&#39;:
+        self._flatten_call(node)
+    elif callee.name == &#39;assign&#39;:
+        self._flatten_assign(node)
+    elif callee.name == &#39;eval&#39;:
+        self._flatten_eval(node)
+    return None</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.Transformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation" href="index.html">refinery.lib.scripts.au3.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.au3.deobfuscation.names.Au3DynamicNameFlattening" href="#refinery.lib.scripts.au3.deobfuscation.names.Au3DynamicNameFlattening">Au3DynamicNameFlattening</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.au3.deobfuscation.names.Au3DynamicNameFlattening.visit" href="#refinery.lib.scripts.au3.deobfuscation.names.Au3DynamicNameFlattening.visit">visit</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
