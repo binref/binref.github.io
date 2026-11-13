@@ -1,0 +1,1593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.cfg documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.cfg</code></h1>
+</header>
+<section id="section-intro">
+<p>PowerShell's contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored.</p>
+<p>Everything structural lives in <code><a title="refinery.lib.scripts.analysis.cfg" href="../../analysis/cfg.html">refinery.lib.scripts.analysis.cfg</a></code>. What is here is the dispatch, the
+accessors, and the places PowerShell's answer differs from the shape JavaScript established:</p>
+<ul>
+<li><strong><code>switch</code> does not fall through, it keeps matching.</strong> Every clause is tested against the value and
+every matching one runs, so an arm's exits may reach any <em>later</em> arm rather than only the next.
+That is <code><a title="refinery.lib.scripts.analysis.cfg.ArmFlow.CUMULATIVE" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ArmFlow.CUMULATIVE">ArmFlow.CUMULATIVE</a></code>, and reading it as C-style
+fallthrough would drop the path in which the first and third clauses match and the second does not.
+It also <em>enumerates its input</em>, so <code>continue</code> inside it advances to the next input value rather
+than to an enclosing loop, and a <code>default</code> clause does not make it exhaustive: over an empty
+collection no clause runs at all.</li>
+<li><strong><code>if</code>/<code>elseif</code> is one flat statement</strong>, not a nest, so the chain of tests is built through
+<code>branch_chain</code> and each <code>elseif</code> condition gets a node of its own.</li>
+<li><strong><code>trap</code> guards the statement block it is written in</strong>, not the scope around it: it catches for
+that block entire, statements written above it included, and for nothing outside it, so one
+written inside an <code>if</code> body is no handler for the body around it. Where blocks nest, the innermost
+block declaring one is the only set consulted, and a set that may fail to match passes the error
+outward rather than letting it resume. <code>continue</code> inside it resumes at the statement after the one
+that threw. See <code>_Builder.block</code>.</li>
+<li><strong><code>exit</code> is a terminator like <code>return</code></strong>, modelled as one: control does not continue in this body.
+That it leaves the <em>script</em> rather than the function is a claim about the caller's body, which a
+per-body graph does not make; keeping the caller's paths is the conservative reading.</li>
+<li><strong>A label is a field of the construct</strong>, not a statement wrapping it, so <code>park_label</code> is called
+from the dispatch rather than through <code>labelled</code>, and the <code>:</code> the lexer keeps on the declaration
+is stripped before a jump can be matched against it.</li>
+</ul>
+<p><code>Ps1Code</code> also splits one body across <code>begin</code>/<code>process</code>/<code>end</code>/<code>dynamicparam</code> blocks, so <code>owner.body</code>
+alone is not what an advanced function runs.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L1-L1022" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+PowerShell&#39;s contribution to the shared control-flow substrate: which node types are which
+control-flow shape, and where the parts of each are stored.
+
+Everything structural lives in `refinery.lib.scripts.analysis.cfg`. What is here is the dispatch, the
+accessors, and the places PowerShell&#39;s answer differs from the shape JavaScript established:
+
+- **`switch` does not fall through, it keeps matching.** Every clause is tested against the value and
+  every matching one runs, so an arm&#39;s exits may reach any *later* arm rather than only the next.
+  That is `refinery.lib.scripts.analysis.cfg.ArmFlow.CUMULATIVE`, and reading it as C-style
+  fallthrough would drop the path in which the first and third clauses match and the second does not.
+  It also *enumerates its input*, so `continue` inside it advances to the next input value rather
+  than to an enclosing loop, and a `default` clause does not make it exhaustive: over an empty
+  collection no clause runs at all.
+- **`if`/`elseif` is one flat statement**, not a nest, so the chain of tests is built through
+  `branch_chain` and each `elseif` condition gets a node of its own.
+- **`trap` guards the statement block it is written in**, not the scope around it: it catches for
+  that block entire, statements written above it included, and for nothing outside it, so one
+  written inside an `if` body is no handler for the body around it. Where blocks nest, the innermost
+  block declaring one is the only set consulted, and a set that may fail to match passes the error
+  outward rather than letting it resume. `continue` inside it resumes at the statement after the one
+  that threw. See `_Builder.block`.
+- **`exit` is a terminator like `return`**, modelled as one: control does not continue in this body.
+  That it leaves the *script* rather than the function is a claim about the caller&#39;s body, which a
+  per-body graph does not make; keeping the caller&#39;s paths is the conservative reading.
+- **A label is a field of the construct**, not a statement wrapping it, so `park_label` is called
+  from the dispatch rather than through `labelled`, and the `:` the lexer keeps on the declaration
+  is stripped before a jump can be matched against it.
+
+`Ps1Code` also splits one body across `begin`/`process`/`end`/`dynamicparam` blocks, so `owner.body`
+alone is not what an advanced function runs.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from functools import partial
+from typing import Callable, Sequence
+from weakref import WeakKeyDictionary
+
+from refinery.lib.scripts import Block, Node, tree_root, tree_version
+from refinery.lib.scripts.analysis.cfg import (
+    ArmFlow,
+    CfgBuilder,
+    CfgNode,
+    ControlFlowGraph,
+    ControlFlowModel,
+    build_control_flow,
+)
+from refinery.lib.scripts.ps1.analysis.dispatch import (
+    EVERY_KIND,
+    Ps1CallSites,
+    Ps1Dispatch,
+    Ps1ErrorKind,
+    preferences_of,
+)
+from refinery.lib.scripts.ps1.analysis.handlers import (
+    Ps1TrapDisposition,
+    Ps1TrapSelection,
+    carries_on,
+    declared_traps,
+    handler_acts,
+    swallows_every_error,
+)
+from refinery.lib.scripts.ps1.analysis.session import session_of
+from refinery.lib.scripts.ps1.analysis.values import point_is_fault_free
+from refinery.lib.scripts.ps1.ast import (
+    STATEMENT_LIST_EXPRESSIONS,
+    get_named_blocks,
+    string_value,
+)
+from refinery.lib.scripts.ps1.model import (
+    Ps1BreakStatement,
+    Ps1Code,
+    Ps1ContinueStatement,
+    Ps1DoLoop,
+    Ps1ExitStatement,
+    Ps1ForEachLoop,
+    Ps1ForLoop,
+    Ps1FunctionDefinition,
+    Ps1IfStatement,
+    Ps1Jump,
+    Ps1PropertyMember,
+    Ps1ReturnStatement,
+    Ps1Script,
+    Ps1ScriptBlock,
+    Ps1SwitchStatement,
+    Ps1ThrowStatement,
+    Ps1TrapStatement,
+    Ps1TryCatchFinally,
+    Ps1WhileLoop,
+)
+
+#: The nodes that own a control-flow graph of their own, beside the script itself. A script block is
+#: PowerShell&#39;s anonymous function: it is a *value* where it is written and runs somewhere else
+#: entirely — as the body of `ForEach-Object`, through `&amp;` or `.`, or as the body of a function,
+#: which is the only script block a `Ps1FunctionDefinition` has and why keying on the definition
+#: instead adds no graph but leaves every other block without one. A block with no graph is climbed
+#: out of, so its statements are reported as running where the block is *written*: they claim to
+#: precede everything after that point and lose their order among themselves.
+#:
+#: This is the same partition `refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel.scope_of`
+#: makes — one body, one scope, one graph. A `trap` divides more finely still: it belongs to the
+#: statement block it is written in, of which a body is only the outermost.
+FUNCTION_NODES = (Ps1ScriptBlock,)
+
+#: The nodes whose content runs at a time of its own and outside every body a graph is drawn for.
+#: A class property&#39;s initializer runs each time the class is constructed, or when the type is first
+#: used for a `static` one, and never at the class statement it is written in.
+DEFERRED_NODES = (Ps1PropertyMember,)
+
+_RUNS_APART = (*FUNCTION_NODES, *DEFERRED_NODES)
+
+
+def _runs_apart(holder: Node, part: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *part* of *holder* runs at a time of its own: every part of a script block runs when
+    the block is invoked, and every part of a class property when it is initialized.
+    &#34;&#34;&#34;
+    return isinstance(holder, _RUNS_APART)
+
+
+def _owns_a_graph(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a graph is drawn for *node*: a script block. A class property&#39;s initializer has none,
+    so an element in one is located nowhere.
+    &#34;&#34;&#34;
+    return isinstance(node, FUNCTION_NODES)
+
+
+_LOOP_NODES = (
+    Ps1WhileLoop,
+    Ps1DoLoop,
+    Ps1ForLoop,
+    Ps1ForEachLoop,
+)
+
+
+def _jump_label(statement: Ps1Jump) -&gt; str | None:
+    &#34;&#34;&#34;
+    The label a `break` or `continue` names, or `None` when it names none or names one this cannot
+    read. PowerShell allows the label to be any expression — `break $name` is legal — and a label
+    that is not a static string is one no lexical target can be matched against, so it is treated as
+    unlabelled, which resolves to the innermost enclosing target and is the conservative reading.
+    &#34;&#34;&#34;
+    return string_value(statement.label) if statement.label is not None else None
+
+
+def _construct_label(label: str | None) -&gt; str | None:
+    &#34;&#34;&#34;
+    The name a labelled loop or `switch` declares, without the `:` the lexer keeps on the token.
+
+    A jump names its target without the colon, so the declaration and the reference are two
+    spellings of one name and comparing them unnormalized never matches — which resolves every
+    labelled jump to nothing and sends it out of the body instead of out of the construct it names.
+    &#34;&#34;&#34;
+    return label[1:] if label is not None and label.startswith(&#39;:&#39;) else label
+
+
+class Ps1TrapSet(Ps1TrapSelection):
+    &#34;&#34;&#34;
+    The `trap` statements one block declares, as the builder wired them: the selection 5.1 makes
+    among them, each member&#39;s entry and disposition, and — where the set resumes the block — the
+    slot it resumes at after each statement of the block. `completions` holds, for each statement
+    of the block, the nodes from which normal control falls through past it, which the graph does
+    not record for a block a set resumes: there the next statement is also reached by resumption,
+    and a reader of `refinery.lib.scripts.analysis.cfg.ControlFlowGraph.completion_of` would read a
+    statement that never completes as one the rest of the block cannot follow. `outward` is where an
+    error goes that the set does not take, and where the errors it takes would go if none of it
+    were written. `owner` is the node holding the block.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        graph: ControlFlowGraph,
+        statements: Sequence[Node],
+        entries: dict[int, CfgNode],
+        traps: Sequence[Ps1TrapStatement],
+    ):
+        super().__init__(traps)
+        owner = traps[0].parent
+        if owner is None:
+            raise ValueError(&#39;a trap set stands in no statement list&#39;)
+        self.owner: Node = owner
+        self.graph = graph
+        self.statements = tuple(statements)
+        self.entries = entries
+        self.chain = tuple(entries[id(trap)] for trap in self.selectable)
+        self.dispositions: dict[int, Ps1TrapDisposition] = {}
+        self.slots: dict[int, CfgNode] = {}
+        self.completions: dict[int, list[CfgNode]] = {}
+        self.outward: CfgNode | None = None
+
+    def entry(self, trap: Ps1TrapStatement) -&gt; CfgNode:
+        return self.entries[id(trap)]
+
+    def disposition(self, trap: Ps1TrapStatement) -&gt; Ps1TrapDisposition:
+        return self.dispositions[id(trap)]
+
+
+@dataclass(eq=False, repr=False)
+class Ps1ReportNode(CfgNode):
+    &#34;&#34;&#34;
+    The node standing for 5.1 reporting an error that leaves a `try` body, a `catch` body or a
+    `trap` body where nothing is in force, and carrying on after the statement `carries_on_after`
+    names. It is not a handler: an edge into it makes what follows that statement reachable, and the
+    error a `Stop` makes terminating ends the run from it.
+    &#34;&#34;&#34;
+    carries_on_after: Node = field(kw_only=True)
+
+
+@dataclass
+class _ReportFrame:
+    &#34;&#34;&#34;
+    A statement being built where no `try` and no `trap` is in force, and the `Ps1ReportNode` that
+    carries on after it. The node joins the graph once an error edge enters it, or once a `trap` set
+    names it as its `outward`, which is `named`: where the errors that set takes would go were none
+    of it written is a position the landing questions read, whether or not any error reaches it as
+    written.
+    &#34;&#34;&#34;
+    statement: Node
+    node: CfgNode | None = None
+    named: bool = False
+
+
+@dataclass
+class _TrapBody:
+    &#34;&#34;&#34;
+    What building one `trap` body reported back: the nodes at which control resumes the block the
+    `trap` guards, and whether the body reaches the `break` that rethrows.
+
+    `resumes` collects the explicit `continue` spellings only. A body that runs off its end resumes
+    too — the error record is written and the block carries on — but that is its exit frontier,
+    which the caller already holds.
+
+    `rethrows` is decided through the builder&#39;s jump-target stack rather than by finding the
+    keyword: a `break` naming a loop written inside the body leaves that loop, and the `trap` goes
+    on swallowing. The stack the body is built against holds nothing from outside it — see
+    `_Builder.block` — because a `trap` body is a scope of its own and a jump in it can name no
+    construct the block is written inside.
+    &#34;&#34;&#34;
+    resumes: list[CfgNode] = field(default_factory=list)
+    rethrows: bool = False
+
+
+def _runs_per_input(owner: Node) -&gt; Sequence[Node] | None:
+    &#34;&#34;&#34;
+    The statements *owner* runs once per object the pipeline hands it: its `process` block, or the
+    body of a `filter`; `None` where it has none.
+    &#34;&#34;&#34;
+    if not isinstance(owner, Ps1Code):
+        return None
+    if owner.process_block is not None:
+        return owner.process_block.body
+    definition = owner.parent
+    if isinstance(definition, Ps1FunctionDefinition) and definition.is_filter and definition.body is owner:
+        return owner.body
+    return None
+
+
+class _TrapHolders:
+    &#34;&#34;&#34;
+    Which nodes hold a `trap` outside a script block, answered for the statements of one graph. A
+    subtree is scanned once: each `trap` it holds marks every node from itself up to the nearest
+    script block, so a statement asked about after its subtree was scanned as part of an outer one
+    is answered by the marks alone, and asking of every statement of a nest of trapped blocks costs
+    the size of the nest once.
+    &#34;&#34;&#34;
+
+    def __init__(self):
+        self._scanned: set[int] = set()
+        self._holders: set[int] = set()
+
+    def holds_a_trap(self, statement: Node) -&gt; bool:
+        scanned = self._scanned
+        holders = self._holders
+        stack = [statement]
+        while stack:
+            node = stack.pop()
+            if id(node) in scanned:
+                continue
+            scanned.add(id(node))
+            if isinstance(node, Ps1TrapStatement):
+                cursor: Node | None = node
+                while (
+                    cursor is not None
+                    and not isinstance(cursor, Ps1ScriptBlock)
+                    and id(cursor) not in holders
+                ):
+                    holders.add(id(cursor))
+                    cursor = cursor.parent
+            stack.extend(child for child in node.children() if not isinstance(child, Ps1ScriptBlock))
+        return id(statement) in holders
+
+
+def _descended_bodies(statement: Node) -&gt; list[list[Node]]:
+    &#34;&#34;&#34;
+    The statement lists of the `STATEMENT_LIST_EXPRESSIONS` written in *statement*&#39;s expression tree,
+    in source order — the sub-statement granularity the fault reader needs and no coarser consumer
+    wants.
+
+    Only the outermost such construct on each path is collected: one nested inside another is reached
+    when the outer body&#39;s statements are built, each of which passes back through `statement` and this
+    descent again, so the nesting is handled by recursion through the builder rather than flattened
+    here. A nested script block is its own graph and is left to it.
+    &#34;&#34;&#34;
+    bodies: list[list[Node]] = []
+
+    def collect(node: Node) -&gt; None:
+        for child in node.children():
+            if isinstance(child, Ps1ScriptBlock):
+                continue
+            if isinstance(child, STATEMENT_LIST_EXPRESSIONS):
+                bodies.append(list(child.body))
+                continue
+            collect(child)
+
+    collect(statement)
+    return bodies
+
+
+class _Builder(CfgBuilder):
+    &#34;&#34;&#34;
+    The structure of one body: its handlers, `trap` sets, report frames and resumption slots, with
+    every route an error takes outward drawn as though it may take it. That is all a `trap` body
+    built for its disposition needs, since how the body ends reads no error edge; every graph a
+    consumer reads is drawn by `_RoutingBuilder`, which asks the evaluator where an error goes.
+    *dispositions* reads how the body of a `trap` ends.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        owner: Node,
+        dispositions: Callable[[Ps1TrapStatement], Ps1TrapDisposition],
+        descend: bool = False,
+        trap_sets: dict[int, Ps1TrapSet] | None = None,
+    ):
+        super().__init__(owner)
+        self._trap_body: _TrapBody | None = None
+        self._descend = descend
+        self._trap_sets = {} if trap_sets is None else trap_sets
+        self._dispositions = dispositions
+        self._open_sets: list[Ps1TrapSet] = []
+        self._frames: list[_ReportFrame] = []
+        self._trap_holders = _TrapHolders()
+
+    def disposition_of(self, trap: Ps1TrapStatement) -&gt; Ps1TrapDisposition:
+        &#34;&#34;&#34;
+        Build the body of *trap* as the whole of this graph, under a handler as the block&#39;s own set
+        stands over it, and read how it ends; see `trap_disposition`.
+        &#34;&#34;&#34;
+        self._handlers.append(self.cfg.exit)
+        self._trap_body = built = _TrapBody()
+        disposition = Ps1TrapDisposition.NONE
+        if self._body(trap.body, [self.cfg.entry]):
+            disposition |= Ps1TrapDisposition.FALLS_THROUGH
+        if built.resumes:
+            disposition |= Ps1TrapDisposition.RESUMES
+        if built.rethrows:
+            disposition |= Ps1TrapDisposition.RETHROWS
+        return disposition
+
+    def escape(self) -&gt; CfgNode:
+        &#34;&#34;&#34;
+        Where nothing is in force, the report node of the statement being built: 5.1 reports an
+        error that leaves a `try`, `catch` or `trap` body there and carries on after the statement.
+        &#34;&#34;&#34;
+        if self._handlers or not self._frames:
+            return self.unwinding()
+        frame = self._frames[-1]
+        if frame.node is None:
+            frame.node = Ps1ReportNode(self.cfg, None, carries_on_after=frame.statement)
+        return frame.node
+
+    def handler_body_guard(self) -&gt; CfgNode | None:
+        &#34;&#34;&#34;
+        A `catch` body is guarded where its `try` stands: an error leaving it is reported after the
+        statement that holds the `try` where nothing is in force, which `escape` names.
+        &#34;&#34;&#34;
+        return self.escape()
+
+    def member(self, statement: Node, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        A statement of a block, with its report frame open where nothing is in force. The report
+        node joins the graph where an error edge entered it or a `trap` set named it: it carries on
+        after the statement, and the error a `Stop` makes terminating ends the run from there.
+        &#34;&#34;&#34;
+        if self._handlers:
+            return super().member(statement, frontier)
+        frame = _ReportFrame(statement)
+        self._frames.append(frame)
+        try:
+            exits = super().member(statement, frontier)
+        finally:
+            self._frames.pop()
+        report = frame.node
+        if report is not None and (report.predecessors or frame.named):
+            self.cfg.nodes.append(report)
+            self.exceptional_edge(report, self.cfg.exit)
+            exits = [*exits, report]
+        return exits
+
+    def offers(self, element: Node, target: CfgNode) -&gt; bool:
+        &#34;&#34;&#34;
+        A report node is not a handler: it stands for 5.1 reporting an error that was raised, and an
+        edge into it makes what follows the statement it carries on after reachable. So only a point
+        that `may_fail` is joined to one.
+        &#34;&#34;&#34;
+        return not isinstance(target, Ps1ReportNode) or self.may_fail(element)
+
+    @staticmethod
+    def may_fail(element: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the point *element* stands for may raise an error, read off the point alone: the
+        head of a `foreach` may, since its loop variable may carry a type that rejects the value,
+        and any other point may unless
+        `refinery.lib.scripts.ps1.analysis.values.point_is_fault_free` clears it. A `throw` is
+        routed by a rule of its own.
+        &#34;&#34;&#34;
+        if isinstance(element, Ps1ForEachLoop):
+            return True
+        return not point_is_fault_free(element)
+
+    def lets_past(self, trap_set: Ps1TrapSet) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the `trap` set *trap_set* may hand an error it is offered on to what guards its
+        block; read here as though it may.
+        &#34;&#34;&#34;
+        return True
+
+    def throw(self, statement: Ps1ThrowStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        A `throw`, its error sent to the innermost handler in force; this builder always has one,
+        since it builds a `trap` body under the handler standing over it.
+        &#34;&#34;&#34;
+        return self.terminate(statement, frontier, exceptional=True)
+
+    def reenter(self, trap_set: Ps1TrapSet, bodies: Sequence[CfgNode]) -&gt; None:
+        &#34;&#34;&#34;
+        Join the points of the bodies of *trap_set*, *bodies*, to the set itself where an error
+        raised in a `trap` body may be offered to its set again; read here as though it may not.
+        &#34;&#34;&#34;
+        return None
+
+    def _outward(self) -&gt; CfgNode:
+        &#34;&#34;&#34;
+        What guards a `trap` set being closed, which `Ps1TrapSet.outward` names. Where that is a
+        report node, its frame is marked so the node joins the graph: a set that takes every error
+        draws no edge into it, and the landing questions still ask where it carries on.
+        &#34;&#34;&#34;
+        outward = self.unwinding()
+        for frame in self._frames:
+            if frame.node is outward:
+                frame.named = True
+        return outward
+
+    def block(self, statements: Sequence[Node], frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        One statement block, with every `trap` it declares installed as a handler over the whole of
+        it.
+
+        A `trap` is not a guarded block. It is declared somewhere in the block and catches for that
+        block entire, including the statements written above it, so it cannot be pushed at the point
+        it appears the way a `try` is — it is pushed before the block is walked at all. Several
+        traps in one block are peers and are chained the way
+        `refinery.lib.scripts.analysis.cfg.CfgBuilder.guarded` chains several `catch` clauses,
+        because which one runs depends on the type of the error and none of them is guaranteed.
+
+        Where blocks nest, the innermost one declaring a `trap` is the only set the error is offered
+        to, which pushing that set on the handler stack already says. The set passes the error
+        outward — to the `catch` or `trap` guarding the block, and to the body exit when nothing
+        guards it — exactly when it may fail to take it, which `lets_past` answers.
+
+        A trap does not guard itself: an error raised inside a trap body is offered to whatever
+        the set itself unwinds to, so the trap bodies are built under that and only the block&#39;s own
+        statements are built under the set. Building them under the set instead gives every node of
+        every trap body an exceptional edge back to a handler that already has a normal edge into
+        it, which is a cycle through the trap that no run can take — and reads as a body that
+        repeats. `refinery.lib.scripts.analysis.cfg.CfgBuilder.guarded` pops before building its
+        `catch` bodies for the same reason. Where nothing guards the block, the trap body is built
+        under `escape`: 5.1 reports an error raised in it and carries on after the statement holding
+        the block, as it does for one leaving a `try` or `catch` body. Where a `trap` of the set may
+        run from inside a `try` statement of the block, an error its body raises leaves that `try`
+        statement and is offered to the set again, which `reenter` draws.
+
+        **A trap body is built against an empty jump-target stack**, because 5.1 compiles one as a
+        scope of its own: `break` in it ends the trap and rethrows, and `continue` in it resumes the
+        guarded block, whatever loop or `switch` the block itself is written inside. Leaving the
+        enclosing construct&#39;s targets in place resolves both keywords to that construct instead —
+        the `break` stops being a rethrow, so the set reads as swallowing an error that in fact ends
+        the body, and the `continue` becomes a back-jump, so the resumption the trap exists to
+        create is never wired at all.
+
+        The *resumption* stack is deliberately not cleared the same way. A jump names a construct and
+        a trap body encloses none of them; a resumption names a place control carries on at, and a
+        trap body written inside a block some outer set resumes is a place that outer set carries on
+        from. Clearing it would leave the body&#39;s nodes on neither projection of the level that does
+        guard them.
+
+        `continue` inside a trap resumes at the statement following the one that threw, which is a
+        shape no single edge set expresses. It is therefore carried twice, as
+        `refinery.lib.scripts.analysis.cfg.CfgEdge` describes: every resumption point is taken to
+        reach *every* node the block owns, through the hub
+        `refinery.lib.scripts.analysis.cfg.CfgBuilder.resumption` wires — the over-approximation
+        an analysis asking whether any resumption path exists must read, since claiming fewer paths
+        would let one call a statement after a trap unreachable, or let a store before one look dead
+        because the resumption that reads it was never modelled — and, alongside it, the precise
+        forward-only half (`_resumable_sequence`), which joins each statement to the one control
+        actually resumes at and is what a flood reads.
+
+        The set is opened after its own handler entries and bodies are built. A `trap` declared in
+        a nested block is a statement of the block around it, so its entries and body belong to the
+        *enclosing* resumable level and are wired against that one. Opening this level first would
+        take them, and the forward projection would then have no
+        edge saying where control goes when the inner set *declines* an error — the enclosing set
+        takes it and resumes past the whole nested block, which is the one path a typed inner trap
+        makes observable.
+        &#34;&#34;&#34;
+        traps = declared_traps(statements)
+        if not traps:
+            return self.sequence(statements, frontier)
+        entries = {id(trap): self.detached_node(trap) for trap in traps}
+        trap_set = Ps1TrapSet(self.cfg, statements, entries, traps)
+        for trap in traps:
+            self._trap_sets[id(trap)] = trap_set
+        chain = trap_set.chain
+        for before, after in zip(chain, chain[1:]):
+            self.exceptional_edge(before, after)
+        handling = list(entries.values())
+        resumes: list[CfgNode] = []
+        enclosing = self._trap_body
+        outer_targets = self._targets
+        outer_labels = self._pending_labels
+        self._targets = []
+        self._pending_labels = frozenset()
+        self._handlers.append(self.escape())
+        for trap in traps:
+            self._trap_body = built = _TrapBody()
+            body_from = len(self.cfg.nodes)
+            falls_through = self._body(trap.body, [trap_set.entry(trap)])
+            handling += self.cfg.nodes[body_from:]
+            trap_set.dispositions[id(trap)] = self._dispositions(trap)
+            if trap_set.is_selectable(trap):
+                resumes += falls_through + built.resumes
+        self.reenter(trap_set, handling[len(entries):])
+        self._handlers.pop()
+        self._trap_body = enclosing
+        self._targets = outer_targets
+        self._pending_labels = outer_labels
+        trap_set.outward = self._outward()
+        self.close_handler_set(list(chain), escapes=self.lets_past(trap_set))
+        self._handlers.append(chain[0])
+        if not resumes:
+            exits = self.sequence(statements, frontier)
+        else:
+            self.mark_hub_bound(handling)
+            self._open_sets.append(trap_set)
+            inert = not any(handler_acts(trap) for trap in trap_set.selectable) and not any(
+                self._trap_holders.holds_a_trap(statement)
+                for statement in statements if not isinstance(statement, Ps1TrapStatement)
+            )
+            with self.resumption([] if inert else resumes):
+                exits = self._resumable_sequence(statements, frontier)
+            self._open_sets.pop()
+        self._handlers.pop()
+        return exits
+
+    def _resumable_sequence(
+        self, statements: Sequence[Node], frontier: list[CfgNode],
+    ) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        The guarded statements of a block whose `trap` set resumes it, threaded as `sequence` does,
+        with the precise forward-only half of resumption drawn against the open block as each node
+        appears.
+
+        What finds the point control resumes at is one elementless slot per statement, which
+        `refinery.lib.scripts.analysis.cfg.CfgBuilder.resume_past` reports once the statement is
+        built. The slot is then passed in the frontier the *next* statement is built from, so that
+        whatever that statement control-*enters* gains an edge from it — its own node, the condition
+        of an `if`, the first guarded statement of a nested block. Reading the entry off the nodes a
+        statement created instead answers the wrong one for every construct that builds something
+        before what it runs first: a `try` builds its handler entry first, so the forward edge would
+        reach the `catch` clause and leave the body it guards reachable only through the hub, which
+        is exactly the backward reach the forward half exists to avoid.
+
+        The last statement&#39;s slot goes into the returned frontier rather than to the body exit.
+        Control resuming past the end of a guarded block carries on with whatever follows the
+        *block*, and for a nested one that is not the end of the body; only the caller threading
+        this frontier knows where it is.
+
+        A statement inside a nested resumable block claims that block&#39;s slot and not this one&#39;s,
+        which is what makes the edge count linear in the nesting depth rather than quadratic. It
+        loses no path: the nested block hands its own last slot back in the frontier this loop
+        threads on, so a statement inside it still reaches the statement after the nested block. The
+        slot a node draws to is the *representative* of a resumption, not the exact statement control
+        lands at — no graph knows which statement threw — and what every consumer reads off it is
+        where the resumption can go, not where it went.
+        &#34;&#34;&#34;
+        trap_set = self._open_sets[-1]
+        for statement in statements:
+            built = self.member(statement, frontier)
+            trap_set.completions[id(statement)] = list(built)
+            slot = self._resumptions[-1].slot
+            if slot is not None:
+                trap_set.slots[id(statement)] = slot
+            frontier = self.resume_past(built)
+        return frontier
+
+    def body_blocks(self, owner: Node) -&gt; Sequence[Sequence[Node]]:
+        &#34;&#34;&#34;
+        The statement blocks *owner* runs, in the order it runs them.
+
+        An advanced function fills `begin`/`process`/`end`/`dynamicparam` instead of `body`, and
+        reading only `body` for one would report an empty graph for a function that runs a great
+        deal — the same trap `refinery.lib.scripts.ps1.ast.get_named_blocks` exists to warn about.
+        `dynamicparam` is pulled to the front because the engine evaluates it during parameter
+        binding, before `begin`, while that accessor reports the blocks in the order they are
+        declared in.
+
+        They are kept apart rather than concatenated because each is a statement block of its own: a
+        `trap` written in `begin` is offered nothing that `process` raises, and joining them hands
+        it errors no run ever will.
+        &#34;&#34;&#34;
+        if not isinstance(owner, Ps1Code):
+            return []
+        blocks = sorted(
+            get_named_blocks(owner),
+            key=lambda block: block is not owner.dynamicparam_block,
+        )
+        return [block.body for block in blocks] + [owner.body]
+
+    def build(self) -&gt; ControlFlowGraph:
+        &#34;&#34;&#34;
+        The blocks of the owner in the order they run, where the one that runs once per object the
+        pipeline hands the owner, a `process` block or the body of a `filter`, may run any number of
+        times, none included: an empty pipeline runs it not at all, so a store it makes is not
+        certainly made by the time `end` runs.
+        &#34;&#34;&#34;
+        owner = self.cfg.owner
+        repeated = _runs_per_input(owner)
+        frontier = [self.cfg.entry]
+        for statements in self.body_blocks(owner):
+            if repeated is not None and statements is repeated:
+                head = self.synthetic_node()
+                self.link(frontier, head)
+                self.link(self.block(statements, [head]), head)
+                frontier = [head]
+            else:
+                frontier = self.block(statements, frontier)
+        self.link(frontier, self.cfg.exit)
+        return self.cfg
+
+    def statement(self, statement: Node, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        if isinstance(statement, Block):
+            return self.block(statement.body, frontier)
+        if isinstance(statement, _LOOP_NODES):
+            self.park_label(_construct_label(statement.label))
+        if isinstance(statement, Ps1IfStatement):
+            return self._if(statement, frontier)
+        if isinstance(statement, Ps1WhileLoop):
+            return self.loop_head_tested(statement, statement.body, frontier)
+        if isinstance(statement, Ps1DoLoop):
+            return self.loop_tail_tested(statement, statement.body, frontier)
+        if isinstance(statement, Ps1ForLoop):
+            return self.loop_counted(
+                statement.initializer,
+                statement.condition,
+                statement.iterator,
+                statement.body,
+                frontier,
+            )
+        if isinstance(statement, Ps1ForEachLoop):
+            return self.loop_head_tested(statement, statement.body, frontier)
+        if isinstance(statement, Ps1SwitchStatement):
+            return self._switch(statement, frontier)
+        if isinstance(statement, Ps1TryCatchFinally):
+            return self._try(statement, frontier)
+        if isinstance(statement, Ps1TrapStatement):
+            return list(frontier)
+        if isinstance(statement, Ps1ExitStatement):
+            return self.terminate(statement, frontier, exceptional=False)
+        if isinstance(statement, Ps1ThrowStatement):
+            return self.throw(statement, frontier)
+        if isinstance(statement, Ps1ReturnStatement):
+            return self.terminate(statement, frontier, exceptional=False)
+        if isinstance(statement, Ps1BreakStatement):
+            label = _jump_label(statement)
+            trap = self._trap_body
+            if trap is not None and not self.has_break_target(label):
+                trap.rethrows = True
+            return self.jump_out(statement, label, frontier)
+        if isinstance(statement, Ps1ContinueStatement):
+            label = _jump_label(statement)
+            trap = self._trap_body
+            if trap is not None and not self.has_continue_target(label):
+                return self._resume(trap.resumes, statement, frontier)
+            return self.jump_back(statement, label, frontier)
+        if self._descend:
+            descended = self._descend_statement(statement, frontier)
+            if descended is not None:
+                return descended
+        return self.opaque(statement, frontier)
+
+    def _descend_statement(
+        self, statement: Node, frontier: list[CfgNode],
+    ) -&gt; list[CfgNode] | None:
+        &#34;&#34;&#34;
+        A leaf statement carrying a value construct whose operand is a statement list — a `$( )` or a
+        `@( )` — modelled at sub-statement granularity so the fault reader sees a statement-terminating
+        error step over to the next statement *inside* the construct. `None` when it carries none, so
+        the caller falls back to `opaque`.
+
+        Each inner statement list is built through `block`, so a `trap` declared inside the construct
+        installs as a handler over its siblings, not as noise the enclosing block owns. The inner
+        frontier then feeds the outer statement&#39;s own node: the construct yields its value, then the
+        statement consuming it runs. This inner-then-outer order matters: a soft raiser that is the
+        last inner statement has the outer node as its successor, which keeps a trap that guards it,
+        where the reverse order would drop it.
+
+        Reached only where `descend` is set, which is only the fault reader&#39;s own graph; every other
+        consumer reads the coarse model, in which this statement is one atomic node.
+        &#34;&#34;&#34;
+        bodies = _descended_bodies(statement)
+        if not bodies:
+            return None
+        for body in bodies:
+            frontier = self.block(body, frontier)
+        node = self.node(statement)
+        self.link(frontier, node)
+        return [node]
+
+    def _resume(
+        self, resumes: list[CfgNode], statement: Node, frontier: list[CfgNode],
+    ) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        A `continue` inside a `trap` body, which is not a back-jump: it resumes the guarded block at
+        the statement after the one that threw. The node is recorded for `block` to link to every
+        landing point once that block exists, and control does not fall through it here.
+
+        Reading it as a loop back-jump instead resolves it to nothing and wires it to the body exit,
+        which deletes the one path the trap exists to create — and leaves the whole resumption model
+        unexercised, because this is the spelling that resumes.
+        &#34;&#34;&#34;
+        node = self.node(statement)
+        self.link(frontier, node)
+        resumes.append(node)
+        return []
+
+    def _if(self, statement: Ps1IfStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        The chain, keyed so that the whole statement is the first test&#39;s node: a caller that locates
+        the `if` itself must reach a node, and the first condition is where control first arrives.
+        &#34;&#34;&#34;
+        clauses: list[tuple[Node, Node | None]] = []
+        for index, (condition, block) in enumerate(statement.clauses):
+            clauses.append((statement if index == 0 else condition, block))
+        if not clauses:
+            return self.opaque(statement, frontier)
+        return self.branch_chain(clauses, statement.else_block, frontier)
+
+    def _switch(self, statement: Ps1SwitchStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        The clauses as arms of an iterated, cumulative dispatch.
+
+        A `default` clause does not make the construct exhaustive the way it does in a language
+        whose `switch` tests one value: PowerShell&#39;s enumerates its input, and over an empty
+        collection no clause runs at all — not even `default`. Reporting it exhaustive drops the
+        edge that leaves the switch without entering any arm, which is what makes the statement
+        after it look unreachable.
+
+        An arm is handed over as the block it is rather than as the statements in it, because a
+        clause body is a statement block of its own and a `trap` written in one guards that clause
+        and nothing else.
+        &#34;&#34;&#34;
+        arms: list[Sequence[Node]] = [
+            [block] if block is not None else [] for _, block in statement.clauses
+        ]
+        self.park_label(_construct_label(statement.label))
+        return self.dispatch(
+            statement,
+            arms,
+            frontier,
+            arm_flow=ArmFlow.CUMULATIVE,
+            exhaustive=False,
+            iterated=True,
+        )
+
+    def _try(self, statement: Ps1TryCatchFinally, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        PowerShell allows several typed `catch` clauses where JavaScript allows one binding, so the
+        clauses are chained: the guarded block reaches the first, and each clause reaches the next,
+        because which one runs depends on the exception type and none of them is guaranteed.
+
+        A clause certain to take every error leaves nothing to pass outward — which is what makes
+        an empty `catch` shield the `catch` or `trap` around it where a typed one hands the error
+        straight on to it. Carrying no type is one way to be certain and naming `System.Exception`
+        is another; see `refinery.lib.scripts.ps1.analysis.handlers.catch_takes_every_error`.
+
+        The `finally` body travels as its block for the same reason a `switch` arm does: it is a
+        statement block, and a `trap` written in one guards it alone.
+        &#34;&#34;&#34;
+        clauses = statement.catch_clauses
+        finalizer = statement.finally_block
+        return self.guarded(
+            statement.try_block,
+            [(clause, clause.body) for clause in clauses],
+            finalizer,
+            (finalizer,) if finalizer is not None else (),
+            frontier,
+            escapes=not swallows_every_error(statement),
+        )
+
+
+class _RoutingBuilder(_Builder):
+    &#34;&#34;&#34;
+    The graphs every consumer reads: the structure `_Builder` draws, with each route an error takes
+    outward of a `trap` set or a `throw` drawn where the evaluator *dispatch* says it goes, so that
+    the graphs and the evaluator answer alike. The evaluator is asked only what holds under any
+    caller of the body, since which calls run a body is read off these graphs.
+
+    No edge joins a point no handler guards to the end of the body: where an error raised there
+    leaves the body, it is the caller&#39;s, and a reader asking where it goes asks the evaluator.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        owner: Node,
+        dispatch: Ps1Dispatch,
+        descend: bool = False,
+        trap_sets: dict[int, Ps1TrapSet] | None = None,
+    ):
+        super().__init__(owner, dispatch.disposition, descend, trap_sets)
+        self._dispatch = dispatch
+
+    def lets_past(self, trap_set: Ps1TrapSet) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the `trap` set *trap_set* may hand an error it is offered on: see
+        `refinery.lib.scripts.ps1.analysis.dispatch.Ps1Dispatch.lets_past`.
+        &#34;&#34;&#34;
+        return self._dispatch.lets_past(trap_set.owner)
+
+    def throw(self, statement: Ps1ThrowStatement, frontier: list[CfgNode]) -&gt; list[CfgNode]:
+        &#34;&#34;&#34;
+        A `throw`: its error goes to the `try` or `trap` in force; where none is, it goes where the
+        evaluator sends it: past the `throw` where the run may carry on after it, to the report
+        node where the run may carry on after the statement that node carries on after, and to
+        the end of the body where it may leave the body.
+        &#34;&#34;&#34;
+        handler = self._handlers[-1] if self._handlers else None
+        if handler is not None and not isinstance(handler, Ps1ReportNode):
+            return super().throw(statement, frontier)
+        node = self.node(statement)
+        self.link(frontier, node)
+        fate = self._dispatch.fate_under_any_caller(statement, Ps1ErrorKind.THROWN)
+        if fate is None:
+            self.exceptional_edge(node, self.cfg.exit)
+            return []
+        if handler is not None and handler.carries_on_after in fate.carried:
+            self.exceptional_edge(node, handler)
+        if fate.leaves:
+            self.exceptional_edge(node, self.cfg.exit)
+        return [node] if statement in fate.carried else []
+
+    def reenter(self, trap_set: Ps1TrapSet, bodies: Sequence[CfgNode]) -&gt; None:
+        &#34;&#34;&#34;
+        Where a `trap` of *trap_set* may run from inside a `try` statement of its block, every point
+        of its body that may fail, and every `throw` there, joins the set where the evaluator offers
+        its error to the set again: see
+        `refinery.lib.scripts.ps1.analysis.dispatch.Ps1Dispatch.traps_run_inside_a_try`. A point a
+        `catch` inside the body takes every error of is not one of them.
+        &#34;&#34;&#34;
+        dispatch = self._dispatch
+        if not dispatch.traps_run_inside_a_try(trap_set.owner):
+            return
+        entry = trap_set.chain[0]
+        members = frozenset(trap_set.members)
+        for node in bodies:
+            element = node.element
+            if element is None:
+                continue
+            if not isinstance(element, Ps1ThrowStatement) and not self.may_fail(element):
+                continue
+            fate = dispatch.fate_under_any_caller(element, EVERY_KIND)
+            if fate is None or not members.isdisjoint(fate.trapped):
+                self.exceptional_edge(node, entry)
+
+
+def dispatch_for(root: Node, sites: Ps1CallSites | None = None) -&gt; Ps1Dispatch:
+    &#34;&#34;&#34;
+    The dispatch of the script *root* stands in, under the error preferences its session may hold:
+    `Stop` where the script writes it to the preference anywhere, a value that silences an error
+    where it may set one, and in a called body also where a call may hand one in. How the body of a
+    `trap` ends is read through `trap_dispositions`. *sites* names the calls that may run each body;
+    without it, every body may be called with errors passed outward.
+    &#34;&#34;&#34;
+    session = session_of(root)
+    called = session.silenced or session.silenced_by_a_call
+    return Ps1Dispatch(
+        preferences_of(session.stops, session.silenced),
+        preferences_of(session.stops, called),
+        trap_dispositions(root),
+        sites,
+    )
+
+
+def build_ps1_control_flow(
+    root: Ps1Script,
+    descend: bool = False,
+    dispatch: Ps1Dispatch | None = None,
+) -&gt; dict[int, ControlFlowGraph]:
+    &#34;&#34;&#34;
+    One control-flow graph per script block — see `FUNCTION_NODES` — and one for the script
+    itself, drawn from *dispatch*, or from the `dispatch_for` *root* where none is given.
+
+    With *descend* set, a statement carrying a `STATEMENT_LIST_EXPRESSIONS` construct is modelled at
+    sub-statement granularity rather than as one atomic node — the finer graph the fault reader needs
+    to see a statement-terminating error step over inside a `$( )` or `@( )`. It is off by default
+    because every consumer but the fault reader wants the coarse one-statement-one-node graph, and
+    turning it on changes only the graph the caller who asks for it reads.
+    &#34;&#34;&#34;
+    return _build(root, descend, {}, dispatch)
+
+
+def _build(
+    root: Ps1Script,
+    descend: bool,
+    trap_sets: dict[int, Ps1TrapSet],
+    dispatch: Ps1Dispatch | None,
+) -&gt; dict[int, ControlFlowGraph]:
+    if dispatch is None:
+        dispatch = dispatch_for(root)
+    builder = partial(_RoutingBuilder, dispatch=dispatch, descend=descend, trap_sets=trap_sets)
+    return build_control_flow(root, builder, _owns_a_graph)
+
+
+def trap_disposition(trap: Ps1TrapStatement, memo: dict[int, Ps1TrapDisposition]) -&gt; Ps1TrapDisposition:
+    &#34;&#34;&#34;
+    What running the body of *trap* may do with the error it took: resume the block with an
+    unlabelled `continue`, re-raise with a `break` that leaves the body, or run off its end. *memo*
+    holds the answers given so far for the tree *trap* stands in, by the identity of each `trap`,
+    and the caller keeps it no longer than that tree stays as it is.
+
+    5.1 compiles a `trap` body as a scope of its own, in which no jump names a construct outside
+    it, so how the body ends is a fact of the body alone: it is read off the body built on its own,
+    every statement-list construct in it descended into, with a handler standing over it as the
+    block&#39;s own set stands over it where the builder wires it — an error raised in a `trap` body
+    leaves it rather than stepping over, whatever the preference says. The builder wiring the body
+    into the block it guards reads its disposition through the dispatch evaluator, which reads it
+    from here, so that the graph and the evaluator read one answer.
+    &#34;&#34;&#34;
+    found = memo.get(id(trap))
+    if found is None:
+        builder = _Builder(trap, partial(trap_disposition, memo=memo), descend=True)
+        found = memo[id(trap)] = builder.disposition_of(trap)
+    return found
+
+
+def trap_dispositions(node: Node) -&gt; Callable[[Ps1TrapStatement], Ps1TrapDisposition]:
+    &#34;&#34;&#34;
+    How the body of each `trap` of the tree *node* stands in ends (`trap_disposition`), each read
+    once for as long as the tree stays as it is: the answers are dropped once it moves, the way
+    `refinery.lib.scripts.ps1.analysis.session.session_of` keeps a session.
+    &#34;&#34;&#34;
+    root = tree_root(node)
+    version = tree_version(root)
+    found = _DISPOSITIONS.get(root)
+    if found is None or found[0] != version:
+        found = _DISPOSITIONS[root] = version, partial(trap_disposition, memo={})
+    return found[1]
+
+
+_DISPOSITIONS: WeakKeyDictionary[Node, tuple[int, Callable[[Ps1TrapStatement], Ps1TrapDisposition]]] = WeakKeyDictionary()
+
+
+def list_may_carry_on(statements: Sequence[Node]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the list *statements* declares a `trap` set that may carry the run on after one of its
+    statements: a member 5.1 may select `carries_on`. Read without the error preference, which
+    never takes a resumption away; the dispatch evaluator reads the same rule for every set.
+    &#34;&#34;&#34;
+    traps = declared_traps(statements)
+    if not traps:
+        return False
+    dispositions = trap_dispositions(traps[0])
+    return any(carries_on(dispositions(trap)) for trap in Ps1TrapSelection(traps).selectable)
+
+
+class Ps1ControlFlowModel(ControlFlowModel):
+    &#34;&#34;&#34;
+    The control-flow graphs of one script, with the `trap` sets the builder wired into them.
+    &#34;&#34;&#34;
+
+    def __init__(self, graphs: dict[int, ControlFlowGraph], trap_sets: dict[int, Ps1TrapSet]):
+        super().__init__(graphs, _runs_apart)
+        self._trap_sets = trap_sets
+        by_graph: dict[ControlFlowGraph, list[Ps1TrapSet]] = {}
+        for trap_set in {id(trap_set): trap_set for trap_set in trap_sets.values()}.values():
+            by_graph.setdefault(trap_set.graph, []).append(trap_set)
+        self._by_graph = by_graph
+
+    def trap_set_of(self, trap: Node) -&gt; Ps1TrapSet | None:
+        &#34;&#34;&#34;
+        The set of `trap` statements *trap* belongs to, or `None` where the graphs hold none.
+        &#34;&#34;&#34;
+        return self._trap_sets.get(id(trap))
+
+    def trap_sets_in(self, graph: ControlFlowGraph) -&gt; list[Ps1TrapSet]:
+        &#34;&#34;&#34;
+        The `trap` sets the builder wired into *graph*.
+        &#34;&#34;&#34;
+        return self._by_graph.get(graph, [])
+
+
+def build_control_flow_model(
+    root: Ps1Script,
+    descend: bool = False,
+    dispatch: Ps1Dispatch | None = None,
+) -&gt; Ps1ControlFlowModel:
+    &#34;&#34;&#34;
+    The graphs of `build_ps1_control_flow` with the `trap` sets the builder wired into them.
+    &#34;&#34;&#34;
+    trap_sets: dict[int, Ps1TrapSet] = {}
+    return Ps1ControlFlowModel(_build(root, descend, trap_sets, dispatch), trap_sets)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES"><code class="name">var <span class="ident">FUNCTION_NODES</span></code></dt>
+<dd>
+<section class="desc"><p>This is the same partition <code><a title="refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel.scope_of" href="model.html#refinery.lib.scripts.ps1.analysis.model.Ps1SemanticModel.scope_of">Ps1SemanticModel.scope_of()</a></code>
+makes — one body, one scope, one graph. A <code>trap</code> divides more finely still: it belongs to the
+statement block it is written in, of which a body is only the outermost.</p></section>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.DEFERRED_NODES"><code class="name">var <span class="ident">DEFERRED_NODES</span></code></dt>
+<dd>
+<section class="desc"><p>The nodes whose content runs at a time of its own and outside every body a graph is drawn for.
+A class property's initializer runs each time the class is constructed, or when the type is first
+used for a <code>static</code> one, and never at the class statement it is written in.</p></section>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.dispatch_for"><code class="name flex">
+<span>def <span class="ident">dispatch_for</span></span>(<span>root, sites=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The dispatch of the script <em>root</em> stands in, under the error preferences its session may hold:
+<code>Stop</code> where the script writes it to the preference anywhere, a value that silences an error
+where it may set one, and in a called body also where a call may hand one in. How the body of a
+<code>trap</code> ends is read through <code><a title="refinery.lib.scripts.ps1.analysis.cfg.trap_dispositions" href="#refinery.lib.scripts.ps1.analysis.cfg.trap_dispositions">trap_dispositions()</a></code>. <em>sites</em> names the calls that may run each body;
+without it, every body may be called with errors passed outward.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L887-L902" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def dispatch_for(root: Node, sites: Ps1CallSites | None = None) -&gt; Ps1Dispatch:
+    &#34;&#34;&#34;
+    The dispatch of the script *root* stands in, under the error preferences its session may hold:
+    `Stop` where the script writes it to the preference anywhere, a value that silences an error
+    where it may set one, and in a called body also where a call may hand one in. How the body of a
+    `trap` ends is read through `trap_dispositions`. *sites* names the calls that may run each body;
+    without it, every body may be called with errors passed outward.
+    &#34;&#34;&#34;
+    session = session_of(root)
+    called = session.silenced or session.silenced_by_a_call
+    return Ps1Dispatch(
+        preferences_of(session.stops, session.silenced),
+        preferences_of(session.stops, called),
+        trap_dispositions(root),
+        sites,
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow"><code class="name flex">
+<span>def <span class="ident">build_ps1_control_flow</span></span>(<span>root, descend=False, dispatch=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>One control-flow graph per script block — see <code><a title="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES" href="#refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES">FUNCTION_NODES</a></code> — and one for the script
+itself, drawn from <em>dispatch</em>, or from the <code><a title="refinery.lib.scripts.ps1.analysis.cfg.dispatch_for" href="#refinery.lib.scripts.ps1.analysis.cfg.dispatch_for">dispatch_for()</a></code> <em>root</em> where none is given.</p>
+<p>With <em>descend</em> set, a statement carrying a <code>STATEMENT_LIST_EXPRESSIONS</code> construct is modelled at
+sub-statement granularity rather than as one atomic node — the finer graph the fault reader needs
+to see a statement-terminating error step over inside a <code>$( )</code> or <code>@( )</code>. It is off by default
+because every consumer but the fault reader wants the coarse one-statement-one-node graph, and
+turning it on changes only the graph the caller who asks for it reads.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L905-L920" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_ps1_control_flow(
+    root: Ps1Script,
+    descend: bool = False,
+    dispatch: Ps1Dispatch | None = None,
+) -&gt; dict[int, ControlFlowGraph]:
+    &#34;&#34;&#34;
+    One control-flow graph per script block — see `FUNCTION_NODES` — and one for the script
+    itself, drawn from *dispatch*, or from the `dispatch_for` *root* where none is given.
+
+    With *descend* set, a statement carrying a `STATEMENT_LIST_EXPRESSIONS` construct is modelled at
+    sub-statement granularity rather than as one atomic node — the finer graph the fault reader needs
+    to see a statement-terminating error step over inside a `$( )` or `@( )`. It is off by default
+    because every consumer but the fault reader wants the coarse one-statement-one-node graph, and
+    turning it on changes only the graph the caller who asks for it reads.
+    &#34;&#34;&#34;
+    return _build(root, descend, {}, dispatch)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.trap_disposition"><code class="name flex">
+<span>def <span class="ident">trap_disposition</span></span>(<span>trap, memo)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What running the body of <em>trap</em> may do with the error it took: resume the block with an
+unlabelled <code>continue</code>, re-raise with a <code>break</code> that leaves the body, or run off its end. <em>memo</em>
+holds the answers given so far for the tree <em>trap</em> stands in, by the identity of each <code>trap</code>,
+and the caller keeps it no longer than that tree stays as it is.</p>
+<p>5.1 compiles a <code>trap</code> body as a scope of its own, in which no jump names a construct outside
+it, so how the body ends is a fact of the body alone: it is read off the body built on its own,
+every statement-list construct in it descended into, with a handler standing over it as the
+block's own set stands over it where the builder wires it — an error raised in a <code>trap</code> body
+leaves it rather than stepping over, whatever the preference says. The builder wiring the body
+into the block it guards reads its disposition through the dispatch evaluator, which reads it
+from here, so that the graph and the evaluator read one answer.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L935-L954" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trap_disposition(trap: Ps1TrapStatement, memo: dict[int, Ps1TrapDisposition]) -&gt; Ps1TrapDisposition:
+    &#34;&#34;&#34;
+    What running the body of *trap* may do with the error it took: resume the block with an
+    unlabelled `continue`, re-raise with a `break` that leaves the body, or run off its end. *memo*
+    holds the answers given so far for the tree *trap* stands in, by the identity of each `trap`,
+    and the caller keeps it no longer than that tree stays as it is.
+
+    5.1 compiles a `trap` body as a scope of its own, in which no jump names a construct outside
+    it, so how the body ends is a fact of the body alone: it is read off the body built on its own,
+    every statement-list construct in it descended into, with a handler standing over it as the
+    block&#39;s own set stands over it where the builder wires it — an error raised in a `trap` body
+    leaves it rather than stepping over, whatever the preference says. The builder wiring the body
+    into the block it guards reads its disposition through the dispatch evaluator, which reads it
+    from here, so that the graph and the evaluator read one answer.
+    &#34;&#34;&#34;
+    found = memo.get(id(trap))
+    if found is None:
+        builder = _Builder(trap, partial(trap_disposition, memo=memo), descend=True)
+        found = memo[id(trap)] = builder.disposition_of(trap)
+    return found</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.trap_dispositions"><code class="name flex">
+<span>def <span class="ident">trap_dispositions</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>How the body of each <code>trap</code> of the tree <em>node</em> stands in ends (<code><a title="refinery.lib.scripts.ps1.analysis.cfg.trap_disposition" href="#refinery.lib.scripts.ps1.analysis.cfg.trap_disposition">trap_disposition()</a></code>), each read
+once for as long as the tree stays as it is: the answers are dropped once it moves, the way
+<code><a title="refinery.lib.scripts.ps1.analysis.session.session_of" href="session.html#refinery.lib.scripts.ps1.analysis.session.session_of">session_of()</a></code> keeps a session.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L957-L968" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trap_dispositions(node: Node) -&gt; Callable[[Ps1TrapStatement], Ps1TrapDisposition]:
+    &#34;&#34;&#34;
+    How the body of each `trap` of the tree *node* stands in ends (`trap_disposition`), each read
+    once for as long as the tree stays as it is: the answers are dropped once it moves, the way
+    `refinery.lib.scripts.ps1.analysis.session.session_of` keeps a session.
+    &#34;&#34;&#34;
+    root = tree_root(node)
+    version = tree_version(root)
+    found = _DISPOSITIONS.get(root)
+    if found is None or found[0] != version:
+        found = _DISPOSITIONS[root] = version, partial(trap_disposition, memo={})
+    return found[1]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.list_may_carry_on"><code class="name flex">
+<span>def <span class="ident">list_may_carry_on</span></span>(<span>statements)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the list <em>statements</em> declares a <code>trap</code> set that may carry the run on after one of its
+statements: a member 5.1 may select <code>carries_on</code>. Read without the error preference, which
+never takes a resumption away; the dispatch evaluator reads the same rule for every set.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L974-L984" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def list_may_carry_on(statements: Sequence[Node]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the list *statements* declares a `trap` set that may carry the run on after one of its
+    statements: a member 5.1 may select `carries_on`. Read without the error preference, which
+    never takes a resumption away; the dispatch evaluator reads the same rule for every set.
+    &#34;&#34;&#34;
+    traps = declared_traps(statements)
+    if not traps:
+        return False
+    dispositions = trap_dispositions(traps[0])
+    return any(carries_on(dispositions(trap)) for trap in Ps1TrapSelection(traps).selectable)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model"><code class="name flex">
+<span>def <span class="ident">build_control_flow_model</span></span>(<span>root, descend=False, dispatch=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The graphs of <code><a title="refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow" href="#refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow">build_ps1_control_flow()</a></code> with the <code>trap</code> sets the builder wired into them.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L1013-L1022" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_control_flow_model(
+    root: Ps1Script,
+    descend: bool = False,
+    dispatch: Ps1Dispatch | None = None,
+) -&gt; Ps1ControlFlowModel:
+    &#34;&#34;&#34;
+    The graphs of `build_ps1_control_flow` with the `trap` sets the builder wired into them.
+    &#34;&#34;&#34;
+    trap_sets: dict[int, Ps1TrapSet] = {}
+    return Ps1ControlFlowModel(_build(root, descend, trap_sets, dispatch), trap_sets)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet"><code class="flex name class">
+<span>class <span class="ident">Ps1TrapSet</span></span>
+<span>(</span><span>graph, statements, entries, traps)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The <code>trap</code> statements one block declares, as the builder wired them: the selection 5.1 makes
+among them, each member's entry and disposition, and — where the set resumes the block — the
+slot it resumes at after each statement of the block. <code>completions</code> holds, for each statement
+of the block, the nodes from which normal control falls through past it, which the graph does
+not record for a block a set resumes: there the next statement is also reached by resumption,
+and a reader of <code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowGraph.completion_of" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowGraph.completion_of">ControlFlowGraph.completion_of()</a></code> would read a
+statement that never completes as one the rest of the block cannot follow. <code>outward</code> is where an
+error goes that the set does not take, and where the errors it takes would go if none of it
+were written. <code>owner</code> is the node holding the block.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L159-L197" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1TrapSet(Ps1TrapSelection):
+    &#34;&#34;&#34;
+    The `trap` statements one block declares, as the builder wired them: the selection 5.1 makes
+    among them, each member&#39;s entry and disposition, and — where the set resumes the block — the
+    slot it resumes at after each statement of the block. `completions` holds, for each statement
+    of the block, the nodes from which normal control falls through past it, which the graph does
+    not record for a block a set resumes: there the next statement is also reached by resumption,
+    and a reader of `refinery.lib.scripts.analysis.cfg.ControlFlowGraph.completion_of` would read a
+    statement that never completes as one the rest of the block cannot follow. `outward` is where an
+    error goes that the set does not take, and where the errors it takes would go if none of it
+    were written. `owner` is the node holding the block.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        graph: ControlFlowGraph,
+        statements: Sequence[Node],
+        entries: dict[int, CfgNode],
+        traps: Sequence[Ps1TrapStatement],
+    ):
+        super().__init__(traps)
+        owner = traps[0].parent
+        if owner is None:
+            raise ValueError(&#39;a trap set stands in no statement list&#39;)
+        self.owner: Node = owner
+        self.graph = graph
+        self.statements = tuple(statements)
+        self.entries = entries
+        self.chain = tuple(entries[id(trap)] for trap in self.selectable)
+        self.dispositions: dict[int, Ps1TrapDisposition] = {}
+        self.slots: dict[int, CfgNode] = {}
+        self.completions: dict[int, list[CfgNode]] = {}
+        self.outward: CfgNode | None = None
+
+    def entry(self, trap: Ps1TrapStatement) -&gt; CfgNode:
+        return self.entries[id(trap)]
+
+    def disposition(self, trap: Ps1TrapStatement) -&gt; Ps1TrapDisposition:
+        return self.dispositions[id(trap)]</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection" href="handlers.html#refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection">Ps1TrapSelection</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet.entry"><code class="name flex">
+<span>def <span class="ident">entry</span></span>(<span>self, trap)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L193-L194" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def entry(self, trap: Ps1TrapStatement) -&gt; CfgNode:
+    return self.entries[id(trap)]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet.disposition"><code class="name flex">
+<span>def <span class="ident">disposition</span></span>(<span>self, trap)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L196-L197" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def disposition(self, trap: Ps1TrapStatement) -&gt; Ps1TrapDisposition:
+    return self.dispositions[id(trap)]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection" href="handlers.html#refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection">Ps1TrapSelection</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection.catching" href="handlers.html#refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection.catching">catching</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection.is_selectable" href="handlers.html#refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection.is_selectable">is_selectable</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection.takes_every_error" href="handlers.html#refinery.lib.scripts.ps1.analysis.handlers.Ps1TrapSelection.takes_every_error">takes_every_error</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1ReportNode"><code class="flex name class">
+<span>class <span class="ident">Ps1ReportNode</span></span>
+<span>(</span><span>graph, element, successors=&lt;factory&gt;, predecessors=&lt;factory&gt;, is_resumption_hub=False, is_hub_bound=False, *, carries_on_after)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The node standing for 5.1 reporting an error that leaves a <code>try</code> body, a <code>catch</code> body or a
+<code>trap</code> body where nothing is in force, and carrying on after the statement <code>carries_on_after</code>
+names. It is not a handler: an edge into it makes what follows that statement reachable, and the
+error a <code>Stop</code> makes terminating ends the run from it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L200-L208" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@dataclass(eq=False, repr=False)
+class Ps1ReportNode(CfgNode):
+    &#34;&#34;&#34;
+    The node standing for 5.1 reporting an error that leaves a `try` body, a `catch` body or a
+    `trap` body where nothing is in force, and carrying on after the statement `carries_on_after`
+    names. It is not a handler: an edge into it makes what follows that statement reachable, and the
+    error a `Stop` makes terminating ends the run from it.
+    &#34;&#34;&#34;
+    carries_on_after: Node = field(kw_only=True)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.analysis.cfg.CfgNode" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode">CfgNode</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1ReportNode.carries_on_after"><code class="name">var <span class="ident">carries_on_after</span></code></dt>
+<dd>
+<section class="desc"><p>The type of the None singleton.</p></section>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.analysis.cfg.CfgNode" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode">CfgNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.analysis.cfg.CfgNode.element" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode.element">element</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.CfgNode.graph" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode.graph">graph</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.CfgNode.is_hub_bound" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode.is_hub_bound">is_hub_bound</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.CfgNode.is_resumption_hub" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode.is_resumption_hub">is_resumption_hub</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.CfgNode.predecessors" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode.predecessors">predecessors</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.CfgNode.successors" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.CfgNode.successors">successors</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel"><code class="flex name class">
+<span>class <span class="ident">Ps1ControlFlowModel</span></span>
+<span>(</span><span>graphs, trap_sets)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The control-flow graphs of one script, with the <code>trap</code> sets the builder wired into them.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L987-L1010" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1ControlFlowModel(ControlFlowModel):
+    &#34;&#34;&#34;
+    The control-flow graphs of one script, with the `trap` sets the builder wired into them.
+    &#34;&#34;&#34;
+
+    def __init__(self, graphs: dict[int, ControlFlowGraph], trap_sets: dict[int, Ps1TrapSet]):
+        super().__init__(graphs, _runs_apart)
+        self._trap_sets = trap_sets
+        by_graph: dict[ControlFlowGraph, list[Ps1TrapSet]] = {}
+        for trap_set in {id(trap_set): trap_set for trap_set in trap_sets.values()}.values():
+            by_graph.setdefault(trap_set.graph, []).append(trap_set)
+        self._by_graph = by_graph
+
+    def trap_set_of(self, trap: Node) -&gt; Ps1TrapSet | None:
+        &#34;&#34;&#34;
+        The set of `trap` statements *trap* belongs to, or `None` where the graphs hold none.
+        &#34;&#34;&#34;
+        return self._trap_sets.get(id(trap))
+
+    def trap_sets_in(self, graph: ControlFlowGraph) -&gt; list[Ps1TrapSet]:
+        &#34;&#34;&#34;
+        The `trap` sets the builder wired into *graph*.
+        &#34;&#34;&#34;
+        return self._by_graph.get(graph, [])</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel.trap_set_of"><code class="name flex">
+<span>def <span class="ident">trap_set_of</span></span>(<span>self, trap)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The set of <code>trap</code> statements <em>trap</em> belongs to, or <code>None</code> where the graphs hold none.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L1000-L1004" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trap_set_of(self, trap: Node) -&gt; Ps1TrapSet | None:
+    &#34;&#34;&#34;
+    The set of `trap` statements *trap* belongs to, or `None` where the graphs hold none.
+    &#34;&#34;&#34;
+    return self._trap_sets.get(id(trap))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel.trap_sets_in"><code class="name flex">
+<span>def <span class="ident">trap_sets_in</span></span>(<span>self, graph)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The <code>trap</code> sets the builder wired into <em>graph</em>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/cfg.py#L1006-L1010" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def trap_sets_in(self, graph: ControlFlowGraph) -&gt; list[Ps1TrapSet]:
+    &#34;&#34;&#34;
+    The `trap` sets the builder wired into *graph*.
+    &#34;&#34;&#34;
+    return self._by_graph.get(graph, [])</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel">ControlFlowModel</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel.built_from" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel.built_from">built_from</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel.graph_of" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel.graph_of">graph_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel.locate" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel.locate">locate</a></code></li>
+<li><code><a title="refinery.lib.scripts.analysis.cfg.ControlFlowModel.node_of" href="../../analysis/cfg.html#refinery.lib.scripts.analysis.cfg.ControlFlowModel.node_of">node_of</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES" href="#refinery.lib.scripts.ps1.analysis.cfg.FUNCTION_NODES">FUNCTION_NODES</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.DEFERRED_NODES" href="#refinery.lib.scripts.ps1.analysis.cfg.DEFERRED_NODES">DEFERRED_NODES</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.dispatch_for" href="#refinery.lib.scripts.ps1.analysis.cfg.dispatch_for">dispatch_for</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow" href="#refinery.lib.scripts.ps1.analysis.cfg.build_ps1_control_flow">build_ps1_control_flow</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.trap_disposition" href="#refinery.lib.scripts.ps1.analysis.cfg.trap_disposition">trap_disposition</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.trap_dispositions" href="#refinery.lib.scripts.ps1.analysis.cfg.trap_dispositions">trap_dispositions</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.list_may_carry_on" href="#refinery.lib.scripts.ps1.analysis.cfg.list_may_carry_on">list_may_carry_on</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model" href="#refinery.lib.scripts.ps1.analysis.cfg.build_control_flow_model">build_control_flow_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet">Ps1TrapSet</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet.entry" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet.entry">entry</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet.disposition" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1TrapSet.disposition">disposition</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1ReportNode" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1ReportNode">Ps1ReportNode</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel">Ps1ControlFlowModel</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel.trap_set_of" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel.trap_set_of">trap_set_of</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel.trap_sets_in" href="#refinery.lib.scripts.ps1.analysis.cfg.Ps1ControlFlowModel.trap_sets_in">trap_sets_in</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

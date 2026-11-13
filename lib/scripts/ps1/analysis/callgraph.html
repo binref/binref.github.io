@@ -1,0 +1,1992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.callgraph documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.callgraph</code></h1>
+</header>
+<section id="section-intro">
+<p>The call graph of one PowerShell script: which function definitions a command name denotes, which
+invocations reach that name, and whether the two together are the whole story.</p>
+<p>Two questions are asked of it, and they fail in opposite directions, which is why one walk answers
+both. <em>Reachability</em> decides whether a definition may be deleted, so a call site the walk misses
+deletes live code. <em>Output flow</em> — <code><a title="refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow" href="effects.html#refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow">Ps1OutputFlow</a></code> —
+decides whether a bare value inside a body may be deleted, so a call site the walk misses deletes a
+payload. A walk that expanded only bodies already proven reachable would be sound for the first
+question and a deletion licence for the second, so the walk here expands every body a name can
+denote.</p>
+<p>The graph is structure and nothing more. It says who can call what; what a call <em>does</em> with the
+value it produces is the effect layer's question, asked through here rather than answered here.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L1-L847" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+The call graph of one PowerShell script: which function definitions a command name denotes, which
+invocations reach that name, and whether the two together are the whole story.
+
+Two questions are asked of it, and they fail in opposite directions, which is why one walk answers
+both. *Reachability* decides whether a definition may be deleted, so a call site the walk misses
+deletes live code. *Output flow* — `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow` —
+decides whether a bare value inside a body may be deleted, so a call site the walk misses deletes a
+payload. A walk that expanded only bodies already proven reachable would be sound for the first
+question and a deletion licence for the second, so the walk here expands every body a name can
+denote.
+
+The graph is structure and nothing more. It says who can call what; what a call *does* with the
+value it produces is the effect layer&#39;s question, asked through here rather than answered here.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import re
+
+from typing import TYPE_CHECKING, Callable, Mapping, NamedTuple, Sequence
+
+if TYPE_CHECKING:
+    from refinery.lib.scripts.analysis.dominance import DominatorModel
+
+from refinery.lib.scripts import Node
+from refinery.lib.scripts.ps1.analysis.listing import (
+    Ps1Listed,
+    Ps1NameNarrowing,
+    functions_listed,
+    get_command_selection,
+    lookup_may_raise,
+    lookup_selection,
+    name_narrowing,
+)
+from refinery.lib.scripts.ps1.analysis.world import (
+    Ps1TypeWorld,
+    command_definition_keyword_binding,
+    runs_code_it_cannot_read,
+)
+from refinery.lib.scripts.ps1.ast import (
+    COMMAND_LOOKUP_METHODS,
+    assignment_target_variables,
+    get_command_name,
+    get_member_name,
+    get_param_block,
+    has_wildcard,
+    implicit_get_retry,
+    is_execution_context_invoke,
+    is_null_discard,
+    is_opaque_dispatch,
+    is_scriptblock_invoke,
+    is_void_cast,
+    may_create_a_scriptblock,
+    member_may_be,
+    normalize_command_name,
+    resolve_command_name,
+)
+from refinery.lib.scripts.ps1.data import KNOWN_CMDLETS
+from refinery.lib.scripts.ps1.model import (
+    Ps1AccessKind,
+    Ps1AssignmentExpression,
+    Ps1CastExpression,
+    Ps1CommandArgument,
+    Ps1CommandInvocation,
+    Ps1FunctionDefinition,
+    Ps1HereString,
+    Ps1InvokeMember,
+    Ps1MemberAccess,
+    Ps1MethodMember,
+    Ps1ParenExpression,
+    Ps1Pipeline,
+    Ps1PipelineElement,
+    Ps1ScopeModifier,
+    Ps1Script,
+    Ps1ScriptBlock,
+    Ps1StringLiteral,
+    Ps1Variable,
+)
+from refinery.lib.scripts.ps1.options import eval_is_trusted
+
+#: The variable namespaces that name a command rather than a value. Kept in step with
+#: `refinery.lib.scripts.ps1.analysis.world._IDENTITY_SCOPES`, which this module cannot reuse
+#: because the world reports one verdict for the whole script and this one needs the single node.
+_IDENTITY_SCOPES = frozenset({
+    Ps1ScopeModifier.ALIAS,
+    Ps1ScopeModifier.FUNCTION,
+})
+
+#: Commands that hand a name to code outside this file. A `.psm1` exporting a function has call
+#: sites in whatever imported it, and no walk over this tree can see them. Read through
+#: `refinery.lib.scripts.ps1.ast.resolve_command_name`, which is the deny-list reading of a name:
+#: a hit here withholds every name-keyed removal, so a spelling that dodges the table is the
+#: dangerous direction. That closes a module qualifier written after the call operator, quoted or
+#: not — `&amp; Microsoft.PowerShell.Core\Export-ModuleMember` arrives as one token either way. Written
+#: as a bare command statement the lexer splits the name at the backslash and the table is dodged;
+#: see `refinery.lib.scripts.ps1.ast.resolve_command_name` for why that hole is the lexer&#39;s.
+_EXPORTING_COMMANDS = frozenset({
+    &#39;export-modulemember&#39;,
+})
+
+#: The .NET attribute type names that, on a function&#39;s `param` block, bind command aliases for the
+#: function — `[Alias(&#39;q&#39;)]` and its `Attribute`-suffixed and namespace-qualified spellings. Matched
+#: after the namespace is stripped, the way .NET resolves an attribute type name.
+_COMMAND_ALIAS_ATTRIBUTES = frozenset({
+    &#39;alias&#39;,
+    &#39;aliasattribute&#39;,
+})
+
+
+def binds_command_identity(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `node` writes the `function:` or `alias:` namespace, binding a command name to something
+    the definition scan does not read as a definition and the call scan does not read as a call.
+    Every name-keyed decision has to treat such a node as an unknown: it can bind the name about to
+    be deleted, and it can be the only thing that reaches it.
+    &#34;&#34;&#34;
+    if not isinstance(node, Ps1AssignmentExpression):
+        return False
+    return any(
+        variable.scope in _IDENTITY_SCOPES
+        for variable in assignment_target_variables(node.target)
+    )
+
+
+def _is_class_method(definition: Ps1FunctionDefinition) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a function definition is the body of a class method rather than a command. A method is
+    reached through `$object.Method()` and never through its bare name, so it is neither a
+    definition a call site can name nor a definition this graph can find the callers of.
+    &#34;&#34;&#34;
+    return isinstance(definition.parent, Ps1MethodMember)
+
+
+def _enclosing_function(node: Node) -&gt; str | None:
+    &#34;&#34;&#34;
+    The key of the **outermost** function definition whose body holds `node`, or `None` when `node`
+    runs as part of the script itself.
+
+    Outermost rather than innermost, because the only reader is `Ps1CallGraph.reachable_names` and a
+    nested definition is never called by name. `function Outer { function Inner { Payload } }`
+    credits the call to `Outer`: reading it as `Inner`&#39;s leaves `Payload` reached by nothing, so it
+    is deleted while `Inner` — which no pass removes, since only a top-level definition is
+    removable — stands there calling a name the emitted script no longer defines. Attribution to the
+    enclosing scope is what makes the two answers agree.
+
+    A class method anywhere on the way out answers `None` and stops the walk, which is the
+    conservative direction. A method body runs whenever something constructs or calls into the
+    class, and this graph cannot see that happen; treating its calls as unconditional keeps every
+    name they reach reachable, and `Ps1OutputFlow` separately refuses to ground a method body
+    because no call site ever names it. Carrying on to the enclosing function instead would make
+    those calls conditional on a name that reaches the *class*, which nothing here can prove.
+    &#34;&#34;&#34;
+    found: str | None = None
+    cursor = node.parent
+    while cursor is not None:
+        if isinstance(cursor, Ps1FunctionDefinition):
+            if _is_class_method(cursor):
+                return None
+            found = normalize_command_name(cursor.name)
+        cursor = cursor.parent
+    return found
+
+
+class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None
+
+
+class Ps1CallGraph:
+    &#34;&#34;&#34;
+    The verdict of `build_call_graph`. Definitions and call sites are keyed through
+    `refinery.lib.scripts.ps1.ast.normalize_command_name`, so `function global:F` and a bare call to
+    `F` meet on one key, and every definition sharing a key is kept: a redefinition shadows the
+    earlier body only from the point it runs, which is order and scope information no walk over the
+    tree carries.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        definitions: Mapping[str, Sequence[Ps1FunctionDefinition]],
+        keyword_definitions: Mapping[str, Sequence[Ps1ScriptBlock]],
+        call_sites: Mapping[str, Sequence[Ps1CallSite]],
+        unattributed_sites: Sequence[Node],
+        readable: bool,
+        exports: bool,
+        handed_out: Ps1Listed = Ps1Listed(),
+    ):
+        self._definitions = dict(definitions)
+        self._keyword_definitions = dict(keyword_definitions)
+        self._call_sites = dict(call_sites)
+        self._unattributed_sites = tuple(unattributed_sites)
+        self._readable = readable
+        self._exports = exports
+        self._handed_out = handed_out
+
+    def hands_out(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the script may reach the body of the function *name* other than by calling it by
+        name: it reads `$function:K`, writes a path into the `function:` drive, looks the command
+        table up by `Get-Command` or through `$ExecutionContext` or `$PSCmdlet` in a way that may
+        list it, reads `$MyInvocation` inside it, or does any of these where the name cannot be
+        read. A body handed out this way may run wherever something runs a block, so no list of
+        call sites is the list of places it runs.
+        &#34;&#34;&#34;
+        return self._handed_out.holds(normalize_command_name(name))
+
+    def named_callers(self, body: Node) -&gt; list[Node] | None:
+        &#34;&#34;&#34;
+        The calls naming the function whose body *body* is, or `None` where those are not all the
+        calls that may run it beside `unattributed_sites`: *body* is no function&#39;s, this graph
+        cannot be read, the function is a class method or has no name, or the script hands it out.
+        &#34;&#34;&#34;
+        parent = body.parent
+        if (
+            not self._readable
+            or not isinstance(parent, Ps1FunctionDefinition)
+            or _is_class_method(parent)
+            or not parent.name
+            or self.hands_out(parent.name)
+        ):
+            return None
+        return [site.invocation for site in self.call_sites(parent.name)]
+
+    def sites_running(self, block: Ps1ScriptBlock, attributed_only: bool = False) -&gt; list[Node] | None:
+        &#34;&#34;&#34;
+        The calls that may run *block*, or `None` where they cannot all be named. A function body is
+        run by the calls naming the function (`named_callers`), and, unless *attributed_only*, by
+        every call in `unattributed_sites`. A script block is run by the `&amp;` or `.` that invokes it
+        where it is written, and by the `ForEach-Object` or `Where-Object` it is handed to.
+        &#34;&#34;&#34;
+        parent = block.parent
+        if isinstance(parent, Ps1FunctionDefinition):
+            named = self.named_callers(block)
+            if named is None or attributed_only:
+                return named
+            return [*named, *self.unattributed_sites]
+        invocation = parent.parent if isinstance(parent, Ps1CommandArgument) else parent
+        if not isinstance(invocation, Ps1CommandInvocation):
+            return None
+        if invocation.name is block:
+            return [invocation] if invocation.invocation_operator in (&#39;&amp;&#39;, &#39;.&#39;) else None
+        if resolve_command_name(invocation) in (&#39;foreach-object&#39;, &#39;where-object&#39;):
+            return [invocation]
+        return None
+
+    @property
+    def is_readable(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this tree is the whole story about what a command name denotes and who reaches it.
+        Six independent things say it is not, and every one of them has to be asked, because none
+        implies another:
+
+        - the command table is open (`Ps1TypeWorld.command_table_closed` is false), so a dot-sourced
+          file, an imported module, an `iex` or an aliasing cmdlet defines or imports a command the
+          walk never read. A pure type-system mutation — a `class`, `Add-Type` — is *not* one of
+          these: it opens the wider `closed_for_the_whole_run` but not the command table, since it
+          binds no command name, so the graph stays readable beside it;
+        - an invocation dispatches opaquely (`&amp; $f`), so a name is reached without being written;
+        - an assignment binds the `function:` or `alias:` namespace, which defines a command under a
+          spelling the definition scan does not read — and leaves the world closed while doing it,
+          since `${function:j} = { }` remaps nothing in the type system;
+        - a function definition carries a function-level `[Alias]` attribute, the declarative form of
+          the same binding: it names a second command for that function under a spelling the
+          definition scan, keyed on the function&#39;s own name, does not read; see
+          `_declares_a_command_alias`;
+        - the script calls `Export-ModuleMember`, which hands a name to a caller outside the file;
+        - a call written under a qualifier resolves onto a name this script defines; see
+          `_collides_with_a_definition`.
+
+        Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.
+
+        The first two rows are the ones
+        `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` switches off, being
+        the two that say a name is reached by code nobody can read; see `build_call_graph`.
+
+        The `Export-ModuleMember` row catches the explicit export and not the general case. A
+        `.psm1` with no export statement exports every function by default, and nothing in a file
+        says it is a module — the assumption the bare-output default rests on, stated where a
+        caller can see it in `refinery.units.scripting.dps1`.
+        &#34;&#34;&#34;
+        return self._readable
+
+    @property
+    def exports_a_name(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script hands a command name to code outside the file, which is one of the six
+        things `is_readable` reads and the only one that says a *definition* has a reader elsewhere.
+
+        The distinction is worth the separate name because the two questions have different answers
+        for the same script. An `Invoke-Expression` opens the type world and could in principle call
+        anything, and every pass here has long accepted that risk in exchange for resolving the
+        trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+        script says in as many words that a caller it cannot see will call this name, so a pass that
+        deletes the definition deletes a reachable entry point.
+        &#34;&#34;&#34;
+        return self._exports
+
+    def may_run_a_body(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether evaluating *node* itself may run a body of this script, or code the script does not
+        spell, which an error handler around it then guards: a script block, which runs wherever
+        something runs it; a call that runs or makes one; or a command that dispatches to a target
+        the source does not spell, runs code nobody can read, or names a function or keyword body
+        this script defines. Where this graph is not the whole story, a name no cmdlet answers to
+        may name a body code nobody can read defined; a name a cmdlet answers to is read as that
+        cmdlet, the risk every pass here takes in exchange for reading through an `iex` at all.
+        &#34;&#34;&#34;
+        if isinstance(node, Ps1ScriptBlock):
+            return True
+        if isinstance(node, Ps1InvokeMember):
+            return (
+                is_scriptblock_invoke(node)
+                or may_create_a_scriptblock(node)
+                or is_execution_context_invoke(node)
+            )
+        if not isinstance(node, Ps1CommandInvocation):
+            return False
+        if is_opaque_dispatch(node) or runs_code_it_cannot_read(node):
+            return True
+        name = get_command_name(node)
+        if name is None or self.definitions(name) or self.keyword_definitions(name):
+            return True
+        if self._readable:
+            return False
+        resolved = resolve_command_name(node)
+        return resolved is None or resolved not in KNOWN_CMDLETS
+
+    def definitions(self, name: str) -&gt; Sequence[Ps1FunctionDefinition]:
+        &#34;&#34;&#34;
+        Every function definition a call to `name` could reach, in source order.
+        &#34;&#34;&#34;
+        return self._definitions.get(normalize_command_name(name), ())
+
+    def keyword_definitions(self, name: str) -&gt; Sequence[Ps1ScriptBlock]:
+        &#34;&#34;&#34;
+        The scriptblock bodies a `workflow`/`configuration` statement binds to `name`, in source
+        order. These define the same command name a `function` does but are not themselves a
+        `refinery.lib.scripts.ps1.model.Ps1FunctionDefinition`, so a caller weighing whether a name
+        is inert reads them beside `definitions`: the empty `function` a call names may be shadowed
+        by a `workflow` whose body acts.
+        &#34;&#34;&#34;
+        return self._keyword_definitions.get(normalize_command_name(name), ())
+
+    def call_sites(self, name: str) -&gt; Sequence[Ps1CallSite]:
+        &#34;&#34;&#34;
+        Every invocation of `name` standing in this tree, in source order, wherever it sits. This
+        is what separates the graph from the reachability query below, which reads only the edges it
+        can reach from the script itself.
+        &#34;&#34;&#34;
+        return self._call_sites.get(normalize_command_name(name), ())
+
+    @property
+    def unattributed_sites(self) -&gt; Sequence[Node]:
+        &#34;&#34;&#34;
+        Every node standing in this tree that runs code this analysis cannot read — a dispatch
+        whose target the source does not spell (`&amp; $f`), a string run as code (`iex $c`), a block
+        made or run from one — in source order, under either reading of such code: it may call any
+        function this script defines, and a later step may spell the very call it makes (`$f = &#39;f1&#39;;
+        &amp; $f`, `iex &#39;f1&#39;`), so a reader asking where a body may run reads these beside the sites
+        that name it.
+        &#34;&#34;&#34;
+        return self._unattributed_sites
+
+    @property
+    def defined_names(self) -&gt; Sequence[str]:
+        &#34;&#34;&#34;
+        Every key this script defines a function under, in source order of the first definition.
+        &#34;&#34;&#34;
+        return tuple(self._definitions)
+
+    def reachable_names(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        Every command name some path from the script itself can reach: the names called outside any
+        function, then the names those functions call, to a fixpoint. A function whose key is absent
+        is called from nowhere in this tree.
+
+        An unreadable graph answers with every name it saw, defined or called, since a name reached
+        from outside is reached by a path this cannot trace.
+        &#34;&#34;&#34;
+        if not self._readable or self._handed_out.every:
+            return frozenset(self._definitions) | frozenset(self._call_sites)
+        calls_from: dict[str | None, set[str]] = {}
+        calls_from[None] = set(self._handed_out.names) | {
+            name for name in self._definitions if self._handed_out.holds(name)}
+        for name, sites in self._call_sites.items():
+            for site in sites:
+                calls_from.setdefault(site.caller, set()).add(name)
+        reachable = set(calls_from.get(None, ()))
+        frontier = [name for name in reachable if name in self._definitions]
+        while frontier:
+            for name in calls_from.get(frontier.pop(), ()):
+                if name in reachable:
+                    continue
+                reachable.add(name)
+                if name in self._definitions:
+                    frontier.append(name)
+        return frozenset(reachable)
+
+
+class Ps1BodyCallers:
+    &#34;&#34;&#34;
+    The calls that may run each script block of the tree *root*, as
+    `refinery.lib.scripts.ps1.analysis.dispatch.Ps1CallSites` asks for them: read off the call
+    graph *calls* hands over, which is asked for only once a question needs it.
+    &#34;&#34;&#34;
+
+    def __init__(self, root: Node, calls: Callable[[], Ps1CallGraph]):
+        self._root = root
+        self._calls = calls
+
+    def bodies(self) -&gt; list[Node]:
+        return [node for node in self._root.walk() if isinstance(node, Ps1ScriptBlock)]
+
+    def sites_running(self, body: Node) -&gt; list[Node] | None:
+        if not isinstance(body, Ps1ScriptBlock):
+            return None
+        return self._calls().sites_running(body, attributed_only=True)
+
+    def unattributed_sites(self) -&gt; Sequence[Node]:
+        return self._calls().unattributed_sites
+
+
+def names_used_before_defined(
+    graph: Ps1CallGraph,
+    dominance: DominatorModel,
+) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    The keys with a call site that no definition of the name is guaranteed to have run before. Such
+    a call names, at the point it stands, whatever bound the name earlier — nothing, at script
+    scope, where Windows PowerShell 5.1 answers the bare word with a `CommandNotFoundException`.
+    That error is non-terminating there, so the run carries on and a later call does reach the
+    body, but the earlier call ran the error rather than the body — measured: `zzqfoo1; function
+    zzqfoo1 { &#39;boom&#39; }; zzqfoo1` writes an error record and then `boom`. A pass that folds that
+    earlier call into the body invents the body&#39;s value for a statement that raised, and one that
+    deletes it with the definition as an inert pair erases the error; which body the call reaches,
+    and whether it reaches one at all, is order the fold does not carry, so every definition and
+    call of a name reported here is left alone rather than resolved for the reachable calls alone.
+
+    Only a call the definition shares a control-flow graph with is ordered. A call inside another
+    function&#39;s body runs when that body is invoked, an ordering no per-body graph carries, and
+    dominance across two graphs is always false; reading that as unreached would refuse every helper
+    that calls another, so a cross-graph call is treated as reached — the direction that keeps a
+    fold the pass already takes. **Strict** dominance, so a definition and a call sharing one node
+    do not read as ordered: statement granularity cannot order a use and a definition written on one
+    line, and the reflexive answer for that pair is the use-before-definition this refuses.
+    &#34;&#34;&#34;
+    unreached: set[str] = set()
+    for key in graph.defined_names:
+        definitions = graph.definitions(key)
+        for site in graph.call_sites(key):
+            call = site.invocation
+            colocated = [d for d in definitions if dominance.locate_pair(d, call) is not None]
+            if colocated and not any(dominance.strictly_dominates(d, call) for d in colocated):
+                unreached.add(key)
+                break
+    return frozenset(unreached)
+
+
+def calls_after_a_definition(
+    graph: Ps1CallGraph,
+    dominance: DominatorModel,
+) -&gt; frozenset[int]:
+    &#34;&#34;&#34;
+    The identities of the call sites a definition of the name they call certainly ran before: in
+    the same body, or, for a call in a function body, before every statement outside any function
+    body through which that body may first be entered. A helper defined at the top and called from
+    functions the script calls later is one; a call from another function that runs before the
+    definition is not. A body whose callers cannot all be listed (an unreadable graph, a function
+    handed out as a value, a class method, a call nested in a block), or that a cycle of calls
+    reaches, is entered from nowhere this can name. **Strict** dominance, for the reason
+    `names_used_before_defined` gives.
+    &#34;&#34;&#34;
+    entries = _BodyEntries(graph)
+    found: set[int] = set()
+    for key in graph.defined_names:
+        definitions = graph.definitions(key)
+        for site in graph.call_sites(key):
+            call = site.invocation
+            if any(_runs_before(definition, call, dominance, entries) for definition in definitions):
+                found.add(id(call))
+    return frozenset(found)
+
+
+def _runs_before(
+    definition: Ps1FunctionDefinition,
+    call: Node,
+    dominance: DominatorModel,
+    entries: _BodyEntries,
+) -&gt; bool:
+    if dominance.locate_pair(definition, call) is not None:
+        return dominance.strictly_dominates(definition, call)
+    body = _enclosing_block(call)
+    if body is None:
+        return False
+    first = entries.of(body)
+    return bool(first) and all(
+        dominance.locate_pair(definition, entry) is not None
+        and dominance.strictly_dominates(definition, entry)
+        for entry in first
+    )
+
+
+def _enclosing_block(node: Node) -&gt; Ps1ScriptBlock | None:
+    cursor = node.parent
+    while cursor is not None and not isinstance(cursor, Ps1ScriptBlock):
+        cursor = cursor.parent
+    return cursor
+
+
+class _BodyEntries:
+    &#34;&#34;&#34;
+    For a function body, the call sites outside every function body through which a run may first
+    enter it, or `None` where a caller cannot be listed. Computed once per body without
+    recursion; a body on a cycle of calls has no entry list this keeps, so neither has any body that
+    a cycle reaches.
+    &#34;&#34;&#34;
+
+    def __init__(self, graph: Ps1CallGraph):
+        self._graph = graph
+        self._memo: dict[int, frozenset[Node] | None] = {}
+
+    def _sites(self, body: Ps1ScriptBlock) -&gt; list[Node] | None:
+        named = self._graph.named_callers(body)
+        return None if named is None else [*named, *self._graph.unattributed_sites]
+
+    def of(self, body: Ps1ScriptBlock) -&gt; frozenset[Node] | None:
+        memo = self._memo
+        if id(body) in memo:
+            return memo[id(body)]
+        active: set[int] = set()
+        stack: list[tuple[Ps1ScriptBlock, list[Node], set[Node] | None]] = []
+
+        def push(block: Ps1ScriptBlock) -&gt; bool:
+            sites = self._sites(block)
+            if sites is None:
+                memo[id(block)] = None
+                return False
+            active.add(id(block))
+            stack.append((block, list(sites), set()))
+            return True
+
+        if not push(body):
+            return None
+        while stack:
+            block, pending, found = stack[-1]
+            if found is not None and pending:
+                site = pending.pop()
+                holder = _enclosing_block(site)
+                if holder is None:
+                    found.add(site)
+                    continue
+                if id(holder) in memo:
+                    inner = memo[id(holder)]
+                    if inner is None:
+                        stack[-1] = (block, pending, None)
+                    else:
+                        found.update(inner)
+                    continue
+                if id(holder) in active:
+                    stack[-1] = (block, pending, None)
+                    continue
+                if not push(holder):
+                    stack[-1] = (block, pending, None)
+                continue
+            stack.pop()
+            active.discard(id(block))
+            result = None if found is None else frozenset(found)
+            memo[id(block)] = result
+            if stack:
+                outer, outer_pending, outer_found = stack[-1]
+                if result is None:
+                    stack[-1] = (outer, outer_pending, None)
+                elif outer_found is not None:
+                    outer_found.update(result)
+        return memo.get(id(body))
+
+
+def _collides_with_a_definition(
+    resolved: Sequence[str],
+    definitions: Mapping[str, Sequence[Ps1FunctionDefinition]],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether some call keyed under a qualifier resolves onto a name this script defines.
+
+    `&amp; &#39;MyModule\\Qzmr&#39;` keys as `mymodule\\qzmr` while `function Qzmr` keys as `qzmr`, so nothing
+    matches, the definition reads as uncalled, and deleting it leaves a script calling a name it no
+    longer defines. `resolved` holds every name a call may run that its written key does not spell,
+    which is the deny-list reading `refinery.lib.scripts.ps1.ast.resolve_command_name` gives — so an
+    alias is here too, and `iex $x` beside a `function Invoke-Expression` collides for the same
+    reason, as does `item` beside a `function Get-Item`, which the implicit `Get-` retry reaches.
+
+    **The two arrive under different conditions, because they sit at opposite ends of the
+    precedence.** An alias is the highest tier and beats a script function, so `iex` reaches
+    `Invoke-Expression` however the script spells its own definitions. The implicit `Get-` retry is
+    the lowest, reached only once the function tier has missed, so `item` reaches `Get-Item` only in
+    a script that defines no `item` of its own — and `build_call_graph` therefore withholds a retry
+    name when the bare key is one this script defines. The set it withholds against is the one
+    `defined_names` reports, which is what the command model&#39;s own function tier reads, so the two
+    cannot disagree about which calls the retry is reached from.
+
+    **The condition is the collision and not the qualifier.** A quoted executable path is the same
+    shape: `&amp; &#39;C:\\tools\\stage2.exe&#39;` keys as the path and resolves to `stage2.exe`. Reading the
+    backslash itself as the signal would make every script that invokes an executable by path
+    unreadable, and `&amp; &#39;C:\\Windows\\Temp\\payload.exe&#39;` is one of the commonest shapes there is;
+    that is not failing closed, it is switching the analysis off. Asked this way it costs nothing
+    unless the stripped name is one this tree actually defines.
+
+    **This has no PowerShell oracle and is a policy choice.** Real PowerShell errors on
+    `&amp; &#39;MyModule\\Qzmr&#39;` when no such module is loaded — it does not reach the local definition — so
+    the language does not say the definition must survive. What says so is the internal invariant
+    that no removal leaves a dangling reference, plus a decision to fail closed in front of the
+    lexer&#39;s qualified-name hole rather than behind it. `&amp; &#39;global:Qzmr&#39;` is a different case and is
+    oracle-backed: the scope qualifier is stripped by the *key*, so the call and the definition
+    already meet and nothing here fires.
+
+    The call is not filed under the stripped key instead, which would be the other way to make the
+    two meet. The same list feeds `refinery.lib.scripts.ps1.analysis.effects.Ps1OutputFlow`, where
+    an extra call site *grounds* a function and licenses deleting what its body writes — so a guess
+    that keeps a definition alive would buy that at the price of a payload.
+    &#34;&#34;&#34;
+    return any(name in definitions for name in resolved)
+
+
+def _declares_a_command_alias(definition: Ps1FunctionDefinition) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `definition` carries a function-level `[Alias(...)]` attribute, which binds each name it
+    lists as a command name for the function the moment the definition runs — a second spelling the
+    definition scan, keyed on the function&#39;s own name, never reads, and one the call scan reaches
+    under a name no definition of it stands. It is the declarative form of a `Set-Alias`, so the
+    graph reads it the way `binds_command_identity` reads the imperative `alias:` write: the tree is
+    no longer the whole story about what a command name denotes.
+
+    Only the attributes on the `param` block itself are read. An `[Alias]` on one of the parameters
+    names a parameter of the function, not the command, and leaves the graph the whole story.
+    &#34;&#34;&#34;
+    block = get_param_block(definition.body)
+    if block is None:
+        return False
+    return any(
+        attribute.name.rpartition(&#39;.&#39;)[2].lower() in _COMMAND_ALIAS_ATTRIBUTES
+        for attribute in block.attributes
+    )
+
+
+def build_call_graph(
+    root: Ps1Script,
+    world: Ps1TypeWorld,
+    options: object | None = None,
+) -&gt; Ps1CallGraph:
+    &#34;&#34;&#34;
+    Walk the whole tree once, recording every function definition, every statically named invocation
+    with the function that holds it, and every reason the result is not the whole story.
+
+    The walk runs in source order so that a consumer removing what it finds removes from the front,
+    and cannot short-circuit on the first unknown, because the definitions and call sites are still
+    needed to decide what to keep.
+
+    The collision row is decided after the walk rather than during it, because a definition may be
+    written below the call that resolves onto it and a script is not read top to bottom.
+
+    `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` clears exactly the two
+    rows that say code nobody can read reaches a name — the open world, through the verdict this is
+    handed, and the opaque dispatch, here. The other four stand under it: an export and a collision
+    are written in the script, and so are an assignment into the `function:` namespace and a
+    function-level `[Alias]` attribute, each a definition under a spelling the scan does not read
+    rather than a call from outside it.
+    &#34;&#34;&#34;
+    trusting = eval_is_trusted(options)
+    definitions: dict[str, list[Ps1FunctionDefinition]] = {}
+    keyword_definitions: dict[str, list[Ps1ScriptBlock]] = {}
+    call_sites: dict[str, list[Ps1CallSite]] = {}
+    unattributed_sites: list[Node] = []
+    qualified: list[str] = []
+    retried: dict[str, list[str]] = {}
+    readable = world.command_table_closed
+    exports = False
+    handed_out: set[str] = set()
+    handed_out_patterns: list[str] = []
+    hands_out_every = False
+    for node in root.walk_in_order():
+        if isinstance(node, (Ps1CommandInvocation, Ps1InvokeMember)) and runs_code_it_cannot_read(node):
+            unattributed_sites.append(node)
+        handing = _functions_handed_out(node)
+        if handing is None or handing.every:
+            hands_out_every = True
+        else:
+            handed_out.update(handing.names)
+            handed_out_patterns.extend(handing.patterns)
+        if isinstance(node, Ps1FunctionDefinition):
+            if not _is_class_method(node):
+                definitions.setdefault(normalize_command_name(node.name), []).append(node)
+                if _declares_a_command_alias(node):
+                    readable = False
+        elif isinstance(node, Ps1CommandInvocation):
+            binding = command_definition_keyword_binding(node)
+            if binding is not None:
+                keyword_name, keyword_body = binding
+                keyword_definitions.setdefault(keyword_name, []).append(keyword_body)
+            name = get_command_name(node)
+            if name is None:
+                if not trusting and is_opaque_dispatch(node):
+                    readable = False
+                continue
+            key = normalize_command_name(name)
+            resolved = resolve_command_name(node)
+            if resolved in _EXPORTING_COMMANDS:
+                readable = False
+                exports = True
+            if resolved is not None and resolved != key:
+                qualified.append(resolved)
+            retry = None if resolved is None else implicit_get_retry(resolved)
+            if retry is not None:
+                retried.setdefault(key, []).append(retry)
+            call_sites.setdefault(key, []).append(Ps1CallSite(node, _enclosing_function(node)))
+        elif binds_command_identity(node):
+            readable = False
+    for key, names in retried.items():
+        if key not in definitions:
+            qualified.extend(names)
+    if _collides_with_a_definition(qualified, definitions):
+        readable = False
+    return Ps1CallGraph(
+        definitions,
+        keyword_definitions,
+        call_sites,
+        unattributed_sites,
+        readable,
+        exports,
+        Ps1Listed(frozenset(handed_out), tuple(handed_out_patterns), hands_out_every),
+    )
+
+
+def _functions_handed_out(node: Node) -&gt; Ps1Listed | None:
+    &#34;&#34;&#34;
+    The functions *node* may hand out as a value rather than call, or `None` where it may hand out
+    any of them: a `$function:K` occurrence; a string that names a path into the `function:` drive;
+    a lookup of the command table by `Get-Command` or through `$ExecutionContext` or `$PSCmdlet`;
+    `$MyInvocation` read inside a function body, which hands out that function. An item command
+    whose path cannot be read is the residual the world model documents for the same commands:
+    refusing on it would refuse every script that copies or deletes a file by variable.
+
+    A lookup hands out what it lists (`refinery.lib.scripts.ps1.analysis.listing.functions_listed`):
+    the function a literal names once its escapes are removed, those a pattern matches, and every
+    function where it names none, narrowed by a `Where-Object` filter on the name it is piped into.
+    Whatever is read off its result — its `.Name` as much as the object — tells the function&#39;s
+    presence apart from its absence, so a lookup hands out nothing only where its value is
+    discarded and it cannot raise: a literal that finds nothing raises, a pattern does not.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1Variable):
+        if node.scope is Ps1ScopeModifier.FUNCTION:
+            return Ps1Listed(names=frozenset({normalize_command_name(node.name)}))
+        if node.scope is Ps1ScopeModifier.NONE and node.name.lower() == &#39;myinvocation&#39;:
+            cursor = node.parent
+            while cursor is not None:
+                if isinstance(cursor, Ps1FunctionDefinition):
+                    return Ps1Listed(names=frozenset({normalize_command_name(cursor.name)}))
+                cursor = cursor.parent
+        return Ps1Listed()
+    if isinstance(node, (Ps1StringLiteral, Ps1HereString)):
+        names = _function_paths_in(node.value)
+        return None if names is None else Ps1Listed(names=frozenset(names))
+    if isinstance(node, Ps1CommandInvocation):
+        if resolve_command_name(node) != &#39;get-command&#39;:
+            return Ps1Listed()
+        selection = get_command_selection(node)
+        if selection is not None and _value_is_discarded(node) and not lookup_may_raise(selection):
+            return Ps1Listed()
+        return functions_listed(selection, _narrowing_after(node))
+    if isinstance(node, Ps1InvokeMember) and node.access is Ps1AccessKind.INSTANCE:
+        if not member_may_be(node.member, COMMAND_LOOKUP_METHODS | {&#39;invoke&#39;}):
+            return Ps1Listed()
+        receiver = node.object
+        while isinstance(receiver, Ps1MemberAccess):
+            receiver = receiver.object
+        if isinstance(receiver, Ps1Variable) and receiver.name.lower() in (&#39;executioncontext&#39;, &#39;pscmdlet&#39;):
+            return functions_listed(lookup_selection(node))
+    return Ps1Listed()
+
+
+def _narrowing_after(command: Ps1CommandInvocation) -&gt; Ps1NameNarrowing | None:
+    &#34;&#34;&#34;
+    The narrowing of the `Where-Object` stage *command* is piped into, if it is one.
+    &#34;&#34;&#34;
+    element = command.parent
+    if not isinstance(element, Ps1PipelineElement):
+        return None
+    pipeline = element.parent
+    if not isinstance(pipeline, Ps1Pipeline):
+        return None
+    elements = pipeline.elements
+    for index, candidate in enumerate(elements[:-1]):
+        if candidate is element:
+            return name_narrowing(elements[index + 1])
+    return None
+
+
+def _value_is_discarded(command: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether what *command* writes out is thrown away where it stands, as `$Null = (Get-Command
+    K).Name` throws it away: the target of a `$Null` assignment holds it, or a `[void]` cast, read
+    through the parentheses, the one-stage pipeline and the member reads between them. Nothing that
+    runs a block is read, so a `.ScriptBlock` on the way keeps it.
+    &#34;&#34;&#34;
+    cursor: Node = command
+    parent = cursor.parent
+    while True:
+        if isinstance(parent, Ps1PipelineElement) and not parent.redirections:
+            pipeline = parent.parent
+            if not isinstance(pipeline, Ps1Pipeline) or len(pipeline.elements) != 1:
+                return False
+            cursor, parent = pipeline, pipeline.parent
+            continue
+        if isinstance(parent, Ps1ParenExpression):
+            cursor, parent = parent, parent.parent
+            continue
+        if isinstance(parent, Ps1MemberAccess) and parent.object is cursor:
+            name = get_member_name(parent.member)
+            if name is None or name.lower() == &#39;scriptblock&#39;:
+                return False
+            cursor, parent = parent, parent.parent
+            continue
+        break
+    if isinstance(parent, Ps1AssignmentExpression) and parent.value is cursor:
+        return is_null_discard(parent)
+    return isinstance(parent, Ps1CastExpression) and is_void_cast(parent)
+
+
+def _function_paths_in(text: str) -&gt; tuple[str, ...] | None:
+    &#34;&#34;&#34;
+    The keys of the functions the paths into the `function:` drive in *text* name, or `None` where
+    one of them names no single function.
+    &#34;&#34;&#34;
+    lowered = text.lower()
+    found: list[str] = []
+    start = lowered.find(&#39;function:&#39;)
+    while start &gt;= 0:
+        rest = lowered[start + len(&#39;function:&#39;):].lstrip(&#39;:\\/&#39;)
+        name = re.split(r&#39;[\s\&#39;&#34;`;,|)}\]]&#39;, rest, maxsplit=1)[0]
+        if not name or has_wildcard(name):
+            return None
+        found.append(normalize_command_name(name))
+        start = lowered.find(&#39;function:&#39;, start + 1)
+    return tuple(found)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.binds_command_identity"><code class="name flex">
+<span>def <span class="ident">binds_command_identity</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <code>node</code> writes the <code>function:</code> or <code>alias:</code> namespace, binding a command name to something
+the definition scan does not read as a definition and the call scan does not read as a call.
+Every name-keyed decision has to treat such a node as an unknown: it can bind the name about to
+be deleted, and it can be the only thing that reaches it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L110-L122" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def binds_command_identity(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether `node` writes the `function:` or `alias:` namespace, binding a command name to something
+    the definition scan does not read as a definition and the call scan does not read as a call.
+    Every name-keyed decision has to treat such a node as an unknown: it can bind the name about to
+    be deleted, and it can be the only thing that reaches it.
+    &#34;&#34;&#34;
+    if not isinstance(node, Ps1AssignmentExpression):
+        return False
+    return any(
+        variable.scope in _IDENTITY_SCOPES
+        for variable in assignment_target_variables(node.target)
+    )</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined"><code class="name flex">
+<span>def <span class="ident">names_used_before_defined</span></span>(<span>graph, dominance)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The keys with a call site that no definition of the name is guaranteed to have run before. Such
+a call names, at the point it stands, whatever bound the name earlier — nothing, at script
+scope, where Windows PowerShell 5.1 answers the bare word with a <code>CommandNotFoundException</code>.
+That error is non-terminating there, so the run carries on and a later call does reach the
+body, but the earlier call ran the error rather than the body — measured: <code>zzqfoo1; function
+zzqfoo1 { 'boom' }; zzqfoo1&lt;code&gt; writes an error record and then &lt;/code&gt;boom</code>. A pass that folds that
+earlier call into the body invents the body's value for a statement that raised, and one that
+deletes it with the definition as an inert pair erases the error; which body the call reaches,
+and whether it reaches one at all, is order the fold does not carry, so every definition and
+call of a name reported here is left alone rather than resolved for the reachable calls alone.</p>
+<p>Only a call the definition shares a control-flow graph with is ordered. A call inside another
+function's body runs when that body is invoked, an ordering no per-body graph carries, and
+dominance across two graphs is always false; reading that as unreached would refuse every helper
+that calls another, so a cross-graph call is treated as reached — the direction that keeps a
+fold the pass already takes. <strong>Strict</strong> dominance, so a definition and a call sharing one node
+do not read as ordered: statement granularity cannot order a use and a definition written on one
+line, and the reflexive answer for that pair is the use-before-definition this refuses.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L427-L460" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def names_used_before_defined(
+    graph: Ps1CallGraph,
+    dominance: DominatorModel,
+) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    The keys with a call site that no definition of the name is guaranteed to have run before. Such
+    a call names, at the point it stands, whatever bound the name earlier — nothing, at script
+    scope, where Windows PowerShell 5.1 answers the bare word with a `CommandNotFoundException`.
+    That error is non-terminating there, so the run carries on and a later call does reach the
+    body, but the earlier call ran the error rather than the body — measured: `zzqfoo1; function
+    zzqfoo1 { &#39;boom&#39; }; zzqfoo1` writes an error record and then `boom`. A pass that folds that
+    earlier call into the body invents the body&#39;s value for a statement that raised, and one that
+    deletes it with the definition as an inert pair erases the error; which body the call reaches,
+    and whether it reaches one at all, is order the fold does not carry, so every definition and
+    call of a name reported here is left alone rather than resolved for the reachable calls alone.
+
+    Only a call the definition shares a control-flow graph with is ordered. A call inside another
+    function&#39;s body runs when that body is invoked, an ordering no per-body graph carries, and
+    dominance across two graphs is always false; reading that as unreached would refuse every helper
+    that calls another, so a cross-graph call is treated as reached — the direction that keeps a
+    fold the pass already takes. **Strict** dominance, so a definition and a call sharing one node
+    do not read as ordered: statement granularity cannot order a use and a definition written on one
+    line, and the reflexive answer for that pair is the use-before-definition this refuses.
+    &#34;&#34;&#34;
+    unreached: set[str] = set()
+    for key in graph.defined_names:
+        definitions = graph.definitions(key)
+        for site in graph.call_sites(key):
+            call = site.invocation
+            colocated = [d for d in definitions if dominance.locate_pair(d, call) is not None]
+            if colocated and not any(dominance.strictly_dominates(d, call) for d in colocated):
+                unreached.add(key)
+                break
+    return frozenset(unreached)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.calls_after_a_definition"><code class="name flex">
+<span>def <span class="ident">calls_after_a_definition</span></span>(<span>graph, dominance)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The identities of the call sites a definition of the name they call certainly ran before: in
+the same body, or, for a call in a function body, before every statement outside any function
+body through which that body may first be entered. A helper defined at the top and called from
+functions the script calls later is one; a call from another function that runs before the
+definition is not. A body whose callers cannot all be listed (an unreadable graph, a function
+handed out as a value, a class method, a call nested in a block), or that a cycle of calls
+reaches, is entered from nowhere this can name. <strong>Strict</strong> dominance, for the reason
+<code><a title="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined" href="#refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined">names_used_before_defined()</a></code> gives.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L463-L485" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def calls_after_a_definition(
+    graph: Ps1CallGraph,
+    dominance: DominatorModel,
+) -&gt; frozenset[int]:
+    &#34;&#34;&#34;
+    The identities of the call sites a definition of the name they call certainly ran before: in
+    the same body, or, for a call in a function body, before every statement outside any function
+    body through which that body may first be entered. A helper defined at the top and called from
+    functions the script calls later is one; a call from another function that runs before the
+    definition is not. A body whose callers cannot all be listed (an unreadable graph, a function
+    handed out as a value, a class method, a call nested in a block), or that a cycle of calls
+    reaches, is entered from nowhere this can name. **Strict** dominance, for the reason
+    `names_used_before_defined` gives.
+    &#34;&#34;&#34;
+    entries = _BodyEntries(graph)
+    found: set[int] = set()
+    for key in graph.defined_names:
+        definitions = graph.definitions(key)
+        for site in graph.call_sites(key):
+            call = site.invocation
+            if any(_runs_before(definition, call, dominance, entries) for definition in definitions):
+                found.add(id(call))
+    return frozenset(found)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph"><code class="name flex">
+<span>def <span class="ident">build_call_graph</span></span>(<span>root, world, options=None)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Walk the whole tree once, recording every function definition, every statically named invocation
+with the function that holds it, and every reason the result is not the whole story.</p>
+<p>The walk runs in source order so that a consumer removing what it finds removes from the front,
+and cannot short-circuit on the first unknown, because the definitions and call sites are still
+needed to decide what to keep.</p>
+<p>The collision row is decided after the walk rather than during it, because a definition may be
+written below the call that resolves onto it and a script is not read top to bottom.</p>
+<p><code><a title="refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval" href="../options.html#refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval">Ps1DeobfuscationOptions.trust_eval</a></code> clears exactly the two
+rows that say code nobody can read reaches a name — the open world, through the verdict this is
+handed, and the opaque dispatch, here. The other four stand under it: an export and a collision
+are written in the script, and so are an assignment into the <code>function:</code> namespace and a
+function-level <code>[Alias]</code> attribute, each a definition under a spelling the scan does not read
+rather than a call from outside it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L649-L734" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def build_call_graph(
+    root: Ps1Script,
+    world: Ps1TypeWorld,
+    options: object | None = None,
+) -&gt; Ps1CallGraph:
+    &#34;&#34;&#34;
+    Walk the whole tree once, recording every function definition, every statically named invocation
+    with the function that holds it, and every reason the result is not the whole story.
+
+    The walk runs in source order so that a consumer removing what it finds removes from the front,
+    and cannot short-circuit on the first unknown, because the definitions and call sites are still
+    needed to decide what to keep.
+
+    The collision row is decided after the walk rather than during it, because a definition may be
+    written below the call that resolves onto it and a script is not read top to bottom.
+
+    `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` clears exactly the two
+    rows that say code nobody can read reaches a name — the open world, through the verdict this is
+    handed, and the opaque dispatch, here. The other four stand under it: an export and a collision
+    are written in the script, and so are an assignment into the `function:` namespace and a
+    function-level `[Alias]` attribute, each a definition under a spelling the scan does not read
+    rather than a call from outside it.
+    &#34;&#34;&#34;
+    trusting = eval_is_trusted(options)
+    definitions: dict[str, list[Ps1FunctionDefinition]] = {}
+    keyword_definitions: dict[str, list[Ps1ScriptBlock]] = {}
+    call_sites: dict[str, list[Ps1CallSite]] = {}
+    unattributed_sites: list[Node] = []
+    qualified: list[str] = []
+    retried: dict[str, list[str]] = {}
+    readable = world.command_table_closed
+    exports = False
+    handed_out: set[str] = set()
+    handed_out_patterns: list[str] = []
+    hands_out_every = False
+    for node in root.walk_in_order():
+        if isinstance(node, (Ps1CommandInvocation, Ps1InvokeMember)) and runs_code_it_cannot_read(node):
+            unattributed_sites.append(node)
+        handing = _functions_handed_out(node)
+        if handing is None or handing.every:
+            hands_out_every = True
+        else:
+            handed_out.update(handing.names)
+            handed_out_patterns.extend(handing.patterns)
+        if isinstance(node, Ps1FunctionDefinition):
+            if not _is_class_method(node):
+                definitions.setdefault(normalize_command_name(node.name), []).append(node)
+                if _declares_a_command_alias(node):
+                    readable = False
+        elif isinstance(node, Ps1CommandInvocation):
+            binding = command_definition_keyword_binding(node)
+            if binding is not None:
+                keyword_name, keyword_body = binding
+                keyword_definitions.setdefault(keyword_name, []).append(keyword_body)
+            name = get_command_name(node)
+            if name is None:
+                if not trusting and is_opaque_dispatch(node):
+                    readable = False
+                continue
+            key = normalize_command_name(name)
+            resolved = resolve_command_name(node)
+            if resolved in _EXPORTING_COMMANDS:
+                readable = False
+                exports = True
+            if resolved is not None and resolved != key:
+                qualified.append(resolved)
+            retry = None if resolved is None else implicit_get_retry(resolved)
+            if retry is not None:
+                retried.setdefault(key, []).append(retry)
+            call_sites.setdefault(key, []).append(Ps1CallSite(node, _enclosing_function(node)))
+        elif binds_command_identity(node):
+            readable = False
+    for key, names in retried.items():
+        if key not in definitions:
+            qualified.extend(names)
+    if _collides_with_a_definition(qualified, definitions):
+        readable = False
+    return Ps1CallGraph(
+        definitions,
+        keyword_definitions,
+        call_sites,
+        unattributed_sites,
+        readable,
+        exports,
+        Ps1Listed(frozenset(handed_out), tuple(handed_out_patterns), hands_out_every),
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite"><code class="flex name class">
+<span>class <span class="ident">Ps1CallSite</span></span>
+<span>(</span><span>invocation, caller)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>One invocation of a command name, paired with the key of the outermost function whose body holds
+it — see <code>_enclosing_function</code> — which is the edge's source, where the invocation is its target.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L164-L170" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite.invocation"><code class="name">var <span class="ident">invocation</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L164-L170" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite.caller"><code class="name">var <span class="ident">caller</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L164-L170" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallSite(NamedTuple):
+    &#34;&#34;&#34;
+    One invocation of a command name, paired with the key of the outermost function whose body holds
+    it — see `_enclosing_function` — which is the edge&#39;s source, where the invocation is its target.
+    &#34;&#34;&#34;
+    invocation: Ps1CommandInvocation
+    caller: str | None</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph"><code class="flex name class">
+<span>class <span class="ident">Ps1CallGraph</span></span>
+<span>(</span><span>definitions, keyword_definitions, call_sites, unattributed_sites, readable, exports, handed_out=Ps1Listed(names=frozenset(), patterns=(), every=False))</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The verdict of <code><a title="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph" href="#refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph">build_call_graph()</a></code>. Definitions and call sites are keyed through
+<code><a title="refinery.lib.scripts.ps1.ast.normalize_command_name" href="../ast.html#refinery.lib.scripts.ps1.ast.normalize_command_name">normalize_command_name()</a></code>, so <code>function global:F</code> and a bare call to
+<code>F</code> meet on one key, and every definition sharing a key is kept: a redefinition shadows the
+earlier body only from the point it runs, which is order and scope information no walk over the
+tree carries.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L173-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1CallGraph:
+    &#34;&#34;&#34;
+    The verdict of `build_call_graph`. Definitions and call sites are keyed through
+    `refinery.lib.scripts.ps1.ast.normalize_command_name`, so `function global:F` and a bare call to
+    `F` meet on one key, and every definition sharing a key is kept: a redefinition shadows the
+    earlier body only from the point it runs, which is order and scope information no walk over the
+    tree carries.
+    &#34;&#34;&#34;
+
+    def __init__(
+        self,
+        definitions: Mapping[str, Sequence[Ps1FunctionDefinition]],
+        keyword_definitions: Mapping[str, Sequence[Ps1ScriptBlock]],
+        call_sites: Mapping[str, Sequence[Ps1CallSite]],
+        unattributed_sites: Sequence[Node],
+        readable: bool,
+        exports: bool,
+        handed_out: Ps1Listed = Ps1Listed(),
+    ):
+        self._definitions = dict(definitions)
+        self._keyword_definitions = dict(keyword_definitions)
+        self._call_sites = dict(call_sites)
+        self._unattributed_sites = tuple(unattributed_sites)
+        self._readable = readable
+        self._exports = exports
+        self._handed_out = handed_out
+
+    def hands_out(self, name: str) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether the script may reach the body of the function *name* other than by calling it by
+        name: it reads `$function:K`, writes a path into the `function:` drive, looks the command
+        table up by `Get-Command` or through `$ExecutionContext` or `$PSCmdlet` in a way that may
+        list it, reads `$MyInvocation` inside it, or does any of these where the name cannot be
+        read. A body handed out this way may run wherever something runs a block, so no list of
+        call sites is the list of places it runs.
+        &#34;&#34;&#34;
+        return self._handed_out.holds(normalize_command_name(name))
+
+    def named_callers(self, body: Node) -&gt; list[Node] | None:
+        &#34;&#34;&#34;
+        The calls naming the function whose body *body* is, or `None` where those are not all the
+        calls that may run it beside `unattributed_sites`: *body* is no function&#39;s, this graph
+        cannot be read, the function is a class method or has no name, or the script hands it out.
+        &#34;&#34;&#34;
+        parent = body.parent
+        if (
+            not self._readable
+            or not isinstance(parent, Ps1FunctionDefinition)
+            or _is_class_method(parent)
+            or not parent.name
+            or self.hands_out(parent.name)
+        ):
+            return None
+        return [site.invocation for site in self.call_sites(parent.name)]
+
+    def sites_running(self, block: Ps1ScriptBlock, attributed_only: bool = False) -&gt; list[Node] | None:
+        &#34;&#34;&#34;
+        The calls that may run *block*, or `None` where they cannot all be named. A function body is
+        run by the calls naming the function (`named_callers`), and, unless *attributed_only*, by
+        every call in `unattributed_sites`. A script block is run by the `&amp;` or `.` that invokes it
+        where it is written, and by the `ForEach-Object` or `Where-Object` it is handed to.
+        &#34;&#34;&#34;
+        parent = block.parent
+        if isinstance(parent, Ps1FunctionDefinition):
+            named = self.named_callers(block)
+            if named is None or attributed_only:
+                return named
+            return [*named, *self.unattributed_sites]
+        invocation = parent.parent if isinstance(parent, Ps1CommandArgument) else parent
+        if not isinstance(invocation, Ps1CommandInvocation):
+            return None
+        if invocation.name is block:
+            return [invocation] if invocation.invocation_operator in (&#39;&amp;&#39;, &#39;.&#39;) else None
+        if resolve_command_name(invocation) in (&#39;foreach-object&#39;, &#39;where-object&#39;):
+            return [invocation]
+        return None
+
+    @property
+    def is_readable(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this tree is the whole story about what a command name denotes and who reaches it.
+        Six independent things say it is not, and every one of them has to be asked, because none
+        implies another:
+
+        - the command table is open (`Ps1TypeWorld.command_table_closed` is false), so a dot-sourced
+          file, an imported module, an `iex` or an aliasing cmdlet defines or imports a command the
+          walk never read. A pure type-system mutation — a `class`, `Add-Type` — is *not* one of
+          these: it opens the wider `closed_for_the_whole_run` but not the command table, since it
+          binds no command name, so the graph stays readable beside it;
+        - an invocation dispatches opaquely (`&amp; $f`), so a name is reached without being written;
+        - an assignment binds the `function:` or `alias:` namespace, which defines a command under a
+          spelling the definition scan does not read — and leaves the world closed while doing it,
+          since `${function:j} = { }` remaps nothing in the type system;
+        - a function definition carries a function-level `[Alias]` attribute, the declarative form of
+          the same binding: it names a second command for that function under a spelling the
+          definition scan, keyed on the function&#39;s own name, does not read; see
+          `_declares_a_command_alias`;
+        - the script calls `Export-ModuleMember`, which hands a name to a caller outside the file;
+        - a call written under a qualifier resolves onto a name this script defines; see
+          `_collides_with_a_definition`.
+
+        Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.
+
+        The first two rows are the ones
+        `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` switches off, being
+        the two that say a name is reached by code nobody can read; see `build_call_graph`.
+
+        The `Export-ModuleMember` row catches the explicit export and not the general case. A
+        `.psm1` with no export statement exports every function by default, and nothing in a file
+        says it is a module — the assumption the bare-output default rests on, stated where a
+        caller can see it in `refinery.units.scripting.dps1`.
+        &#34;&#34;&#34;
+        return self._readable
+
+    @property
+    def exports_a_name(self) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether this script hands a command name to code outside the file, which is one of the six
+        things `is_readable` reads and the only one that says a *definition* has a reader elsewhere.
+
+        The distinction is worth the separate name because the two questions have different answers
+        for the same script. An `Invoke-Expression` opens the type world and could in principle call
+        anything, and every pass here has long accepted that risk in exchange for resolving the
+        trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+        script says in as many words that a caller it cannot see will call this name, so a pass that
+        deletes the definition deletes a reachable entry point.
+        &#34;&#34;&#34;
+        return self._exports
+
+    def may_run_a_body(self, node: Node) -&gt; bool:
+        &#34;&#34;&#34;
+        Whether evaluating *node* itself may run a body of this script, or code the script does not
+        spell, which an error handler around it then guards: a script block, which runs wherever
+        something runs it; a call that runs or makes one; or a command that dispatches to a target
+        the source does not spell, runs code nobody can read, or names a function or keyword body
+        this script defines. Where this graph is not the whole story, a name no cmdlet answers to
+        may name a body code nobody can read defined; a name a cmdlet answers to is read as that
+        cmdlet, the risk every pass here takes in exchange for reading through an `iex` at all.
+        &#34;&#34;&#34;
+        if isinstance(node, Ps1ScriptBlock):
+            return True
+        if isinstance(node, Ps1InvokeMember):
+            return (
+                is_scriptblock_invoke(node)
+                or may_create_a_scriptblock(node)
+                or is_execution_context_invoke(node)
+            )
+        if not isinstance(node, Ps1CommandInvocation):
+            return False
+        if is_opaque_dispatch(node) or runs_code_it_cannot_read(node):
+            return True
+        name = get_command_name(node)
+        if name is None or self.definitions(name) or self.keyword_definitions(name):
+            return True
+        if self._readable:
+            return False
+        resolved = resolve_command_name(node)
+        return resolved is None or resolved not in KNOWN_CMDLETS
+
+    def definitions(self, name: str) -&gt; Sequence[Ps1FunctionDefinition]:
+        &#34;&#34;&#34;
+        Every function definition a call to `name` could reach, in source order.
+        &#34;&#34;&#34;
+        return self._definitions.get(normalize_command_name(name), ())
+
+    def keyword_definitions(self, name: str) -&gt; Sequence[Ps1ScriptBlock]:
+        &#34;&#34;&#34;
+        The scriptblock bodies a `workflow`/`configuration` statement binds to `name`, in source
+        order. These define the same command name a `function` does but are not themselves a
+        `refinery.lib.scripts.ps1.model.Ps1FunctionDefinition`, so a caller weighing whether a name
+        is inert reads them beside `definitions`: the empty `function` a call names may be shadowed
+        by a `workflow` whose body acts.
+        &#34;&#34;&#34;
+        return self._keyword_definitions.get(normalize_command_name(name), ())
+
+    def call_sites(self, name: str) -&gt; Sequence[Ps1CallSite]:
+        &#34;&#34;&#34;
+        Every invocation of `name` standing in this tree, in source order, wherever it sits. This
+        is what separates the graph from the reachability query below, which reads only the edges it
+        can reach from the script itself.
+        &#34;&#34;&#34;
+        return self._call_sites.get(normalize_command_name(name), ())
+
+    @property
+    def unattributed_sites(self) -&gt; Sequence[Node]:
+        &#34;&#34;&#34;
+        Every node standing in this tree that runs code this analysis cannot read — a dispatch
+        whose target the source does not spell (`&amp; $f`), a string run as code (`iex $c`), a block
+        made or run from one — in source order, under either reading of such code: it may call any
+        function this script defines, and a later step may spell the very call it makes (`$f = &#39;f1&#39;;
+        &amp; $f`, `iex &#39;f1&#39;`), so a reader asking where a body may run reads these beside the sites
+        that name it.
+        &#34;&#34;&#34;
+        return self._unattributed_sites
+
+    @property
+    def defined_names(self) -&gt; Sequence[str]:
+        &#34;&#34;&#34;
+        Every key this script defines a function under, in source order of the first definition.
+        &#34;&#34;&#34;
+        return tuple(self._definitions)
+
+    def reachable_names(self) -&gt; frozenset[str]:
+        &#34;&#34;&#34;
+        Every command name some path from the script itself can reach: the names called outside any
+        function, then the names those functions call, to a fixpoint. A function whose key is absent
+        is called from nowhere in this tree.
+
+        An unreadable graph answers with every name it saw, defined or called, since a name reached
+        from outside is reached by a path this cannot trace.
+        &#34;&#34;&#34;
+        if not self._readable or self._handed_out.every:
+            return frozenset(self._definitions) | frozenset(self._call_sites)
+        calls_from: dict[str | None, set[str]] = {}
+        calls_from[None] = set(self._handed_out.names) | {
+            name for name in self._definitions if self._handed_out.holds(name)}
+        for name, sites in self._call_sites.items():
+            for site in sites:
+                calls_from.setdefault(site.caller, set()).add(name)
+        reachable = set(calls_from.get(None, ()))
+        frontier = [name for name in reachable if name in self._definitions]
+        while frontier:
+            for name in calls_from.get(frontier.pop(), ()):
+                if name in reachable:
+                    continue
+                reachable.add(name)
+                if name in self._definitions:
+                    frontier.append(name)
+        return frozenset(reachable)</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.is_readable"><code class="name">var <span class="ident">is_readable</span></code></dt>
+<dd>
+<section class="desc"><p>Whether this tree is the whole story about what a command name denotes and who reaches it.
+Six independent things say it is not, and every one of them has to be asked, because none
+implies another:</p>
+<ul>
+<li>the command table is open (<code>Ps1TypeWorld.command_table_closed</code> is false), so a dot-sourced
+file, an imported module, an <code>iex</code> or an aliasing cmdlet defines or imports a command the
+walk never read. A pure type-system mutation — a <code>class</code>, <code>Add-Type</code> — is <em>not</em> one of
+these: it opens the wider <code>closed_for_the_whole_run</code> but not the command table, since it
+binds no command name, so the graph stays readable beside it;</li>
+<li>an invocation dispatches opaquely (<code>&amp; $f</code>), so a name is reached without being written;</li>
+<li>an assignment binds the <code>function:</code> or <code>alias:</code> namespace, which defines a command under a
+spelling the definition scan does not read — and leaves the world closed while doing it,
+since <code>${function:j} = { }</code> remaps nothing in the type system;</li>
+<li>a function definition carries a function-level <code>[Alias]</code> attribute, the declarative form of
+the same binding: it names a second command for that function under a spelling the
+definition scan, keyed on the function's own name, does not read; see
+<code>_declares_a_command_alias</code>;</li>
+<li>the script calls <code>Export-ModuleMember</code>, which hands a name to a caller outside the file;</li>
+<li>a call written under a qualifier resolves onto a name this script defines; see
+<code>_collides_with_a_definition</code>.</li>
+</ul>
+<p>Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.</p>
+<p>The first two rows are the ones
+<code><a title="refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval" href="../options.html#refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval">Ps1DeobfuscationOptions.trust_eval</a></code> switches off, being
+the two that say a name is reached by code nobody can read; see <code><a title="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph" href="#refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph">build_call_graph()</a></code>.</p>
+<p>The <code>Export-ModuleMember</code> row catches the explicit export and not the general case. A
+<code>.psm1</code> with no export statement exports every function by default, and nothing in a file
+says it is a module — the assumption the bare-output default rests on, stated where a
+caller can see it in <code><a title="refinery.units.scripting.dps1" href="../../../../units/scripting/dps1.html">refinery.units.scripting.dps1</a></code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L250-L285" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def is_readable(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether this tree is the whole story about what a command name denotes and who reaches it.
+    Six independent things say it is not, and every one of them has to be asked, because none
+    implies another:
+
+    - the command table is open (`Ps1TypeWorld.command_table_closed` is false), so a dot-sourced
+      file, an imported module, an `iex` or an aliasing cmdlet defines or imports a command the
+      walk never read. A pure type-system mutation — a `class`, `Add-Type` — is *not* one of
+      these: it opens the wider `closed_for_the_whole_run` but not the command table, since it
+      binds no command name, so the graph stays readable beside it;
+    - an invocation dispatches opaquely (`&amp; $f`), so a name is reached without being written;
+    - an assignment binds the `function:` or `alias:` namespace, which defines a command under a
+      spelling the definition scan does not read — and leaves the world closed while doing it,
+      since `${function:j} = { }` remaps nothing in the type system;
+    - a function definition carries a function-level `[Alias]` attribute, the declarative form of
+      the same binding: it names a second command for that function under a spelling the
+      definition scan, keyed on the function&#39;s own name, does not read; see
+      `_declares_a_command_alias`;
+    - the script calls `Export-ModuleMember`, which hands a name to a caller outside the file;
+    - a call written under a qualifier resolves onto a name this script defines; see
+      `_collides_with_a_definition`.
+
+    Every consumer reads this as fail-closed: an unreadable graph keeps more, never less.
+
+    The first two rows are the ones
+    `refinery.lib.scripts.ps1.options.Ps1DeobfuscationOptions.trust_eval` switches off, being
+    the two that say a name is reached by code nobody can read; see `build_call_graph`.
+
+    The `Export-ModuleMember` row catches the explicit export and not the general case. A
+    `.psm1` with no export statement exports every function by default, and nothing in a file
+    says it is a module — the assumption the bare-output default rests on, stated where a
+    caller can see it in `refinery.units.scripting.dps1`.
+    &#34;&#34;&#34;
+    return self._readable</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.exports_a_name"><code class="name">var <span class="ident">exports_a_name</span></code></dt>
+<dd>
+<section class="desc"><p>Whether this script hands a command name to code outside the file, which is one of the six
+things <code>is_readable</code> reads and the only one that says a <em>definition</em> has a reader elsewhere.</p>
+<p>The distinction is worth the separate name because the two questions have different answers
+for the same script. An <code>Invoke-Expression</code> opens the type world and could in principle call
+anything, and every pass here has long accepted that risk in exchange for resolving the
+trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+script says in as many words that a caller it cannot see will call this name, so a pass that
+deletes the definition deletes a reachable entry point.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L287-L300" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def exports_a_name(self) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether this script hands a command name to code outside the file, which is one of the six
+    things `is_readable` reads and the only one that says a *definition* has a reader elsewhere.
+
+    The distinction is worth the separate name because the two questions have different answers
+    for the same script. An `Invoke-Expression` opens the type world and could in principle call
+    anything, and every pass here has long accepted that risk in exchange for resolving the
+    trampolines obfuscators are built out of. An export is not a risk taken for anything: the
+    script says in as many words that a caller it cannot see will call this name, so a pass that
+    deletes the definition deletes a reachable entry point.
+    &#34;&#34;&#34;
+    return self._exports</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.unattributed_sites"><code class="name">var <span class="ident">unattributed_sites</span></code></dt>
+<dd>
+<section class="desc"><p>Every node standing in this tree that runs code this analysis cannot read — a dispatch
+whose target the source does not spell (<code>&amp; $f</code>), a string run as code (<code>iex $c</code>), a block
+made or run from one — in source order, under either reading of such code: it may call any
+function this script defines, and a later step may spell the very call it makes (<code>$f = 'f1';
+&amp; $f&lt;code&gt;, &lt;/code&gt;iex 'f1'</code>), so a reader asking where a body may run reads these beside the sites
+that name it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L356-L366" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def unattributed_sites(self) -&gt; Sequence[Node]:
+    &#34;&#34;&#34;
+    Every node standing in this tree that runs code this analysis cannot read — a dispatch
+    whose target the source does not spell (`&amp; $f`), a string run as code (`iex $c`), a block
+    made or run from one — in source order, under either reading of such code: it may call any
+    function this script defines, and a later step may spell the very call it makes (`$f = &#39;f1&#39;;
+    &amp; $f`, `iex &#39;f1&#39;`), so a reader asking where a body may run reads these beside the sites
+    that name it.
+    &#34;&#34;&#34;
+    return self._unattributed_sites</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.defined_names"><code class="name">var <span class="ident">defined_names</span></code></dt>
+<dd>
+<section class="desc"><p>Every key this script defines a function under, in source order of the first definition.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L368-L373" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">@property
+def defined_names(self) -&gt; Sequence[str]:
+    &#34;&#34;&#34;
+    Every key this script defines a function under, in source order of the first definition.
+    &#34;&#34;&#34;
+    return tuple(self._definitions)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.hands_out"><code class="name flex">
+<span>def <span class="ident">hands_out</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether the script may reach the body of the function <em>name</em> other than by calling it by
+name: it reads <code>$function:K</code>, writes a path into the <code>function:</code> drive, looks the command
+table up by <code>Get-Command</code> or through <code>$ExecutionContext</code> or <code>$PSCmdlet</code> in a way that may
+list it, reads <code>$MyInvocation</code> inside it, or does any of these where the name cannot be
+read. A body handed out this way may run wherever something runs a block, so no list of
+call sites is the list of places it runs.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L200-L209" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def hands_out(self, name: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the script may reach the body of the function *name* other than by calling it by
+    name: it reads `$function:K`, writes a path into the `function:` drive, looks the command
+    table up by `Get-Command` or through `$ExecutionContext` or `$PSCmdlet` in a way that may
+    list it, reads `$MyInvocation` inside it, or does any of these where the name cannot be
+    read. A body handed out this way may run wherever something runs a block, so no list of
+    call sites is the list of places it runs.
+    &#34;&#34;&#34;
+    return self._handed_out.holds(normalize_command_name(name))</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.named_callers"><code class="name flex">
+<span>def <span class="ident">named_callers</span></span>(<span>self, body)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The calls naming the function whose body <em>body</em> is, or <code>None</code> where those are not all the
+calls that may run it beside <code>unattributed_sites</code>: <em>body</em> is no function's, this graph
+cannot be read, the function is a class method or has no name, or the script hands it out.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L211-L226" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def named_callers(self, body: Node) -&gt; list[Node] | None:
+    &#34;&#34;&#34;
+    The calls naming the function whose body *body* is, or `None` where those are not all the
+    calls that may run it beside `unattributed_sites`: *body* is no function&#39;s, this graph
+    cannot be read, the function is a class method or has no name, or the script hands it out.
+    &#34;&#34;&#34;
+    parent = body.parent
+    if (
+        not self._readable
+        or not isinstance(parent, Ps1FunctionDefinition)
+        or _is_class_method(parent)
+        or not parent.name
+        or self.hands_out(parent.name)
+    ):
+        return None
+    return [site.invocation for site in self.call_sites(parent.name)]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.sites_running"><code class="name flex">
+<span>def <span class="ident">sites_running</span></span>(<span>self, block, attributed_only=False)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The calls that may run <em>block</em>, or <code>None</code> where they cannot all be named. A function body is
+run by the calls naming the function (<code>named_callers</code>), and, unless <em>attributed_only</em>, by
+every call in <code>unattributed_sites</code>. A script block is run by the <code>&amp;</code> or <code>.</code> that invokes it
+where it is written, and by the <code>ForEach-Object</code> or <code>Where-Object</code> it is handed to.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L228-L248" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def sites_running(self, block: Ps1ScriptBlock, attributed_only: bool = False) -&gt; list[Node] | None:
+    &#34;&#34;&#34;
+    The calls that may run *block*, or `None` where they cannot all be named. A function body is
+    run by the calls naming the function (`named_callers`), and, unless *attributed_only*, by
+    every call in `unattributed_sites`. A script block is run by the `&amp;` or `.` that invokes it
+    where it is written, and by the `ForEach-Object` or `Where-Object` it is handed to.
+    &#34;&#34;&#34;
+    parent = block.parent
+    if isinstance(parent, Ps1FunctionDefinition):
+        named = self.named_callers(block)
+        if named is None or attributed_only:
+            return named
+        return [*named, *self.unattributed_sites]
+    invocation = parent.parent if isinstance(parent, Ps1CommandArgument) else parent
+    if not isinstance(invocation, Ps1CommandInvocation):
+        return None
+    if invocation.name is block:
+        return [invocation] if invocation.invocation_operator in (&#39;&amp;&#39;, &#39;.&#39;) else None
+    if resolve_command_name(invocation) in (&#39;foreach-object&#39;, &#39;where-object&#39;):
+        return [invocation]
+    return None</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.may_run_a_body"><code class="name flex">
+<span>def <span class="ident">may_run_a_body</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether evaluating <em>node</em> itself may run a body of this script, or code the script does not
+spell, which an error handler around it then guards: a script block, which runs wherever
+something runs it; a call that runs or makes one; or a command that dispatches to a target
+the source does not spell, runs code nobody can read, or names a function or keyword body
+this script defines. Where this graph is not the whole story, a name no cmdlet answers to
+may name a body code nobody can read defined; a name a cmdlet answers to is read as that
+cmdlet, the risk every pass here takes in exchange for reading through an <code>iex</code> at all.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L302-L330" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def may_run_a_body(self, node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether evaluating *node* itself may run a body of this script, or code the script does not
+    spell, which an error handler around it then guards: a script block, which runs wherever
+    something runs it; a call that runs or makes one; or a command that dispatches to a target
+    the source does not spell, runs code nobody can read, or names a function or keyword body
+    this script defines. Where this graph is not the whole story, a name no cmdlet answers to
+    may name a body code nobody can read defined; a name a cmdlet answers to is read as that
+    cmdlet, the risk every pass here takes in exchange for reading through an `iex` at all.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1ScriptBlock):
+        return True
+    if isinstance(node, Ps1InvokeMember):
+        return (
+            is_scriptblock_invoke(node)
+            or may_create_a_scriptblock(node)
+            or is_execution_context_invoke(node)
+        )
+    if not isinstance(node, Ps1CommandInvocation):
+        return False
+    if is_opaque_dispatch(node) or runs_code_it_cannot_read(node):
+        return True
+    name = get_command_name(node)
+    if name is None or self.definitions(name) or self.keyword_definitions(name):
+        return True
+    if self._readable:
+        return False
+    resolved = resolve_command_name(node)
+    return resolved is None or resolved not in KNOWN_CMDLETS</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.definitions"><code class="name flex">
+<span>def <span class="ident">definitions</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every function definition a call to <code>name</code> could reach, in source order.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L332-L336" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def definitions(self, name: str) -&gt; Sequence[Ps1FunctionDefinition]:
+    &#34;&#34;&#34;
+    Every function definition a call to `name` could reach, in source order.
+    &#34;&#34;&#34;
+    return self._definitions.get(normalize_command_name(name), ())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.keyword_definitions"><code class="name flex">
+<span>def <span class="ident">keyword_definitions</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The scriptblock bodies a <code>workflow</code>/<code>configuration</code> statement binds to <code>name</code>, in source
+order. These define the same command name a <code>function</code> does but are not themselves a
+<code><a title="refinery.lib.scripts.ps1.model.Ps1FunctionDefinition" href="../model.html#refinery.lib.scripts.ps1.model.Ps1FunctionDefinition">Ps1FunctionDefinition</a></code>, so a caller weighing whether a name
+is inert reads them beside <code>definitions</code>: the empty <code>function</code> a call names may be shadowed
+by a <code>workflow</code> whose body acts.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L338-L346" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def keyword_definitions(self, name: str) -&gt; Sequence[Ps1ScriptBlock]:
+    &#34;&#34;&#34;
+    The scriptblock bodies a `workflow`/`configuration` statement binds to `name`, in source
+    order. These define the same command name a `function` does but are not themselves a
+    `refinery.lib.scripts.ps1.model.Ps1FunctionDefinition`, so a caller weighing whether a name
+    is inert reads them beside `definitions`: the empty `function` a call names may be shadowed
+    by a `workflow` whose body acts.
+    &#34;&#34;&#34;
+    return self._keyword_definitions.get(normalize_command_name(name), ())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.call_sites"><code class="name flex">
+<span>def <span class="ident">call_sites</span></span>(<span>self, name)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every invocation of <code>name</code> standing in this tree, in source order, wherever it sits. This
+is what separates the graph from the reachability query below, which reads only the edges it
+can reach from the script itself.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L348-L354" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def call_sites(self, name: str) -&gt; Sequence[Ps1CallSite]:
+    &#34;&#34;&#34;
+    Every invocation of `name` standing in this tree, in source order, wherever it sits. This
+    is what separates the graph from the reachability query below, which reads only the edges it
+    can reach from the script itself.
+    &#34;&#34;&#34;
+    return self._call_sites.get(normalize_command_name(name), ())</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.reachable_names"><code class="name flex">
+<span>def <span class="ident">reachable_names</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Every command name some path from the script itself can reach: the names called outside any
+function, then the names those functions call, to a fixpoint. A function whose key is absent
+is called from nowhere in this tree.</p>
+<p>An unreadable graph answers with every name it saw, defined or called, since a name reached
+from outside is reached by a path this cannot trace.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L375-L401" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def reachable_names(self) -&gt; frozenset[str]:
+    &#34;&#34;&#34;
+    Every command name some path from the script itself can reach: the names called outside any
+    function, then the names those functions call, to a fixpoint. A function whose key is absent
+    is called from nowhere in this tree.
+
+    An unreadable graph answers with every name it saw, defined or called, since a name reached
+    from outside is reached by a path this cannot trace.
+    &#34;&#34;&#34;
+    if not self._readable or self._handed_out.every:
+        return frozenset(self._definitions) | frozenset(self._call_sites)
+    calls_from: dict[str | None, set[str]] = {}
+    calls_from[None] = set(self._handed_out.names) | {
+        name for name in self._definitions if self._handed_out.holds(name)}
+    for name, sites in self._call_sites.items():
+        for site in sites:
+            calls_from.setdefault(site.caller, set()).add(name)
+    reachable = set(calls_from.get(None, ()))
+    frontier = [name for name in reachable if name in self._definitions]
+    while frontier:
+        for name in calls_from.get(frontier.pop(), ()):
+            if name in reachable:
+                continue
+            reachable.add(name)
+            if name in self._definitions:
+                frontier.append(name)
+    return frozenset(reachable)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers"><code class="flex name class">
+<span>class <span class="ident">Ps1BodyCallers</span></span>
+<span>(</span><span>root, calls)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The calls that may run each script block of the tree <em>root</em>, as
+<code><a title="refinery.lib.scripts.ps1.analysis.dispatch.Ps1CallSites" href="dispatch.html#refinery.lib.scripts.ps1.analysis.dispatch.Ps1CallSites">Ps1CallSites</a></code> asks for them: read off the call
+graph <em>calls</em> hands over, which is asked for only once a question needs it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L404-L424" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1BodyCallers:
+    &#34;&#34;&#34;
+    The calls that may run each script block of the tree *root*, as
+    `refinery.lib.scripts.ps1.analysis.dispatch.Ps1CallSites` asks for them: read off the call
+    graph *calls* hands over, which is asked for only once a question needs it.
+    &#34;&#34;&#34;
+
+    def __init__(self, root: Node, calls: Callable[[], Ps1CallGraph]):
+        self._root = root
+        self._calls = calls
+
+    def bodies(self) -&gt; list[Node]:
+        return [node for node in self._root.walk() if isinstance(node, Ps1ScriptBlock)]
+
+    def sites_running(self, body: Node) -&gt; list[Node] | None:
+        if not isinstance(body, Ps1ScriptBlock):
+            return None
+        return self._calls().sites_running(body, attributed_only=True)
+
+    def unattributed_sites(self) -&gt; Sequence[Node]:
+        return self._calls().unattributed_sites</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.bodies"><code class="name flex">
+<span>def <span class="ident">bodies</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L415-L416" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def bodies(self) -&gt; list[Node]:
+    return [node for node in self._root.walk() if isinstance(node, Ps1ScriptBlock)]</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.sites_running"><code class="name flex">
+<span>def <span class="ident">sites_running</span></span>(<span>self, body)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L418-L421" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def sites_running(self, body: Node) -&gt; list[Node] | None:
+    if not isinstance(body, Ps1ScriptBlock):
+        return None
+    return self._calls().sites_running(body, attributed_only=True)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.unattributed_sites"><code class="name flex">
+<span>def <span class="ident">unattributed_sites</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<section class="desc"></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/callgraph.py#L423-L424" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def unattributed_sites(self) -&gt; Sequence[Node]:
+    return self._calls().unattributed_sites</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.binds_command_identity" href="#refinery.lib.scripts.ps1.analysis.callgraph.binds_command_identity">binds_command_identity</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined" href="#refinery.lib.scripts.ps1.analysis.callgraph.names_used_before_defined">names_used_before_defined</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.calls_after_a_definition" href="#refinery.lib.scripts.ps1.analysis.callgraph.calls_after_a_definition">calls_after_a_definition</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph" href="#refinery.lib.scripts.ps1.analysis.callgraph.build_call_graph">build_call_graph</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallSite">Ps1CallSite</a></code></h4>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph">Ps1CallGraph</a></code></h4>
+<ul class="two-column">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.hands_out" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.hands_out">hands_out</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.named_callers" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.named_callers">named_callers</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.sites_running" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.sites_running">sites_running</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.may_run_a_body" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.may_run_a_body">may_run_a_body</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.definitions" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.definitions">definitions</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.keyword_definitions" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.keyword_definitions">keyword_definitions</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.call_sites" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.call_sites">call_sites</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.reachable_names" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1CallGraph.reachable_names">reachable_names</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers">Ps1BodyCallers</a></code></h4>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.bodies" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.bodies">bodies</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.sites_running" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.sites_running">sites_running</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.unattributed_sites" href="#refinery.lib.scripts.ps1.analysis.callgraph.Ps1BodyCallers.unattributed_sites">unattributed_sites</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

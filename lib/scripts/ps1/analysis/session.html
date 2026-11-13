@@ -1,0 +1,1316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.ps1.analysis.session documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.ps1.analysis.session</code></h1>
+</header>
+<section id="section-intro">
+<p>What a PowerShell script may set in its session that changes what an error or a command does: the
+error preference, the table of default parameter values, and the seed of the random generator.</p>
+<p>Each is a variable or a state of the session rather than of a block, so a write in one body governs
+a raise or a call in another, and a script that sets one anywhere is read as setting it throughout.
+Position is never asked here, and nothing here needs a graph: the control-flow builder reads these
+answers while it builds, and the fault and value layers read them afterwards, so that all of them
+read one answer.</p>
+<p>Two readings of a write are made, and which one a question takes is a matter of which way a missed
+write errs. Where missing a write keeps code or a handler, the write is read as it is spelled:
+<code><a title="refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference" href="#refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference">writes_stop_to_the_preference()</a></code> reads an assignment or a command that names the variable.
+Where missing a write deletes code that runs, any mention of the name counts, in a variable, inside
+a string that may run as code or name a provider path, or as the name of a variable written by a
+name nobody can read. <code><a title="refinery.lib.scripts.ps1.analysis.session.Ps1Session" href="#refinery.lib.scripts.ps1.analysis.session.Ps1Session">Ps1Session</a></code> holds the answers for a whole script, read in one walk.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L1-L664" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+What a PowerShell script may set in its session that changes what an error or a command does: the
+error preference, the table of default parameter values, and the seed of the random generator.
+
+Each is a variable or a state of the session rather than of a block, so a write in one body governs
+a raise or a call in another, and a script that sets one anywhere is read as setting it throughout.
+Position is never asked here, and nothing here needs a graph: the control-flow builder reads these
+answers while it builds, and the fault and value layers read them afterwards, so that all of them
+read one answer.
+
+Two readings of a write are made, and which one a question takes is a matter of which way a missed
+write errs. Where missing a write keeps code or a handler, the write is read as it is spelled:
+`writes_stop_to_the_preference` reads an assignment or a command that names the variable.
+Where missing a write deletes code that runs, any mention of the name counts, in a variable, inside
+a string that may run as code or name a provider path, or as the name of a variable written by a
+name nobody can read. `Ps1Session` holds the answers for a whole script, read in one walk.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+import typing
+
+from weakref import WeakKeyDictionary
+
+from refinery.lib.scripts import Node, tree_root, tree_version
+from refinery.lib.scripts.ps1.analysis.model import Ps1OccurrenceRole, occurrence_role
+from refinery.lib.scripts.ps1.analysis.naming import (
+    Ps1NamedReference,
+    Ps1NameRole,
+    named_references,
+    unreadable_name_target,
+)
+from refinery.lib.scripts.ps1.analysis.values import ordinal_of, read
+from refinery.lib.scripts.ps1.ast import (
+    argument_text,
+    assignment_of,
+    assignment_target_variables,
+    binding_key,
+    binds_parameter,
+    bound_argument_value,
+    free_positional_values,
+    get_member_name,
+    resolve_command_name,
+    string_value,
+    unwrap_parens,
+)
+from refinery.lib.scripts.ps1.data import COMMON_PARAMETERS
+from refinery.lib.scripts.ps1.model import (
+    Ps1AssignmentExpression,
+    Ps1CommandArgument,
+    Ps1CommandArgumentKind,
+    Ps1CommandInvocation,
+    Ps1ExpressionStatement,
+    Ps1HashLiteral,
+    Ps1IndexExpression,
+    Ps1IntegerLiteral,
+    Ps1InvokeMember,
+    Ps1MemberAccess,
+    Ps1RealLiteral,
+    Ps1Variable,
+)
+
+#: The names the `-ErrorAction` parameter answers to, lowercased and without the dash: the parameter
+#: itself and every alias the collected command data records for it. The alias is subscripted rather
+#: than defaulted, so that a collected surface which stops carrying this parameter fails the load
+#: rather than silently dropping the spelling, as `refinery.lib.scripts.ps1.data` does for its own
+#: derived sets.
+_ERROR_ACTION_NAME = &#39;erroraction&#39;
+_ERROR_ACTION = frozenset((_ERROR_ACTION_NAME, *COMMON_PARAMETERS[_ERROR_ACTION_NAME]))
+
+#: The names the `-InformationAction` parameter answers to, read as `_ERROR_ACTION` is: bound to
+#: `Stop` it makes `Write-Host` in the command it is bound on fail after writing, as a `Stop` stored
+#: into `$InformationPreference` does.
+_INFORMATION_ACTION_NAME = &#39;informationaction&#39;
+_INFORMATION_ACTION = frozenset((
+    _INFORMATION_ACTION_NAME,
+    *COMMON_PARAMETERS[_INFORMATION_ACTION_NAME],
+))
+
+#: Every name a *common* parameter answers to, so that an abbreviation of one can be told from an
+#: abbreviation that reaches several. A command carrying `-ErrorAction` carries the whole set of
+#: them — that is what makes a command advanced — so a prefix reaching another member of this set
+#: reaches it on the very commands the question is about.
+_COMMON_SURFACES = frozenset(
+    surface
+    for parameter, aliases in COMMON_PARAMETERS.items()
+    for surface in (parameter, *aliases)
+)
+
+#: The `ActionPreference` member that makes an error terminating, and the number that member is.
+#: `Stop` and `1` are the two spellings the corpus measures directly.
+#:
+#: Neither is read literally. The ordinal is read as a *number* rather than as a numeral, because
+#: what selects the member is its value and `0x1`, `01` and `1` all denote it. The name is read by
+#: prefix, because 5.1 resolves `-ErrorAction St` to `Stop`.
+#:
+#: An **ambiguous** member prefix is a third thing, and the reading costs recall rather than
+#: correctness. `-ErrorAction S` reaches `SilentlyContinue`, `Stop` and `Suspend`, and 5.1 answers
+#: it with a `ParameterBindingException` — `CannotConvertArgumentNoMessage`, measured — so the
+#: command never runs at all and the error it reports instead is statement-terminating: the script
+#: carries on. Reading the prefix as `Stop` keeps a handler over that, which is the safe direction
+#: and is what `TestPs1AnAmbiguousActionPrefixKeepsTheTrapOverIt` records.
+_STOP = &#39;stop&#39;
+_STOP_ORDINAL = 1
+
+#: The automatic variable that decides what a command does with an error it reports. Set to `Stop`
+#: it makes every one of them terminating — a failing cast included, which is otherwise reported
+#: and stepped over.
+_ERROR_ACTION_PREFERENCE = &#39;erroractionpreference&#39;
+
+#: The automatic variable that binds a default argument into every command that takes the parameter.
+#: A `Stop` written under a key that names `-ErrorAction` — `*:ErrorAction` for every command, or
+#: `Get-Item:ErrorAction` for one — makes that command&#39;s reported error terminating, but a failing
+#: cast is not a command and is left stepped over. That is why an arming written here reaches the
+#: per-command terminating path rather than the whole-script `_stops_on_every_error` gate.
+_DEFAULT_PARAMETER_VALUES = &#39;psdefaultparametervalues&#39;
+
+#: The members that mutate a hashtable in place, so that a `Stop` written through one of them arms
+#: the default table as an index-assignment does. Spelled as `resolve` sees a member — lowercased
+#: — and read as a set so `.Add` and its accessor alias `.set_Item` are one question.
+_HASHTABLE_MUTATORS = frozenset({&#39;add&#39;, &#39;set_item&#39;})
+
+
+def _binds_only(written: str, surfaces: frozenset[str]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the parameter name *written* at a call site binds the common parameter whose names are
+    *surfaces* and nothing else.
+
+    5.1 binds a parameter by any prefix of its name that no other parameter of the command answers
+    to, which `refinery.lib.scripts.ps1.ast.binds_parameter` reads. What it cannot read on its own
+    is the *ambiguity*, and here that is decidable: every command carrying a common parameter
+    carries every one of them, so a prefix reaching a second common name reaches it on exactly the
+    commands this asks about. `-e`, `-er` and `-erro` all reach `-ErrorVariable` as well as
+    `-ErrorAction` and are measured not to stop; `-errora` reaches `-ErrorAction` alone and is
+    measured to stop.
+
+    Refusing an ambiguous prefix is also what keeps a native command out: `powershell.exe -e &lt;b64&gt;`
+    hands `-e` to a program rather than to a parameter binder, and reading it as an error action
+    pins every handler in the script around the commonest shape in this project&#39;s corpus.
+    &#34;&#34;&#34;
+    reached = {surface for surface in _COMMON_SURFACES if binds_parameter(written, surface)}
+    return bool(reached) and reached &lt;= surfaces
+
+
+def selects_stop(value: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* selects `Stop`, as the argument of `-ErrorAction` or as what a write to
+    `$ErrorActionPreference` stores. A value this cannot read is read as selecting it: the question
+    decides whether a handler is load bearing, and a value computed at run time may be anything.
+
+    A numeral is read for the number it denotes rather than for the text it is written as, because
+    what selects the member is the ordinal and `0x1`, `01` and `1` all denote it.
+    `refinery.lib.scripts.ps1.ast.argument_text` deliberately answers a numeral&#39;s spelling, which
+    is the right reading where a bare word names something and the wrong one here. A name is
+    matched by prefix, for the same reason a parameter name is.
+
+    A value the domain reads as an enum member — the spelling an inlined preference variable
+    arrives in — selects `Stop` by its ordinal whatever enum it is a member of, because 5.1
+    converts one enum to another by ordinal: `-ErrorAction ([ConfirmImpact]::Low)` is `Stop`.
+    &#34;&#34;&#34;
+    return _selects_a_member(value, _STOP_MEMBER)
+
+
+class _ActionMembers(typing.NamedTuple):
+    &#34;&#34;&#34;
+    Members of `ActionPreference`, by the ordinals they are and the names they answer to.
+    &#34;&#34;&#34;
+    ordinals: frozenset[int]
+    names: tuple[str, ...]
+
+
+_STOP_MEMBER = _ActionMembers(frozenset({_STOP_ORDINAL}), (_STOP,))
+_SILENT_MEMBERS = _ActionMembers(frozenset({0, 4}), (&#39;silentlycontinue&#39;, &#39;ignore&#39;))
+
+
+def _selects_a_member(value: Node | None, members: _ActionMembers) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* selects one of *members*, read as `selects_stop` reads `Stop`: a numeral by the
+    number it denotes, an enum member by its ordinal, a name by prefix, and a value this cannot read
+    as selecting one.
+    &#34;&#34;&#34;
+    if isinstance(value, (Ps1IntegerLiteral, Ps1RealLiteral)):
+        return value.value in members.ordinals
+    ordinal = ordinal_of(read(value))
+    if ordinal is not None:
+        return ordinal in members.ordinals
+    text = argument_text(value)
+    if text is None:
+        return True
+    text = text.strip().lower()
+    return bool(text) and (
+        text in {str(ordinal) for ordinal in members.ordinals}
+        or any(name.startswith(text) for name in members.names)
+    )
+
+
+def selects_silence(value: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* selects `SilentlyContinue` or `Ignore`, the two members under which an error is
+    neither reported nor stops anything, read the way `selects_stop` reads `Stop`: a value this
+    cannot read selects them.
+    &#34;&#34;&#34;
+    return _selects_a_member(value, _SILENT_MEMBERS)
+
+
+def _binds_an_action(
+    command: Ps1CommandInvocation,
+    selects: typing.Callable[[Node | None], bool],
+    surfaces: frozenset[str] = _ERROR_ACTION,
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *command* binds the action parameter whose names are *surfaces*, `-ErrorAction` unless
+    given, to a value *selects* answers for, or carries a splat, whose table this cannot see into.
+    Read as `stops_on_error` describes.
+    &#34;&#34;&#34;
+    arguments = [
+        argument for argument in command.arguments
+        if isinstance(argument, Ps1CommandArgument)
+    ]
+    for index, argument in enumerate(arguments):
+        value = argument.value
+        if isinstance(value, Ps1Variable) and value.splatted:
+            return True
+        if not _binds_only(argument.name, surfaces):
+            continue
+        if argument.kind is not Ps1CommandArgumentKind.NAMED:
+            following = arguments[index + 1] if index + 1 &lt; len(arguments) else None
+            value = None
+            if following is not None and following.kind is Ps1CommandArgumentKind.POSITIONAL:
+                value = following.value
+        if selects(value):
+            return True
+    return False
+
+
+def _resolved_as_a_reference(node: Node, key: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether the string *node* is a name the command or call holding it addresses, so that what it
+    does to the name is read off its reference rather than off the string.
+    &#34;&#34;&#34;
+    cursor = node.parent
+    while cursor is not None and not isinstance(cursor, (Ps1CommandInvocation, Ps1InvokeMember)):
+        cursor = cursor.parent
+    return cursor is not None and any(
+        reference.key == key for reference in named_references(cursor)
+    )
+
+
+def _value_written_by(reference_node: Node) -&gt; Node | None:
+    &#34;&#34;&#34;
+    The value a command or a `PSVariable` call writes to the name it addresses, or `None` where
+    it binds none or this cannot tell which argument it is.
+    &#34;&#34;&#34;
+    if isinstance(reference_node, Ps1CommandInvocation):
+        return _written_variable_value(reference_node)
+    if isinstance(reference_node, Ps1InvokeMember) and len(reference_node.arguments) &gt;= 2:
+        return reference_node.arguments[1]
+    return None
+
+
+class _Names(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one node does to names addressed other than as a variable: the references it makes to
+    names spelled as strings, and whether it writes a variable by a name nobody can read. Read once
+    per node, for every session variable asked about.
+    &#34;&#34;&#34;
+    references: list[Ps1NamedReference]
+    unreadable: bool
+
+
+def _names_of(node: Node) -&gt; _Names:
+    return _Names(named_references(node), unreadable_name_target(node) is not None)
+
+
+def _may_write(
+    node: Node,
+    names: _Names,
+    key: str,
+    harmless: typing.Callable[[Node], bool],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node*, which does to names what *names* says, may leave the session variable named by
+    *key* holding a value *harmless* does not clear, read the wide way: a read and a plain
+    assignment of a value *harmless* clears are the only occurrences of the variable that pass; a
+    write by name passes where it binds such a value; a variable written by a name nobody can read,
+    and a string that holds the name anywhere else, never pass.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1Variable) and binding_key(node) == key:
+        role = occurrence_role(node)
+        if not role.stores:
+            return False
+        assignment = assignment_of(node)
+        return not (
+            role is Ps1OccurrenceRole.WRITE_REPLACING
+            and assignment is not None
+            and assignment.operator == &#39;=&#39;
+            and assignment.value is not None
+            and harmless(assignment.value)
+        )
+    if names.unreadable:
+        return True
+    for reference in names.references:
+        if reference.key != key or reference.role is Ps1NameRole.READS:
+            continue
+        value = _value_written_by(reference.node)
+        if value is None or not harmless(value):
+            return True
+    written = string_value(node)
+    return written is not None and key in written.lower() and not _resolved_as_a_reference(node, key)
+
+
+def _mentions(node: Node, names: _Names, key: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node*, which does to names what *names* says, names the session variable *key* at all,
+    as a variable, inside a string, or possibly as a variable written by a name nobody can read.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1Variable):
+        return binding_key(node) == key
+    if names.unreadable:
+        return True
+    if any(reference.key == key for reference in names.references):
+        return True
+    written = string_value(node)
+    return written is not None and key in written.lower()
+
+
+#: The parameter of `Get-Random` that seeds the generator every later call reads, lowercased.
+_SET_SEED = &#39;setseed&#39;
+
+
+def _may_seed(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* may seed the random generator: a command that binds a splat or a parameter name
+    `-SetSeed` answers to, or a string that holds the parameter&#39;s name. Any command counts, whatever
+    its name: the name a script calls `Get-Random` by may be one it defines as an alias, or one 5.1
+    reaches through the implicit `Get-` retry, and asking which is a question about the script this
+    does not read.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1CommandInvocation):
+        for argument in node.arguments:
+            if not isinstance(argument, Ps1CommandArgument):
+                continue
+            value = argument.value
+            if isinstance(value, Ps1Variable) and value.splatted:
+                return True
+            if argument.name and binds_parameter(argument.name, _SET_SEED):
+                return True
+        return False
+    written = string_value(node)
+    return written is not None and _SET_SEED in written.lower()
+
+
+def stops_on_error(command: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *command* carries `-ErrorAction Stop`, which turns every error it reports into one that
+    ends the script wherever nothing handles it.
+
+    The parameter and its argument are two arguments rather than one: 5.1 binds a bare `-Name value`
+    pair by position and only the `-Name:value` spelling arrives as a single named argument, so both
+    shapes are read here. A parameter written last with nothing after it binds no value at all,
+    which 5.1 rejects, and is read as `Stop` for the same reason an unreadable value is.
+
+    Every occurrence is read rather than the first, so that a name bound by a prefix 5.1 would in
+    fact reject cannot hide the parameter written after it — reading such a name as this one is
+    then the over-approximation the name set claims it is, rather than a verdict on the command. A
+    command carrying a splat is read as carrying the parameter for the same reason: the names it
+    binds are in a table this cannot see into.
+    &#34;&#34;&#34;
+    return _binds_an_action(command, selects_stop)
+
+
+def writes_stop_to_the_preference(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* writes `$ErrorActionPreference` a value that may be `Stop`, which makes every
+    error terminating — the failing cast included, which is otherwise reported and stepped over.
+
+    Two shapes write the variable and both are read. An assignment names it through
+    `refinery.lib.scripts.ps1.ast.assignment_target_variables`, so that a type-constrained,
+    parenthesized or multi-assignment target is the same write as a bare one, and is keyed through
+    `refinery.lib.scripts.ps1.ast.binding_key`, so that the unrelated process-global
+    `$env:ErrorActionPreference` is not read as this variable. A cmdlet writes it by name —
+    `New-Variable`/`Set-Variable ErrorActionPreference Stop`, the provider form
+    `Set-Item Variable:ErrorActionPreference Stop`, or the session state&#39;s
+    `$ExecutionContext.SessionState.PSVariable.Set(&#39;ErrorActionPreference&#39;, &#39;Stop&#39;)` — which
+    `_names_write_stop_to_the_preference` reads through the same name authority the model builds
+    bindings from.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1AssignmentExpression):
+        return any(
+            binding_key(variable) == _ERROR_ACTION_PREFERENCE
+            for variable in assignment_target_variables(node.target)
+        ) and selects_stop(node.value)
+    if isinstance(node, (Ps1CommandInvocation, Ps1InvokeMember)):
+        return _names_write_stop_to_the_preference(node)
+    return False
+
+
+def _names_write_stop_to_the_preference(cmd: Ps1CommandInvocation | Ps1InvokeMember) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *cmd* writes `Stop` to `$ErrorActionPreference` by naming the variable as a string —
+    `Set-Variable ErrorActionPreference Stop`, `New-Variable ErrorActionPreference Stop -Force`,
+    `Set-Item Variable:ErrorActionPreference Stop`, or a `Set` of the session state&#39;s `PSVariable`
+    handed the name and the value.
+
+    Whether the command writes the variable at all is
+    `refinery.lib.scripts.ps1.analysis.naming.named_references`&#39; answer, the one authority for what
+    a command does to a name it addresses as a string; it reports the write for every alias, casing
+    and scope-qualified spelling of these commands. What it does not report is the *value* written,
+    which is read here so the negative controls are decidable: `_written_variable_value` reads the
+    named `-Value`, else the positional value the command binds after the name — the `-Name` written
+    explicitly moves the value to the first free positional, exactly as it moves the name off it.
+
+    A write that binds no value at all stores `$null` and arms nothing: `Clear-Variable` and a
+    `-OutVariable` that happens to name the preference both reach here as writes with no value node,
+    and are read as not arming. A value present but not statically readable is read as `Stop`, the
+    `selects_stop(None)` over-approximation that keeps a handler rather than dropping one.
+    &#34;&#34;&#34;
+    if not any(
+        reference.role is Ps1NameRole.WRITES
+        and reference.key == _ERROR_ACTION_PREFERENCE
+        for reference in named_references(cmd)
+    ):
+        return False
+    value = _written_variable_value(cmd)
+    return value is not None and selects_stop(value)
+
+
+def _written_variable_value(cmd: Ps1CommandInvocation | Ps1InvokeMember) -&gt; Node | None:
+    &#34;&#34;&#34;
+    The value a variable- or item-writing command stores, or `None` when it binds no value. A call
+    of the session state is handed the value after the name.
+
+    Read as the named `-Value` where one is written, else the positional value the command binds
+    after its subject: the name or path takes the first free positional unless an explicit `-Name`,
+    `-Path` or `-LiteralPath` moves it off, so the value is the free positional at index one when
+    the subject is positional and at index zero when it is not — the same reading
+    `refinery.lib.scripts.ps1.analysis.naming` makes for the name, one place along.
+    &#34;&#34;&#34;
+    if isinstance(cmd, Ps1InvokeMember):
+        return cmd.arguments[1] if len(cmd.arguments) &gt; 1 else None
+    value = bound_argument_value(cmd, &#39;value&#39;)
+    if value is not None:
+        return value
+    command = resolve_command_name(cmd)
+    if command is None:
+        return None
+    subject_is_positional = all(
+        bound_argument_value(cmd, parameter) is None
+        for parameter in (&#39;name&#39;, &#39;path&#39;, &#39;literalpath&#39;)
+    )
+    index = 1 if subject_is_positional else 0
+    positional = free_positional_values(cmd, command)
+    return positional[index] if len(positional) &gt; index else None
+
+
+def _names_the_default_table(node: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* is the `$PSDefaultParameterValues` variable itself, keyed the way every other
+    occurrence of it is so an aliased copy under another name is not read as it — that copy is the
+    completeness hole tracked as an xfail, not a write this sees.
+    &#34;&#34;&#34;
+    return isinstance(node, Ps1Variable) and binding_key(node) == _DEFAULT_PARAMETER_VALUES
+
+
+def _names_the_error_action(key: str | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether a `$PSDefaultParameterValues` key *key* binds `-ErrorAction`: its parameter half — what
+    stands after the `command:` scope — being the action&#39;s own name or its `ea` alias. 5.1 matches
+    that half against the parameter&#39;s name and aliases exactly rather than by prefix, so `ea` and
+    `erroraction` bind it where an abbreviation like `errora` does not — the `_ERROR_ACTION` set
+    the call-site reader already answers from. A key this cannot read as a literal is read as
+    binding it, the direction that keeps a handler.
+    &#34;&#34;&#34;
+    if key is None:
+        return True
+    _scope, separator, parameter = key.strip().lower().rpartition(&#39;:&#39;)
+    return bool(separator) and parameter in _ERROR_ACTION
+
+
+def _holds_a_stop_action(table: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *table*, stored whole into `$PSDefaultParameterValues`, may hold `Stop` under an
+    `-ErrorAction` key. A hashtable literal is read entry by entry; any other value is a table this
+    cannot read, which is read as holding it, the direction that keeps a handler.
+    &#34;&#34;&#34;
+    if table is None:
+        return False
+    table = unwrap_parens(table)
+    if not isinstance(table, Ps1HashLiteral):
+        return True
+    for key, value in table.pairs:
+        if isinstance(value, Ps1ExpressionStatement):
+            value = value.expression
+        if _names_the_error_action(argument_text(key)) and selects_stop(value):
+            return True
+    return False
+
+
+def writes_stop_to_the_default_table(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* writes `Stop` under an `-ErrorAction` key of `$PSDefaultParameterValues`, which
+    makes every command that binds the key report a terminating error.
+
+    Four spellings write the table statically and all are read: the index-assignment
+    `$PSDefaultParameterValues[&#39;*:ErrorAction&#39;] = &#39;Stop&#39;`, the member-assignment
+    `$PSDefaultParameterValues.&#39;*:ErrorAction&#39; = &#39;Stop&#39;` that sets the same key through the
+    hashtable adapter, the in-place mutation `$PSDefaultParameterValues.Add(&#39;*:ErrorAction&#39;,
+    &#39;Stop&#39;)` or its `.set_Item` accessor, and the whole-table replacement
+    `$PSDefaultParameterValues = @{ &#39;*:ErrorAction&#39; = &#39;Stop&#39; }`, read by `_holds_a_stop_action`.
+    The key is read through `_names_the_error_action`, and the value through the same
+    `selects_stop` a preference write reads, so `Continue` written here arms nothing. A splat and an
+    aliased copy are the completeness holes tracked as xfails: their target is not this table.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1AssignmentExpression):
+        target = node.target
+        if _names_the_default_table(target):
+            return _holds_a_stop_action(node.value)
+        if isinstance(target, Ps1IndexExpression):
+            return (
+                _names_the_default_table(target.object)
+                and _names_the_error_action(argument_text(target.index))
+                and selects_stop(node.value)
+            )
+        if isinstance(target, Ps1MemberAccess):
+            return (
+                _names_the_default_table(target.object)
+                and _names_the_error_action(get_member_name(target.member))
+                and selects_stop(node.value)
+            )
+        return False
+    if isinstance(node, Ps1InvokeMember):
+        member = node.member.lower() if isinstance(node.member, str) else &#39;&#39;
+        return (
+            _names_the_default_table(node.object)
+            and member in _HASHTABLE_MUTATORS
+            and len(node.arguments) &gt;= 2
+            and _names_the_error_action(argument_text(node.arguments[0]))
+            and selects_stop(node.arguments[1])
+        )
+    return False
+
+
+#: The automatic variables through which a `Stop` can be armed for commands that did not ask for
+#: one: the preference itself, and the table that binds `-ErrorAction` into every command that takes
+#: it. Spelled as names rather than as assignment shapes because `a_stop_may_be_in_force` asks
+#: whether either is *touched* at all, however it is spelled.
+_STOP_BEARING_NAMES = frozenset({
+    _ERROR_ACTION_PREFERENCE,
+    _DEFAULT_PARAMETER_VALUES,
+})
+
+
+def a_stop_may_be_in_force(root: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether anything in *root* may make an error a command reports into a terminating one — the
+    strict counterpart of the whole-script question `Ps1FaultReach` asks itself, and a different
+    question from it.
+
+    That one reads a `Stop` written to `$ErrorActionPreference` — by assignment or by a cmdlet that
+    names the variable — and a `Stop` written under an `-ErrorAction` key of
+    `$PSDefaultParameterValues` by index-assignment, `.Add` or a whole-table replacement, and reads
+    them *laxly* on purpose: it decides whether a handler may be removed, where a missed arming
+    keeps a handler that could have gone and costs recall on junk. The spellings it still misses
+    arm through a shape whose target is not the variable or the table — a splatted `Set-Variable`,
+    and an aliased copy of the table under another name — each tracked as an expected failure.
+
+    A caller asking whether a *statement completed* cannot inherit those. Reading a script as arming
+    nothing where it does says a command that in fact raised ran to its end, and a value it was
+    going to establish is then resolved through at every use below it — which rewrites calls a run
+    never makes. So this asks the wider question: does the script touch either name at all, in any
+    way, including naming one in a string that a command could set it through. What that costs is
+    the recall of every script that so much as mentions the preference, which is a shape worth
+    refusing.
+
+    A variable occurrence must carry the name exactly; a string value need only *contain* one,
+    which is the same asymmetry `refinery.lib.scripts.ps1.analysis.worldflow._names_own_path`
+    makes, and for the same reason. A provider path spells the name inside a larger word, and
+    `Set-Item Variable:ErrorActionPreference Stop` arms it as surely as the assignment does — as
+    does a payload handed to `Invoke-Expression`. Matching the whole literal instead reads a script
+    that really arms `Stop` as arming nothing, which is the one direction that rewrites a call the
+    run does not make.
+    &#34;&#34;&#34;
+    for node in root.walk():
+        if isinstance(node, Ps1Variable) and binding_key(node) in _STOP_BEARING_NAMES:
+            return True
+        written = string_value(node)
+        if written is not None and any(
+            name in written.lower() for name in _STOP_BEARING_NAMES
+        ):
+            return True
+    return False
+
+
+class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool
+
+
+def _keeps_reporting(value: Node) -&gt; bool:
+    return not selects_silence(value)
+
+
+def _session(root: Node) -&gt; Ps1Session:
+    silenced = silenced_by_a_call = defaults = seeded = informs = stops = False
+    for node in root.walk():
+        if not (silenced and defaults and informs):
+            names = _names_of(node)
+            if not silenced:
+                silenced = _may_write(node, names, _ERROR_ACTION_PREFERENCE, _keeps_reporting)
+            if not defaults:
+                defaults = _mentions(node, names, _DEFAULT_PARAMETER_VALUES)
+            if not informs:
+                informs = _mentions(node, names, &#39;informationpreference&#39;)
+        if not silenced_by_a_call and isinstance(node, Ps1CommandInvocation):
+            silenced_by_a_call = _binds_an_action(node, selects_silence)
+        if not informs and isinstance(node, Ps1CommandInvocation):
+            informs = _binds_an_action(node, selects_stop, _INFORMATION_ACTION)
+        if not seeded:
+            seeded = _may_seed(node)
+        if not stops:
+            stops = writes_stop_to_the_preference(node)
+    return Ps1Session(
+        silenced,
+        silenced_by_a_call or defaults,
+        defaults,
+        seeded or defaults,
+        informs or defaults,
+        stops,
+    )
+
+
+def session_of(node: Node) -&gt; Ps1Session:
+    &#34;&#34;&#34;
+    The `Ps1Session` of the script holding *node*, remembered until that script changes, the way
+    `refinery.lib.scripts.modelcache.ModelCacheBase` remembers a model: by the version its root
+    stood at, so that a change to some other tree keeps it.
+    &#34;&#34;&#34;
+    root = tree_root(node)
+    version = tree_version(root)
+    found = _SESSIONS.get(root)
+    if found is None or found[0] != version:
+        found = _SESSIONS[root] = version, _session(root)
+    return found[1]
+
+
+_SESSIONS: WeakKeyDictionary[Node, tuple[int, Ps1Session]] = WeakKeyDictionary()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.session.selects_stop"><code class="name flex">
+<span>def <span class="ident">selects_stop</span></span>(<span>value)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>value</em> selects <code>Stop</code>, as the argument of <code>-ErrorAction</code> or as what a write to
+<code>$ErrorActionPreference</code> stores. A value this cannot read is read as selecting it: the question
+decides whether a handler is load bearing, and a value computed at run time may be anything.</p>
+<p>A numeral is read for the number it denotes rather than for the text it is written as, because
+what selects the member is the ordinal and <code>0x1</code>, <code>01</code> and <code>1</code> all denote it.
+<code><a title="refinery.lib.scripts.ps1.ast.argument_text" href="../ast.html#refinery.lib.scripts.ps1.ast.argument_text">argument_text()</a></code> deliberately answers a numeral's spelling, which
+is the right reading where a bare word names something and the wrong one here. A name is
+matched by prefix, for the same reason a parameter name is.</p>
+<p>A value the domain reads as an enum member — the spelling an inlined preference variable
+arrives in — selects <code>Stop</code> by its ordinal whatever enum it is a member of, because 5.1
+converts one enum to another by ordinal: <code>-ErrorAction ([ConfirmImpact]::Low)</code> is <code>Stop</code>.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L144-L160" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def selects_stop(value: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* selects `Stop`, as the argument of `-ErrorAction` or as what a write to
+    `$ErrorActionPreference` stores. A value this cannot read is read as selecting it: the question
+    decides whether a handler is load bearing, and a value computed at run time may be anything.
+
+    A numeral is read for the number it denotes rather than for the text it is written as, because
+    what selects the member is the ordinal and `0x1`, `01` and `1` all denote it.
+    `refinery.lib.scripts.ps1.ast.argument_text` deliberately answers a numeral&#39;s spelling, which
+    is the right reading where a bare word names something and the wrong one here. A name is
+    matched by prefix, for the same reason a parameter name is.
+
+    A value the domain reads as an enum member — the spelling an inlined preference variable
+    arrives in — selects `Stop` by its ordinal whatever enum it is a member of, because 5.1
+    converts one enum to another by ordinal: `-ErrorAction ([ConfirmImpact]::Low)` is `Stop`.
+    &#34;&#34;&#34;
+    return _selects_a_member(value, _STOP_MEMBER)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.selects_silence"><code class="name flex">
+<span>def <span class="ident">selects_silence</span></span>(<span>value)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>value</em> selects <code>SilentlyContinue</code> or <code>Ignore</code>, the two members under which an error is
+neither reported nor stops anything, read the way <code><a title="refinery.lib.scripts.ps1.analysis.session.selects_stop" href="#refinery.lib.scripts.ps1.analysis.session.selects_stop">selects_stop()</a></code> reads <code>Stop</code>: a value this
+cannot read selects them.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L196-L202" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def selects_silence(value: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *value* selects `SilentlyContinue` or `Ignore`, the two members under which an error is
+    neither reported nor stops anything, read the way `selects_stop` reads `Stop`: a value this
+    cannot read selects them.
+    &#34;&#34;&#34;
+    return _selects_a_member(value, _SILENT_MEMBERS)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.stops_on_error"><code class="name flex">
+<span>def <span class="ident">stops_on_error</span></span>(<span>command)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>command</em> carries <code>-ErrorAction Stop</code>, which turns every error it reports into one that
+ends the script wherever nothing handles it.</p>
+<p>The parameter and its argument are two arguments rather than one: 5.1 binds a bare <code>-Name value</code>
+pair by position and only the <code>-Name:value</code> spelling arrives as a single named argument, so both
+shapes are read here. A parameter written last with nothing after it binds no value at all,
+which 5.1 rejects, and is read as <code>Stop</code> for the same reason an unreadable value is.</p>
+<p>Every occurrence is read rather than the first, so that a name bound by a prefix 5.1 would in
+fact reject cannot hide the parameter written after it — reading such a name as this one is
+then the over-approximation the name set claims it is, rather than a verdict on the command. A
+command carrying a splat is read as carrying the parameter for the same reason: the names it
+binds are in a table this cannot see into.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L352-L368" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def stops_on_error(command: Ps1CommandInvocation) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *command* carries `-ErrorAction Stop`, which turns every error it reports into one that
+    ends the script wherever nothing handles it.
+
+    The parameter and its argument are two arguments rather than one: 5.1 binds a bare `-Name value`
+    pair by position and only the `-Name:value` spelling arrives as a single named argument, so both
+    shapes are read here. A parameter written last with nothing after it binds no value at all,
+    which 5.1 rejects, and is read as `Stop` for the same reason an unreadable value is.
+
+    Every occurrence is read rather than the first, so that a name bound by a prefix 5.1 would in
+    fact reject cannot hide the parameter written after it — reading such a name as this one is
+    then the over-approximation the name set claims it is, rather than a verdict on the command. A
+    command carrying a splat is read as carrying the parameter for the same reason: the names it
+    binds are in a table this cannot see into.
+    &#34;&#34;&#34;
+    return _binds_an_action(command, selects_stop)</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference"><code class="name flex">
+<span>def <span class="ident">writes_stop_to_the_preference</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>node</em> writes <code>$ErrorActionPreference</code> a value that may be <code>Stop</code>, which makes every
+error terminating — the failing cast included, which is otherwise reported and stepped over.</p>
+<p>Two shapes write the variable and both are read. An assignment names it through
+<code><a title="refinery.lib.scripts.ps1.ast.assignment_target_variables" href="../ast.html#refinery.lib.scripts.ps1.ast.assignment_target_variables">assignment_target_variables()</a></code>, so that a type-constrained,
+parenthesized or multi-assignment target is the same write as a bare one, and is keyed through
+<code><a title="refinery.lib.scripts.ps1.ast.binding_key" href="../ast.html#refinery.lib.scripts.ps1.ast.binding_key">binding_key()</a></code>, so that the unrelated process-global
+<code>$env:ErrorActionPreference</code> is not read as this variable. A cmdlet writes it by name —
+<code>New-Variable</code>/<code>Set-Variable ErrorActionPreference Stop</code>, the provider form
+<code>Set-Item Variable:ErrorActionPreference Stop</code>, or the session state's
+<code>$ExecutionContext.SessionState.PSVariable.Set('ErrorActionPreference', 'Stop')</code> — which
+<code>_names_write_stop_to_the_preference</code> reads through the same name authority the model builds
+bindings from.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L371-L394" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def writes_stop_to_the_preference(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* writes `$ErrorActionPreference` a value that may be `Stop`, which makes every
+    error terminating — the failing cast included, which is otherwise reported and stepped over.
+
+    Two shapes write the variable and both are read. An assignment names it through
+    `refinery.lib.scripts.ps1.ast.assignment_target_variables`, so that a type-constrained,
+    parenthesized or multi-assignment target is the same write as a bare one, and is keyed through
+    `refinery.lib.scripts.ps1.ast.binding_key`, so that the unrelated process-global
+    `$env:ErrorActionPreference` is not read as this variable. A cmdlet writes it by name —
+    `New-Variable`/`Set-Variable ErrorActionPreference Stop`, the provider form
+    `Set-Item Variable:ErrorActionPreference Stop`, or the session state&#39;s
+    `$ExecutionContext.SessionState.PSVariable.Set(&#39;ErrorActionPreference&#39;, &#39;Stop&#39;)` — which
+    `_names_write_stop_to_the_preference` reads through the same name authority the model builds
+    bindings from.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1AssignmentExpression):
+        return any(
+            binding_key(variable) == _ERROR_ACTION_PREFERENCE
+            for variable in assignment_target_variables(node.target)
+        ) and selects_stop(node.value)
+    if isinstance(node, (Ps1CommandInvocation, Ps1InvokeMember)):
+        return _names_write_stop_to_the_preference(node)
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_default_table"><code class="name flex">
+<span>def <span class="ident">writes_stop_to_the_default_table</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether <em>node</em> writes <code>Stop</code> under an <code>-ErrorAction</code> key of <code>$PSDefaultParameterValues</code>, which
+makes every command that binds the key report a terminating error.</p>
+<p>Four spellings write the table statically and all are read: the index-assignment
+<code>$PSDefaultParameterValues['*:ErrorAction'] = 'Stop'</code>, the member-assignment
+<code>$PSDefaultParameterValues.'*:ErrorAction' = 'Stop'</code> that sets the same key through the
+hashtable adapter, the in-place mutation <code>$PSDefaultParameterValues.Add('*:ErrorAction',
+'Stop')&lt;code&gt; or its &lt;/code&gt;.set_Item</code> accessor, and the whole-table replacement
+<code>$PSDefaultParameterValues = @{ '*:ErrorAction' = 'Stop' }</code>, read by <code>_holds_a_stop_action</code>.
+The key is read through <code>_names_the_error_action</code>, and the value through the same
+<code><a title="refinery.lib.scripts.ps1.analysis.session.selects_stop" href="#refinery.lib.scripts.ps1.analysis.session.selects_stop">selects_stop()</a></code> a preference write reads, so <code>Continue</code> written here arms nothing. A splat and an
+aliased copy are the completeness holes tracked as xfails: their target is not this table.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L498-L539" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def writes_stop_to_the_default_table(node: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* writes `Stop` under an `-ErrorAction` key of `$PSDefaultParameterValues`, which
+    makes every command that binds the key report a terminating error.
+
+    Four spellings write the table statically and all are read: the index-assignment
+    `$PSDefaultParameterValues[&#39;*:ErrorAction&#39;] = &#39;Stop&#39;`, the member-assignment
+    `$PSDefaultParameterValues.&#39;*:ErrorAction&#39; = &#39;Stop&#39;` that sets the same key through the
+    hashtable adapter, the in-place mutation `$PSDefaultParameterValues.Add(&#39;*:ErrorAction&#39;,
+    &#39;Stop&#39;)` or its `.set_Item` accessor, and the whole-table replacement
+    `$PSDefaultParameterValues = @{ &#39;*:ErrorAction&#39; = &#39;Stop&#39; }`, read by `_holds_a_stop_action`.
+    The key is read through `_names_the_error_action`, and the value through the same
+    `selects_stop` a preference write reads, so `Continue` written here arms nothing. A splat and an
+    aliased copy are the completeness holes tracked as xfails: their target is not this table.
+    &#34;&#34;&#34;
+    if isinstance(node, Ps1AssignmentExpression):
+        target = node.target
+        if _names_the_default_table(target):
+            return _holds_a_stop_action(node.value)
+        if isinstance(target, Ps1IndexExpression):
+            return (
+                _names_the_default_table(target.object)
+                and _names_the_error_action(argument_text(target.index))
+                and selects_stop(node.value)
+            )
+        if isinstance(target, Ps1MemberAccess):
+            return (
+                _names_the_default_table(target.object)
+                and _names_the_error_action(get_member_name(target.member))
+                and selects_stop(node.value)
+            )
+        return False
+    if isinstance(node, Ps1InvokeMember):
+        member = node.member.lower() if isinstance(node.member, str) else &#39;&#39;
+        return (
+            _names_the_default_table(node.object)
+            and member in _HASHTABLE_MUTATORS
+            and len(node.arguments) &gt;= 2
+            and _names_the_error_action(argument_text(node.arguments[0]))
+            and selects_stop(node.arguments[1])
+        )
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.a_stop_may_be_in_force"><code class="name flex">
+<span>def <span class="ident">a_stop_may_be_in_force</span></span>(<span>root)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>Whether anything in <em>root</em> may make an error a command reports into a terminating one — the
+strict counterpart of the whole-script question <code>Ps1FaultReach</code> asks itself, and a different
+question from it.</p>
+<p>That one reads a <code>Stop</code> written to <code>$ErrorActionPreference</code> — by assignment or by a cmdlet that
+names the variable — and a <code>Stop</code> written under an <code>-ErrorAction</code> key of
+<code>$PSDefaultParameterValues</code> by index-assignment, <code>.Add</code> or a whole-table replacement, and reads
+them <em>laxly</em> on purpose: it decides whether a handler may be removed, where a missed arming
+keeps a handler that could have gone and costs recall on junk. The spellings it still misses
+arm through a shape whose target is not the variable or the table — a splatted <code>Set-Variable</code>,
+and an aliased copy of the table under another name — each tracked as an expected failure.</p>
+<p>A caller asking whether a <em>statement completed</em> cannot inherit those. Reading a script as arming
+nothing where it does says a command that in fact raised ran to its end, and a value it was
+going to establish is then resolved through at every use below it — which rewrites calls a run
+never makes. So this asks the wider question: does the script touch either name at all, in any
+way, including naming one in a string that a command could set it through. What that costs is
+the recall of every script that so much as mentions the preference, which is a shape worth
+refusing.</p>
+<p>A variable occurrence must carry the name exactly; a string value need only <em>contain</em> one,
+which is the same asymmetry <code>refinery.lib.scripts.ps1.analysis.worldflow._names_own_path</code>
+makes, and for the same reason. A provider path spells the name inside a larger word, and
+<code>Set-Item Variable:ErrorActionPreference Stop</code> arms it as surely as the assignment does — as
+does a payload handed to <code>Invoke-Expression</code>. Matching the whole literal instead reads a script
+that really arms <code>Stop</code> as arming nothing, which is the one direction that rewrites a call the
+run does not make.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L552-L590" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def a_stop_may_be_in_force(root: Node) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether anything in *root* may make an error a command reports into a terminating one — the
+    strict counterpart of the whole-script question `Ps1FaultReach` asks itself, and a different
+    question from it.
+
+    That one reads a `Stop` written to `$ErrorActionPreference` — by assignment or by a cmdlet that
+    names the variable — and a `Stop` written under an `-ErrorAction` key of
+    `$PSDefaultParameterValues` by index-assignment, `.Add` or a whole-table replacement, and reads
+    them *laxly* on purpose: it decides whether a handler may be removed, where a missed arming
+    keeps a handler that could have gone and costs recall on junk. The spellings it still misses
+    arm through a shape whose target is not the variable or the table — a splatted `Set-Variable`,
+    and an aliased copy of the table under another name — each tracked as an expected failure.
+
+    A caller asking whether a *statement completed* cannot inherit those. Reading a script as arming
+    nothing where it does says a command that in fact raised ran to its end, and a value it was
+    going to establish is then resolved through at every use below it — which rewrites calls a run
+    never makes. So this asks the wider question: does the script touch either name at all, in any
+    way, including naming one in a string that a command could set it through. What that costs is
+    the recall of every script that so much as mentions the preference, which is a shape worth
+    refusing.
+
+    A variable occurrence must carry the name exactly; a string value need only *contain* one,
+    which is the same asymmetry `refinery.lib.scripts.ps1.analysis.worldflow._names_own_path`
+    makes, and for the same reason. A provider path spells the name inside a larger word, and
+    `Set-Item Variable:ErrorActionPreference Stop` arms it as surely as the assignment does — as
+    does a payload handed to `Invoke-Expression`. Matching the whole literal instead reads a script
+    that really arms `Stop` as arming nothing, which is the one direction that rewrites a call the
+    run does not make.
+    &#34;&#34;&#34;
+    for node in root.walk():
+        if isinstance(node, Ps1Variable) and binding_key(node) in _STOP_BEARING_NAMES:
+            return True
+        written = string_value(node)
+        if written is not None and any(
+            name in written.lower() for name in _STOP_BEARING_NAMES
+        ):
+            return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.session_of"><code class="name flex">
+<span>def <span class="ident">session_of</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>The <code><a title="refinery.lib.scripts.ps1.analysis.session.Ps1Session" href="#refinery.lib.scripts.ps1.analysis.session.Ps1Session">Ps1Session</a></code> of the script holding <em>node</em>, remembered until that script changes, the way
+<code><a title="refinery.lib.scripts.modelcache.ModelCacheBase" href="../../modelcache.html#refinery.lib.scripts.modelcache.ModelCacheBase">ModelCacheBase</a></code> remembers a model: by the version its root
+stood at, so that a change to some other tree keeps it.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L650-L661" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">def session_of(node: Node) -&gt; Ps1Session:
+    &#34;&#34;&#34;
+    The `Ps1Session` of the script holding *node*, remembered until that script changes, the way
+    `refinery.lib.scripts.modelcache.ModelCacheBase` remembers a model: by the version its root
+    stood at, so that a change to some other tree keeps it.
+    &#34;&#34;&#34;
+    root = tree_root(node)
+    version = tree_version(root)
+    found = _SESSIONS.get(root)
+    if found is None or found[0] != version:
+        found = _SESSIONS[root] = version, _session(root)
+    return found[1]</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session"><code class="flex name class">
+<span>class <span class="ident">Ps1Session</span></span>
+<span>(</span><span>silenced, silenced_by_a_call, defaults, seeded, informs, stops)</span>
+</code></dt>
+<dd>
+<section class="desc"><p>What one script may set in its session, each read the wide way, because each answers a question
+where a missed write deletes code that runs.</p>
+<p><code>silenced</code> is whether <code>$ErrorActionPreference</code> may hold <code>SilentlyContinue</code> or <code>Ignore</code> anywhere,
+so that a <code>throw</code> may be reported and stepped over in every body. <code>silenced_by_a_call</code> is
+whether a call may be handed a silent <code>-ErrorAction</code> or the default table may hand one, which
+sets the preference in the body called and in every body that body runs: every body but the
+script's own. <code>defaults</code> is whether <code>$PSDefaultParameterValues</code> may bind a value into any
+command, which changes what the command does without a word at the call. <code>seeded</code> is whether the
+random generator may be seeded, after which every call of <code>Get-Random</code> changes what the next one
+hands back. <code>stops</code> is whether the script writes <code>Stop</code> to <code>$ErrorActionPreference</code> anywhere,
+read as spelled (<code><a title="refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference" href="#refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference">writes_stop_to_the_preference()</a></code>): it makes every error terminating, a failing
+cast among them, and position is not asked, since the preference is a variable of the session.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session.silenced"><code class="name">var <span class="ident">silenced</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 0</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session.silenced_by_a_call"><code class="name">var <span class="ident">silenced_by_a_call</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 1</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session.defaults"><code class="name">var <span class="ident">defaults</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 2</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session.seeded"><code class="name">var <span class="ident">seeded</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 3</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session.informs"><code class="name">var <span class="ident">informs</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 4</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+</dd>
+<dt id="refinery.lib.scripts.ps1.analysis.session.Ps1Session.stops"><code class="name">var <span class="ident">stops</span></code></dt>
+<dd>
+<section class="desc"><p>Alias for field number 5</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/ps1/analysis/session.py#L593-L614" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class Ps1Session(typing.NamedTuple):
+    &#34;&#34;&#34;
+    What one script may set in its session, each read the wide way, because each answers a question
+    where a missed write deletes code that runs.
+
+    `silenced` is whether `$ErrorActionPreference` may hold `SilentlyContinue` or `Ignore` anywhere,
+    so that a `throw` may be reported and stepped over in every body. `silenced_by_a_call` is
+    whether a call may be handed a silent `-ErrorAction` or the default table may hand one, which
+    sets the preference in the body called and in every body that body runs: every body but the
+    script&#39;s own. `defaults` is whether `$PSDefaultParameterValues` may bind a value into any
+    command, which changes what the command does without a word at the call. `seeded` is whether the
+    random generator may be seeded, after which every call of `Get-Random` changes what the next one
+    hands back. `stops` is whether the script writes `Stop` to `$ErrorActionPreference` anywhere,
+    read as spelled (`writes_stop_to_the_preference`): it makes every error terminating, a failing
+    cast among them, and position is not asked, since the preference is a variable of the session.
+    &#34;&#34;&#34;
+    silenced: bool
+    silenced_by_a_call: bool
+    defaults: bool
+    seeded: bool
+    informs: bool
+    stops: bool</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.ps1.analysis" href="index.html">refinery.lib.scripts.ps1.analysis</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.selects_stop" href="#refinery.lib.scripts.ps1.analysis.session.selects_stop">selects_stop</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.selects_silence" href="#refinery.lib.scripts.ps1.analysis.session.selects_silence">selects_silence</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.stops_on_error" href="#refinery.lib.scripts.ps1.analysis.session.stops_on_error">stops_on_error</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference" href="#refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_preference">writes_stop_to_the_preference</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_default_table" href="#refinery.lib.scripts.ps1.analysis.session.writes_stop_to_the_default_table">writes_stop_to_the_default_table</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.a_stop_may_be_in_force" href="#refinery.lib.scripts.ps1.analysis.session.a_stop_may_be_in_force">a_stop_may_be_in_force</a></code></li>
+<li><code><a title="refinery.lib.scripts.ps1.analysis.session.session_of" href="#refinery.lib.scripts.ps1.analysis.session.session_of">session_of</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.ps1.analysis.session.Ps1Session" href="#refinery.lib.scripts.ps1.analysis.session.Ps1Session">Ps1Session</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

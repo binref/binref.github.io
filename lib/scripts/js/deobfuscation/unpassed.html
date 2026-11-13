@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.unpassed documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.unpassed</code></h1>
+</header>
+<section id="section-intro">
+<p>Put back the declarations an obfuscation moved into the parameter list of a function. It gives a
+function no call passes more arguments to than it declares a parameter for each declaration of its
+body, and writes the declaration as a store the function makes when it starts:</p>
+<pre><code>function parse(source) {               function parse(source, decode) {
+  function decode(n) { ... }             if (!decode) {
+  ...                                      decode = function (n) { ... };
+}                                        }
+                                         ...
+                                       }
+</code></pre>
+<p>A <code>var</code> whose value is made of literals and stands first in the body becomes a parameter with that
+value as its default, <code>function parse(source, limit = 8)</code>, and any other <code>var</code> a parameter the body
+assigns where the declaration stood.</p>
+<p>No call passes such a parameter
+(<code><a title="refinery.lib.scripts.js.analysis.model.SemanticModel.parameter_never_passed" href="../analysis/model.html#refinery.lib.scripts.js.analysis.model.SemanticModel.parameter_never_passed">SemanticModel.parameter_never_passed()</a></code>), so when the
+function starts it holds <code>undefined</code> or its default, as the local it was. The pass makes it a local
+again: the store of a function becomes the declaration of that function, a default a <code>var</code> with
+that value at the top of the body, and a plain parameter a <code>var</code> without one. Only parameters that
+end the list go, since the position of every other one is what a call passes to it.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/js/deobfuscation/unpassed.py#L1-L323" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Put back the declarations an obfuscation moved into the parameter list of a function. It gives a
+function no call passes more arguments to than it declares a parameter for each declaration of its
+body, and writes the declaration as a store the function makes when it starts:
+
+    function parse(source) {               function parse(source, decode) {
+      function decode(n) { ... }             if (!decode) {
+      ...                                      decode = function (n) { ... };
+    }                                        }
+                                             ...
+                                           }
+
+A `var` whose value is made of literals and stands first in the body becomes a parameter with that
+value as its default, `function parse(source, limit = 8)`, and any other `var` a parameter the body
+assigns where the declaration stood.
+
+No call passes such a parameter
+(`refinery.lib.scripts.js.analysis.model.SemanticModel.parameter_never_passed`), so when the
+function starts it holds `undefined` or its default, as the local it was. The pass makes it a local
+again: the store of a function becomes the declaration of that function, a default a `var` with
+that value at the top of the body, and a plain parameter a `var` without one. Only parameters that
+end the list go, since the position of every other one is what a call passes to it.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import NamedTuple
+
+from refinery.lib.scripts import Expression, Node, Statement, set_child_list
+from refinery.lib.scripts.js.analysis.cache import ModelCache, model_cache
+from refinery.lib.scripts.js.analysis.model import (
+    Binding,
+    arguments_aliasing_changes,
+    pattern_identifiers,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    ScriptLevelTransformer,
+    is_literal,
+    walk_scope,
+)
+from refinery.lib.scripts.js.model import (
+    FUNCTION_NODES,
+    JsArrayExpression,
+    JsAssignmentExpression,
+    JsAssignmentPattern,
+    JsBigIntLiteral,
+    JsBinaryExpression,
+    JsBlockStatement,
+    JsCatchClause,
+    JsClassDeclaration,
+    JsConditionalExpression,
+    JsExpressionStatement,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsFunctionNode,
+    JsIdentifier,
+    JsIfStatement,
+    JsLogicalExpression,
+    JsObjectExpression,
+    JsProperty,
+    JsPropertyKind,
+    JsScript,
+    JsUnaryExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+    JsVarKind,
+)
+from refinery.lib.scripts.js.strict import directive_prologue, strict_mode_at
+
+
+def _made_of_literals(node: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* computes its value from literals alone and can neither throw nor run code of the
+    program: an array or object literal of such values with plain keys, a conditional or logical
+    operator over them, `!` or `void` of one, or a primitive made of literals
+    (`_primitive_literal`). Such a value is the same wherever and whenever it is computed, so a
+    generator, which computes its defaults when it is called and its body when it first resumes,
+    computes it the same in either.
+    &#34;&#34;&#34;
+    if isinstance(node, JsArrayExpression):
+        return all(_made_of_literals(element) for element in node.elements)
+    if isinstance(node, JsObjectExpression):
+        return all(
+            isinstance(prop, JsProperty)
+            and not prop.computed
+            and not prop.method
+            and prop.kind is JsPropertyKind.INIT
+            and _made_of_literals(prop.value)
+            for prop in node.properties
+        )
+    if isinstance(node, JsConditionalExpression):
+        return all(_made_of_literals(part) for part in (node.test, node.consequent, node.alternate))
+    if isinstance(node, JsLogicalExpression):
+        return _made_of_literals(node.left) and _made_of_literals(node.right)
+    if isinstance(node, JsUnaryExpression) and node.operator in (&#39;!&#39;, &#39;void&#39;):
+        return _made_of_literals(node.operand)
+    return _primitive_literal(node)
+
+
+def _primitive_literal(node: Node | None) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *node* is a primitive made of literals that no operator over it can throw on: a literal
+    that is no `BigInt`, or `-`, `+` or `~` of one, or a binary operator but `in` and `instanceof`
+    over two of them.
+    &#34;&#34;&#34;
+    if node is None or isinstance(node, JsBigIntLiteral):
+        return False
+    if isinstance(node, JsUnaryExpression) and node.operator in (&#39;-&#39;, &#39;+&#39;, &#39;~&#39;):
+        return _primitive_literal(node.operand)
+    if isinstance(node, JsBinaryExpression):
+        if node.operator in (&#39;in&#39;, &#39;instanceof&#39;):
+            return False
+        return _primitive_literal(node.left) and _primitive_literal(node.right)
+    return is_literal(node)
+
+
+class _Store(NamedTuple):
+    &#34;&#34;&#34;
+    A statement `if (!p) { p = function () {...}; }`, the read of `p` it tests, and the function.
+    &#34;&#34;&#34;
+    statement: JsIfStatement
+    test: JsIdentifier
+    function: JsFunctionExpression
+
+
+class _Local(NamedTuple):
+    &#34;&#34;&#34;
+    A parameter no call passes, by its name: its default, and the store of the function it holds
+    where it holds one. It becomes the declaration of that function in place of the store, or a
+    `var` at the top of the body.
+    &#34;&#34;&#34;
+    name: str
+    default: Expression | None
+    store: _Store | None
+
+    def declaration(self) -&gt; Statement:
+        &#34;&#34;&#34;
+        The declaration the parameter becomes, made of the nodes of the tree when the edit is made.
+        &#34;&#34;&#34;
+        if (store := self.store) is not None:
+            function = store.function
+            return JsFunctionDeclaration(
+                id=JsIdentifier(name=self.name),
+                params=list(function.params),
+                body=function.body,
+                generator=function.generator,
+                is_async=function.is_async,
+            )
+        declarator = JsVariableDeclarator(id=JsIdentifier(name=self.name), init=self.default)
+        return JsVariableDeclaration(kind=JsVarKind.VAR, declarations=[declarator])
+
+
+def _function_store(statement: Statement, binding: Binding, cache: ModelCache) -&gt; _Store | None:
+    &#34;&#34;&#34;
+    The function *statement* stores into the parameter *binding* when the parameter is falsy,
+    `if (!p) { p = function () {...}; }`, where that store is the only write of the parameter.
+    &#34;&#34;&#34;
+    model = cache.model
+    if not isinstance(statement, JsIfStatement) or statement.alternate is not None:
+        return None
+    test = statement.test
+    if (
+        not isinstance(test, JsUnaryExpression)
+        or test.operator != &#39;!&#39;
+        or not isinstance(read := test.operand, JsIdentifier)
+        or model.resolve(read) is not binding
+    ):
+        return None
+    body = statement.consequent
+    if isinstance(body, JsBlockStatement):
+        if len(body.body) != 1:
+            return None
+        body = body.body[0]
+    if (
+        not isinstance(body, JsExpressionStatement)
+        or not isinstance(store := body.expression, JsAssignmentExpression)
+        or store.operator != &#39;=&#39;
+        or not isinstance(target := store.left, JsIdentifier)
+        or not isinstance(function := store.right, JsFunctionExpression)
+        or function.id is not None
+        or binding.writes != [target]
+    ):
+        return None
+    return _Store(statement, read, function)
+
+
+def _tested_names(statements: list[Statement]) -&gt; dict[str, list[JsIfStatement]]:
+    &#34;&#34;&#34;
+    The statements among *statements* that test a plain name for being falsy and have no `else`,
+    `if (!p) ...`, by the name they test: the only statements that can store a function into a
+    parameter (`_function_store`).
+    &#34;&#34;&#34;
+    tested: dict[str, list[JsIfStatement]] = {}
+    for statement in statements:
+        if (
+            isinstance(statement, JsIfStatement)
+            and statement.alternate is None
+            and isinstance(test := statement.test, JsUnaryExpression)
+            and test.operator == &#39;!&#39;
+            and isinstance(read := test.operand, JsIdentifier)
+        ):
+            tested.setdefault(read.name, []).append(statement)
+    return tested
+
+
+def _names_declared_in_the_body(function: JsFunctionNode) -&gt; set[str]:
+    &#34;&#34;&#34;
+    The names the body of *function* declares itself, in any of its blocks or clauses. Annex B
+    copies a block function to the body only where its name is no parameter, and with a default in
+    the list the body&#39;s own `var`s and functions live apart from the parameters; a parameter made a
+    declaration of the body would meet either.
+    &#34;&#34;&#34;
+    declared: set[str] = set()
+    if function.body is None:
+        return declared
+    for node in walk_scope(function.body):
+        if isinstance(node, (JsFunctionDeclaration, JsClassDeclaration)):
+            if node.id is not None:
+                declared.add(node.id.name)
+        elif isinstance(node, JsVariableDeclarator):
+            declared.update(identifier.name for identifier in pattern_identifiers(node.id))
+        elif isinstance(node, JsCatchClause):
+            declared.update(identifier.name for identifier in pattern_identifiers(node.param))
+    return declared
+
+
+def _locals(function: JsFunctionNode, cache: ModelCache) -&gt; list[_Local] | None:
+    &#34;&#34;&#34;
+    The parameters that end the list of *function* and become declarations of its body, last first,
+    or `None` where none does. Every call of the function is one the text shows, the host&#39;s included
+    (`refinery.lib.scripts.js.analysis.model.SemanticModel.reached_only_by_shown_calls`), so
+    nothing else passes them or reads the `length`; a call through a table under a key only the run
+    knows is taken for a call of one of the table&#39;s own entries (`own_keys`), which is how a router
+    of the obfuscation selects them by random keys, while a key that names what every object
+    inherits there is a program made up for it
+    (`TestAnEntryOfATableHandedBackUnderAKeyKnownOnlyAtRuntimeKeepsWhatItIsHanded`). The run is
+    the obfuscation&#39;s only where one of
+    them holds a function stored under `if (!p)`, a shape no author writes; a run of plain or
+    defaulted parameters alone is the shape an optional argument has, and stays. A function whose
+    body tests none of its parameters that way is therefore passed over before the model is asked
+    anything.
+    &#34;&#34;&#34;
+    body = function.body
+    if not isinstance(body, JsBlockStatement):
+        return None
+    statements = body.body[len(directive_prologue(body)):]
+    tested = _tested_names(statements)
+    if not any(
+        isinstance(parameter, JsIdentifier) and parameter.name in tested
+        for parameter in function.params
+    ):
+        return None
+    model = cache.model
+    if not model.reached_only_by_shown_calls(function, own_keys=True):
+        return None
+    declared = _names_declared_in_the_body(function)
+    found: list[_Local] = []
+    for parameter in reversed(function.params):
+        default = None
+        name = parameter
+        if isinstance(parameter, JsAssignmentPattern):
+            name, default = parameter.left, parameter.right
+            if not _made_of_literals(default):
+                break
+        if not isinstance(name, JsIdentifier) or name.name in declared:
+            break
+        binding = model.binding_of(name)
+        if (
+            binding is None
+            or not model.parameter_never_passed(binding, own_keys=True)
+            or model.reflection_can_reach(binding)
+            or model.references(binding, exclude=body)
+        ):
+            break
+        stored = None
+        if default is None:
+            candidates = tested.get(name.name, [])
+            stores = (_function_store(statement, binding, cache) for statement in candidates)
+            stored = next((store for store in stores if store is not None), None)
+        if stored is not None:
+            reads = [read for read in binding.reads if read is not stored.test]
+            if not all(cache.dominance.runs_before(stored.statement, read) for read in reads):
+                break
+        found.append(_Local(name.name, default, stored))
+    if not any(local.store is not None for local in found):
+        return None
+    kept = function.params[:len(function.params) - len(found)]
+    if (
+        kept
+        and arguments_aliasing_changes(function, function.params, kept, strict=strict_mode_at(body))
+    ):
+        return None
+    return found
+
+
+class JsUnpassedParameters(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Make the parameters no call passes that end a parameter list the declarations of the body they
+    were moved out of.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        cache = model_cache(self, node)
+        edits: list[tuple[JsFunctionNode, list[_Local]]] = []
+        with cache.pinned():
+            for function in node.walk():
+                if not isinstance(function, FUNCTION_NODES) or not function.params:
+                    continue
+                if (found := _locals(function, cache)) is not None:
+                    edits.append((function, found))
+        for function, found in edits:
+            body = function.body
+            assert isinstance(body, JsBlockStatement)
+            set_child_list(function, &#39;params&#39;, function.params[:len(function.params) - len(found)])
+            statements = list(body.body)
+            prologue = len(directive_prologue(body))
+            placed = [local.declaration() for local in reversed(found) if local.store is None]
+            for local in found:
+                if local.store is not None:
+                    statements[statements.index(local.store.statement)] = local.declaration()
+            statements[prologue:prologue] = placed
+            set_child_list(body, &#39;body&#39;, statements)
+        if edits:
+            self.mark_changed()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.unpassed.JsUnpassedParameters"><code class="flex name class">
+<span>class <span class="ident">JsUnpassedParameters</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Make the parameters no call passes that end a parameter list the declarations of the body they
+were moved out of.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/js/deobfuscation/unpassed.py#L295-L323" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsUnpassedParameters(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Make the parameters no call passes that end a parameter list the declarations of the body they
+    were moved out of.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        cache = model_cache(self, node)
+        edits: list[tuple[JsFunctionNode, list[_Local]]] = []
+        with cache.pinned():
+            for function in node.walk():
+                if not isinstance(function, FUNCTION_NODES) or not function.params:
+                    continue
+                if (found := _locals(function, cache)) is not None:
+                    edits.append((function, found))
+        for function, found in edits:
+            body = function.body
+            assert isinstance(body, JsBlockStatement)
+            set_child_list(function, &#39;params&#39;, function.params[:len(function.params) - len(found)])
+            statements = list(body.body)
+            prologue = len(directive_prologue(body))
+            placed = [local.declaration() for local in reversed(found) if local.store is None]
+            for local in found:
+                if local.store is not None:
+                    statements[statements.index(local.store.statement)] = local.declaration()
+            statements[prologue:prologue] = placed
+            set_child_list(body, &#39;body&#39;, statements)
+        if edits:
+            self.mark_changed()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.unpassed.JsUnpassedParameters" href="#refinery.lib.scripts.js.deobfuscation.unpassed.JsUnpassedParameters">JsUnpassedParameters</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>

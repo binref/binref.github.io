@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.11.6" />
+<title>the refinery.lib.scripts.js.deobfuscation.iifeaccessor documentation</title>
+<meta name="description" content="On a Mission to Refine Binaries" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow-night-bright.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{background-color:#0D0D0D;color:#EEEEEE;font-size:16pt}@font-face{font-family:"FixedSysEx";src:local('Fixedsys Excelsior 3.01-L2'),local('Fixedsys Excelsior 3.01'),local('FixedSysEx'),url(../../../../FixedSysEx.ttf) format('truetype')}code,pre,body,html{font-family:FixedSysEx,monospace}b,strong{font-weight:normal}#content{padding:20px}#sidebar{padding:1vw;overflow:hidden}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #EEEEEE;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}hr{display:none}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#EE8080;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#EEEEEE}// .title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#BB4040}pre code{background:#000000;display:block;padding:1px 0px 4px 0px;line-height:100%}code{background:#000000;padding:1px 0px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#000000;border:0;border-top:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;margin:1em 0;padding:1ex;overflow-x:auto}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index ul{list-style-type:square;padding:0}// #index h4{font-weight:bold}#index h4 + ul{margin-bottom:.6em}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 10px}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#000000;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#0D0D0D}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#EEEEEE;border-left:5px solid #EEEEEE;padding-left:1em}.inheritance em{font-style:normal}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1ch}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition.note,.admonition.info,.admonition.todo,.admonition.versionadded,.admonition.important,.admonition.tip,.admonition.hint{background:#054000}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#998800}.admonition.error,.admonition.danger,.admonition.caution{background:#300000}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%}#content{width:70%;max-width:100ch;padding:1vw}main{display:flex;flex-direction:row;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #EEEEEE;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>refinery.lib.scripts.js.deobfuscation.iifeaccessor</code></h1>
+</header>
+<section id="section-intro">
+<p>Promote IIFE-bound function accessors to plain function declarations.</p>
+<p>Recognizes the pattern</p>
+<pre><code>var X = function () {
+    var c1 = &lt;literal&gt;;
+    var c2 = &lt;literal-array&gt;;
+    return function (p) { ... uses c1, c2 ... };
+}();
+</code></pre>
+<p>and rewrites it as</p>
+<pre><code>function X(p) {
+    var c1 = &lt;literal&gt;;
+    var c2 = &lt;literal-array&gt;;
+    ... uses c1, c2 ...
+}
+</code></pre>
+<p>This is a common obfuscator pattern where a string-decoding accessor is built once and bound to a
+variable through the result of an IIFE that closes over a constant lookup table and a few scalar
+parameters. <code><a title="refinery.lib.scripts.js.deobfuscation.evaluator.JsFunctionEvaluator" href="evaluator.html#refinery.lib.scripts.js.deobfuscation.evaluator.JsFunctionEvaluator">JsFunctionEvaluator</a></code> only registers
+<code><a title="refinery.lib.scripts.js.model.JsFunctionDeclaration" href="../model.html#refinery.lib.scripts.js.model.JsFunctionDeclaration">JsFunctionDeclaration</a></code> nodes in its scope tree, so call sites like
+<code>X(0x3a2)</code> are otherwise never folded. The rewrite is only applied when the returned function
+assigns no captured variable and only reads through a captured list or object, and no list or
+object such a read answers leaves the call (<code>_closed_over_containers_stay_unchanged</code>); under that
+condition building the captured values afresh at every call computes what the one build the IIFE
+ran did. After the rewrite, the function evaluator folds each call site to its computed string
+literal.</p>
+<p>The declaration has to stand at the top level of a function, a module or a script, exported or
+not, where a function declaration names the scope the declarator named. In a block it would name
+the block, which strict code keeps it in and sloppy code copies it out of (Annex B.3.3), and neither
+is where a <code>var</code>, a <code>let</code> or a <code>const</code> there puts its name.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/js/deobfuscation/iifeaccessor.py#L1-L450" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Promote IIFE-bound function accessors to plain function declarations.
+
+Recognizes the pattern
+
+    var X = function () {
+        var c1 = &lt;literal&gt;;
+        var c2 = &lt;literal-array&gt;;
+        return function (p) { ... uses c1, c2 ... };
+    }();
+
+and rewrites it as
+
+    function X(p) {
+        var c1 = &lt;literal&gt;;
+        var c2 = &lt;literal-array&gt;;
+        ... uses c1, c2 ...
+    }
+
+This is a common obfuscator pattern where a string-decoding accessor is built once and bound to a
+variable through the result of an IIFE that closes over a constant lookup table and a few scalar
+parameters. `refinery.lib.scripts.js.deobfuscation.evaluator.JsFunctionEvaluator` only registers
+`refinery.lib.scripts.js.model.JsFunctionDeclaration` nodes in its scope tree, so call sites like
+`X(0x3a2)` are otherwise never folded. The rewrite is only applied when the returned function
+assigns no captured variable and only reads through a captured list or object, and no list or
+object such a read answers leaves the call (`_closed_over_containers_stay_unchanged`); under that
+condition building the captured values afresh at every call computes what the one build the IIFE
+ran did. After the rewrite, the function evaluator folds each call site to its computed string
+literal.
+
+The declaration has to stand at the top level of a function, a module or a script, exported or
+not, where a function declaration names the scope the declarator named. In a block it would name
+the block, which strict code keeps it in and sloppy code copies it out of (Annex B.3.3), and neither
+is where a `var`, a `let` or a `const` there puts its name.
+&#34;&#34;&#34;
+from __future__ import annotations
+
+from typing import Iterable, Iterator, NamedTuple
+
+from refinery.lib.scripts import (
+    Node,
+    _clone_node,
+    _replace_in_parent,
+)
+from refinery.lib.scripts.js.analysis.cache import ModelCache, model_cache
+from refinery.lib.scripts.js.analysis.model import (
+    FUNCTION_NODES,
+    Binding,
+    ContainerRole,
+    container_reference_role,
+    enclosing_operator,
+    hoists_its_functions,
+)
+from refinery.lib.scripts.js.deobfuscation.helpers import (
+    ScriptLevelTransformer,
+    extract_identifier_params,
+    is_literal,
+    references_receiver_this,
+    walk_receiver_scope,
+    walk_scope,
+)
+from refinery.lib.scripts.js.keys import key_text
+from refinery.lib.scripts.js.model import (
+    JsArrayExpression,
+    JsArrowFunctionExpression,
+    JsAssignmentExpression,
+    JsBlockStatement,
+    JsCallExpression,
+    JsExportNamedDeclaration,
+    JsFunctionDeclaration,
+    JsFunctionExpression,
+    JsIdentifier,
+    JsMemberExpression,
+    JsObjectExpression,
+    JsProperty,
+    JsReturnStatement,
+    JsScript,
+    JsUpdateExpression,
+    JsVariableDeclaration,
+    JsVariableDeclarator,
+    is_async_function,
+    is_generator_function,
+    object_sets_prototype,
+    strip_parens,
+    wraps_return,
+)
+from refinery.lib.scripts.js.strict import directive_prologue
+
+
+def _is_literal_initializer(node: Node | None) -&gt; bool:
+    if node is None:
+        return False
+    if is_literal(node):
+        return True
+    if isinstance(node, JsArrayExpression):
+        return all(el is not None and _is_literal_initializer(el) for el in node.elements)
+    if isinstance(node, JsObjectExpression):
+        for prop in node.properties:
+            if not isinstance(prop, JsProperty):
+                return False
+            if prop.computed and (prop.key is None or not is_literal(prop.key)):
+                return False
+            if prop.value is None or not _is_literal_initializer(prop.value):
+                return False
+        return True
+    return False
+
+
+class _Pattern(NamedTuple):
+    declaration: JsVariableDeclaration
+    name: str
+    closure_decls: list[JsVariableDeclaration]
+    inner_func: JsFunctionExpression | JsArrowFunctionExpression
+
+
+def _detect(declarator: JsVariableDeclarator) -&gt; _Pattern | None:
+    if not isinstance(declarator.id, JsIdentifier):
+        return None
+    declaration = declarator.parent
+    if not isinstance(declaration, JsVariableDeclaration):
+        return None
+    if len(declaration.declarations) != 1:
+        return None
+    statement: Node = declaration
+    if isinstance(statement.parent, JsExportNamedDeclaration):
+        statement = statement.parent
+    if (holder := statement.parent) is None or not hoists_its_functions(holder):
+        return None
+    init = strip_parens(declarator.init)
+    if not isinstance(init, JsCallExpression):
+        return None
+    if init.arguments:
+        return None
+    callee = strip_parens(init.callee)
+    if not isinstance(callee, (JsFunctionExpression, JsArrowFunctionExpression)):
+        return None
+    if wraps_return(callee):
+        return None
+    if callee.params:
+        return None
+    body = callee.body
+    if not isinstance(body, JsBlockStatement) or not body.body:
+        return None
+    closure_decls: list[JsVariableDeclaration] = []
+    inner_func: JsFunctionExpression | JsArrowFunctionExpression | None = None
+    for stmt in body.body:
+        if inner_func is not None:
+            return None
+        if isinstance(stmt, JsVariableDeclaration):
+            for decl in stmt.declarations:
+                if not isinstance(decl, JsVariableDeclarator):
+                    return None
+                if not isinstance(decl.id, JsIdentifier):
+                    return None
+                if not _is_literal_initializer(decl.init):
+                    return None
+            closure_decls.append(stmt)
+            continue
+        if isinstance(stmt, JsReturnStatement):
+            ret_arg = strip_parens(stmt.argument)
+            if not isinstance(ret_arg, (JsFunctionExpression, JsArrowFunctionExpression)):
+                return None
+            if not isinstance(ret_arg.body, JsBlockStatement):
+                return None
+            inner_func = ret_arg
+            continue
+        return None
+    if inner_func is None:
+        return None
+    return _Pattern(declaration, declarator.id.name, closure_decls, inner_func)
+
+
+def _closure_names(closure_decls: list[JsVariableDeclaration]) -&gt; set[str]:
+    names: set[str] = set()
+    for decl in closure_decls:
+        for d in decl.declarations:
+            if isinstance(d, JsVariableDeclarator) and isinstance(d.id, JsIdentifier):
+                names.add(d.id.name)
+    return names
+
+
+def _is_safe_to_promote(
+    inner: JsFunctionExpression | JsArrowFunctionExpression,
+    closure_names: set[str],
+) -&gt; bool:
+    param_names = extract_identifier_params(inner.params)
+    if param_names is None:
+        return False
+    if any(p in closure_names for p in param_names):
+        return False
+    body = inner.body
+    if not isinstance(body, JsBlockStatement):
+        return False
+    inner_name: str | None = None
+    if isinstance(inner, JsFunctionExpression) and isinstance(inner.id, JsIdentifier):
+        inner_name = inner.id.name
+    if references_receiver_this(body):
+        return False
+    for node in walk_receiver_scope(body):
+        if isinstance(node, JsIdentifier) and node.name == &#39;arguments&#39;:
+            return False
+    for node in walk_scope(body):
+        if inner_name is not None and isinstance(node, JsIdentifier) and node.name == inner_name:
+            return False
+    for node in body.walk():
+        if isinstance(node, JsAssignmentExpression):
+            if isinstance(node.left, JsIdentifier) and node.left.name in closure_names:
+                return False
+        if isinstance(node, JsUpdateExpression):
+            if (
+                isinstance(node.argument, JsIdentifier)
+                and node.argument.name in closure_names
+            ):
+                return False
+        if isinstance(node, JsVariableDeclarator):
+            if isinstance(node.id, JsIdentifier) and node.id.name in closure_names:
+                return False
+        if isinstance(node, FUNCTION_NODES) and node is not inner:
+            for p in node.params:
+                if isinstance(p, JsIdentifier) and p.name in closure_names:
+                    return False
+            if (
+                isinstance(node, JsFunctionDeclaration)
+                and isinstance(node.id, JsIdentifier)
+                and node.id.name in closure_names
+            ):
+                return False
+    return True
+
+
+_Container = JsArrayExpression | JsObjectExpression
+
+
+def _containers(values: Iterable[Node]) -&gt; list[_Container]:
+    return [value for value in values if isinstance(value, (JsArrayExpression, JsObjectExpression))]
+
+
+def _held_values(literal: _Container) -&gt; list[Node]:
+    if isinstance(literal, JsArrayExpression):
+        return [element for element in literal.elements if element is not None]
+    return [
+        prop.value for prop in literal.properties
+        if isinstance(prop, JsProperty) and prop.value is not None
+    ]
+
+
+def _containers_within(literal: _Container) -&gt; Iterator[_Container]:
+    yield literal
+    for held in _containers(_held_values(literal)):
+        yield from _containers_within(held)
+
+
+def _values_read_under(literal: _Container, key: str | None) -&gt; list[Node]:
+    &#34;&#34;&#34;
+    The values the closure built that a read of *key* off *literal* may answer: the one it holds
+    under that key, or every one it holds where the key has no text. A key the literal does not hold
+    answers a primitive or a value of the language, such as `length` or a method of a prototype,
+    which no call of the accessor builds.
+    &#34;&#34;&#34;
+    if key is None:
+        return _held_values(literal)
+    if isinstance(literal, JsArrayExpression):
+        if not key.isascii() or not key.isdigit() or str(int(key)) != key:
+            return []
+        index = int(key)
+        elements = literal.elements
+        if index &gt;= len(elements) or (element := elements[index]) is None:
+            return []
+        return [element]
+    return [
+        prop.value for prop in literal.properties
+        if isinstance(prop, JsProperty) and prop.value is not None and key_text(prop) in (key, None)
+    ]
+
+
+def _read_values_stay_in_the_call(cache: ModelCache, binding: Binding, held: list[_Container]) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether no list or object the closure built leaves a call through a reference of *binding*,
+    which holds one of *held* and was already found to be only read through
+    (`refinery.lib.scripts.js.analysis.effects.EffectModel.binding_is_immutable_container`). A
+    reference only tests the binding, reads through it, calls a method on it where *held* holds no
+    list or object, or is the value of a variable that is itself only read through
+    (`_stored_where_it_is_only_read_through`). A read that may answer a list or object of *held* is
+    held to the same rule.
+    &#34;&#34;&#34;
+    holds_containers = any(_containers(_held_values(container)) for container in held)
+    if binding.dynamic_refs and holds_containers:
+        return False
+    for reference in cache.model.references(binding):
+        role = container_reference_role(reference)
+        if role is ContainerRole.VERDICT_READ:
+            continue
+        if role is ContainerRole.MEMBER_CALL and not holds_containers:
+            continue
+        if role is ContainerRole.ESCAPE:
+            if not _stored_where_it_is_only_read_through(cache, reference, held):
+                return False
+            continue
+        if role is not ContainerRole.MEMBER_READ:
+            return False
+        read: Node = reference
+        values: list[Node] = list(held)
+        while (
+            isinstance(member := enclosing_operator(read), JsMemberExpression)
+            and strip_parens(member.object) is read
+        ):
+            key = key_text(member)
+            values = [value for container in _containers(values) for value in _values_read_under(container, key)]
+            read = member
+        if not (answered := _containers(values)):
+            continue
+        if container_reference_role(read) is ContainerRole.VERDICT_READ:
+            continue
+        if not _stored_where_it_is_only_read_through(cache, read, answered):
+            return False
+    return True
+
+
+def _stored_where_it_is_only_read_through(
+    cache: ModelCache,
+    read: Node,
+    answered: list[_Container],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether *read*, which may answer one of the lists or objects *answered*, initializes a variable
+    declared once, written nowhere else and only read through
+    (`refinery.lib.scripts.js.analysis.effects.EffectModel.binding_is_immutable_container`), with no
+    list or object its own references answer leaving the call either. A second declaration with an
+    initializer writes the variable as well, and no binding records it among its writes.
+    &#34;&#34;&#34;
+    declarator = enclosing_operator(read)
+    if not isinstance(declarator, JsVariableDeclarator) or strip_parens(declarator.init) is not read:
+        return False
+    if not isinstance(name := declarator.id, JsIdentifier):
+        return False
+    variable = cache.model.binding_of(name)
+    return (
+        variable is not None
+        and len(variable.declarations) == 1
+        and not variable.writes
+        and cache.effects.binding_is_immutable_container(variable)
+        and _read_values_stay_in_the_call(cache, variable, answered)
+    )
+
+
+def _closed_over_containers_stay_unchanged(
+    cache: ModelCache,
+    closure_decls: list[JsVariableDeclaration],
+) -&gt; bool:
+    &#34;&#34;&#34;
+    Whether every list or object the closure builds stays as it was and inside each call. The IIFE
+    builds such a value once, so what one call writes into it, and its identity, reach the next
+    call, which the promoted declaration starts from a fresh value instead. The list or object a
+    captured variable holds is only read through: never written into or given to a method that may
+    change it
+    (`refinery.lib.scripts.js.analysis.effects.EffectModel.binding_is_immutable_container`), and
+    never handed out, not even to a variable outside the call that is only read through
+    (`_read_values_stay_in_the_call`). A call on a value it holds is vouched for where every such
+    value is a primitive, which no call can change. A list or object it holds is one the closure
+    built as well, so no read may hand one out either; an object literal setting its prototype is
+    declined, because a read of a key it does not hold may then answer a value the prototype holds.
+    &#34;&#34;&#34;
+    for statement in closure_decls:
+        for declarator in statement.declarations:
+            if not isinstance(declarator, JsVariableDeclarator):
+                return False
+            literal = declarator.init
+            if not isinstance(literal, (JsArrayExpression, JsObjectExpression)):
+                continue
+            if not isinstance(name := declarator.id, JsIdentifier):
+                return False
+            if (binding := cache.model.binding_of(name)) is None:
+                return False
+            nested = bool(_containers(_held_values(literal)))
+            inert = None if nested else frozenset()
+            if not cache.effects.binding_is_immutable_container(binding, inert_methods=inert):
+                return False
+            if nested and any(
+                isinstance(container, JsObjectExpression) and object_sets_prototype(container)
+                for container in _containers_within(literal)
+            ):
+                return False
+            if not _read_values_stay_in_the_call(cache, binding, [literal]):
+                return False
+    return True
+
+
+class JsIIFEAccessorPromoter(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Detect accessor variables built from an IIFE that closes over literal lookup tables, and
+    rewrite each one into a plain named function declaration so that the function evaluator can
+    fold its call sites.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        &#34;&#34;&#34;
+        Every accessor is decided against the tree the pass entered on and promoted afterwards, so
+        no decision reads models of a tree an earlier promotion already changed.
+        &#34;&#34;&#34;
+        cache = model_cache(self, node)
+        promotions: list[_Pattern] = []
+        for declarator in list(node.walk()):
+            if not isinstance(declarator, JsVariableDeclarator):
+                continue
+            pattern = _detect(declarator)
+            if pattern is None:
+                continue
+            closure_names = _closure_names(pattern.closure_decls)
+            if not _is_safe_to_promote(pattern.inner_func, closure_names):
+                continue
+            if not _closed_over_containers_stay_unchanged(cache, pattern.closure_decls):
+                continue
+            promotions.append(pattern)
+        for pattern in promotions:
+            self._promote(pattern)
+
+    def _promote(self, pattern: _Pattern) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite the accessor as a function declaration of the same kind, moving the closure&#39;s
+        declarations into the inner function&#39;s body. The kind is carried rather than defaulted: an
+        accessor that was `async` returns a promise and one that was a generator returns an iterator,
+        and a declaration that dropped either would compute a different value — a `yield` left in a
+        body no longer marked `*` does not even parse.
+
+        They go behind that body&#39;s Directive Prologue rather than at its head. A declaration written
+        above a `&#39;use strict&#39;` ends the prologue before it is reached, and the promoted function runs
+        sloppy where the source wrote it strict. Behind the prologue is a position the declarations
+        can always take: a prologue is string literals, which read nothing and so cannot observe a
+        binding that is now introduced after them. That is the reason, and not that the declarations
+        happen to be `var`s — `_detect` accepts any `JsVariableDeclaration`, `let` and `const`
+        included.
+        &#34;&#34;&#34;
+        inner = pattern.inner_func
+        inner_body = inner.body
+        if not isinstance(inner_body, JsBlockStatement):
+            return
+        carried = [_clone_node(s) for s in inner_body.body]
+        prologue = len(directive_prologue(inner_body))
+        new_body_stmts = carried[:prologue]
+        new_body_stmts.extend(_clone_node(d) for d in pattern.closure_decls)
+        new_body_stmts.extend(carried[prologue:])
+        new_func = JsFunctionDeclaration(
+            id=JsIdentifier(name=pattern.name),
+            params=[_clone_node(p) for p in inner.params],
+            body=JsBlockStatement(body=new_body_stmts),
+            generator=is_generator_function(inner),
+            is_async=is_async_function(inner),
+        )
+        _replace_in_parent(pattern.declaration, new_func)
+        self.mark_changed()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="refinery.lib.scripts.js.deobfuscation.iifeaccessor.JsIIFEAccessorPromoter"><code class="flex name class">
+<span>class <span class="ident">JsIIFEAccessorPromoter</span></span>
+</code></dt>
+<dd>
+<section class="desc"><p>Detect accessor variables built from an IIFE that closes over literal lookup tables, and
+rewrite each one into a plain named function declaration so that the function evaluator can
+fold its call sites.</p></section>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+<a href="https://github.com/binref/refinery/blob/ec849d66a55c2d4a63ef427f268f67ad00299e3d/refinery/lib/scripts/js/deobfuscation/iifeaccessor.py#L388-L450" class="git-link">Browse git</a>
+</summary>
+<pre><code class="python">class JsIIFEAccessorPromoter(ScriptLevelTransformer):
+    &#34;&#34;&#34;
+    Detect accessor variables built from an IIFE that closes over literal lookup tables, and
+    rewrite each one into a plain named function declaration so that the function evaluator can
+    fold its call sites.
+    &#34;&#34;&#34;
+
+    def _process_script(self, node: JsScript) -&gt; None:
+        &#34;&#34;&#34;
+        Every accessor is decided against the tree the pass entered on and promoted afterwards, so
+        no decision reads models of a tree an earlier promotion already changed.
+        &#34;&#34;&#34;
+        cache = model_cache(self, node)
+        promotions: list[_Pattern] = []
+        for declarator in list(node.walk()):
+            if not isinstance(declarator, JsVariableDeclarator):
+                continue
+            pattern = _detect(declarator)
+            if pattern is None:
+                continue
+            closure_names = _closure_names(pattern.closure_decls)
+            if not _is_safe_to_promote(pattern.inner_func, closure_names):
+                continue
+            if not _closed_over_containers_stay_unchanged(cache, pattern.closure_decls):
+                continue
+            promotions.append(pattern)
+        for pattern in promotions:
+            self._promote(pattern)
+
+    def _promote(self, pattern: _Pattern) -&gt; None:
+        &#34;&#34;&#34;
+        Rewrite the accessor as a function declaration of the same kind, moving the closure&#39;s
+        declarations into the inner function&#39;s body. The kind is carried rather than defaulted: an
+        accessor that was `async` returns a promise and one that was a generator returns an iterator,
+        and a declaration that dropped either would compute a different value — a `yield` left in a
+        body no longer marked `*` does not even parse.
+
+        They go behind that body&#39;s Directive Prologue rather than at its head. A declaration written
+        above a `&#39;use strict&#39;` ends the prologue before it is reached, and the promoted function runs
+        sloppy where the source wrote it strict. Behind the prologue is a position the declarations
+        can always take: a prologue is string literals, which read nothing and so cannot observe a
+        binding that is now introduced after them. That is the reason, and not that the declarations
+        happen to be `var`s — `_detect` accepts any `JsVariableDeclaration`, `let` and `const`
+        included.
+        &#34;&#34;&#34;
+        inner = pattern.inner_func
+        inner_body = inner.body
+        if not isinstance(inner_body, JsBlockStatement):
+            return
+        carried = [_clone_node(s) for s in inner_body.body]
+        prologue = len(directive_prologue(inner_body))
+        new_body_stmts = carried[:prologue]
+        new_body_stmts.extend(_clone_node(d) for d in pattern.closure_decls)
+        new_body_stmts.extend(carried[prologue:])
+        new_func = JsFunctionDeclaration(
+            id=JsIdentifier(name=pattern.name),
+            params=[_clone_node(p) for p in inner.params],
+            body=JsBlockStatement(body=new_body_stmts),
+            generator=is_generator_function(inner),
+            is_async=is_async_function(inner),
+        )
+        _replace_in_parent(pattern.declaration, new_func)
+        self.mark_changed()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></li>
+<li><a title="refinery.lib.scripts.Transformer" href="../../index.html#refinery.lib.scripts.Transformer">Transformer</a></li>
+<li><a title="refinery.lib.scripts.Visitor" href="../../index.html#refinery.lib.scripts.Visitor">Visitor</a></li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer" href="helpers.html#refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer">ScriptLevelTransformer</a></b></code>:
+<ul class="hlist">
+<li><code><a title="refinery.lib.scripts.js.deobfuscation.helpers.ScriptLevelTransformer.self_converging" href="../../index.html#refinery.lib.scripts.Transformer.self_converging">self_converging</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="refinery.lib.scripts.js.deobfuscation" href="index.html">refinery.lib.scripts.js.deobfuscation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="refinery.lib.scripts.js.deobfuscation.iifeaccessor.JsIIFEAccessorPromoter" href="#refinery.lib.scripts.js.deobfuscation.iifeaccessor.JsIIFEAccessorPromoter">JsIIFEAccessorPromoter</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+hljs.configure({languages: []})
+hljs.initHighlightingOnLoad()
+</script>
+</body>
+</html>
